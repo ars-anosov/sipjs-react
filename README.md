@@ -66,4 +66,11 @@ npm run dev
 cd phone
 npm install
 npm run dev
+
+# Докидываю необходимое
+npm install --save react-redux redux redux-logger redux-thunk
+npm install --save @mui/icons-material
+npm install --save sip.js
+
+# !!! Разобраться configureStore.js : createStore is deprecated.
 ```
