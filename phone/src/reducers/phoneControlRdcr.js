@@ -37,6 +37,7 @@ const initialState = {
   registerDisplay : true,
   phoneHeader     : 'Телефон',
   callerUserNum   : '',
+  regUserPass     : '',
   calleePhoneNum  : '',
   incomeDisplay   : false,
   outgoCallNow    : false,

@@ -127,7 +127,7 @@ function PhoneWin(props) {
   const userAgentOptions = {
     uri,
     authorizationUsername: callerUserNum,
-    authorizationPassword: "cisco"+callerUserNum,
+    authorizationPassword: phoneControlRdcr.regUserPass,
     displayName: "WebRTC user "+callerUserNum,
     hackIpInContact: true,
     transportOptions: {
@@ -202,21 +202,39 @@ function PhoneWin(props) {
     <Typography variant="h6">{phoneControlRdcr.phoneHeader}</Typography>
     <Divider />
 
+    <br />
+
     {phoneControlRdcr.registerDisplay ?
     <Box onSubmit={handleClkRegister}
       component="form"
       autoComplete="off"
     >
+      <Stack direction="row" spacing={2} justifyContent="flex-start">
       <FormControl margin="normal" required fullWidth >
-        <InputLabel htmlFor="callerUserNum">Ваш вн.номер</InputLabel>
+        <InputLabel htmlFor="callerUserNum">User num</InputLabel>
         <Input onChange={phoneControlActions.handleChangeData}
           id="callerUserNum"
           aria-describedby="callerUserNum-helper-text"
           variant="outlined"
           value={callerUserNum}
         />
-        {/* <FormHelperText id="callerUserNum-helper-tex">Зарегистрировать вн.номер на АТС</FormHelperText> */}
+        <FormHelperText id="callerUserNum-helper-tex">Вн.номер</FormHelperText>
       </FormControl>
+      <FormControl margin="normal" required fullWidth >
+        <InputLabel htmlFor="regUserPass">Secret</InputLabel>
+        <Input onChange={phoneControlActions.handleChangeData}
+          id="regUserPass"
+          type="password"
+          aria-describedby="regUserPass-helper-text"
+          variant="outlined"
+          value={phoneControlRdcr.regUserPass}
+        />
+        <FormHelperText id="regUserPass-helper-tex">Пароль</FormHelperText>
+      </FormControl>
+      </Stack>
+
+      <br />
+
       <Stack direction="row" spacing={2} justifyContent="flex-start">
         <ButtonRegister
           type="submit"
@@ -257,24 +275,26 @@ function PhoneWin(props) {
           End
         </ButtonEnd>
       </Stack>
+
+      <br />
+
+      <TableContainer >
+        <Table size="small" aria-label="История звонков">
+          <TableHead>
+            <TableRow>
+              <TableCell>Время</TableCell>
+              <TableCell>Абонент</TableCell>
+              <TableCell align="right">Статус</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {callComonentsArr}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </Box>
     }
-    <br />
 
-    <TableContainer >
-      <Table size="small" aria-label="История звонков">
-        <TableHead>
-          <TableRow>
-            <TableCell>Время</TableCell>
-            <TableCell>Абонент</TableCell>
-            <TableCell align="right">Статус</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {callComonentsArr}
-        </TableBody>
-      </Table>
-    </TableContainer>
 
   </PaperSt>
 
