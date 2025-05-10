@@ -5,13 +5,13 @@ import Box from '@mui/material/Box';
 
 import Copyright from './Copyright';
 
+import Cnt_phone from './containers/Cnt_phone.jsx'
+
 export default function App() {
   return (
     <Container maxWidth="sm">
       <Box sx={{ my: 4 }}>
-        <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
-          WebRTC phone
-        </Typography>
+        <Cnt_phone />
         <Copyright />
       </Box>
     </Container>
