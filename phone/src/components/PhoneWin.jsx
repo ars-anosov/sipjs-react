@@ -14,18 +14,12 @@ import {
   Paper,
   Typography,
   Stack,
-
-  TableContainer,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow
 } from '@mui/material'
 
 import IconLogin from '@mui/icons-material/Login';
 import IconCall from '@mui/icons-material/Call';
 import IconCallEnd from '@mui/icons-material/CallEnd';
+
 
 
 const PaperSt = styled(Paper)(({ theme }) => ({
@@ -54,41 +48,6 @@ const ButtonRegister = styled(Button)(({ theme }) => ({
 import {
   UserAgent,
 } from "sip.js";
-
-
-const dateStrFromTimestamp = function(intStamp, format='ISO', tzone='+03:00') {
-  let dateStr = ''
-
-  if (intStamp) {
-    const dateObj = new Date(intStamp)
-    const dateArr = new Date( dateObj.getTime() - dateObj.getTimezoneOffset() * 60000 ).toISOString().split('T')
-    // toISOString (https://ru.wikipedia.org/wiki/ISO_8601) -> "2011-10-05T14:48:00.000Z"
-    // Часовой пояс всегда равен UTC, что обозначено суффиксом "Z"
-
-    switch (format) {
-      case 'ISO':
-        dateStr = dateArr[0]+'T'+dateArr[1].substring(0, 8)+tzone
-        break
-      case 'date_dig_only':
-        dateStr = dateArr[0].replace(/\-/g, '')
-        break
-
-      case 'time_only':
-        dateStr = dateArr[1].substring(0, 8)
-        break
-
-      case 'mysql':
-        dateStr = dateArr[0]+' '+dateArr[1].substring(0, 8)
-        break
-
-      default:
-        dateStr = dateArr[0]+' '+dateArr[1].substring(0, 8)
-        break
-    }
-  }
-
-  return dateStr
-}
 
 
 
@@ -176,26 +135,6 @@ function PhoneWin(props) {
   }
 
 
-  const handleCallLogClk = (event) => {
-    const textSplit = event.target.textContent.split(" ")
-    phoneControlActions.handleChangeData({'target':{'id':'calleePhoneNum', 'value':textSplit[0]}})
-  }
-
-
-  const callComonentsArr = []
-  for (const row of phoneControlRdcr.callsArr) {
-    callComonentsArr.push(
-      <TableRow
-        key={row.start}
-        sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-      >
-        <TableCell component="th" scope="row"><small>{dateStrFromTimestamp(row.start,'mysql')}</small></TableCell>
-        <TableCell><span onClick={handleCallLogClk}>{row.uri}</span></TableCell>
-        <TableCell align="right"><small>{row.flow + ' ' + row.status}</small></TableCell>
-      </TableRow>
-    )
-  }
-
 
   const finalTemplate =
   <PaperSt elevation={8}>
@@ -275,23 +214,6 @@ function PhoneWin(props) {
           End
         </ButtonEnd>
       </Stack>
-
-      <br />
-
-      <TableContainer >
-        <Table size="small" aria-label="История звонков">
-          <TableHead>
-            <TableRow>
-              <TableCell>Время</TableCell>
-              <TableCell>Абонент</TableCell>
-              <TableCell align="right">Статус</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {callComonentsArr}
-          </TableBody>
-        </Table>
-      </TableContainer>
     </Box>
     }
 

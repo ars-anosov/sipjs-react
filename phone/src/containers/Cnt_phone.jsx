@@ -6,6 +6,7 @@ import { connect }                    from 'react-redux'
 // Components
 import PhoneWin                       from '../components/PhoneWin.jsx'
 import PhoneControl                   from '../components/PhoneControl.jsx'
+import PhoneHistrory                  from '../components/PhoneHistrory.jsx'
 
 // Actions
 import * as phoneControlActions       from '../actions/phoneControlActions.js'
@@ -34,7 +35,7 @@ class Cnt_clientPage extends React.Component {
 
 
 
-  render() { 
+  render() {
     if (process.env.NODE_ENV === 'development') console.log('Cnt_phone render')
     const {
       phoneControlRdcr, phoneControlActions,
@@ -50,6 +51,11 @@ class Cnt_clientPage extends React.Component {
       />
       <br />
       <PhoneWin
+        phoneControlRdcr      = {phoneControlRdcr}
+        phoneControlActions   = {phoneControlActions}
+      />
+      <br />
+      <PhoneHistrory 
         phoneControlRdcr      = {phoneControlRdcr}
         phoneControlActions   = {phoneControlActions}
       />

@@ -12,6 +12,7 @@ export default function App() {
     <Container maxWidth="sm">
       <Box sx={{ my: 4 }}>
         <Cnt_phone />
+        <br />
         <Copyright />
       </Box>
     </Container>
