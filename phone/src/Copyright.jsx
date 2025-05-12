@@ -22,8 +22,8 @@ export default function Copyright() {
       sip.js {pkg.dependencies['sip.js']}
       <br />
       {'Copyright © '}
-      <Link color="inherit" href="https://sbc.pecom.ru/">
-        sbc.pecom.ru
+      <Link color="inherit" href="https://github.com/ars-anosov/sipjs-react">
+        ars
       </Link>{' '}
       {new Date().getFullYear()}.
     </Typography>
