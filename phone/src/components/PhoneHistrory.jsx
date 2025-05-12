@@ -18,7 +18,7 @@ import {
 
 const PaperSt = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(1),
-  maxWidth: '600px'
+  // maxWidth: '600px'
 }))
 
 function dateStrFromTimestamp(intStamp, format='ISO', tzone='+03:00') {

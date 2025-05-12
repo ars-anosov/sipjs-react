@@ -10,6 +10,7 @@ export default function Copyright() {
       variant="body2"
       align="center"
       sx={{
+        'font-size': '11px',
         color: 'text.secondary',
       }}
     >

@@ -24,7 +24,7 @@ import IconCallEnd from '@mui/icons-material/CallEnd';
 
 const PaperSt = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(1),
-  maxWidth: '600px'
+  // maxWidth: '600px'
 }))
 
 const ButtonCall = styled(Button)(({ theme }) => ({
@@ -150,14 +150,14 @@ function PhoneWin(props) {
     >
       <Stack direction="row" spacing={2} justifyContent="flex-start">
       <FormControl margin="normal" required fullWidth >
-        <InputLabel htmlFor="callerUserNum">User num</InputLabel>
+        <InputLabel htmlFor="callerUserNum">Number</InputLabel>
         <Input onChange={phoneControlActions.handleChangeData}
           id="callerUserNum"
           aria-describedby="callerUserNum-helper-text"
           variant="outlined"
           value={callerUserNum}
         />
-        <FormHelperText id="callerUserNum-helper-tex">Вн.номер</FormHelperText>
+        {/* <FormHelperText id="callerUserNum-helper-tex">Вн.номер</FormHelperText> */}
       </FormControl>
       <FormControl margin="normal" required fullWidth >
         <InputLabel htmlFor="regUserPass">Secret</InputLabel>
@@ -168,7 +168,7 @@ function PhoneWin(props) {
           variant="outlined"
           value={phoneControlRdcr.regUserPass}
         />
-        <FormHelperText id="regUserPass-helper-tex">Пароль</FormHelperText>
+        {/* <FormHelperText id="regUserPass-helper-tex">Пароль</FormHelperText> */}
       </FormControl>
       </Stack>
 
@@ -199,6 +199,7 @@ function PhoneWin(props) {
       </FormControl>
       <Stack direction="row" spacing={2} justifyContent="flex-end">
         <ButtonCall
+          color="success"
           type="submit"
           variant="contained"
           startIcon={<IconCall />}
@@ -207,6 +208,7 @@ function PhoneWin(props) {
           { phoneControlRdcr.incomeDisplay ? 'Answer' : 'Call' }
         </ButtonCall>
         <ButtonEnd
+          color="error"
           type="reset"
           variant="contained"
           startIcon={<IconCallEnd />}

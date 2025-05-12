@@ -10,7 +10,13 @@ import Cnt_phone from './containers/Cnt_phone.jsx'
 export default function App() {
   return (
     <Container maxWidth="sm">
-      <Box sx={{ my: 4 }}>
+      <br />
+      <Box sx={{
+        padding: 2,
+        border: '1px dashed grey',
+        borderRadius: 5,
+        }}
+      >
         <Cnt_phone />
         <br />
         <Copyright />

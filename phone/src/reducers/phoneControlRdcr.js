@@ -35,7 +35,7 @@ const initialState = {
   outgoingSession   : undefined,
 
   registerDisplay : true,
-  phoneHeader     : 'Телефон',
+  phoneHeader     : 'Не зарегистрирован',
   callerUserNum   : '',
   regUserPass     : '',
   calleePhoneNum  : '',

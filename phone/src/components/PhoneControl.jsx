@@ -43,7 +43,10 @@ function PhoneControl(props) {
 
 
   const finalTemplate =
-  <Box>
+  <Box sx={{
+    padding: 1,
+    }}
+  >
     <Typography variant='h6'>Телефон</Typography>
     { (phoneControlRdcr.incomeDisplay) ?
       <Stack direction="row" spacing={2} justifyContent="space-evenly">

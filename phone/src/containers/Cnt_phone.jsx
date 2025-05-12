@@ -4,6 +4,7 @@ import { bindActionCreators }         from 'redux'
 import { connect }                    from 'react-redux'
 
 // Components
+import MenuAppBar                     from '../components/MenuAppBar.jsx'
 import PhoneWin                       from '../components/PhoneWin.jsx'
 import PhoneControl                   from '../components/PhoneControl.jsx'
 import PhoneHistrory                  from '../components/PhoneHistrory.jsx'
@@ -13,17 +14,9 @@ import * as phoneControlActions       from '../actions/phoneControlActions.js'
 
 import {
   styled,
+
+  Box
 }                                     from '@mui/material'
-
-
-
-const MainSt = styled('main')(({ theme }) => ({
-  top: 0,
-  left: 0,
-  padding: theme.spacing(1)
-}))
-
-
 
 
 
@@ -44,8 +37,8 @@ class Cnt_clientPage extends React.Component {
 
 
     return (
-    <MainSt>
-      <PhoneControl
+    <Box>
+      <MenuAppBar
         phoneControlRdcr      = {phoneControlRdcr}
         phoneControlActions   = {phoneControlActions}
       />
@@ -59,7 +52,7 @@ class Cnt_clientPage extends React.Component {
         phoneControlRdcr      = {phoneControlRdcr}
         phoneControlActions   = {phoneControlActions}
       />
-    </MainSt>
+    </Box>
     ) 
   } 
 }
