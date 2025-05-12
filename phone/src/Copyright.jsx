@@ -14,14 +14,15 @@ export default function Copyright() {
         color: 'text.secondary',
       }}
     >
-      Powered by
+      powered by
       vite {pkg.devDependencies['vite']},
       react-dom {pkg.dependencies['react-dom']},
       react-redux {pkg.dependencies['react-redux']},
       @mui/material {pkg.dependencies['@mui/material']},
       sip.js {pkg.dependencies['sip.js']}
       <br />
-      {'Copyright © '}
+      <strong>v.{pkg.version}</strong>
+      {' Copyright © '}
       <Link color="inherit" href="https://github.com/ars-anosov/sipjs-react">
         ars
       </Link>{' '}
