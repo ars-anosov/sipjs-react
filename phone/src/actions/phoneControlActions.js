@@ -221,6 +221,15 @@ const handleClkRegister = function(userAgentOptions, sessionOptions) {
     const registererOptions = sessionOptions
     const registerer = new Registerer(userAgent, registererOptions)
 
+    /*
+    * Setup handling for incoming REG replyes
+    */
+    registerer.delegate = {
+      onAccept() {},
+      onReject(response) {
+        console.log(response)
+      }
+    }
 
 
     // ------------------------------------------------------------ Handling Changes in Network State
@@ -392,9 +401,10 @@ const handleClkSubmitOut = (rdcr) => {
     })
     audioLocalOut.play()
 
-    const target = UserAgent.makeURI("sip:"+calleePhoneNum+"@osips.pecom.local");
+    const target = UserAgent.makeURI("sip:"+calleePhoneNum+"@"+window.localStorage.getItem('uas_uri'))
     if (!target) {
-      throw new Error("Failed to create target URI.");
+      // throw new Error("Failed to create target URI.")
+      console.log("Failed to create target URI for:","sip:"+calleePhoneNum+"@"+window.localStorage.getItem('uas_uri'))
     }
 
     const inviter = new Inviter(userAgent, target, sessionOptions)

@@ -78,9 +78,10 @@ function PhoneWin(props) {
   // sipjs --------------------------------------
   let uri = undefined
   if (callerUserNum) {
-    uri = UserAgent.makeURI("sip:"+callerUserNum+"@"+window.localStorage.getItem('uas_uri'));
+    uri = UserAgent.makeURI("sip:"+callerUserNum+"@"+window.localStorage.getItem('uas_uri'))
     if (!uri) {
-      throw new Error("Failed to create URI");
+      // throw new Error("Failed to create URI")
+      console.log("Failed to create UserAgent URI for:","sip:"+callerUserNum+"@"+window.localStorage.getItem('uas_uri'))
     }
   }
 
