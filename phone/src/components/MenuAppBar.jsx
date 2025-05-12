@@ -36,7 +36,7 @@ export default function MenuAppBar(props) {
       phoneControlIcoComponent = <IconSettingsPhone color='warning' />
       break
     case 'Success':
-      phoneControlIcoComponent = <IconDialerSip color='success' />
+      phoneControlIcoComponent = <IconDialerSip color='inherit' />
       break
     case 'Error':
       phoneControlIcoComponent = <IconPhoneDisabled color='error' />

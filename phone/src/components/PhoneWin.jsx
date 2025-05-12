@@ -28,18 +28,19 @@ const PaperSt = styled(Paper)(({ theme }) => ({
 }))
 
 const ButtonCall = styled(Button)(({ theme }) => ({
-  backgroundColor: theme.palette.success.main,
+  // backgroundColor: theme.palette.success.main,
   // marginRight: theme.spacing(2),
-  width: theme.spacing(14),
+  width: theme.spacing(15),
 }))
 const ButtonEnd = styled(Button)(({ theme }) => ({
-  backgroundColor: theme.palette.primary.main,
+  // backgroundColor: theme.palette.primary.main,
   // marginRight: theme.spacing(2),
-  width: theme.spacing(14),
+  width: theme.spacing(15),
 }))
 const ButtonRegister = styled(Button)(({ theme }) => ({
   // backgroundColor: theme.palette.warning.main,
   // marginRight: theme.spacing(2),
+  width: theme.spacing(15),
 }))
 
 
@@ -174,7 +175,7 @@ function PhoneWin(props) {
 
       <br />
 
-      <Stack direction="row" spacing={2} justifyContent="flex-start">
+      <Stack direction="row" spacing={2} justifyContent="flex-end">
         <ButtonRegister
           type="submit"
           variant="contained"
