@@ -221,16 +221,6 @@ const handleClkRegister = function(userAgentOptions, sessionOptions) {
     const registererOptions = sessionOptions
     const registerer = new Registerer(userAgent, registererOptions)
 
-    /*
-    * Setup handling for incoming REG replyes
-    */
-    registerer.delegate = {
-      onAccept() {},
-      onReject(response) {
-        console.log(response)
-      }
-    }
-
 
     // ------------------------------------------------------------ Handling Changes in Network State
     const reconnectionAttempts = 3
@@ -284,7 +274,19 @@ const handleClkRegister = function(userAgentOptions, sessionOptions) {
 
 
     userAgent.delegate.onConnect = () => {
-      registerer.register()
+      registerer.register({
+        requestDelegate: {
+          onAccept(response) {
+            console.log('register.onAccept()',response)
+          },
+          onReject(response) {
+            console.log('register.onReject()',response)
+            // if (response.message.statusCode === 403) {
+            //   reject(response.message)
+            // }
+          },
+        },
+      })
       .then(() => {
         dispatch({
           type: PHONECTL_CONNECT_SUCCESS,
