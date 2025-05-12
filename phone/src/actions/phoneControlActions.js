@@ -277,26 +277,29 @@ const handleClkRegister = function(userAgentOptions, sessionOptions) {
       registerer.register({
         requestDelegate: {
           onAccept(response) {
-            console.log('register.onAccept()',response)
+            // console.log('register.onAccept()',response)
+            dispatch({
+              type: PHONECTL_CONNECT_SUCCESS,
+              payload: {
+                'registerDisplay' : false,
+                'phoneHeader'     : userAgentOptions.authorizationUsername
+              }
+            })
           },
           onReject(response) {
-            console.log('register.onReject()',response)
-            // if (response.message.statusCode === 403) {
-            //   reject(response.message)
-            // }
+            // console.log('register.onReject()',response)
+            dispatch({
+              type: PHONECTL_CONNECT_ERROR,
+              payload: {
+                'registerDisplay' : true,
+                'phoneHeader'     : 'Registration error '+response.message.statusCode+' '+response.message.reasonPhrase
+              }
+            })
           },
         },
       })
-      .then(() => {
-        dispatch({
-          type: PHONECTL_CONNECT_SUCCESS,
-          payload: {
-            'registerDisplay' : false,
-            'phoneHeader'     : userAgentOptions.authorizationUsername
-          }
-        })
-      })
       .catch((e) => {
+        console.log('register.catch()',e)
         dispatch({
           type: PHONECTL_CONNECT_ERROR,
           payload: {
