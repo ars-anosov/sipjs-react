@@ -47,7 +47,7 @@ function PhoneControl(props) {
     padding: 1,
     }}
   >
-    <Typography variant='h6'>Телефон</Typography>
+    <Typography variant='body2'>{"wss://"+window.localStorage.getItem('uas_uri')+":"+window.localStorage.getItem('wss_port')}</Typography>
     { (phoneControlRdcr.incomeDisplay) ?
       <Stack direction="row" spacing={2} justifyContent="space-evenly">
         <IconButton onClick={handleClkSubmitIn}>

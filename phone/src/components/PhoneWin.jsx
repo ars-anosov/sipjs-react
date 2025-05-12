@@ -78,7 +78,7 @@ function PhoneWin(props) {
   // sipjs --------------------------------------
   let uri = undefined
   if (callerUserNum) {
-    uri = UserAgent.makeURI("sip:"+callerUserNum+"@osips.pecom.local");
+    uri = UserAgent.makeURI("sip:"+callerUserNum+"@"+window.localStorage.getItem('uas_uri'));
     if (!uri) {
       throw new Error("Failed to create URI");
     }
@@ -91,7 +91,7 @@ function PhoneWin(props) {
     displayName: "WebRTC user "+callerUserNum,
     hackIpInContact: true,
     transportOptions: {
-      server: "wss://osips.pecom.local:9443"
+      server: "wss://"+window.localStorage.getItem('uas_uri')+":"+window.localStorage.getItem('wss_port')
     },
     logLevel: process.env.NODE_ENV === 'production' ? "error" : "debug"
   }

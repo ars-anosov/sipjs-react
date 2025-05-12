@@ -13,6 +13,10 @@
     <title>WebRTC phone</title>
   </head>
   <body>
+    <script type="text/javascript">
+      window.localStorage.setItem('uas_uri', 'osips.pecom.local')
+      window.localStorage.setItem('wss_port', '9443')
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
