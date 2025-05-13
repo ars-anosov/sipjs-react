@@ -376,7 +376,7 @@ const handleClkSubmitIn = (rdcr) => {
       payload: {
         'incomeDisplay'   : false,
         'incomeCallNow'   : true,
-        'phoneHeader'     : incomingSession.remoteIdentity.uri.raw.user+' &rarr; '+callerUserNum
+        'phoneHeader'     : incomingSession.remoteIdentity.uri.raw.user+' > '+callerUserNum
       }
     })
     audioLocalIn.pause()
@@ -401,7 +401,7 @@ const handleClkSubmitOut = (rdcr) => {
       type: PHONECTL_OUTGO_SUBMIT,
       payload: {
         'outgoCallNow'    : true,
-        'phoneHeader'     : calleePhoneNum+' &larr; '+callerUserNum
+        'phoneHeader'     : calleePhoneNum+' < '+callerUserNum
       }
     })
     audioLocalOut.play()

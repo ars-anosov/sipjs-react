@@ -46,8 +46,8 @@ function MenuAppBar(props) {
   switch (phoneControlRdcr.status) {
     case 'Request':
       icoImgComponent = <IconSettingsPhone />
-      icoBtnColor = 'warning'
-      icoBtnBgColor = 'rgba(255, 165, 0, 0.2)'
+      icoBtnColor = 'inherit'
+      icoBtnBgColor = 'inherit'
       break
     case 'Success':
       icoImgComponent = <IconDialerSip />
@@ -67,18 +67,18 @@ function MenuAppBar(props) {
   }
   if (phoneControlRdcr.incomeDisplay) {
     icoImgComponent = <IconRingVolume />
-    icoBtnColor = 'warning'
-    icoBtnBgColor = 'rgba(255, 255, 255, 0.2)'
+    icoBtnColor = 'error'
+    icoBtnBgColor = 'rgba(255, 165, 0, 0.9)'
   }
   if (phoneControlRdcr.incomeCallNow) {
     icoImgComponent = <IconPhoneEnabled />
     icoBtnColor = 'success'
-    icoBtnBgColor = 'rgba(255, 255, 255, 0.9)'
+    icoBtnBgColor = 'rgba(0, 255, 0, 0.7)'
   }
     if (phoneControlRdcr.outgoCallNow) {
     icoImgComponent = <IconPhoneEnabled />
     icoBtnColor = 'success'
-    icoBtnBgColor = 'rgba(255, 255, 255, 0.9)'
+    icoBtnBgColor = 'rgba(0, 255, 0, 0.7)'
   }
 
   return (
