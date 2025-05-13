@@ -48,6 +48,8 @@ function PhoneControl(props) {
     }}
   >
     <Typography variant='body2'>{"wss://"+window.localStorage.getItem('uas_uri')+":"+window.localStorage.getItem('wss_port')}</Typography>
+    <Divider />
+    <Typography variant='caption'>{phoneControlRdcr.phoneHeader}</Typography>
     { (phoneControlRdcr.incomeDisplay) ?
       <Stack direction="row" spacing={2} justifyContent="space-evenly">
         <IconButton onClick={handleClkSubmitIn}>
@@ -69,8 +71,6 @@ function PhoneControl(props) {
     :
       <span></span>
     }
-    <Divider />
-    <Typography variant='caption'>{phoneControlRdcr.phoneHeader}</Typography>
   </Box>
 
   return finalTemplate

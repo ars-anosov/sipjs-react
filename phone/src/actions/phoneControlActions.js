@@ -292,7 +292,7 @@ const handleClkRegister = function(userAgentOptions, sessionOptions) {
               type: PHONECTL_CONNECT_ERROR,
               payload: {
                 'registerDisplay' : true,
-                'phoneHeader'     : 'Registration error '+response.message.statusCode+' '+response.message.reasonPhrase
+                'phoneHeader'     : 'Registration '+response.message.statusCode+' '+response.message.reasonPhrase
               }
             })
           },
@@ -376,7 +376,7 @@ const handleClkSubmitIn = (rdcr) => {
       payload: {
         'incomeDisplay'   : false,
         'incomeCallNow'   : true,
-        'phoneHeader'     : callerUserNum+' < '+incomingSession.remoteIdentity.uri.raw.user
+        'phoneHeader'     : incomingSession.remoteIdentity.uri.raw.user+' &rarr; '+callerUserNum
       }
     })
     audioLocalIn.pause()
@@ -401,7 +401,7 @@ const handleClkSubmitOut = (rdcr) => {
       type: PHONECTL_OUTGO_SUBMIT,
       payload: {
         'outgoCallNow'    : true,
-        'phoneHeader'     : callerUserNum+' > '+calleePhoneNum
+        'phoneHeader'     : calleePhoneNum+' &larr; '+callerUserNum
       }
     })
     audioLocalOut.play()

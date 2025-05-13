@@ -68,6 +68,7 @@ function MenuAppBar(props) {
   if (phoneControlRdcr.incomeDisplay) {
     icoImgComponent = <IconRingVolume />
     icoBtnColor = 'warning'
+    icoBtnBgColor = 'rgba(255, 255, 255, 0.2)'
   }
   if (phoneControlRdcr.incomeCallNow) {
     icoImgComponent = <IconPhoneEnabled />
@@ -102,7 +103,6 @@ function MenuAppBar(props) {
               {phoneControlRdcr.phoneHeader}
             </Typography>
             <IconButton
-              size="medium"
               aria-label="account of current user"
               aria-controls="menu-appbar"
               aria-haspopup="true"
