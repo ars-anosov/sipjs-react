@@ -1,12 +1,13 @@
 // React main
-import React                          from 'react'
+import * as React from 'react';
+import PropTypes from 'prop-types';
+
 import { bindActionCreators }         from 'redux'
 import { connect }                    from 'react-redux'
 
 // Components
 import MenuAppBar                     from '../components/MenuAppBar.jsx'
-import PhoneWin                       from '../components/PhoneWin.jsx'
-import PhoneControl                   from '../components/PhoneControl.jsx'
+import PhonePad                       from '../components/PhonePad.jsx'
 import PhoneHistrory                  from '../components/PhoneHistrory.jsx'
 
 // Actions
@@ -43,7 +44,7 @@ class Cnt_clientPage extends React.Component {
         phoneControlActions   = {phoneControlActions}
       />
       <br />
-      <PhoneWin
+      <PhonePad
         phoneControlRdcr      = {phoneControlRdcr}
         phoneControlActions   = {phoneControlActions}
       />
@@ -64,6 +65,11 @@ class Cnt_clientPage extends React.Component {
 
 
 
+
+Cnt_clientPage.propTypes = {
+  phoneControlRdcr      : PropTypes.object.isRequired,
+  phoneControlActions   : PropTypes.object.isRequired
+}
 
 function mapStateToProps (state) { 
   //console.log(state) 

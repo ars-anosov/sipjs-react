@@ -1,19 +1,29 @@
 import * as React from 'react';
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
-import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
-import Menu from '@mui/material/Menu';
+import PropTypes from 'prop-types';
 
+import {
+  styled,
+
+  AppBar,
+  Box,
+  Toolbar,
+  Typography,
+  IconButton,
+  Menu,
+} from '@mui/material'
+
+import MenuIcon from '@mui/icons-material/Menu';
 import IconDialerSip from '@mui/icons-material/DialerSip';
 import IconPhoneDisabled from '@mui/icons-material/PhoneDisabled';
 import IconSettingsPhone from '@mui/icons-material/SettingsPhone';
+import IconRingVolume from '@mui/icons-material/RingVolume';
+import IconPhoneEnabled from '@mui/icons-material/PhoneEnabled';
+
 
 import PhoneControl                   from './PhoneControl.jsx'
 
-export default function MenuAppBar(props) {
+
+function MenuAppBar(props) {
   if (process.env.NODE_ENV === 'development') console.log('MenuAppBar hook')
 
   const {
@@ -30,22 +40,44 @@ export default function MenuAppBar(props) {
     setAnchorEl(null);
   };
 
-  let phoneControlIcoComponent = ''
+  let icoImgComponent = <IconDialerSip />
+  let icoBtnColor = 'inherit'
+  let icoBtnBgColor = 'inherit'
   switch (phoneControlRdcr.status) {
     case 'Request':
-      phoneControlIcoComponent = <IconSettingsPhone color='warning' />
+      icoImgComponent = <IconSettingsPhone />
+      icoBtnColor = 'warning'
+      icoBtnBgColor = 'rgba(255, 165, 0, 0.2)'
       break
     case 'Success':
-      phoneControlIcoComponent = <IconDialerSip color='inherit' />
+      icoImgComponent = <IconDialerSip />
+      icoBtnColor = 'inherit'
+      icoBtnBgColor = 'inherit'
       break
     case 'Error':
-      phoneControlIcoComponent = <IconPhoneDisabled color='error' />
+      icoImgComponent = <IconPhoneDisabled />
+      icoBtnColor = 'error'
+      icoBtnBgColor = 'rgba(255, 0, 0, 0.2)'
       break
     case 'Reconnect':
-      phoneControlIcoComponent = <IconSettingsPhone color='warning' />
+      icoImgComponent = <IconSettingsPhone />
+      icoBtnColor = 'warning'
+      icoBtnBgColor = 'rgba(255, 255, 255, 0.2)'
       break
-    default:
-      phoneControlIcoComponent = <IconDialerSip />
+  }
+  if (phoneControlRdcr.incomeDisplay) {
+    icoImgComponent = <IconRingVolume />
+    icoBtnColor = 'warning'
+  }
+  if (phoneControlRdcr.incomeCallNow) {
+    icoImgComponent = <IconPhoneEnabled />
+    icoBtnColor = 'success'
+    icoBtnBgColor = 'rgba(255, 255, 255, 0.9)'
+  }
+    if (phoneControlRdcr.outgoCallNow) {
+    icoImgComponent = <IconPhoneEnabled />
+    icoBtnColor = 'success'
+    icoBtnBgColor = 'rgba(255, 255, 255, 0.9)'
   }
 
   return (
@@ -66,16 +98,19 @@ export default function MenuAppBar(props) {
           </Typography>
 
           <div>
-            {phoneControlRdcr.phoneHeader}
+            <Typography variant="caption" component="span">
+              {phoneControlRdcr.phoneHeader}
+            </Typography>
             <IconButton
-              size="large"
+              size="medium"
               aria-label="account of current user"
               aria-controls="menu-appbar"
               aria-haspopup="true"
               onClick={handleMenu}
-              color="inherit"
+              color={icoBtnColor}
+              sx={{ ml: 1, backgroundColor: icoBtnBgColor }}
             >
-              {phoneControlIcoComponent}
+              {icoImgComponent}
             </IconButton>
             <Menu
               id="menu-appbar"
@@ -104,3 +139,10 @@ export default function MenuAppBar(props) {
     </Box>
   );
 }
+
+MenuAppBar.propTypes = {
+  phoneControlRdcr      : PropTypes.object.isRequired,
+  phoneControlActions   : PropTypes.object.isRequired
+}
+
+export default MenuAppBar

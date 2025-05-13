@@ -1,4 +1,4 @@
-import React, { useState, useEffect} from 'react';
+import * as React from 'react';
 import PropTypes from 'prop-types';
 
 import {
@@ -52,8 +52,8 @@ import {
 
 
 
-function PhoneWin(props) {
-  if (process.env.NODE_ENV === 'development') console.log('PhoneWin hook')
+function PhonePad(props) {
+  if (process.env.NODE_ENV === 'development') console.log('PhonePad hook')
 
   const {
     phoneControlRdcr, phoneControlActions
@@ -63,13 +63,13 @@ function PhoneWin(props) {
 
 
 
-  useEffect(() => {
-    console.log('PhoneWin MOUNT')
+  React.useEffect(() => {
+    console.log('PhonePad MOUNT')
     // Рисую историю звонков из LocalStorage
     phoneControlActions.CallsArrUpdate()
 
     return () => {
-      console.log('PhoneWin UNMOUNT')
+      console.log('PhonePad UNMOUNT')
     }
   }, [])
 
@@ -229,9 +229,9 @@ function PhoneWin(props) {
 
 
 
-PhoneWin.propTypes = {
+PhonePad.propTypes = {
   phoneControlRdcr      : PropTypes.object.isRequired,
   phoneControlActions   : PropTypes.object.isRequired
 }
 
-export default PhoneWin
+export default PhonePad

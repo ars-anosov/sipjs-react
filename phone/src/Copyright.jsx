@@ -9,17 +9,18 @@ export default function Copyright() {
     <Typography
       variant="body2"
       align="center"
+      
       sx={{
-        'font-size': '11px',
+        fontSize: 11,
         color: 'text.secondary',
       }}
     >
       powered by
-      vite {pkg.devDependencies['vite']},
+      sip.js {pkg.dependencies['sip.js']},
       react-dom {pkg.dependencies['react-dom']},
       react-redux {pkg.dependencies['react-redux']},
       @mui/material {pkg.dependencies['@mui/material']},
-      sip.js {pkg.dependencies['sip.js']}
+      vite {pkg.devDependencies['vite']}
       <br />
       <strong>v.{pkg.version}</strong>
       {' Copyright © '}
