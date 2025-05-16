@@ -21,7 +21,9 @@ import {
 } from '../constants/all'
 
 const initialState = {
-  displayBlock    : false,
+  displayPad      : false,
+  displayReg      : true,
+  displayIco      : true,
   status          : '',
 
   userAgentOptions  : undefined,
@@ -33,8 +35,7 @@ const initialState = {
   remoteStream      : undefined,
   incomingSession   : undefined,
   outgoingSession   : undefined,
-
-  registerDisplay : true,
+  
   phoneHeader     : 'Не зарегистрирован',
   callerUserNum   : '',
   regUserPass     : '',
@@ -54,7 +55,7 @@ export default function phoneControlRdcr(state = initialState, action) {
     case PHONECTL_CONNECT_REQUEST:
       return { ...state,
         'status'          : 'Request',
-        'displayBlock'    : true,
+        'displayPad'      : true,
         'userAgent'       : action.payload.userAgent,
         'audioLocalIn'    : action.payload.audioLocalIn,
         'audioLocalOut'   : action.payload.audioLocalOut,
@@ -66,24 +67,24 @@ export default function phoneControlRdcr(state = initialState, action) {
     case PHONECTL_CONNECT_SUCCESS:
       return { ...state,
         'status': 'Success',
-        'displayBlock'    : true,
-        'registerDisplay' : action.payload.registerDisplay,
+        'displayPad'      : true,
+        'displayReg'      : action.payload.displayReg,
         'phoneHeader'     : action.payload.phoneHeader,
       }
 
     case PHONECTL_CONNECT_ERROR:
       return { ...state,
         'status': 'Error',
-        'displayBlock'    : true,
-        'registerDisplay' : action.payload.registerDisplay,
+        'displayPad'      : true,
+        'displayReg'      : action.payload.displayReg,
         'phoneHeader'     : action.payload.phoneHeader,
       }
 
     case PHONECTL_RECONNECT_TRY:
       return { ...state,
         'status': 'Reconnect',
-        'displayBlock'    : true,
-        'registerDisplay' : action.payload.registerDisplay,
+        'displayPad'      : true,
+        'displayReg'      : action.payload.displayReg,
         'phoneHeader'     : action.payload.phoneHeader,
       }
 
@@ -138,7 +139,7 @@ export default function phoneControlRdcr(state = initialState, action) {
       }
 
     case PHONECTL_DISPLAY_BLK:
-      return { ...state, 'displayBlock': action.payload.boolVal }
+      return { ...state, 'displayPad': action.payload.boolVal }
 
     case PHONECTL_USER_INPUT:
       stateClone[action.payload.storeDataKey] = action.payload.storeDataValue

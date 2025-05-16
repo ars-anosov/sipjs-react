@@ -145,7 +145,7 @@ function PhonePad(props) {
 
     <br />
 
-    {phoneControlRdcr.registerDisplay ?
+    {phoneControlRdcr.displayReg ?
     <Box onSubmit={handleClkRegister}
       component="form"
       autoComplete="off"

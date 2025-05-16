@@ -232,6 +232,11 @@ const handleClkRegister = function(userAgentOptions, sessionOptions) {
     let shouldBeConnected = true;
 
     const attemptReconnection = (reconnectionAttempt = 1) => {
+
+      if (!userAgent) {
+        return;
+      }
+
       if (!shouldBeConnected) {
         return;
       }
@@ -247,7 +252,7 @@ const handleClkRegister = function(userAgentOptions, sessionOptions) {
       dispatch({
         type: PHONECTL_RECONNECT_TRY,
         payload: {
-          'registerDisplay' : true,
+          'displayReg'      : true,
           'phoneHeader'     : 'Reconnection'
         }
       })
@@ -281,7 +286,7 @@ const handleClkRegister = function(userAgentOptions, sessionOptions) {
             dispatch({
               type: PHONECTL_CONNECT_SUCCESS,
               payload: {
-                'registerDisplay' : false,
+                'displayReg'      : false,
                 'phoneHeader'     : userAgentOptions.authorizationUsername
               }
             })
@@ -291,10 +296,14 @@ const handleClkRegister = function(userAgentOptions, sessionOptions) {
             dispatch({
               type: PHONECTL_CONNECT_ERROR,
               payload: {
-                'registerDisplay' : true,
-                'phoneHeader'     : 'Registration '+response.message.statusCode+' '+response.message.reasonPhrase
+                'displayReg'      : true,
+                'phoneHeader'     : response.message.statusCode+' '+response.message.reasonPhrase
               }
             })
+            // Принудительно отключаю, чтобы сбросить старые атрибуты user/secret
+            setTimeout(() => {
+              userAgent.stop()
+            }, 1000)
           },
         },
       })
@@ -303,10 +312,14 @@ const handleClkRegister = function(userAgentOptions, sessionOptions) {
         dispatch({
           type: PHONECTL_CONNECT_ERROR,
           payload: {
-            'registerDisplay' : true,
+            'displayReg'      : true,
             'phoneHeader'     : 'Registration error'
           }
         })
+        // Принудительно отключаю, чтобы сбросить старые атрибуты user/secret
+        setTimeout(() => {
+          userAgent.stop()
+        }, 1000)
       })
     }
 
@@ -314,7 +327,7 @@ const handleClkRegister = function(userAgentOptions, sessionOptions) {
       dispatch({
         type: PHONECTL_CONNECT_ERROR,
         payload: {
-          'registerDisplay' : true,
+          'displayReg'      : true,
           'phoneHeader'     : 'Disconnected'
         }
       })
@@ -354,7 +367,7 @@ const handleClkRegister = function(userAgentOptions, sessionOptions) {
       dispatch({
         type: PHONECTL_CONNECT_ERROR,
         payload: {
-          'registerDisplay' : true,
+          'displayReg'      : true,
           'phoneHeader'     : 'SIP proxy WebSocket problem'
         }
       })
