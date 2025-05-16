@@ -311,19 +311,20 @@ const handleClkRegister = function(userAgentOptions, sessionOptions) {
     }
 
     userAgent.delegate.onDisconnect = (error) => {
-      registerer.unregister()
-        .catch((e) => {
-          // Unregister failed
-        })
+      dispatch({
+        type: PHONECTL_CONNECT_ERROR,
+        payload: {
+          'registerDisplay' : true,
+          'phoneHeader'     : 'Disconnected'
+        }
+      })
+      // registerer.unregister()
+      // .catch((e) => {
+      //   console.log('unregister.catch()', e)
+      // })
 
-        dispatch({
-          type: PHONECTL_CONNECT_ERROR,
-          payload: {
-            'registerDisplay' : true,
-            'phoneHeader'     : 'Disconnected'
-          }
-        })
       if (error) {
+        // console.log('userAgent.onDisconnect(error)', error)
         attemptReconnection();
       }
     }

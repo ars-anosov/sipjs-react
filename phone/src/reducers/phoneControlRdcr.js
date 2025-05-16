@@ -89,6 +89,7 @@ export default function phoneControlRdcr(state = initialState, action) {
 
     case PHONECTL_CLK_RESET:
       return { ...state,
+        'status': '',
         'phoneHeader'     : action.payload.phoneHeader,
         'calleePhoneNum'  : action.payload.calleePhoneNum,
         'incomeDisplay'   : action.payload.incomeDisplay,

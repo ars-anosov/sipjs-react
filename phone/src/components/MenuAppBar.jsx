@@ -68,7 +68,7 @@ function MenuAppBar(props) {
   if (phoneControlRdcr.incomeDisplay) {
     icoImgComponent = <IconRingVolume />
     icoBtnColor = 'error'
-    icoBtnBgColor = 'rgba(255, 165, 0, 0.9)'
+    icoBtnBgColor = 'rgba(255, 255, 255, 0.9)'
   }
   if (phoneControlRdcr.incomeCallNow) {
     icoImgComponent = <IconPhoneEnabled />
