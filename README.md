@@ -12,8 +12,8 @@ npm install
 npm run dev
 ```
 
-## phoneReg.jsx
-![component_phoneReg.png](img/component_phoneReg.png)
+## PhoneReg.jsx
+![component_PhoneReg.png](img/component_PhoneReg.png)
 
 ## PhonePad.jsx
 ![component_PhonePad.png](img/component_PhonePad.png)
