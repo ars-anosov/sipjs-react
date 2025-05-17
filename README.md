@@ -4,15 +4,28 @@ WebRTC телефон на базе библиотеки [sipjs](https://sipjs.c
 
 
 # phone
-Готовая сборка лежит в [phone/dist](phone/dist)
+Готовая сборка в [phone/dist](phone/dist)
 
 ```powershell
 cd phone
 npm install
 npm run dev
-
-# !!! Разобраться configureStore.js : createStore is deprecated.
 ```
+
+## phoneReg.jsx
+![component_phoneReg.png](img/component_phoneReg.png)
+
+## PhonePad.jsx
+![component_PhonePad.png](img/component_PhonePad.png)
+
+## PhoneHistory.jsx
+![component_PhoneHistory.png](img/component_PhoneHistory.png)
+
+## PhoneControlIco.jsx
+![component_PhoneControlIco.png](img/component_PhoneControlIco.png)
+
+## PhoneControl.jsx
+![component_PhoneControl.png](img/component_PhoneControl.png)
 
 ## package.json
 Обновиться
