@@ -14,7 +14,7 @@ import {
 
 import MenuIcon from '@mui/icons-material/Menu';
 
-import PhoneIcoBtn                    from './PhoneIcoBtn.jsx'
+import PhoneControlIco                from './PhoneControlIco.jsx'
 import PhoneControl                   from './PhoneControl.jsx'
 
 
@@ -75,7 +75,10 @@ function MenuAppBar(props) {
           <DivStRight>
             {phoneControlRdcr.displayIco ?
               <div popover_flag="phoneControl_id" onClick={handleClickAnchorEl}>
-                <PhoneIcoBtn
+                <Typography variant="caption" component="span">
+                  {phoneControlRdcr.phoneHeader}
+                </Typography>
+                <PhoneControlIco
                   phoneControlRdcr      = {phoneControlRdcr}
                   phoneControlActions   = {phoneControlActions}
                 />

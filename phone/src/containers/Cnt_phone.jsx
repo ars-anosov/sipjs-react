@@ -7,6 +7,7 @@ import { connect }                    from 'react-redux'
 
 // Components
 import MenuAppBar                     from '../components/MenuAppBar.jsx'
+import PhoneReg                       from '../components/PhoneReg.jsx'
 import PhonePad                       from '../components/PhonePad.jsx'
 import PhoneHistrory                  from '../components/PhoneHistrory.jsx'
 
@@ -44,10 +45,17 @@ class Cnt_clientPage extends React.Component {
         phoneControlActions   = {phoneControlActions}
       />
       <br />
+      {phoneControlRdcr.displayReg ?
+      <PhoneReg
+        phoneControlRdcr      = {phoneControlRdcr}
+        phoneControlActions   = {phoneControlActions}
+      />
+      :
       <PhonePad
         phoneControlRdcr      = {phoneControlRdcr}
         phoneControlActions   = {phoneControlActions}
       />
+      }
       <br />
       <PhoneHistrory 
         phoneControlRdcr      = {phoneControlRdcr}

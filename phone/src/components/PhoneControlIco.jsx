@@ -14,8 +14,8 @@ import IconPhoneEnabled from '@mui/icons-material/PhoneEnabled';
 
 
 
-function PhoneIcoBtn(props) {
-  if (process.env.NODE_ENV === 'development') console.log('PhoneIcoBtn hook')
+function PhoneControlIco(props) {
+  if (process.env.NODE_ENV === 'development') console.log('PhoneControlIco hook')
 
   const {
     phoneControlRdcr, phoneControlActions
@@ -63,26 +63,21 @@ function PhoneIcoBtn(props) {
   }
 
   return (
-    <div>
-      <Typography variant="caption" component="span">
-        {phoneControlRdcr.phoneHeader}
-      </Typography>
-      <IconButton
-        aria-label="account of current user"
-        aria-controls="menu-appbar"
-        aria-haspopup="true"
-        color={icoBtnColor}
-        sx={{ ml: 1, backgroundColor: icoBtnBgColor }}
-      >
-        {icoImgComponent}
-      </IconButton>
-    </div>
-  );
+  <IconButton
+    aria-label="account of current user"
+    aria-controls="menu-appbar"
+    aria-haspopup="true"
+    color={icoBtnColor}
+    sx={{ ml: 1, backgroundColor: icoBtnBgColor }}
+  >
+    {icoImgComponent}
+  </IconButton>
+  )
 }
 
-PhoneIcoBtn.propTypes = {
+PhoneControlIco.propTypes = {
   phoneControlRdcr      : PropTypes.object.isRequired,
   phoneControlActions   : PropTypes.object.isRequired
 }
 
-export default PhoneIcoBtn
+export default PhoneControlIco

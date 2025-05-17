@@ -17,8 +17,6 @@ import {
 } from '@mui/material'
 
 import IconLogin from '@mui/icons-material/Login';
-import IconCall from '@mui/icons-material/Call';
-import IconCallEnd from '@mui/icons-material/CallEnd';
 
 
 
@@ -27,17 +25,11 @@ const PaperSt = styled(Paper)(({ theme }) => ({
   // maxWidth: '600px'
 }))
 
-const ButtonCall = styled(Button)(({ theme }) => ({
-  // backgroundColor: theme.palette.success.main,
+const ButtonRegister = styled(Button)(({ theme }) => ({
+  // backgroundColor: theme.palette.warning.main,
   // marginRight: theme.spacing(2),
   width: theme.spacing(15),
 }))
-const ButtonEnd = styled(Button)(({ theme }) => ({
-  // backgroundColor: theme.palette.primary.main,
-  // marginRight: theme.spacing(2),
-  width: theme.spacing(15),
-}))
-
 
 
 // sip.js
@@ -81,24 +73,37 @@ function PhonePad(props) {
     }
   }
 
-
-
-  const handleClkSubmit = (event) => {
-    event.preventDefault()  // Не перезагружать после form Submit
-
-    if (phoneControlRdcr.incomeDisplay) {
-      // Входящий
-      phoneControlActions.handleClkSubmitIn(phoneControlRdcr)
-    }
-    else {
-      // Исходящий
-      phoneControlActions.handleClkSubmitOut(phoneControlRdcr)
-    }
-
+  const userAgentOptions = {
+    uri,
+    authorizationUsername: callerUserNum,
+    authorizationPassword: phoneControlRdcr.regUserPass,
+    displayName: "WebRTC user "+callerUserNum,
+    hackIpInContact: true,
+    transportOptions: {
+      server: "wss://"+window.localStorage.getItem('uas_uri')+":"+window.localStorage.getItem('wss_port')
+    },
+    logLevel: process.env.NODE_ENV === 'production' ? "error" : "debug"
   }
 
-  const handleClkReset = (event) => {
-    phoneControlActions.handleClkReset(phoneControlRdcr.outgoingSession, phoneControlRdcr.incomingSession, callerUserNum)
+  const constrainsDefault = {
+    audio: true,
+    video: false,
+  }
+
+  const sessionOptions = {
+    sessionDescriptionHandlerOptions: {
+      constraints: constrainsDefault,
+    }
+  }
+
+
+
+  const handleClkRegister = (event) => {
+    event.preventDefault()  // Не перезагружать после form Submit
+
+    if (userAgentOptions.authorizationUsername) {
+      phoneControlActions.handleClkRegister(userAgentOptions, sessionOptions)
+    }
   }
 
 
@@ -107,37 +112,45 @@ function PhonePad(props) {
   <PaperSt elevation={8}>
     <Typography variant="h6">{phoneControlRdcr.phoneHeader}</Typography>
     <Divider />
-
-    <Box onSubmit={handleClkSubmit} onReset={handleClkReset}
+    <br />
+    <Box onSubmit={handleClkRegister}
       component="form"
       autoComplete="off"
     >
+      <Stack direction="row" spacing={2} justifyContent="flex-start">
       <FormControl margin="normal" required fullWidth >
-        <InputLabel htmlFor="calleePhoneNum">Номер</InputLabel>
+        <InputLabel htmlFor="callerUserNum">Number</InputLabel>
         <Input onChange={phoneControlActions.handleChangeData}
-          id="calleePhoneNum"
-          aria-describedby="calleePhoneNum-helper-text"
-          value={phoneControlRdcr.calleePhoneNum}
+          id="callerUserNum"
+          aria-describedby="callerUserNum-helper-text"
+          variant="outlined"
+          value={callerUserNum}
         />
+        {/* <FormHelperText id="callerUserNum-helper-tex">Вн.номер</FormHelperText> */}
       </FormControl>
+      <FormControl margin="normal" required fullWidth >
+        <InputLabel htmlFor="regUserPass">Secret</InputLabel>
+        <Input onChange={phoneControlActions.handleChangeData}
+          id="regUserPass"
+          type="password"
+          aria-describedby="regUserPass-helper-text"
+          variant="outlined"
+          value={phoneControlRdcr.regUserPass}
+        />
+        {/* <FormHelperText id="regUserPass-helper-tex">Пароль</FormHelperText> */}
+      </FormControl>
+      </Stack>
+
+      <br />
+
       <Stack direction="row" spacing={2} justifyContent="flex-end">
-        <ButtonCall
-          color="success"
+        <ButtonRegister
           type="submit"
           variant="contained"
-          startIcon={<IconCall />}
-          disabled={phoneControlRdcr.outgoCallNow || phoneControlRdcr.incomeCallNow}
+          startIcon={<IconLogin />}
         >
-          { phoneControlRdcr.incomeDisplay ? 'Answer' : 'Call' }
-        </ButtonCall>
-        <ButtonEnd
-          color="error"
-          type="reset"
-          variant="contained"
-          startIcon={<IconCallEnd />}
-        >
-          End
-        </ButtonEnd>
+          Register
+        </ButtonRegister>
       </Stack>
     </Box>
 
