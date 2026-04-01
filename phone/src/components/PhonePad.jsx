@@ -58,8 +58,6 @@ function PhonePad(props) {
     phoneControlRdcr, phoneControlActions
   } = props
 
-  const callerUserNum     = phoneControlRdcr.callerUserNum
-
 
 
   React.useEffect(() => {
@@ -76,11 +74,11 @@ function PhonePad(props) {
 
   // sipjs --------------------------------------
   let uri = undefined
-  if (callerUserNum) {
-    uri = UserAgent.makeURI("sip:"+callerUserNum+"@"+window.localStorage.getItem('uas_uri'))
+  if (phoneControlRdcr.callerUserNum) {
+    uri = UserAgent.makeURI("sip:"+phoneControlRdcr.callerUserNum+"@"+window.localStorage.getItem('uas_uri'))
     if (!uri) {
       // throw new Error("Failed to create URI")
-      console.log("Failed to create UserAgent URI for:","sip:"+callerUserNum+"@"+window.localStorage.getItem('uas_uri'))
+      console.log("Failed to create UserAgent URI for:","sip:"+phoneControlRdcr.callerUserNum+"@"+phoneControlRdcr.uriHost)
     }
   }
 
@@ -101,7 +99,7 @@ function PhonePad(props) {
   }
 
   const handleClkReset = (event) => {
-    phoneControlActions.handleClkReset(phoneControlRdcr.outgoingSession, phoneControlRdcr.incomingSession, callerUserNum)
+    phoneControlActions.handleClkReset(phoneControlRdcr.outgoingSession, phoneControlRdcr.incomingSession, phoneControlRdcr.callerUserNum, phoneControlRdcr)
   }
 
   const digits = [
@@ -186,7 +184,7 @@ function PhonePad(props) {
 
       <Grid container spacing={2}>
         {digits.map(([digit, letters], index) => (
-          <Grid item xs={4} key={index}>
+          <Grid key={index}>
             <Button
               variant="contained"
               onClick={() => handleDigitClick(digit)}

@@ -38,7 +38,7 @@ function PhoneControl(props) {
   }
 
   function handleClkReset(event) {
-    phoneControlActions.handleClkReset(phoneControlRdcr.outgoingSession, phoneControlRdcr.incomingSession, phoneControlRdcr.callerUserNum)
+    phoneControlActions.handleClkReset(phoneControlRdcr.outgoingSession, phoneControlRdcr.incomingSession, phoneControlRdcr.callerUserNum, phoneControlRdcr)
   }
 
 

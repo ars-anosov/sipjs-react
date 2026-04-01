@@ -487,7 +487,7 @@ const handleClkSubmitOut = function(rdcr) {
           logCall(outgoingSession, 'завершен', 'исх.')
           dispatch(CallsArrUpdate())
           cleanupMedia(audioRemote, audioLocalIn, audioLocalOut)
-          dispatch(handleClkReset(outgoingSession, false, callerUserNum))
+          dispatch(handleClkReset(outgoingSession, false, callerUserNum, rdcr))
           break
         default:
           break
