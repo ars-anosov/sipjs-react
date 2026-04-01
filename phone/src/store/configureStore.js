@@ -3,7 +3,6 @@ import rootReducer from '../reducers/rootReducer'
 
 // Middleware
 import { createLogger } from 'redux-logger'
-import { checkBodyMessage, ping } from '../enhancers/myMiddleWare'
 import { thunk } from 'redux-thunk'
 
 export default function configureStore(initialState) {
@@ -12,7 +11,7 @@ export default function configureStore(initialState) {
   const store = createStore(
     rootReducer,
     initialState,
-    ( process.env.NODE_ENV === 'production' ? applyMiddleware(thunk, checkBodyMessage) : applyMiddleware(thunk, checkBodyMessage, logger) )
+    ( process.env.NODE_ENV === 'production' ? applyMiddleware(thunk) : applyMiddleware(thunk, logger) )
   )
 
   return store

@@ -21,31 +21,33 @@ import {
 } from '../constants/all'
 
 const initialState = {
-  displayPad      : false,
-  displayReg      : true,
-  displayIco      : true,
-  status          : '',
+    userAgentOptions  : null,
+    sessionOptions    : null,
+    userAgent         : null,
+    audioLocalIn      : null,
+    audioLocalOut     : null,
+    audioRemote       : null,
+    remoteStream      : null,
+    incomingSession   : null,
+    outgoingSession   : null,
 
-  userAgentOptions  : undefined,
-  sessionOptions    : undefined,
-  userAgent         : undefined,
-  audioLocalIn      : undefined,
-  audioLocalOut     : undefined,
-  audioRemote       : undefined,
-  remoteStream      : undefined,
-  incomingSession   : undefined,
-  outgoingSession   : undefined,
-  
-  phoneHeader     : 'Не зарегистрирован',
-  callerUserNum   : '',
-  regUserPass     : '',
-  calleePhoneNum  : '',
-  incomeDisplay   : false,
-  outgoCallNow    : false,
-  incomeCallNow   : false,
-
-  callsArr        : []
+    displayReg      : true,
+    displayPad      : false,
+    displayControl  : true,
+    displayHistory  : false,
+    phoneHeader     : 'Не зарегистрирован',
+    uriHost         : localStorage.getItem('uriHost') ? localStorage.getItem('uriHost') : '',
+    wssPort         : localStorage.getItem('wssPort') ? localStorage.getItem('wssPort') : '',
+    callerUserNum   : localStorage.getItem('callerUserNum') ? localStorage.getItem('callerUserNum') : '',
+    regUserPass     : '',
+    calleePhoneNum  : '',
+    incomeDisplay   : false,
+    outgoCallNow    : false,
+    incomeCallNow   : false,
+    regNow          : false,
+    callsArr        : []
 }
+
 
 
 export default function phoneControlRdcr(state = initialState, action) {

@@ -8,8 +8,8 @@
   </head>
   <body>
     <script type="text/javascript">
-      window.localStorage.setItem('uas_uri', 'sbc.pecom.ru')
-      window.localStorage.setItem('wss_port', '9443')
+      if (!localStorage.getItem('uriHost')) localStorage.setItem('uriHost', 'sbc.pecom.ru')
+      if (!localStorage.getItem('wssPort')) localStorage.setItem('wssPort', '9443')
     </script>
     <div id="root"></div>
     <script type="module" src="src/main.jsx"></script>

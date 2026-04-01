@@ -1,13 +1,16 @@
 {
-	"name": "Node24",
-	"image": "node:24-slim",
-	"forwardPorts": [3000],
-	// "build": { "dockerfile": "Dockerfile" },
-	"customizations": {
-		"vscode": {
-			"settings": {
-				"git.enabled": false
-			}
-		}
-	}
+	"name": "Node",
+
+	"build": { "dockerfile": "Dockerfile" },
+
+	// "image": "node:24-slim",
+	// "customizations": {
+	// 	"vscode": {
+	// 		"settings": {
+	// 			"git.enabled": false
+	// 		}
+	// 	}
+	// },
+
+	"forwardPorts": [3000]
 }
