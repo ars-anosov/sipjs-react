@@ -14,9 +14,11 @@ import {
   Paper,
   Typography,
   Stack,
+  IconButton,
 } from '@mui/material'
 
-import IconLogin from '@mui/icons-material/Login';
+import IconLogin from '@mui/icons-material/Login'
+import IconClose from '@mui/icons-material/Close'
 
 
 
@@ -40,24 +42,22 @@ import {
 
 
 
-function PhonePad(props) {
-  if (process.env.NODE_ENV === 'development') console.log('PhonePad hook')
+function PhoneReg(props) {
+  if (process.env.NODE_ENV === 'development') console.log('PhoneReg hook')
 
   const {
     phoneControlRdcr, phoneControlActions
   } = props
 
-  const callerUserNum     = phoneControlRdcr.callerUserNum
-
 
 
   React.useEffect(() => {
-    console.log('PhonePad MOUNT')
+    console.log('PhoneReg MOUNT')
     // Рисую историю звонков из LocalStorage
     phoneControlActions.CallsArrUpdate()
 
     return () => {
-      console.log('PhonePad UNMOUNT')
+      console.log('PhoneReg UNMOUNT')
     }
   }, [])
 
@@ -65,22 +65,22 @@ function PhonePad(props) {
 
   // sipjs --------------------------------------
   let uri = undefined
-  if (callerUserNum) {
-    uri = UserAgent.makeURI("sip:"+callerUserNum+"@"+window.localStorage.getItem('uas_uri'))
+  if (phoneControlRdcr.callerUserNum) {
+    uri = UserAgent.makeURI("sip:"+phoneControlRdcr.callerUserNum+"@"+phoneControlRdcr.uriHost)
     if (!uri) {
       // throw new Error("Failed to create URI")
-      console.log("Failed to create UserAgent URI for:","sip:"+callerUserNum+"@"+window.localStorage.getItem('uas_uri'))
+      console.log("Failed to create UserAgent URI for:","sip:"+phoneControlRdcr.callerUserNum+"@"+phoneControlRdcr.uriHost)
     }
   }
 
   const userAgentOptions = {
     uri,
-    authorizationUsername: callerUserNum,
+    authorizationUsername: phoneControlRdcr.callerUserNum,
     authorizationPassword: phoneControlRdcr.regUserPass,
-    displayName: "WebRTC user "+callerUserNum,
+    displayName: phoneControlRdcr.callerUserNum,
     hackIpInContact: true,
     transportOptions: {
-      server: "wss://"+window.localStorage.getItem('uas_uri')+":"+window.localStorage.getItem('wss_port')
+      server: "wss://"+phoneControlRdcr.uriHost+":"+phoneControlRdcr.wssPort
     },
     logLevel: process.env.NODE_ENV === 'production' ? "error" : "debug"
   }
@@ -98,11 +98,14 @@ function PhonePad(props) {
 
 
 
-  const handleClkRegister = (event) => {
-    event.preventDefault()  // Не перезагружать после form Submit
+  const handleClose = function() {
+    phoneControlActions.handleChangeData({'target':{'id':'displayReg', 'value':false}})
+  }
 
+  const handleRegister = (event) => {
+    event.preventDefault()
     if (userAgentOptions.authorizationUsername) {
-      phoneControlActions.handleClkRegister(userAgentOptions, sessionOptions)
+      phoneControlActions.handleClkRegister(userAgentOptions, sessionOptions, phoneControlRdcr)
     }
   }
 
@@ -110,10 +113,13 @@ function PhonePad(props) {
 
   const finalTemplate =
   <PaperSt elevation={8}>
-    <Typography variant="h6">{phoneControlRdcr.phoneHeader}</Typography>
-    <Divider />
-    <br />
-    <Box onSubmit={handleClkRegister}
+    <Stack direction="row" spacing={2} justifyContent="flex-end">
+      <IconButton onClick={handleClose}>
+        <IconClose color='error' />
+      </IconButton>
+    </Stack>
+
+    <Box onSubmit={handleRegister}
       component="form"
       autoComplete="off"
     >
@@ -124,7 +130,7 @@ function PhonePad(props) {
           id="callerUserNum"
           aria-describedby="callerUserNum-helper-text"
           variant="outlined"
-          value={callerUserNum}
+          value={phoneControlRdcr.callerUserNum}
         />
         {/* <FormHelperText id="callerUserNum-helper-tex">Вн.номер</FormHelperText> */}
       </FormControl>
@@ -138,6 +144,31 @@ function PhonePad(props) {
           value={phoneControlRdcr.regUserPass}
         />
         {/* <FormHelperText id="regUserPass-helper-tex">Пароль</FormHelperText> */}
+      </FormControl>
+      </Stack>
+
+      <br />
+
+      <Stack direction="row" spacing={2} justifyContent="flex-start">
+      <FormControl margin="normal" required fullWidth >
+        <InputLabel htmlFor="uriHost">Host</InputLabel>
+        <Input onChange={phoneControlActions.handleChangeData}
+          id="uriHost"
+          aria-describedby="uriHost-helper-text"
+          variant="outlined"
+          value={phoneControlRdcr.uriHost}
+        />
+        {/* <FormHelperText id="uriHost-helper-tex">Вн.номер</FormHelperText> */}
+      </FormControl>
+      <FormControl margin="normal" required fullWidth >
+        <InputLabel htmlFor="wssPort">Port</InputLabel>
+        <Input onChange={phoneControlActions.handleChangeData}
+          id="wssPort"
+          aria-describedby="wssPort-helper-text"
+          variant="outlined"
+          value={phoneControlRdcr.wssPort}
+        />
+        {/* <FormHelperText id="wssPort-helper-tex">Пароль</FormHelperText> */}
       </FormControl>
       </Stack>
 
@@ -161,9 +192,9 @@ function PhonePad(props) {
 
 
 
-PhonePad.propTypes = {
+PhoneReg.propTypes = {
   phoneControlRdcr      : PropTypes.object.isRequired,
   phoneControlActions   : PropTypes.object.isRequired
 }
 
-export default PhonePad
+export default PhoneReg

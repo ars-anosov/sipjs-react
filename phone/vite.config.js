@@ -10,6 +10,9 @@ export default defineConfig({
   },
   server: {
     port: 3000,
+    watch: {
+      usePolling: true, // Включает опрос для отслеживания изменений в контейнерах/WSL
+    },
   },
   plugins: [react()],
 });

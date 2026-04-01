@@ -1,6 +1,4 @@
 import {
-  PHONECTL_DISPLAY_BLK,
-
   PHONECTL_CONNECT_REQUEST,
   PHONECTL_CONNECT_SUCCESS,
   PHONECTL_CONNECT_ERROR,
@@ -8,7 +6,6 @@ import {
 
   PHONECTL_CLK_RESET,
   PHONECTL_CALLLOG_UPD,
-  PHONECTL_CALEE_NUM,
 
   PHONECTL_INCOME_DISPLAY,
   PHONECTL_INCOME_SUBMIT,
@@ -33,12 +30,12 @@ import {
   UserAgent,
   // UserAgentOptions,
   // InvitationAcceptOptions
-} from "sip.js";
+} from "sip.js"
 
 
 
 // https://sipjs.com/guides/end-call/
-function endCall(session) {
+const endCall = function(session) {
   switch(session.state) {
     case SessionState.Initial:
     case SessionState.Establishing:
@@ -62,7 +59,7 @@ function endCall(session) {
 }
 
 // https://sipjs.com/guides/attach-media/
-function setupRemoteMedia(session, mediaElement, remoteStream) {
+const setupRemoteMedia = function(session, mediaElement, remoteStream) {
   session.sessionDescriptionHandler.peerConnection.getReceivers().forEach((receiver) => {
     if (receiver.track) {
       remoteStream.addTrack(receiver.track);
@@ -72,7 +69,7 @@ function setupRemoteMedia(session, mediaElement, remoteStream) {
   mediaElement.play();
 }
 
-function cleanupMedia(mediaElement, audioLocalIn, audioLocalOut) {
+const cleanupMedia = function(mediaElement, audioLocalIn, audioLocalOut) {
   mediaElement.srcObject = null
   mediaElement.pause()
   audioLocalIn.pause()
@@ -90,17 +87,17 @@ const logCall = function(session, status, direction) {
   if (!calllog) { calllog = {} }
 
   if (!calllog.hasOwnProperty(session.id)) {
-      calllog[log.id] = {
-          id    : log.id,
-          clid  : log.clid,
-          uri   : log.uri,
-          start : log.time,
-          flow  : direction
-      }
+    calllog[log.id] = {
+      id    : log.id,
+      clid  : log.clid,
+      uri   : log.uri,
+      start : log.time,
+      flow  : direction
+    }
   }
 
   if (status === 'завершен') {
-      calllog[log.id].stop = log.time
+    calllog[log.id].stop = log.time
   }
 
   if (status === 'завершен' && calllog[log.id].status === 'звонит') {
@@ -116,20 +113,20 @@ const CallsArrUpdate = function() {
   return (dispatch) => {
     let calllog = JSON.parse(localStorage.getItem('sipCalls'))
     const rows = []
-  
+
     if (calllog !== null) {
       for (const calllogObj in calllog) {
         rows.push(calllog[calllogObj])
       }
     }
-  
+
     // Удаляю первую строчку лога (самую старую)
     if (rows.length > 10) {
       delete calllog[rows[0].id]
       localStorage.setItem('sipCalls', JSON.stringify(calllog))
     }
 
-    rows.sort((a, b) => a.start > b.start ? -1 : 1);
+    rows.sort((a, b) => a.start > b.start ? -1 : 1)
     dispatch({
       type: PHONECTL_CALLLOG_UPD,
       payload: {
@@ -141,8 +138,22 @@ const CallsArrUpdate = function() {
 
 
 
-const handleClkRegister = function(userAgentOptions, sessionOptions) {
+const handleClkRegister = function(userAgentOptions, sessionOptions, rdcr) {
+  const uriHost       = rdcr.uriHost
+  const wssPort       = rdcr.wssPort
+  const callerUserNum = rdcr.callerUserNum
+  const regUserPass   = rdcr.regUserPass
+
+
   return (dispatch) => {
+    // Checks
+    if (!uriHost || !wssPort || !callerUserNum || !regUserPass) {
+      console.log("Not all reg.data!")
+      return
+    }
+    localStorage.setItem('uriHost', uriHost)
+    localStorage.setItem('wssPort', wssPort)
+    localStorage.setItem('callerUserNum', callerUserNum)
 
     const audioLocalIn = new Audio()
     audioLocalIn.preload = 'auto'
@@ -157,7 +168,7 @@ const handleClkRegister = function(userAgentOptions, sessionOptions) {
     const audioRemote = new Audio()
 
     const remoteStream = new MediaStream()
-
+    
     const userAgent = new UserAgent(userAgentOptions)
 
     /*
@@ -195,7 +206,7 @@ const handleClkRegister = function(userAgentOptions, sessionOptions) {
               logCall(incomingSession, 'завершен', 'вх.')
               dispatch(CallsArrUpdate())
               cleanupMedia(audioRemote, audioLocalIn, audioLocalOut)
-              dispatch(handleClkReset(false, incomingSession, userAgentOptions.authorizationUsername))
+              dispatch(handleClkReset(false, incomingSession, userAgentOptions.authorizationUsername, rdcr))
               break;
             default:
               break;
@@ -209,7 +220,7 @@ const handleClkRegister = function(userAgentOptions, sessionOptions) {
           type: PHONECTL_INCOME_DISPLAY,
           payload: {
             'incomeDisplay'   : true,
-            'phoneHeader'     : userAgentOptions.authorizationUsername+' < '+incomingSession.remoteIdentity.uri.raw.user,
+            'phoneHeader'     : incomingSession.remoteIdentity.uri.raw.user+' ⇢ '+userAgentOptions.authorizationUsername,
             'calleePhoneNum'  : incomingSession.remoteIdentity.uri.raw.user
           }
         })
@@ -252,7 +263,6 @@ const handleClkRegister = function(userAgentOptions, sessionOptions) {
       dispatch({
         type: PHONECTL_RECONNECT_TRY,
         payload: {
-          'displayReg'      : true,
           'phoneHeader'     : 'Reconnection'
         }
       })
@@ -261,19 +271,20 @@ const handleClkRegister = function(userAgentOptions, sessionOptions) {
 
       setTimeout(() => {
         if (!shouldBeConnected) {
-          attemptingReconnection = false;
+          attemptingReconnection = false
           return;
         }
         // Attempt reconnect
         userAgent.reconnect()
           .then(() => {
-            attemptingReconnection = false;
+            // console.log('userAgent.reconnect()')
+            attemptingReconnection = false
           })
           .catch((error) => {
-            attemptingReconnection = false;
-            attemptReconnection(++reconnectionAttempt);
+            attemptingReconnection = false
+            attemptReconnection(++reconnectionAttempt)
           });
-      }, reconnectionAttempt === 1 ? 0 : reconnectionDelay * 1000);
+      }, reconnectionAttempt === 1 ? 0 : reconnectionDelay * 1000)
     }
 
 
@@ -286,8 +297,11 @@ const handleClkRegister = function(userAgentOptions, sessionOptions) {
             dispatch({
               type: PHONECTL_CONNECT_SUCCESS,
               payload: {
+                'regNow'          : true,
                 'displayReg'      : false,
-                'phoneHeader'     : userAgentOptions.authorizationUsername
+                'displayPad'      : true,
+                'displayHistory'  : true,
+                'phoneHeader'     : response.message.from.displayName
               }
             })
           },
@@ -296,14 +310,14 @@ const handleClkRegister = function(userAgentOptions, sessionOptions) {
             dispatch({
               type: PHONECTL_CONNECT_ERROR,
               payload: {
-                'displayReg'      : true,
+                'regNow'          : false,
                 'phoneHeader'     : response.message.statusCode+' '+response.message.reasonPhrase
               }
             })
             // Принудительно отключаю, чтобы сбросить старые атрибуты user/secret
             setTimeout(() => {
               userAgent.stop()
-            }, 1000)
+            }, 3000)
           },
         },
       })
@@ -312,14 +326,14 @@ const handleClkRegister = function(userAgentOptions, sessionOptions) {
         dispatch({
           type: PHONECTL_CONNECT_ERROR,
           payload: {
-            'displayReg'      : true,
+            'regNow'          : false,
             'phoneHeader'     : 'Registration error'
           }
         })
         // Принудительно отключаю, чтобы сбросить старые атрибуты user/secret
         setTimeout(() => {
           userAgent.stop()
-        }, 1000)
+        }, 3000)
       })
     }
 
@@ -327,18 +341,17 @@ const handleClkRegister = function(userAgentOptions, sessionOptions) {
       dispatch({
         type: PHONECTL_CONNECT_ERROR,
         payload: {
-          'displayReg'      : true,
           'phoneHeader'     : 'Disconnected'
         }
       })
       // registerer.unregister()
       // .catch((e) => {
       //   console.log('unregister.catch()', e)
-      // })
+      // })      
 
       if (error) {
         // console.log('userAgent.onDisconnect(error)', error)
-        attemptReconnection();
+        attemptReconnection()
       }
     }
 
@@ -367,7 +380,7 @@ const handleClkRegister = function(userAgentOptions, sessionOptions) {
       dispatch({
         type: PHONECTL_CONNECT_ERROR,
         payload: {
-          'displayReg'      : true,
+          'regNow'          : false,
           'phoneHeader'     : 'SIP proxy WebSocket problem'
         }
       })
@@ -378,7 +391,7 @@ const handleClkRegister = function(userAgentOptions, sessionOptions) {
 
 
 
-const handleClkSubmitIn = (rdcr) => {
+const handleClkSubmitIn = function(rdcr) {
   const incomingSession = rdcr.incomingSession
   const sessionOptions  = rdcr.sessionOptions
   const audioLocalIn    = rdcr.audioLocalIn
@@ -390,7 +403,7 @@ const handleClkSubmitIn = (rdcr) => {
       payload: {
         'incomeDisplay'   : false,
         'incomeCallNow'   : true,
-        'phoneHeader'     : incomingSession.remoteIdentity.uri.raw.user+' > '+callerUserNum
+        'phoneHeader'     : incomingSession.remoteIdentity.uri.raw.user+' ⇢ '+callerUserNum
       }
     })
     audioLocalIn.pause()
@@ -400,7 +413,7 @@ const handleClkSubmitIn = (rdcr) => {
 
 
 
-const handleClkSubmitOut = (rdcr) => {
+const handleClkSubmitOut = function(rdcr) {
   const userAgent       = rdcr.userAgent
   const sessionOptions  = rdcr.sessionOptions
   const audioLocalIn    = rdcr.audioLocalIn
@@ -409,25 +422,41 @@ const handleClkSubmitOut = (rdcr) => {
   const calleePhoneNum  = rdcr.calleePhoneNum
   const audioRemote     = rdcr.audioRemote
   const remoteStream    = rdcr.remoteStream
+  const regNow          = rdcr.regNow
 
+
+  // Checks
+  if (!regNow) {
+    console.log("Not Registered state!")
+    return
+  }
+  if (!callerUserNum) {
+    console.log("callerUserNum is empty!")
+    return
+  }
+  if (!calleePhoneNum) {
+    console.log("calleePhoneNum is empty!")
+    return
+  }
+  
+  const target = UserAgent.makeURI("sip:"+calleePhoneNum+"@"+window.localStorage.getItem('uas_uri'))
+  if (!target) {
+    console.log("Failed to create target URI for:","sip:"+calleePhoneNum+"@"+window.localStorage.getItem('uas_uri'))
+    return
+  }
+
+  // do it
   return (dispatch) => {
     dispatch({
       type: PHONECTL_OUTGO_SUBMIT,
       payload: {
         'outgoCallNow'    : true,
-        'phoneHeader'     : calleePhoneNum+' < '+callerUserNum
+        'phoneHeader'     : calleePhoneNum+' ⇠ '+callerUserNum
       }
     })
     audioLocalOut.play()
 
-    const target = UserAgent.makeURI("sip:"+calleePhoneNum+"@"+window.localStorage.getItem('uas_uri'))
-    if (!target) {
-      // throw new Error("Failed to create target URI.")
-      console.log("Failed to create target URI for:","sip:"+calleePhoneNum+"@"+window.localStorage.getItem('uas_uri'))
-    }
-
-    const inviter = new Inviter(userAgent, target, sessionOptions)
-    const outgoingSession = inviter
+    const outgoingSession = new Inviter(userAgent, target, sessionOptions)
     dispatch({
       type: PHONECTL_SESSION_OUT,
       payload: {
@@ -447,24 +476,24 @@ const handleClkSubmitOut = (rdcr) => {
         case SessionState.Establishing:
           logCall(outgoingSession, 'звонит', 'исх.')
           dispatch(CallsArrUpdate())
-          break;
+          break
         case SessionState.Established:
           logCall(outgoingSession, 'разговор', 'исх.')
           dispatch(CallsArrUpdate())
           audioLocalOut.pause()
           setupRemoteMedia(outgoingSession, audioRemote, remoteStream)
-          break;
+          break
         case SessionState.Terminated:
           logCall(outgoingSession, 'завершен', 'исх.')
           dispatch(CallsArrUpdate())
           cleanupMedia(audioRemote, audioLocalIn, audioLocalOut)
           dispatch(handleClkReset(outgoingSession, false, callerUserNum))
-          break;
+          break
         default:
-          break;
+          break
       }
     })
-  
+
     // Send the INVITE request
     outgoingSession.invite()
       .then(() => {
@@ -478,10 +507,15 @@ const handleClkSubmitOut = (rdcr) => {
 
 
 
-const handleClkReset = (outgoingSession, incomingSession, phoneHeader) => {
+const handleClkReset = function(outgoingSession, incomingSession, phoneHeader, rdcr) {
+  const audioLocalIn    = rdcr.audioLocalIn
+  const audioLocalOut   = rdcr.audioLocalOut
+
   return (dispatch) => {
     if (outgoingSession) endCall(outgoingSession)
     if (incomingSession) endCall(incomingSession)
+    if (audioLocalIn) audioLocalIn.pause()
+    if (audioLocalOut) audioLocalOut.pause()
 
     dispatch({
       type: PHONECTL_CLK_RESET,
@@ -498,7 +532,7 @@ const handleClkReset = (outgoingSession, incomingSession, phoneHeader) => {
 
 
 
-function handleChangeData(event) {
+const handleChangeData = function(event) {
   return (dispatch) => {
     dispatch({
       type: PHONECTL_USER_INPUT,
@@ -506,6 +540,7 @@ function handleChangeData(event) {
     })
   }
 }
+
 
 
 export {
