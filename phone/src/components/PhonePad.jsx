@@ -54,19 +54,6 @@ function PhonePad(props) {
 
 
 
-  // (+) sipjs --------------------------------------
-  let uri = undefined
-  if (phoneControlRdcr.callerUserNum) {
-    uri = UserAgent.makeURI("sip:"+phoneControlRdcr.callerUserNum+"@"+phoneControlRdcr.uriHost)
-    if (!uri) {
-      // throw new Error("Failed to create URI")
-      console.log("Failed to create UserAgent URI for:","sip:"+phoneControlRdcr.callerUserNum+"@"+phoneControlRdcr.uriHost)
-    }
-  }
-  // (-) sipjs --------------------------------------
-
-
-
   const handleSubmit = (event) => {
     event.preventDefault()
     if (phoneControlRdcr.incomeDisplay) { // Входящий
@@ -74,7 +61,7 @@ function PhonePad(props) {
     }
     else { // Исходящий
       phoneControlActions.handleChangeData({'target':{'id':'calleePhoneNum', 'value':calleeTxt}})
-      phoneControlActions.handleClkSubmitOut(phoneControlRdcr, calleeTxt)
+      phoneControlActions.handleClkSubmitOut(calleeTxt, phoneControlRdcr)
     }
   }
 

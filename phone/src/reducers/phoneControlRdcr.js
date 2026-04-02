@@ -14,7 +14,9 @@ import {
   PHONECTL_SESSION_IN,
   PHONECTL_SESSION_OUT,
 
-  PHONECTL_USER_INPUT
+  PHONECTL_USER_INPUT,
+
+  PHONECTL_ERROR_ALERT,
 } from '../constants/all'
 
 const initialState = {
@@ -33,6 +35,9 @@ const initialState = {
   displayControl  : true,
   displayHistory  : false,
   phoneHeader     : 'Не зарегистрирован',
+  controlHeader   : 'Не зарегистрирован',
+  errComponent    : '',
+  errText         : '',
   uriHost         : localStorage.getItem('uriHost') ? localStorage.getItem('uriHost') : '',
   wssPort         : localStorage.getItem('wssPort') ? localStorage.getItem('wssPort') : '',
   callerUserNum   : localStorage.getItem('callerUserNum') ? localStorage.getItem('callerUserNum') : '',
@@ -61,6 +66,7 @@ export default function phoneControlRdcr(state = initialState, action) {
         'sessionOptions'    : action.payload.sessionOptions,
         'userAgent'         : action.payload.userAgent,
         'phoneHeader'       : action.payload.phoneHeader,
+        'controlHeader'     : action.payload.controlHeader,
       }
 
     case PHONECTL_CONNECT_SUCCESS:
@@ -70,22 +76,26 @@ export default function phoneControlRdcr(state = initialState, action) {
         'displayPad'      : action.payload.displayPad,
         'displayHistory'  : action.payload.displayHistory,
         'phoneHeader'     : action.payload.phoneHeader,
+        'controlHeader'   : action.payload.controlHeader,
       }
 
     case PHONECTL_CONNECT_ERROR:
       return { ...state,
         'regNow'      : action.payload.regNow,
         'phoneHeader'     : action.payload.phoneHeader,
+        'controlHeader'   : action.payload.controlHeader,
       }
 
     case PHONECTL_RECONNECT_TRY:
       return { ...state,
         'phoneHeader'     : action.payload.phoneHeader,
+        'controlHeader'   : action.payload.controlHeader,
       }
 
     case PHONECTL_CLK_RESET:
       return { ...state,
         'phoneHeader'     : action.payload.phoneHeader,
+        'controlHeader'   : action.payload.controlHeader,
         'calleePhoneNum'  : action.payload.calleePhoneNum,
         'incomeDisplay'   : action.payload.incomeDisplay,
         'incomeCallNow'   : action.payload.outgoCallNow,
@@ -101,20 +111,23 @@ export default function phoneControlRdcr(state = initialState, action) {
       return { ...state,
         'incomeDisplay'   : action.payload.incomeDisplay,
         'phoneHeader'     : action.payload.phoneHeader,
+        'controlHeader'   : action.payload.controlHeader,
         'calleePhoneNum'  : action.payload.calleePhoneNum,
       }
 
     case PHONECTL_INCOME_SUBMIT:
       return { ...state,
-        'incomeDisplay' : action.payload.incomeDisplay,
-        'incomeCallNow' : action.payload.incomeCallNow,
-        'phoneHeader'   : action.payload.phoneHeader,
+        'incomeDisplay'   : action.payload.incomeDisplay,
+        'incomeCallNow'   : action.payload.incomeCallNow,
+        'phoneHeader'     : action.payload.phoneHeader,
+        'controlHeader'   : action.payload.controlHeader,
       }
 
     case PHONECTL_OUTGO_SUBMIT:
       return { ...state,
-        'outgoCallNow'  : action.payload.outgoCallNow,
-        'phoneHeader'   : action.payload.phoneHeader,
+        'outgoCallNow'    : action.payload.outgoCallNow,
+        'phoneHeader'     : action.payload.phoneHeader,
+        'controlHeader'   : action.payload.controlHeader,
       }
 
     case PHONECTL_SESSION_IN:
@@ -128,8 +141,15 @@ export default function phoneControlRdcr(state = initialState, action) {
       }
 
     case PHONECTL_USER_INPUT:
-      stateClone[action.payload.storeDataKey] = action.payload.storeDataValue
-      return stateClone
+      return { ...state,
+        [action.payload.storeDataKey]: action.payload.storeDataValue
+      }
+
+    case PHONECTL_ERROR_ALERT:
+      return { ...state,
+        'errComponent' : action.payload.errComponent,
+        'errText'      : action.payload.errText,
+      }
 
     default:
       return state;

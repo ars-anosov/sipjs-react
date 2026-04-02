@@ -8,17 +8,14 @@ import {
   Paper,
   Stack,
   IconButton,
+  Alert,
+  Collapse,
 } from '@mui/material'
 
 import {
   Login as IconLogin,
   Close as IconClose,
 } from '@mui/icons-material'
-
-// https://github.com/onsip/SIP.js/blob/main/docs/api.md
-import {
-  UserAgent,
-} from "sip.js";
 
 
 
@@ -33,49 +30,11 @@ function PhoneReg(props) {
 
   React.useEffect(() => {
     console.log('PhoneReg MOUNT')
-    // Рисую историю звонков из LocalStorage
-    phoneControlActions.CallsArrUpdate()
 
     return () => {
       console.log('PhoneReg UNMOUNT')
     }
   }, [])
-
-
-
-  // (+) sipjs --------------------------------------
-  let uri = undefined
-  if (phoneControlRdcr.callerUserNum) {
-    uri = UserAgent.makeURI("sip:"+phoneControlRdcr.callerUserNum+"@"+phoneControlRdcr.uriHost)
-    if (!uri) {
-      // throw new Error("Failed to create URI")
-      console.log("Failed to create UserAgent URI for:","sip:"+phoneControlRdcr.callerUserNum+"@"+phoneControlRdcr.uriHost)
-    }
-  }
-
-  const userAgentOptions = {
-    uri,
-    authorizationUsername: phoneControlRdcr.callerUserNum,
-    authorizationPassword: phoneControlRdcr.regUserPass,
-    displayName: phoneControlRdcr.callerUserNum,
-    hackIpInContact: true,
-    transportOptions: {
-      server: "wss://"+phoneControlRdcr.uriHost+":"+phoneControlRdcr.wssPort
-    },
-    logLevel: process.env.NODE_ENV === 'production' ? "error" : "debug"
-  }
-
-  const constrainsDefault = {
-    audio: true,
-    video: false,
-  }
-
-  const sessionOptions = {
-    sessionDescriptionHandlerOptions: {
-      constraints: constrainsDefault,
-    }
-  }
-  // (-) sipjs --------------------------------------
 
 
 
@@ -85,13 +44,19 @@ function PhoneReg(props) {
 
   const handleRegister = (event) => {
     event.preventDefault()
-    if (userAgentOptions.authorizationUsername) {
-      phoneControlActions.handleClkRegister(userAgentOptions, sessionOptions, phoneControlRdcr)
-    }
+    const formData = { callerUserNum, regUserPass, uriHost, wssPort }
+    phoneControlActions.handleClkRegister(formData, phoneControlRdcr)
   }
 
+  const [callerUserNum, setCallerUserNum] = React.useState(phoneControlRdcr.callerUserNum)
+  const [regUserPass, setRegUserPass] = React.useState(phoneControlRdcr.regUserPass)
+  const [uriHost, setUriHost] = React.useState(phoneControlRdcr.uriHost)
+  const [wssPort, setWssPort] = React.useState(phoneControlRdcr.wssPort)
+  const handleChange = (setter) => (event) => {
+    setter(event.target.value);
+  }
 
-
+  // Добавить анимацию алерта TO DO !!!
   const finalTemplate =
   <Paper elevation={8} sx={{ p: 1, mt: 2 }}>
     <Stack direction="row" justifyContent="flex-end">
@@ -116,8 +81,8 @@ function PhoneReg(props) {
             id="callerUserNum"
             label="Number"
             variant="outlined"
-            value={phoneControlRdcr.callerUserNum}
-            onChange={phoneControlActions.handleChangeData}
+            value={callerUserNum}
+            onChange={handleChange(setCallerUserNum)}
           />
           <TextField
             fullWidth
@@ -126,8 +91,8 @@ function PhoneReg(props) {
             label="Secret"
             type="password"
             variant="outlined"
-            value={phoneControlRdcr.regUserPass}
-            onChange={phoneControlActions.handleChangeData}
+            value={regUserPass}
+            onChange={handleChange(setRegUserPass)}
           />
         </Stack>
 
@@ -139,8 +104,8 @@ function PhoneReg(props) {
             id="uriHost"
             label="Host"
             variant="outlined"
-            value={phoneControlRdcr.uriHost}
-            onChange={phoneControlActions.handleChangeData}
+            value={uriHost}
+            onChange={handleChange(setUriHost)}
           />
           <TextField
             fullWidth
@@ -148,8 +113,8 @@ function PhoneReg(props) {
             id="wssPort"
             label="Port"
             variant="outlined"
-            value={phoneControlRdcr.wssPort}
-            onChange={phoneControlActions.handleChangeData}
+            value={wssPort}
+            onChange={handleChange(setWssPort)}
           />
         </Stack>
 
@@ -165,6 +130,10 @@ function PhoneReg(props) {
         </Stack>
       </Stack>
     </Box>
+
+    <Collapse in={phoneControlRdcr.errComponent == 'PhoneReg' && phoneControlRdcr.errText}>
+      <Alert severity="error" sx={{ mt: 2 }}>{phoneControlRdcr.errText}</Alert>
+    </Collapse>
   </Paper>
 
   return finalTemplate

@@ -73,10 +73,10 @@ function MenuAppBar(props) {
           </Typography>
 
           <DivStRight>
-            {phoneControlRdcr.displayIco ?
+            {phoneControlRdcr.displayControl ?
               <div popover_flag="phoneControl_id" onClick={handleClickAnchorEl}>
                 <Typography variant="caption" component="span">
-                  {phoneControlRdcr.phoneHeader}
+                  {phoneControlRdcr.controlHeader}
                 </Typography>
                 <PhoneControlIco
                   phoneControlRdcr      = {phoneControlRdcr}
