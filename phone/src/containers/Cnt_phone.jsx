@@ -44,23 +44,28 @@ class Cnt_clientPage extends React.Component {
         phoneControlRdcr      = {phoneControlRdcr}
         phoneControlActions   = {phoneControlActions}
       />
-      <br />
-      {phoneControlRdcr.displayReg ?
+
+      {phoneControlRdcr.displayReg && (
       <PhoneReg
         phoneControlRdcr      = {phoneControlRdcr}
         phoneControlActions   = {phoneControlActions}
       />
-      :
+      )}
+
+      {phoneControlRdcr.displayPad && (
       <PhonePad
         phoneControlRdcr      = {phoneControlRdcr}
         phoneControlActions   = {phoneControlActions}
+        showInput             = {true}
       />
-      }
-      <br />
+      )}
+
+      {phoneControlRdcr.displayHistory && (
       <PhoneHistrory 
         phoneControlRdcr      = {phoneControlRdcr}
         phoneControlActions   = {phoneControlActions}
       />
+      )}
     </Box>
     ) 
   } 

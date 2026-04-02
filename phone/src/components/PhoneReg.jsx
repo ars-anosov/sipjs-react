@@ -2,39 +2,19 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 
 import {
-  styled,
-
-  Divider,
+  TextField,
   Box,
-  FormControl,
-  FormHelperText,
   Button,
-  Input,
-  InputLabel,
   Paper,
-  Typography,
   Stack,
   IconButton,
 } from '@mui/material'
 
-import IconLogin from '@mui/icons-material/Login'
-import IconClose from '@mui/icons-material/Close'
+import {
+  Login as IconLogin,
+  Close as IconClose,
+} from '@mui/icons-material'
 
-
-
-const PaperSt = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(1),
-  // maxWidth: '600px'
-}))
-
-const ButtonRegister = styled(Button)(({ theme }) => ({
-  // backgroundColor: theme.palette.warning.main,
-  // marginRight: theme.spacing(2),
-  width: theme.spacing(15),
-}))
-
-
-// sip.js
 // https://github.com/onsip/SIP.js/blob/main/docs/api.md
 import {
   UserAgent,
@@ -63,7 +43,7 @@ function PhoneReg(props) {
 
 
 
-  // sipjs --------------------------------------
+  // (+) sipjs --------------------------------------
   let uri = undefined
   if (phoneControlRdcr.callerUserNum) {
     uri = UserAgent.makeURI("sip:"+phoneControlRdcr.callerUserNum+"@"+phoneControlRdcr.uriHost)
@@ -95,6 +75,7 @@ function PhoneReg(props) {
       constraints: constrainsDefault,
     }
   }
+  // (-) sipjs --------------------------------------
 
 
 
@@ -112,80 +93,79 @@ function PhoneReg(props) {
 
 
   const finalTemplate =
-  <PaperSt elevation={8}>
-    <Stack direction="row" spacing={2} justifyContent="flex-end">
+  <Paper elevation={8} sx={{ p: 1, mt: 2 }}>
+    <Stack direction="row" justifyContent="flex-end">
       <IconButton onClick={handleClose}>
-        <IconClose color='error' />
+        <IconClose color="error" />
       </IconButton>
     </Stack>
 
-    <Box onSubmit={handleRegister}
-      component="form"
+    <Box 
+      component="form" 
+      onSubmit={handleRegister} 
+      noValidate 
       autoComplete="off"
     >
-      <Stack direction="row" spacing={2} justifyContent="flex-start">
-      <FormControl margin="normal" required fullWidth >
-        <InputLabel htmlFor="callerUserNum">Number</InputLabel>
-        <Input onChange={phoneControlActions.handleChangeData}
-          id="callerUserNum"
-          aria-describedby="callerUserNum-helper-text"
-          variant="outlined"
-          value={phoneControlRdcr.callerUserNum}
-        />
-        {/* <FormHelperText id="callerUserNum-helper-tex">Вн.номер</FormHelperText> */}
-      </FormControl>
-      <FormControl margin="normal" required fullWidth >
-        <InputLabel htmlFor="regUserPass">Secret</InputLabel>
-        <Input onChange={phoneControlActions.handleChangeData}
-          id="regUserPass"
-          type="password"
-          aria-describedby="regUserPass-helper-text"
-          variant="outlined"
-          value={phoneControlRdcr.regUserPass}
-        />
-        {/* <FormHelperText id="regUserPass-helper-tex">Пароль</FormHelperText> */}
-      </FormControl>
-      </Stack>
+      <Stack spacing={2}>
+        
+        {/* Первый ряд */}
+        <Stack direction="row" spacing={2}>
+          <TextField
+            fullWidth
+            required
+            id="callerUserNum"
+            label="Number"
+            variant="outlined"
+            value={phoneControlRdcr.callerUserNum}
+            onChange={phoneControlActions.handleChangeData}
+          />
+          <TextField
+            fullWidth
+            required
+            id="regUserPass"
+            label="Secret"
+            type="password"
+            variant="outlined"
+            value={phoneControlRdcr.regUserPass}
+            onChange={phoneControlActions.handleChangeData}
+          />
+        </Stack>
 
-      <br />
+        {/* Второй ряд */}
+        <Stack direction="row" spacing={2}>
+          <TextField
+            fullWidth
+            required
+            id="uriHost"
+            label="Host"
+            variant="outlined"
+            value={phoneControlRdcr.uriHost}
+            onChange={phoneControlActions.handleChangeData}
+          />
+          <TextField
+            fullWidth
+            required
+            id="wssPort"
+            label="Port"
+            variant="outlined"
+            value={phoneControlRdcr.wssPort}
+            onChange={phoneControlActions.handleChangeData}
+          />
+        </Stack>
 
-      <Stack direction="row" spacing={2} justifyContent="flex-start">
-      <FormControl margin="normal" required fullWidth >
-        <InputLabel htmlFor="uriHost">Host</InputLabel>
-        <Input onChange={phoneControlActions.handleChangeData}
-          id="uriHost"
-          aria-describedby="uriHost-helper-text"
-          variant="outlined"
-          value={phoneControlRdcr.uriHost}
-        />
-        {/* <FormHelperText id="uriHost-helper-tex">Вн.номер</FormHelperText> */}
-      </FormControl>
-      <FormControl margin="normal" required fullWidth >
-        <InputLabel htmlFor="wssPort">Port</InputLabel>
-        <Input onChange={phoneControlActions.handleChangeData}
-          id="wssPort"
-          aria-describedby="wssPort-helper-text"
-          variant="outlined"
-          value={phoneControlRdcr.wssPort}
-        />
-        {/* <FormHelperText id="wssPort-helper-tex">Пароль</FormHelperText> */}
-      </FormControl>
-      </Stack>
-
-      <br />
-
-      <Stack direction="row" spacing={2} justifyContent="flex-end">
-        <ButtonRegister
-          type="submit"
-          variant="contained"
-          startIcon={<IconLogin />}
-        >
-          Register
-        </ButtonRegister>
+        <Stack direction="row" justifyContent="flex-end">
+          <Button
+            type="submit"
+            variant="contained"
+            startIcon={<IconLogin />}
+            size="large"
+          >
+            Register
+          </Button>
+        </Stack>
       </Stack>
     </Box>
-
-  </PaperSt>
+  </Paper>
 
   return finalTemplate
 }

@@ -16,11 +16,6 @@ import {
   TableRow
 } from '@mui/material'
 
-const PaperSt = styled(Paper)(({ theme }) => ({
-  padding: theme.spacing(1),
-  // maxWidth: '600px'
-}))
-
 function dateStrFromTimestamp(intStamp, format='ISO', tzone='+03:00') {
   let dateStr = ''
 
@@ -98,7 +93,7 @@ function PhoneHistrory(props) {
   }
 
   const finalTemplate =
-  <PaperSt elevation={8}>
+  <Paper elevation={8} sx={{ p: 1, mt: 2 }}>
     <Typography variant="h6">История звонков</Typography>
     <Divider />
 
@@ -117,7 +112,7 @@ function PhoneHistrory(props) {
       </Table>
     </TableContainer>
 
-  </PaperSt>
+  </Paper>
 
   return finalTemplate
 }

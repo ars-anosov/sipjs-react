@@ -413,13 +413,13 @@ const handleClkSubmitIn = function(rdcr) {
 
 
 
-const handleClkSubmitOut = function(rdcr) {
+const handleClkSubmitOut = function(rdcr, calleePhoneNum) {
   const userAgent       = rdcr.userAgent
   const sessionOptions  = rdcr.sessionOptions
   const audioLocalIn    = rdcr.audioLocalIn
   const audioLocalOut   = rdcr.audioLocalOut
   const callerUserNum   = rdcr.callerUserNum
-  const calleePhoneNum  = rdcr.calleePhoneNum
+  // const calleePhoneNum  = rdcr.calleePhoneNum  // Передаю отдельным аргументом т.к. rdcr.calleePhoneNum прилетит позже при след.рендере.
   const audioRemote     = rdcr.audioRemote
   const remoteStream    = rdcr.remoteStream
   const regNow          = rdcr.regNow
