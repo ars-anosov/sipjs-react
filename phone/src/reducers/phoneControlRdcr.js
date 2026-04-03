@@ -58,6 +58,7 @@ export default function phoneControlRdcr(state = initialState, action) {
   switch (action.type) {
     case PHONECTL_CONNECT_REQUEST:
       return { ...state,
+        'status'            : 'Request',
         'audioLocalIn'      : action.payload.audioLocalIn,
         'audioLocalOut'     : action.payload.audioLocalOut,
         'audioRemote'       : action.payload.audioRemote,
@@ -71,6 +72,7 @@ export default function phoneControlRdcr(state = initialState, action) {
 
     case PHONECTL_CONNECT_SUCCESS:
       return { ...state,
+        'status'          : 'Success',
         'regNow'          : action.payload.regNow,
         'displayReg'      : action.payload.displayReg,
         'displayPad'      : action.payload.displayPad,
@@ -81,19 +83,22 @@ export default function phoneControlRdcr(state = initialState, action) {
 
     case PHONECTL_CONNECT_ERROR:
       return { ...state,
-        'regNow'      : action.payload.regNow,
+        'status'          : 'Error',
+        'regNow'          : action.payload.regNow,
         'phoneHeader'     : action.payload.phoneHeader,
         'controlHeader'   : action.payload.controlHeader,
       }
 
     case PHONECTL_RECONNECT_TRY:
       return { ...state,
+        'status'          : 'Reconnect',
         'phoneHeader'     : action.payload.phoneHeader,
         'controlHeader'   : action.payload.controlHeader,
       }
 
     case PHONECTL_CLK_RESET:
       return { ...state,
+        'status'          : '',
         'phoneHeader'     : action.payload.phoneHeader,
         'controlHeader'   : action.payload.controlHeader,
         'calleePhoneNum'  : action.payload.calleePhoneNum,

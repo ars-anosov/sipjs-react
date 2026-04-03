@@ -2,9 +2,6 @@ import { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 
 import {
-  styled,
-
-  Divider,
   Paper,
   Typography,
 
@@ -16,39 +13,7 @@ import {
   TableRow
 } from '@mui/material'
 
-function dateStrFromTimestamp(intStamp, format='ISO', tzone='+03:00') {
-  let dateStr = ''
-
-  if (intStamp) {
-    const dateObj = new Date(intStamp)
-    const dateArr = new Date( dateObj.getTime() - dateObj.getTimezoneOffset() * 60000 ).toISOString().split('T')
-    // toISOString (https://ru.wikipedia.org/wiki/ISO_8601) -> "2011-10-05T14:48:00.000Z"
-    // Часовой пояс всегда равен UTC, что обозначено суффиксом "Z"
-
-    switch (format) {
-      case 'ISO':
-        dateStr = dateArr[0]+'T'+dateArr[1].substring(0, 8)+tzone
-        break
-      case 'date_dig_only':
-        dateStr = dateArr[0].replace(/\-/g, '')
-        break
-
-      case 'time_only':
-        dateStr = dateArr[1].substring(0, 8)
-        break
-
-      case 'mysql':
-        dateStr = dateArr[0]+' '+dateArr[1].substring(0, 8)
-        break
-
-      default:
-        dateStr = dateArr[0]+' '+dateArr[1].substring(0, 8)
-        break
-    }
-  }
-
-  return dateStr
-}
+import { format } from 'date-fns'
 
 
 
@@ -63,7 +28,6 @@ function PhoneHistory(props) {
 
   useEffect(() => {
     console.log('PhoneHistory MOUNT')
-    // Рисую историю звонков из LocalStorage
     phoneControlActions.CallsArrUpdate()
 
     return () => {
@@ -71,9 +35,9 @@ function PhoneHistory(props) {
     }
   }, [])
 
-  const handleCallLogClk = (event) => {
-    const textSplit = event.target.textContent.split(" ")
-    phoneControlActions.handleChangeStore('calleePhoneNum', textSplit[0])
+  const handleCallLogClk = (phoneNum) => {
+    const cleanNum = phoneNum.split(" ")[0]; 
+    phoneControlActions.handleChangeStore('calleePhoneNum', cleanNum);
   }
 
 
@@ -85,8 +49,8 @@ function PhoneHistory(props) {
         key={row.start}
         sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
       >
-        <TableCell component="th" scope="row"><small>{dateStrFromTimestamp(row.start,'mysql')}</small></TableCell>
-        <TableCell><span onClick={handleCallLogClk}>{row.uri}</span></TableCell>
+        <TableCell component="th" scope="row"><small>{row.start ? format(new Date(row.start), 'yyyy-MM-dd HH:mm:ss') : '—'}</small></TableCell>
+        <TableCell><span onClick={() => handleCallLogClk(row.uri)}>{row.uri}</span></TableCell>
         <TableCell align="right"><small>{row.flow + ' ' + row.status}</small></TableCell>
       </TableRow>
     )
@@ -95,7 +59,6 @@ function PhoneHistory(props) {
   const finalTemplate =
   <Paper elevation={8} sx={{ p: 1, mt: 2 }}>
     <Typography variant="h6">История звонков</Typography>
-    <Divider />
 
     <TableContainer >
       <Table size="small" aria-label="История звонков">

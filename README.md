@@ -34,7 +34,7 @@ npm run dev
 npm install --save react react-dom
 npm install --save react-redux redux redux-logger redux-thunk
 npm install --save @mui/material @emotion/react @emotion/styled @mui/icons-material
-npm install --save sip.js
+npm install --save sip.js date-fns
 npm install --save-dev vite @vitejs/plugin-react
 
 # Перепрыгнуть за мажорные версии

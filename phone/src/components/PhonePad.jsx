@@ -15,8 +15,8 @@ import {
 import {
   Backspace     as IconBackspace,
   Phone         as IconPhone, 
-  PhoneInTalk   as IconPhoneRing,
-  PhoneDisabled as IconHangup 
+  RingVolume    as IconPhoneRing,
+  PhoneDisabled as IconHangup,
 } from '@mui/icons-material'
 
 
