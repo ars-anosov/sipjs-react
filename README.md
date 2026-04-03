@@ -1,16 +1,19 @@
 # sipjs-react
 WebRTC телефон на базе библиотеки [sipjs](https://sipjs.com/)
 
+![phone](img/phone.png)
 
-
-# phone
 Готовая сборка в [phone/dist](phone/dist)
 
-```powershell
+```bash
 cd phone
 npm install
-npm run dev
+# npm run dev
+npm run build
 ```
+
+
+# Компоненты
 
 ## PhoneReg.jsx
 ![component_PhoneReg.png](img/component_PhoneReg.png)
@@ -24,13 +27,12 @@ npm run dev
 ## PhoneControlIco.jsx
 ![component_PhoneControlIco.png](img/component_PhoneControlIco.png)
 
-## PhoneControl.jsx
-![component_PhoneControl.png](img/component_PhoneControl.png)
 
-## package.json
-Обновиться
 
-```powershell
+# Пакеты
+Использую Node.js + Vite, см. [tools](tools)
+
+```bash
 npm install --save react react-dom
 npm install --save react-redux redux redux-logger redux-thunk
 npm install --save @mui/material @emotion/react @emotion/styled @mui/icons-material
@@ -40,6 +42,3 @@ npm install --save-dev vite @vitejs/plugin-react
 # Перепрыгнуть за мажорные версии
 npx npm-check-updates
 ```
-
-## tools
-Использую Node.js + Vite, см. [tools](tools)

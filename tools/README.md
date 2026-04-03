@@ -4,7 +4,7 @@
 # Node.js + Vite
 [nodejs.org](https://nodejs.org/en/download), [fnm](https://github.com/Schniz/fnm)
 
-```powershell
+```bash
 winget install Schniz.fnm
 
 fnm list
@@ -26,7 +26,7 @@ node -v
 
 [vite.dev](https://vite.dev/guide/)
 
-```powershell
+```bash
 npm create vite@latest vite-react-app -- --template react
 
 cd vite-react-app
@@ -41,7 +41,7 @@ npm run dev
 
 [mui.com](https://mui.com/material-ui/getting-started/example-projects/), [material-ui-vite](https://github.com/mui/material-ui/tree/master/examples/material-ui-vite)
 
-```powershell
+```bash
 # 200+ MB
 curl https://codeload.github.com/mui/material-ui/tar.gz/master --output material-ui-master.tar.gz
 tar -f material-ui-master.tar.gz -xz --strip=2 material-ui-master/examples/material-ui-vite

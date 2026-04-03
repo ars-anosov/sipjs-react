@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 
 import {
   Box,
+  Stack,
   AppBar,
   Toolbar,
   Typography,
@@ -11,6 +12,8 @@ import {
   Menu,
   MenuItem,
   ListItemText,
+  ListItemIcon,
+  Checkbox,
 } from '@mui/material'
 
 import MenuIcon         from '@mui/icons-material/Menu';
@@ -18,6 +21,13 @@ import PhoneControlIco  from './PhoneControlIco.jsx'
 import PhonePad         from './PhonePad.jsx'
 
 
+
+const MENU_ITEMS = [
+  { key: 'displayReg', primary: 'Карточка регистрации', secondary: 'PhoneReg.jsx' },
+  { key: 'displayPad', primary: 'Телефон с кнопками', secondary: 'PhonePad.jsx' },
+  { key: 'displayHistory', primary: 'История звонков', secondary: 'PhoneHistory.jsx' },
+  { key: 'displayControl', primary: 'Кругляш состояния', secondary: 'PhoneControl.jsx' },
+]
 
 function MenuAppBar(props) {
   const { phoneControlRdcr, phoneControlActions } = props
@@ -52,64 +62,58 @@ function MenuAppBar(props) {
             open={Boolean(anchorEl_mainMenu)}
             onClose={handleCloseMenu}
           >
-            <MenuItem
-              onClick={() => toggleDisplay('displayReg')}
-              selected={phoneControlRdcr.displayReg}
-              sx={{ 
-                opacity: phoneControlRdcr.displayReg ? 1 : 0.5,
-              }}
-            >
-              <ListItemText primary="Карточка регистрации" secondary="PhoneReg.jsx" />
-            </MenuItem>
-            <MenuItem
-              onClick={() => toggleDisplay('displayPad')}
-              selected={phoneControlRdcr.displayPad}
-              sx={{ 
-                opacity: phoneControlRdcr.displayPad ? 1 : 0.5,
-              }}
-            >
-              <ListItemText primary="Телефон с кнопками" secondary="PhonePad.jsx" />
-            </MenuItem>
-            <MenuItem
-              onClick={() => toggleDisplay('displayHistory')}
-              selected={phoneControlRdcr.displayHistory}
-              sx={{ 
-                opacity: phoneControlRdcr.displayHistory ? 1 : 0.5,
-              }}
-            >
-              <ListItemText primary="История звонков" secondary="PhoneHistory.jsx" />
-            </MenuItem>
-            <MenuItem
-              onClick={() => toggleDisplay('displayControl')}
-              selected={phoneControlRdcr.displayControl}
-              sx={{ 
-                opacity: phoneControlRdcr.displayControl ? 1 : 0.5,
-              }}
-            >
-              <ListItemText primary="Кругляш состояния" secondary="PhoneControl.jsx" />
-            </MenuItem>
+            {MENU_ITEMS.map((item) => {
+              return (
+                <MenuItem
+                  key={item.key}
+                  onClick={() => toggleDisplay(item.key)}
+                  selected={phoneControlRdcr[item.key]}
+                  sx={{ 
+                    // Немного приглушаем текст, если не выбрано
+                    opacity: phoneControlRdcr[item.key] ? 1 : 0.7, 
+                    py: 1 
+                  }}
+                >
+                  <ListItemIcon>
+                    <Checkbox
+                      edge="start"
+                      checked={phoneControlRdcr[item.key]}
+                      tabIndex={-1}
+                      disableRipple
+                      size="small"
+                    />
+                  </ListItemIcon>
+                  <ListItemText 
+                    primary={item.primary} 
+                    secondary={item.secondary} 
+                  />
+                </MenuItem>
+              )
+            })}
           </Menu>
 
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             WebRTC
           </Typography>
 
-          <Box sx={{ flexGrow: 1, textAlign: 'right' }}>
-            {phoneControlRdcr.displayControl && (
-              <div 
-                style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center' }} 
-                onClick={(e) => setAnchorEl_phoneControl(e.currentTarget)}
-              >
-                <Typography variant="caption" sx={{ mr: 1 }}>
-                  {phoneControlRdcr.controlHeader}
-                </Typography>
-                <PhoneControlIco
-                  phoneControlRdcr={phoneControlRdcr}
-                  phoneControlActions={phoneControlActions}
-                />
-              </div>
-            )}
-          </Box>
+          {phoneControlRdcr.displayControl && (
+            <Stack 
+              direction="row" 
+              spacing={1} 
+              alignItems="center" 
+              sx={{ cursor: 'pointer' }}
+              onClick={(e) => setAnchorEl_phoneControl(e.currentTarget)}
+            >
+              <Typography variant="caption" sx={{ mr: 1 }}>
+                {phoneControlRdcr.controlHeader}
+              </Typography>
+              <PhoneControlIco
+                phoneControlRdcr={phoneControlRdcr}
+                phoneControlActions={phoneControlActions}
+              />
+            </Stack>
+          )}
+
         </Toolbar>
       </AppBar>
 
