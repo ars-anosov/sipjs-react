@@ -1,5 +1,5 @@
-import * as React from 'react';
-import PropTypes from 'prop-types';
+import { useState, useEffect } from 'react'
+import PropTypes from 'prop-types'
 
 import {
   styled,
@@ -33,7 +33,7 @@ function MenuAppBar(props) {
     phoneControlRdcr, phoneControlActions
   } = props
 
-  React.useEffect(() => {
+  useEffect(() => {
     console.log('MenuAppBar MOUNT')
     return () => {
       console.log('MenuAppBar UNMOUNT')
@@ -42,7 +42,7 @@ function MenuAppBar(props) {
   }, [])
 
 
-  const [anchorEl_phoneControl, setAnchorEl_phoneControl] = React.useState(null)
+  const [anchorEl_phoneControl, setAnchorEl_phoneControl] = useState(null)
 
   function handleClickAnchorEl(event) {
     if ( event.currentTarget.getAttribute('popover_flag') === 'phoneControl_id' )  { setAnchorEl_phoneControl(event.currentTarget)  }

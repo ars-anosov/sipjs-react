@@ -1,5 +1,5 @@
-import * as React from 'react';
-import PropTypes from 'prop-types';
+import { useState, useEffect } from 'react'
+import PropTypes from 'prop-types'
 
 import {
   styled,
@@ -52,8 +52,8 @@ function dateStrFromTimestamp(intStamp, format='ISO', tzone='+03:00') {
 
 
 
-function PhoneHistrory(props) {
-  if (process.env.NODE_ENV === 'development') console.log('PhoneHistrory hook')
+function PhoneHistory(props) {
+  if (process.env.NODE_ENV === 'development') console.log('PhoneHistory hook')
 
   const {
     phoneControlRdcr, phoneControlActions
@@ -61,19 +61,19 @@ function PhoneHistrory(props) {
 
 
 
-  React.useEffect(() => {
-    console.log('PhoneHistrory MOUNT')
+  useEffect(() => {
+    console.log('PhoneHistory MOUNT')
     // Рисую историю звонков из LocalStorage
     phoneControlActions.CallsArrUpdate()
 
     return () => {
-      console.log('PhoneHistrory UNMOUNT')
+      console.log('PhoneHistory UNMOUNT')
     }
   }, [])
 
   const handleCallLogClk = (event) => {
     const textSplit = event.target.textContent.split(" ")
-    phoneControlActions.handleChangeData({'target':{'id':'calleePhoneNum', 'value':textSplit[0]}})
+    phoneControlActions.handleChangeStore('calleePhoneNum', textSplit[0])
   }
 
 
@@ -119,9 +119,9 @@ function PhoneHistrory(props) {
 
 
 
-PhoneHistrory.propTypes = {
+PhoneHistory.propTypes = {
   phoneControlRdcr      : PropTypes.object.isRequired,
   phoneControlActions   : PropTypes.object.isRequired
 }
 
-export default PhoneHistrory
+export default PhoneHistory

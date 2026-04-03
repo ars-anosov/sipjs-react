@@ -1,5 +1,5 @@
-import * as React from 'react';
-import PropTypes from 'prop-types';
+import { useState, useEffect } from 'react'
+import PropTypes from 'prop-types'
 
 import {
   TextField,
@@ -12,23 +12,12 @@ import {
   InputAdornment
 } from '@mui/material'
 
-// import Grid from '@mui/material/Grid2'
-
 import {
-  Login as IconLogin,
-  Call as IconCall,
-  CallEnd as IconCallEnd,
-  Backspace as IconBackspace,
-
-  Phone as IconPhone, 
-  PhoneInTalk as IconPhoneRing,
+  Backspace     as IconBackspace,
+  Phone         as IconPhone, 
+  PhoneInTalk   as IconPhoneRing,
   PhoneDisabled as IconHangup 
 } from '@mui/icons-material'
-
-// https://github.com/onsip/SIP.js/blob/main/docs/api.md
-import {
-  UserAgent,
-} from "sip.js";
 
 
 
@@ -42,9 +31,8 @@ function PhonePad(props) {
 
 
 
-  React.useEffect(() => {
+  useEffect(() => {
     console.log('PhonePad MOUNT')
-    // Рисую историю звонков из LocalStorage
     phoneControlActions.CallsArrUpdate()
 
     return () => {
@@ -60,7 +48,7 @@ function PhonePad(props) {
       phoneControlActions.handleClkSubmitIn(phoneControlRdcr)
     }
     else { // Исходящий
-      phoneControlActions.handleChangeData({'target':{'id':'calleePhoneNum', 'value':calleeTxt}})
+      phoneControlActions.handleChangeStore('calleePhoneNum', calleeTxt)
       phoneControlActions.handleClkSubmitOut(calleeTxt, phoneControlRdcr)
     }
   }
@@ -70,7 +58,7 @@ function PhonePad(props) {
     phoneControlActions.handleClkReset(phoneControlRdcr.outgoingSession, phoneControlRdcr.incomingSession, phoneControlRdcr.callerUserNum, phoneControlRdcr)
   }
 
-  const [calleeTxt, setCalleeTxt] = React.useState("");
+  const [calleeTxt, setCalleeTxt] = useState("")
   const handleInput = (event) => {
     setCalleeTxt(event.target.value)
   }
@@ -215,7 +203,8 @@ function PhonePad(props) {
 
 PhonePad.propTypes = {
   phoneControlRdcr      : PropTypes.object.isRequired,
-  phoneControlActions   : PropTypes.object.isRequired
+  phoneControlActions   : PropTypes.object.isRequired,
+  showInput             : PropTypes.bool.isRequired,
 }
 
 export default PhonePad

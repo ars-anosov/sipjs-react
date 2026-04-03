@@ -14,7 +14,7 @@ import {
   PHONECTL_SESSION_IN,
   PHONECTL_SESSION_OUT,
 
-  PHONECTL_USER_INPUT,
+  PHONECTL_STORE_VALUE,
 
   PHONECTL_ERROR_ALERT,
 } from '../constants/all'
@@ -568,11 +568,11 @@ const handleClkReset = function(outgoingSession, incomingSession, phoneHeader, r
 
 
 
-const handleChangeData = function(event) {
+const handleChangeStore = function(storeDataKey, storeDataValue) {
   return (dispatch) => {
     dispatch({
-      type: PHONECTL_USER_INPUT,
-      payload: {'storeDataKey': event.target.id, 'storeDataValue': event.target.value}
+      type: PHONECTL_STORE_VALUE,
+      payload: {'storeDataKey': storeDataKey, 'storeDataValue': storeDataValue}
     })
   }
 }
@@ -584,6 +584,6 @@ export {
   handleClkReset,
   handleClkSubmitIn,
   handleClkSubmitOut,
-  handleChangeData,
+  handleChangeStore,
   CallsArrUpdate
 }

@@ -1,26 +1,19 @@
-import * as React from 'react';
-import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
-
-import Copyright from './Copyright';
-
-import Cnt_phone from './containers/Cnt_phone.jsx'
+import Container from '@mui/material/Container'
+import PhoneContainer from './containers/PhoneContainer.jsx'
+import Copyright from './Copyright'
 
 export default function App() {
   return (
-    <Container maxWidth="sm">
-      <br />
-      <Box sx={{
+    <Container
+      maxWidth="sm"
+      sx={{
         padding: 2,
         border: '1px dashed grey',
         borderRadius: 5,
-        }}
-      >
-        <Cnt_phone />
-        <br />
-        <Copyright />
-      </Box>
+      }}
+    >
+      <PhoneContainer />
+      <Copyright />
     </Container>
-  );
+  )
 }

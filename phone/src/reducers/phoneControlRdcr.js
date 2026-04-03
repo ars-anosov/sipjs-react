@@ -14,7 +14,7 @@ import {
   PHONECTL_SESSION_IN,
   PHONECTL_SESSION_OUT,
 
-  PHONECTL_USER_INPUT,
+  PHONECTL_STORE_VALUE,
 
   PHONECTL_ERROR_ALERT,
 } from '../constants/all'
@@ -140,7 +140,7 @@ export default function phoneControlRdcr(state = initialState, action) {
         'outgoingSession' : action.payload.outgoingSession,
       }
 
-    case PHONECTL_USER_INPUT:
+    case PHONECTL_STORE_VALUE:
       return { ...state,
         [action.payload.storeDataKey]: action.payload.storeDataValue
       }

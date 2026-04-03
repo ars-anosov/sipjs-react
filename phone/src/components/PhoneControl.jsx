@@ -1,5 +1,5 @@
-import * as React from 'react';
-import PropTypes from 'prop-types';
+import { useState, useEffect } from 'react'
+import PropTypes from 'prop-types'
 
 import {
   Box,
@@ -23,7 +23,7 @@ function PhoneControl(props) {
 
 
 
-  React.useEffect(() => {
+  useEffect(() => {
     console.log('phoneControl MOUNT')
     return () => {
       console.log('phoneControl UNMOUNT')
