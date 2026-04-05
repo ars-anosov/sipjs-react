@@ -17,8 +17,8 @@ import {
 } from '@mui/material'
 
 import MenuIcon         from '@mui/icons-material/Menu';
-import PhoneControlIco  from './PhoneControlIco.jsx'
-import PhonePad         from './PhonePad.jsx'
+import PhoneIco         from './PhoneIco'
+import PhonePad         from './PhonePad'
 
 
 
@@ -26,7 +26,7 @@ const MENU_ITEMS = [
   { key: 'displayReg', primary: 'Карточка регистрации', secondary: 'PhoneReg.jsx' },
   { key: 'displayPad', primary: 'Телефон с кнопками', secondary: 'PhonePad.jsx' },
   { key: 'displayHistory', primary: 'История звонков', secondary: 'PhoneHistory.jsx' },
-  { key: 'displayControl', primary: 'Кругляш состояния', secondary: 'PhoneControl.jsx' },
+  { key: 'displayControl', primary: 'Кругляш состояния', secondary: 'PhoneIco.jsx' },
 ]
 
 function MenuAppBar(props) {
@@ -107,10 +107,7 @@ function MenuAppBar(props) {
               <Typography variant="caption" sx={{ mr: 1 }}>
                 {phoneControlRdcr.controlHeader}
               </Typography>
-              <PhoneControlIco
-                phoneControlRdcr={phoneControlRdcr}
-                phoneControlActions={phoneControlActions}
-              />
+              <PhoneIco phoneControlRdcr={phoneControlRdcr} />
             </Stack>
           )}
 

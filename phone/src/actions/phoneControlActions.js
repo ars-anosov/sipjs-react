@@ -2,6 +2,7 @@ import {
   PHONECTL_CONNECT_REQUEST,
   PHONECTL_CONNECT_SUCCESS,
   PHONECTL_CONNECT_ERROR,
+  PHONECTL_UNREGISTER,
   PHONECTL_RECONNECT_TRY,
 
   PHONECTL_CLK_RESET,
@@ -34,7 +35,8 @@ import {
   // InvitationAcceptOptions
 } from "sip.js"
 
-
+/** Добровольный unregister + stop: не слать PHONECTL_CONNECT_ERROR «Disconnected» и не reconnect. */
+let suppressReconnectOnNextDisconnect = false
 
 // https://sipjs.com/guides/end-call/
 const endCall = function(session) {
@@ -142,35 +144,43 @@ const CallsArrUpdate = function() {
 
 const handleClkRegister = function(formData, rdcr) {
   return (dispatch) => {
-    // Checks
-    if (!formData.uriHost || !formData.wssPort || !formData.callerUserNum || !formData.regUserPass) {
+    const regAlert = (errText) => {
       dispatch({
         type: PHONECTL_ERROR_ALERT,
         payload: {
-          'errComponent'  : 'PhoneReg',
-          'errText'       : 'Заполните все поля.',
-        }
+          errComponent: 'PhoneReg',
+          errText,
+        },
       })
+    }
+
+    const clearRegAlert = () => {
+      dispatch({
+        type: PHONECTL_ERROR_ALERT,
+        payload: {
+          errComponent: '',
+          errText: '',
+        },
+      })
+    }
+
+    // Checks
+    if (!formData.uriHost || !formData.wssPort || !formData.callerUserNum || !formData.regUserPass) {
+      regAlert('Заполните все поля.')
       return
     }
     localStorage.setItem('uriHost', formData.uriHost)
     localStorage.setItem('wssPort', formData.wssPort)
     localStorage.setItem('callerUserNum', formData.callerUserNum)
 
-
-
     const uriStr = "sip:"+formData.callerUserNum+"@"+formData.uriHost
     const uri = UserAgent.makeURI(uriStr)
     if (!uri) {
-      dispatch({
-        type: PHONECTL_ERROR_ALERT,
-        payload: {
-          'errComponent'  : 'PhoneReg',
-          'errText'       : 'UserAgent URI:'+uriStr,
-        }
-      })
+      regAlert('UserAgent URI:'+uriStr)
       return
     }
+
+    clearRegAlert()
 
     const userAgentOptions = {
       uri,
@@ -246,7 +256,12 @@ const handleClkRegister = function(formData, rdcr) {
               logCall(incomingSession, 'завершен', 'вх.')
               dispatch(CallsArrUpdate())
               cleanupMedia(audioRemote, audioLocalIn, audioLocalOut)
-              dispatch(handleClkReset(false, incomingSession, userAgentOptions.authorizationUsername, rdcr))
+              const callData = {
+                outgoingSession: false,
+                incomingSession,
+                phoneHeader: userAgentOptions.authorizationUsername,
+              }
+              dispatch(handleClkReset(callData, rdcr))
               break;
             default:
               break;
@@ -380,6 +395,11 @@ const handleClkRegister = function(formData, rdcr) {
     }
 
     userAgent.delegate.onDisconnect = (error) => {
+      if (suppressReconnectOnNextDisconnect) {
+        suppressReconnectOnNextDisconnect = false
+        return
+      }
+
       dispatch({
         type: PHONECTL_CONNECT_ERROR,
         payload: {
@@ -387,10 +407,6 @@ const handleClkRegister = function(formData, rdcr) {
           'controlHeader'   : 'Disconnected',
         }
       })
-      // registerer.unregister()
-      // .catch((e) => {
-      //   console.log('unregister.catch()', e)
-      // })      
 
       if (error) {
         // console.log('userAgent.onDisconnect(error)', error)
@@ -410,19 +426,14 @@ const handleClkRegister = function(formData, rdcr) {
         'userAgentOptions'  : userAgentOptions,
         'sessionOptions'    : sessionOptions,
         'userAgent'         : userAgent,
+        'registerer'        : registerer,
         'phoneHeader'       : 'UserAgent starting...',
         'controlHeader'     : 'UserAgent starting...',
       }
     })
 
     userAgent.start().then(() => {
-      dispatch({
-        type: PHONECTL_ERROR_ALERT,
-        payload: {
-          'errComponent'  : '',
-          'errText'       : '',
-        }
-      })
+      clearRegAlert()
     })
     .catch((e) => {
       dispatch({
@@ -435,6 +446,73 @@ const handleClkRegister = function(formData, rdcr) {
       })
     })
 
+  }
+}
+
+
+
+const handleClkUnregister = function(rdcr) {
+  return (dispatch) => {
+    const regAlert = (errText) => {
+      dispatch({
+        type: PHONECTL_ERROR_ALERT,
+        payload: {
+          errComponent: 'PhoneReg',
+          errText,
+        },
+      })
+    }
+
+    const clearRegAlert = () => {
+      dispatch({
+        type: PHONECTL_ERROR_ALERT,
+        payload: {
+          errComponent: '',
+          errText: '',
+        },
+      })
+    }
+
+    if (!rdcr.userAgent) {
+      regAlert('Нет подключения к SIP.')
+      return
+    }
+    if (!rdcr.regNow) {
+      regAlert('Нет активной регистрации.')
+      return
+    }
+
+    if (rdcr.outgoingSession) endCall(rdcr.outgoingSession)
+    if (rdcr.incomingSession) endCall(rdcr.incomingSession)
+    if (rdcr.audioLocalIn) rdcr.audioLocalIn.pause()
+    if (rdcr.audioLocalOut) rdcr.audioLocalOut.pause()
+
+    const finishStop = () => {
+      suppressReconnectOnNextDisconnect = true
+      return rdcr.userAgent.stop()
+        .then(() => {
+          dispatch({ type: PHONECTL_UNREGISTER })
+          clearRegAlert()
+        })
+        .catch((e) => {
+          console.log('userAgent.stop()', e)
+          dispatch({ type: PHONECTL_UNREGISTER })
+          clearRegAlert()
+        })
+    }
+
+    const registerer = rdcr.registerer
+    if (registerer) {
+      registerer
+        .unregister()
+        .then(() => finishStop())
+        .catch((e) => {
+          console.log('unregister.catch()', e)
+          return finishStop()
+        })
+    } else {
+      finishStop()
+    }
   }
 }
 
@@ -461,35 +539,57 @@ const handleClkSubmitIn = function(rdcr) {
 const handleClkSubmitOut = function(calleePhoneNum, rdcr) {
   // calleePhoneNum передаю отдельным аргументом т.к. rdcr.calleePhoneNum прилетит позже при след.рендере.
 
-  // Checks
-  if (!rdcr.regNow) {
-    console.log("Not Registered state!")
-    return
-  }
-  if (!rdcr.callerUserNum) {
-    console.log("callerUserNum is empty!")
-    return
-  }
-  if (!calleePhoneNum) {
-    console.log("calleePhoneNum is empty!")
-    return
-  }
-  
-  const targetStr = "sip:"+calleePhoneNum+"@"+rdcr.uriHost
-  const target = UserAgent.makeURI(targetStr)
-  if (!target) {
-    // dispatch алерта TO DO !!!
-    console.log("Failed to create UserAgent URI for:", targetStr)
-  }
-
-  // do it
   return (dispatch) => {
+    const padAlert = (errText) => {
+      dispatch({
+        type: PHONECTL_ERROR_ALERT,
+        payload: {
+          errComponent: 'PhonePad',
+          errText,
+        },
+      })
+    }
+
+    const clearPadAlert = () => {
+      dispatch({
+        type: PHONECTL_ERROR_ALERT,
+        payload: {
+          errComponent: '',
+          errText: '',
+        },
+      })
+    }
+
+    const callee = typeof calleePhoneNum === 'string' ? calleePhoneNum.trim() : String(calleePhoneNum ?? '').trim()
+
+    if (!rdcr.regNow) {
+      padAlert('Нет регистрации. Сначала зарегистрируйтесь.')
+      return
+    }
+    if (!rdcr.callerUserNum) {
+      padAlert('Не задан внутренний номер.')
+      return
+    }
+    if (!callee) {
+      padAlert('Введите номер абонента.')
+      return
+    }
+
+    const targetStr = 'sip:' + callee + '@' + rdcr.uriHost
+    const target = UserAgent.makeURI(targetStr)
+    if (!target) {
+      padAlert('Некорректный SIP URI: ' + targetStr)
+      return
+    }
+
+    clearPadAlert()
+
     dispatch({
       type: PHONECTL_OUTGO_SUBMIT,
       payload: {
         'outgoCallNow'    : true,
-        'phoneHeader'     : rdcr.callerUserNum+' ⇢ '+calleePhoneNum,
-        'controlHeader'   : calleePhoneNum+' ⇠ '+rdcr.callerUserNum,
+        'phoneHeader'     : rdcr.callerUserNum+' ⇢ '+callee,
+        'controlHeader'   : callee+' ⇠ '+rdcr.callerUserNum,
       }
     })
     rdcr.audioLocalOut.play()
@@ -525,7 +625,12 @@ const handleClkSubmitOut = function(calleePhoneNum, rdcr) {
           logCall(outgoingSession, 'завершен', 'исх.')
           dispatch(CallsArrUpdate())
           cleanupMedia(rdcr.audioRemote, rdcr.audioLocalIn, rdcr.audioLocalOut)
-          dispatch(handleClkReset(outgoingSession, false, rdcr.callerUserNum, rdcr))
+          const callData = {
+            outgoingSession,
+            incomingSession: false,
+            phoneHeader: rdcr.callerUserNum,
+          }
+          dispatch(handleClkReset(callData, rdcr))
           break
         default:
           break
@@ -539,14 +644,23 @@ const handleClkSubmitOut = function(calleePhoneNum, rdcr) {
       })
       .catch((error) => {
         console.log('inviter INVITE send ERROR !', error)
+        const msg = error && typeof error.message === 'string' ? error.message : String(error)
+        padAlert('Не удалось отправить вызов: ' + msg)
+        const callData = {
+          outgoingSession,
+          incomingSession: false,
+          phoneHeader: rdcr.callerUserNum,
+        }
+        dispatch(handleClkReset(callData, rdcr))
       })
   }
 }
 
 
 
-const handleClkReset = function(outgoingSession, incomingSession, phoneHeader, rdcr) {
+const handleClkReset = function(callData, rdcr) {
   return (dispatch) => {
+    const { outgoingSession, incomingSession, phoneHeader } = callData
     if (outgoingSession) endCall(outgoingSession)
     if (incomingSession) endCall(incomingSession)
     if (rdcr.audioLocalIn) rdcr.audioLocalIn.pause()
@@ -581,6 +695,7 @@ const handleChangeStore = function(storeDataKey, storeDataValue) {
 
 export {
   handleClkRegister,
+  handleClkUnregister,
   handleClkReset,
   handleClkSubmitIn,
   handleClkSubmitOut,

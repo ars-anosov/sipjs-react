@@ -13,8 +13,9 @@ import {
 } from '@mui/material'
 
 import {
-  Login as IconLogin,
-  Close as IconClose,
+  Login   as IconLogin,
+  Logout  as IconLogout,
+  Close   as IconClose,
 } from '@mui/icons-material'
 
 
@@ -46,6 +47,10 @@ function PhoneReg(props) {
     event.preventDefault()
     const formData = { callerUserNum, regUserPass, uriHost, wssPort }
     phoneControlActions.handleClkRegister(formData, phoneControlRdcr)
+  }
+
+  const handleUnregister = () => {
+    phoneControlActions.handleClkUnregister(phoneControlRdcr)
   }
 
   const [callerUserNum, setCallerUserNum] = useState(phoneControlRdcr.callerUserNum)
@@ -117,10 +122,23 @@ function PhoneReg(props) {
           />
         </Stack>
 
-        <Stack direction="row" justifyContent="flex-end">
+        <Stack direction="row" spacing={2} justifyContent="flex-end">
+          <Button
+            type="button"
+            variant="outlined"
+            color="warning"
+            disabled={!phoneControlRdcr.regNow}
+            onClick={handleUnregister}
+            startIcon={<IconLogout />}
+            size="large"
+          >
+            Unregister
+          </Button>
           <Button
             type="submit"
             variant="contained"
+            color="primary"
+            disabled={phoneControlRdcr.regNow}
             startIcon={<IconLogin />}
             size="large"
           >

@@ -1,6 +1,7 @@
-import Container from '@mui/material/Container'
-import PhoneContainer from './containers/PhoneContainer.jsx'
-import Copyright from './Copyright'
+import Container        from '@mui/material/Container'
+import MenuAppContainer from './containers/MenuAppContainer'
+import PhoneContainer   from './containers/PhoneContainer.jsx'
+import Copyright        from './Copyright'
 
 export default function App() {
   return (
@@ -12,6 +13,7 @@ export default function App() {
         borderRadius: 5,
       }}
     >
+      <MenuAppContainer />
       <PhoneContainer />
       <Copyright />
     </Container>

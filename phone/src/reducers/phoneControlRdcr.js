@@ -2,6 +2,7 @@ import {
   PHONECTL_CONNECT_REQUEST,
   PHONECTL_CONNECT_SUCCESS,
   PHONECTL_CONNECT_ERROR,
+  PHONECTL_UNREGISTER,
   PHONECTL_RECONNECT_TRY,
 
   PHONECTL_CLK_RESET,
@@ -20,9 +21,11 @@ import {
 } from '../constants/all'
 
 const initialState = {
+  // sip.js
   userAgentOptions  : null,
   sessionOptions    : null,
   userAgent         : null,
+  registerer        : null,
   audioLocalIn      : null,
   audioLocalOut     : null,
   audioRemote       : null,
@@ -30,24 +33,32 @@ const initialState = {
   incomingSession   : null,
   outgoingSession   : null,
 
-  displayReg      : true,
-  displayPad      : false,
-  displayControl  : true,
-  displayHistory  : false,
-  phoneHeader     : 'Не зарегистрирован',
-  controlHeader   : 'Не зарегистрирован',
-  errComponent    : '',
-  errText         : '',
-  uriHost         : localStorage.getItem('uriHost') ? localStorage.getItem('uriHost') : '',
-  wssPort         : localStorage.getItem('wssPort') ? localStorage.getItem('wssPort') : '',
-  callerUserNum   : localStorage.getItem('callerUserNum') ? localStorage.getItem('callerUserNum') : '',
-  regUserPass     : '',
-  calleePhoneNum  : '',
-  incomeDisplay   : false,
-  outgoCallNow    : false,
-  incomeCallNow   : false,
-  regNow          : false,
-  callsArr        : []
+
+  // --- UI ---
+  // MenuAppBar
+  displayReg        : true,
+  displayPad        : false,
+  displayControl    : true,
+  displayHistory    : false,
+  // PhoneReg form fields
+  uriHost           : localStorage.getItem('uriHost') ? localStorage.getItem('uriHost') : '',
+  wssPort           : localStorage.getItem('wssPort') ? localStorage.getItem('wssPort') : '',
+  callerUserNum     : localStorage.getItem('callerUserNum') ? localStorage.getItem('callerUserNum') : '',
+  regUserPass       : '',
+  calleePhoneNum    : '',
+  // PhoneIco + PhonePad
+  status            : '',
+  regNow            : false,
+  phoneHeader       : 'Не зарегистрирован',
+  controlHeader     : 'Не зарегистрирован',
+  incomeDisplay     : false,
+  outgoCallNow      : false,
+  incomeCallNow     : false,
+  // PhoneHistory
+  callsArr          : [],
+  // Error alert
+  errComponent      : '',
+  errText           : '',
 }
 
 
@@ -66,6 +77,7 @@ export default function phoneControlRdcr(state = initialState, action) {
         'userAgentOptions'  : action.payload.userAgentOptions,
         'sessionOptions'    : action.payload.sessionOptions,
         'userAgent'         : action.payload.userAgent,
+        'registerer'        : action.payload.registerer,
         'phoneHeader'       : action.payload.phoneHeader,
         'controlHeader'     : action.payload.controlHeader,
       }
@@ -89,6 +101,33 @@ export default function phoneControlRdcr(state = initialState, action) {
         'controlHeader'   : action.payload.controlHeader,
       }
 
+    case PHONECTL_UNREGISTER:
+      return { ...state,
+        'userAgent'         : null,
+        'registerer'        : null,
+        'userAgentOptions'  : null,
+        'sessionOptions'    : null,
+        'audioLocalIn'      : null,
+        'audioLocalOut'     : null,
+        'audioRemote'       : null,
+        'remoteStream'      : null,
+        'incomingSession'   : null,
+        'outgoingSession'   : null,
+        'status'            : '',
+        'regNow'            : false,
+        'phoneHeader'       : 'Не зарегистрирован',
+        'controlHeader'     : 'Не зарегистрирован',
+        'displayReg'        : true,
+        'displayPad'        : false,
+        'displayHistory'    : false,
+        'incomeDisplay'     : false,
+        'outgoCallNow'      : false,
+        'incomeCallNow'     : false,
+        'calleePhoneNum'    : '',
+        'errComponent'      : '',
+        'errText'           : '',
+      }
+
     case PHONECTL_RECONNECT_TRY:
       return { ...state,
         'status'          : 'Reconnect',
@@ -103,7 +142,7 @@ export default function phoneControlRdcr(state = initialState, action) {
         'controlHeader'   : action.payload.controlHeader,
         'calleePhoneNum'  : action.payload.calleePhoneNum,
         'incomeDisplay'   : action.payload.incomeDisplay,
-        'incomeCallNow'   : action.payload.outgoCallNow,
+        'incomeCallNow'   : action.payload.incomeCallNow,
         'outgoCallNow'    : action.payload.outgoCallNow,
       }
 

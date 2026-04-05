@@ -7,7 +7,6 @@ import * as phoneActions            from '../actions/phoneControlActions.js'
 
 // Components
 import { Box }                      from '@mui/material'
-import MenuAppBar                   from '../components/MenuAppBar.jsx'
 import PhoneReg                     from '../components/PhoneReg.jsx'
 import PhonePad                     from '../components/PhonePad.jsx'
 import PhoneHistory                 from '../components/PhoneHistory.jsx'
@@ -29,8 +28,6 @@ const PhoneContainer = () => {
 
   return (
     <Box>
-
-      <MenuAppBar {...commonProps} />
 
       {(phoneControlRdcr.displayReg || phoneControlRdcr.errComponent === 'PhoneReg') && (
         <PhoneReg {...commonProps} />

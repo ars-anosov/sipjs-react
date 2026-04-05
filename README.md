@@ -24,8 +24,8 @@ npm run build
 ## PhoneHistory.jsx
 ![component_PhoneHistory.png](img/component_PhoneHistory.png)
 
-## PhoneControlIco.jsx
-![component_PhoneControlIco.png](img/component_PhoneControlIco.png)
+## PhoneIco.jsx
+![component_PhoneIco.png](img/component_PhoneIco.png)
 
 
 

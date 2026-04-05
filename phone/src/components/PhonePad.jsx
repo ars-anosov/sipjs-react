@@ -9,7 +9,9 @@ import {
   Typography,
   Grid,
   IconButton,
-  InputAdornment
+  InputAdornment,
+  Alert,
+  Collapse,
 } from '@mui/material'
 
 import {
@@ -55,7 +57,12 @@ function PhonePad(props) {
 
   const handleReset = () => {
     setCalleeTxt('')
-    phoneControlActions.handleClkReset(phoneControlRdcr.outgoingSession, phoneControlRdcr.incomingSession, phoneControlRdcr.callerUserNum, phoneControlRdcr)
+    const callData = {
+      outgoingSession: phoneControlRdcr.outgoingSession,
+      incomingSession: phoneControlRdcr.incomingSession,
+      phoneHeader: phoneControlRdcr.callerUserNum,
+    }
+    phoneControlActions.handleClkReset(callData, phoneControlRdcr)
   }
 
   const [calleeTxt, setCalleeTxt] = useState("")
@@ -85,7 +92,7 @@ function PhonePad(props) {
   ]
 
   const finalTemplate =
-  <Paper elevation={8} sx={{ maxWidth: 300, mx: 'auto', p: 2, mt: 2 }}>
+  <Paper elevation={showInput ? 8 : 0} sx={{ maxWidth: 300, mx: 'auto', p: 2, mt: 2 }}>
     <Typography variant="h6" sx={{ mb: 2 }}>
       {phoneControlRdcr.phoneHeader}
     </Typography>
@@ -192,6 +199,10 @@ function PhonePad(props) {
       )}
 
     </Box>
+
+    <Collapse in={phoneControlRdcr.errComponent == 'PhonePad' && phoneControlRdcr.errText}>
+      <Alert severity="error" sx={{ mt: 2 }}>{phoneControlRdcr.errText}</Alert>
+    </Collapse>
   </Paper>
 
 
