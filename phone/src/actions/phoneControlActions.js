@@ -669,12 +669,14 @@ const handleClkReset = function(callData, rdcr) {
     dispatch({
       type: PHONECTL_CLK_RESET,
       payload: {
-        'phoneHeader'     : phoneHeader,
-        'icoHeader'       : phoneHeader,
-        'calleePhoneNum'  : '',
-        'incomeDisplay'   : false,
-        'outgoCallNow'    : false,
-        'incomeCallNow'   : false,
+        'phoneHeader'       : phoneHeader,
+        'icoHeader'         : phoneHeader,
+        'calleePhoneNum'    : '',
+        'incomeDisplay'     : false,
+        'outgoCallNow'      : false,
+        'incomeCallNow'     : false,
+        'errComponent'      : '',
+        'errText'           : '',
       }
     })
   }

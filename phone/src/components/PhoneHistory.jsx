@@ -45,9 +45,11 @@ function PhoneHistory(props) {
   }, [])
 
   const handleCallLogClk = (phoneNum) => {
-    const cleanNum = phoneNum.split(" ")[0]
-    phoneControlActions.handleChangeStore('calleePhoneNum', cleanNum)
-    phoneControlActions.handleClkSubmitOut(cleanNum, phoneControlRdcr)
+    if (!phoneControlRdcr.incomeDisplay && !phoneControlRdcr.outgoCallNow && !phoneControlRdcr.incomeCallNow ) {
+      const cleanNum = phoneNum.split(" ")[0]
+      phoneControlActions.handleChangeStore('calleePhoneNum', cleanNum)
+      phoneControlActions.handleClkSubmitOut(cleanNum, phoneControlRdcr)
+    }
   }
 
   const blink = keyframes`

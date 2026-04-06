@@ -144,6 +144,8 @@ export default function phoneControlRdcr(state = initialState, action) {
         'incomeDisplay'     : action.payload.incomeDisplay,
         'incomeCallNow'     : action.payload.incomeCallNow,
         'outgoCallNow'      : action.payload.outgoCallNow,
+        'errComponent'      : action.payload.errComponent,
+        'errText'           : action.payload.errText,
       }
 
     case PHONECTL_CALLLOG_UPD:
