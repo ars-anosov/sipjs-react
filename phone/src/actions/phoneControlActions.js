@@ -172,6 +172,20 @@ const handleClkRegister = function(formData, rdcr) {
     localStorage.setItem('uriHost', formData.uriHost)
     localStorage.setItem('wssPort', formData.wssPort)
     localStorage.setItem('callerUserNum', formData.callerUserNum)
+    dispatch({
+      type: PHONECTL_STORE_VALUE,
+      payload: {'storeDataKey': 'uriHost', 'storeDataValue': formData.uriHost}
+    })
+    dispatch({
+      type: PHONECTL_STORE_VALUE,
+      payload: {'storeDataKey': 'wssPort', 'storeDataValue': formData.wssPort}
+    })
+    dispatch({
+      type: PHONECTL_STORE_VALUE,
+      payload: {'storeDataKey': 'callerUserNum', 'storeDataValue': formData.callerUserNum}
+    })
+
+
 
     const uriStr = "sip:"+formData.callerUserNum+"@"+formData.uriHost
     const uri = UserAgent.makeURI(uriStr)
