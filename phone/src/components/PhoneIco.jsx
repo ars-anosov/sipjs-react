@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { IconButton, keyframes, useTheme } from '@mui/material'
 
@@ -14,6 +15,15 @@ const pulse = keyframes`
 `;
 
 function PhoneIco({ phoneControlRdcr }) {
+
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') console.log('PhoneIco MOUNT')
+
+    return () => {
+      if (process.env.NODE_ENV === 'development') console.log('PhoneIco UNMOUNT')
+    }
+  }, [])
+
   const theme = useTheme(); // Доступ к палитре темы
 
   const getStyle = () => {
@@ -38,7 +48,7 @@ function PhoneIco({ phoneControlRdcr }) {
     }
 
     // Ошибки и статусы
-    switch (phoneControlRdcr.status) {
+    switch (phoneControlRdcr.connectStatus) {
       case 'Error':
         return {
           icon: <IconPhoneDisabled />,

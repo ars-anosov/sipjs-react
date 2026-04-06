@@ -32,6 +32,14 @@ const MENU_ITEMS = [
 function MenuAppBar(props) {
   const { phoneControlRdcr, phoneControlActions } = props
 
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') console.log('MenuAppBar MOUNT')
+
+    return () => {
+      if (process.env.NODE_ENV === 'development') console.log('MenuAppBar UNMOUNT')
+    }
+  }, [])
+
   const [anchorEl_phoneControl, setAnchorEl_phoneControl] = useState(null)
   const [anchorEl_mainMenu, setAnchorEl_mainMenu] = useState(null)
   const handleOpenMenu = (event) => setAnchorEl_mainMenu(event.currentTarget)
@@ -63,34 +71,34 @@ function MenuAppBar(props) {
             onClose={handleCloseMenu}
           >
             {MENU_ITEMS.map((item) => {
+              const isChecked = !!phoneControlRdcr[item.key];
+              const labelId = `checkbox-list-label-${item.key}`;
+
               return (
                 <MenuItem
                   key={item.key}
                   onClick={() => toggleDisplay(item.key)}
-                  selected={phoneControlRdcr[item.key]}
-                  sx={{ 
-                    // Немного приглушаем текст, если не выбрано
-                    opacity: phoneControlRdcr[item.key] ? 1 : 0.7, 
-                    py: 1 
-                  }}
+                  sx={{ minWidth: 250 }}
                 >
                   <ListItemIcon>
                     <Checkbox
                       edge="start"
-                      checked={phoneControlRdcr[item.key]}
+                      checked={isChecked}
                       tabIndex={-1}
                       disableRipple
-                      size="small"
+                      inputProps={{ 'aria-labelledby': labelId }}
                     />
                   </ListItemIcon>
                   <ListItemText 
+                    id={labelId}
                     primary={item.primary} 
                     secondary={item.secondary} 
                   />
                 </MenuItem>
-              )
+              );
             })}
           </Menu>
+
 
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             WebRTC
@@ -105,7 +113,7 @@ function MenuAppBar(props) {
               onClick={(e) => setAnchorEl_phoneControl(e.currentTarget)}
             >
               <Typography variant="caption" sx={{ mr: 1 }}>
-                {phoneControlRdcr.controlHeader}
+                {phoneControlRdcr.icoHeader}
               </Typography>
               <PhoneIco phoneControlRdcr={phoneControlRdcr} />
             </Stack>

@@ -34,11 +34,11 @@ function PhonePad(props) {
 
 
   useEffect(() => {
-    console.log('PhonePad MOUNT')
+    if (process.env.NODE_ENV === 'development') console.log('PhonePad MOUNT')
     phoneControlActions.CallsArrUpdate()
 
     return () => {
-      console.log('PhonePad UNMOUNT')
+      if (process.env.NODE_ENV === 'development') console.log('PhonePad UNMOUNT')
     }
   }, [])
 

@@ -30,10 +30,10 @@ function PhoneReg(props) {
 
 
   useEffect(() => {
-    console.log('PhoneReg MOUNT')
+    if (process.env.NODE_ENV === 'development') console.log('PhoneReg MOUNT')
 
     return () => {
-      console.log('PhoneReg UNMOUNT')
+      if (process.env.NODE_ENV === 'development') console.log('PhoneReg UNMOUNT')
     }
   }, [])
 

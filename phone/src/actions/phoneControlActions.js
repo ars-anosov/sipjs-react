@@ -80,7 +80,7 @@ const cleanupMedia = function(mediaElement, audioLocalIn, audioLocalOut) {
   audioLocalOut.pause()
 }
 
-const logCall = function(session, status, direction) {
+const logCall = function(session, callState, direction) {
   const log = {
     id   : session.id,
     clid : session.displayName,
@@ -100,14 +100,14 @@ const logCall = function(session, status, direction) {
     }
   }
 
-  if (status === 'завершен') {
+  if (callState === 'complete') {
     calllog[log.id].stop = log.time
   }
 
-  if (status === 'завершен' && calllog[log.id].status === 'звонит') {
-      calllog[log.id].status = 'пропущен'
+  if (callState === 'complete' && calllog[log.id].callState === 'ringing') {
+      calllog[log.id].callState = 'lost'
   } else {
-      calllog[log.id].status = status
+      calllog[log.id].callState = callState
   }
 
   localStorage.setItem('sipCalls', JSON.stringify(calllog))
@@ -248,12 +248,12 @@ const handleClkRegister = function(formData, rdcr) {
               // logCall
               break;
             case SessionState.Established:
-              logCall(incomingSession, 'разговор', 'вх.')
+              logCall(incomingSession, 'incall', 'in')
               dispatch(CallsArrUpdate())
               setupRemoteMedia(incomingSession, audioRemote, remoteStream)
               break;
             case SessionState.Terminated:
-              logCall(incomingSession, 'завершен', 'вх.')
+              logCall(incomingSession, 'complete', 'in')
               dispatch(CallsArrUpdate())
               cleanupMedia(audioRemote, audioLocalIn, audioLocalOut)
               const callData = {
@@ -269,14 +269,14 @@ const handleClkRegister = function(formData, rdcr) {
         })
 
         audioLocalIn.play()
-        logCall(incomingSession, 'звонит', 'вх.')
+        logCall(incomingSession, 'ringing', 'in')
         dispatch(CallsArrUpdate())
         dispatch({
           type: PHONECTL_INCOME_DISPLAY,
           payload: {
             'incomeDisplay'   : true,
             'phoneHeader'     : userAgentOptions.authorizationUsername+' ⇠ '+incomingSession.remoteIdentity.uri.raw.user,
-            'controlHeader'   : incomingSession.remoteIdentity.uri.raw.user+' ⇢ '+userAgentOptions.authorizationUsername,
+            'icoHeader'       : incomingSession.remoteIdentity.uri.raw.user+' ⇢ '+userAgentOptions.authorizationUsername,
             'calleePhoneNum'  : incomingSession.remoteIdentity.uri.raw.user,
           }
         })
@@ -319,7 +319,7 @@ const handleClkRegister = function(formData, rdcr) {
         type: PHONECTL_RECONNECT_TRY,
         payload: {
           'phoneHeader'     : 'Reconnection',
-          'controlHeader'   : 'Reconnection',
+          'icoHeader'       : 'Reconnection',
         }
       })
 
@@ -356,7 +356,7 @@ const handleClkRegister = function(formData, rdcr) {
                 'displayPad'      : true,
                 'displayHistory'  : true,
                 'phoneHeader'     : response.message.from.displayName,
-                'controlHeader'   : response.message.from.displayName,
+                'icoHeader'       : response.message.from.displayName,
               }
             })
           },
@@ -367,7 +367,7 @@ const handleClkRegister = function(formData, rdcr) {
               payload: {
                 'regNow'          : false,
                 'phoneHeader'     : response.message.statusCode+' '+response.message.reasonPhrase,
-                'controlHeader'   : response.message.statusCode+' '+response.message.reasonPhrase,
+                'icoHeader'   : response.message.statusCode+' '+response.message.reasonPhrase,
               }
             })
             // Принудительно отключаю, чтобы сбросить старые атрибуты user/secret
@@ -384,7 +384,7 @@ const handleClkRegister = function(formData, rdcr) {
           payload: {
             'regNow'          : false,
             'phoneHeader'     : 'Registration error',
-            'controlHeader'   : 'Registration error',
+            'icoHeader'       : 'Registration error',
           }
         })
         // Принудительно отключаю, чтобы сбросить старые атрибуты user/secret
@@ -404,7 +404,7 @@ const handleClkRegister = function(formData, rdcr) {
         type: PHONECTL_CONNECT_ERROR,
         payload: {
           'phoneHeader'     : 'Disconnected',
-          'controlHeader'   : 'Disconnected',
+          'icoHeader'       : 'Disconnected',
         }
       })
 
@@ -428,7 +428,7 @@ const handleClkRegister = function(formData, rdcr) {
         'userAgent'         : userAgent,
         'registerer'        : registerer,
         'phoneHeader'       : 'UserAgent starting...',
-        'controlHeader'     : 'UserAgent starting...',
+        'icoHeader'         : 'UserAgent starting...',
       }
     })
 
@@ -441,7 +441,7 @@ const handleClkRegister = function(formData, rdcr) {
         payload: {
           'regNow'          : false,
           'phoneHeader'     : 'SIP proxy WebSocket problem',
-          'controlHeader'   : 'SIP proxy WebSocket problem',
+          'icoHeader'       : 'SIP proxy WebSocket problem',
         }
       })
     })
@@ -526,7 +526,7 @@ const handleClkSubmitIn = function(rdcr) {
         'incomeDisplay'   : false,
         'incomeCallNow'   : true,
         'phoneHeader'     : rdcr.callerUserNum+' ⇠ '+rdcr.incomingSession.remoteIdentity.uri.raw.user,
-        'controlHeader'   : rdcr.incomingSession.remoteIdentity.uri.raw.user+' ⇢ '+rdcr.callerUserNum,
+        'icoHeader'       : rdcr.incomingSession.remoteIdentity.uri.raw.user+' ⇢ '+rdcr.callerUserNum,
       }
     })
     rdcr.audioLocalIn.pause()
@@ -589,7 +589,7 @@ const handleClkSubmitOut = function(calleePhoneNum, rdcr) {
       payload: {
         'outgoCallNow'    : true,
         'phoneHeader'     : rdcr.callerUserNum+' ⇢ '+callee,
-        'controlHeader'   : callee+' ⇠ '+rdcr.callerUserNum,
+        'icoHeader'       : callee+' ⇠ '+rdcr.callerUserNum,
       }
     })
     rdcr.audioLocalOut.play()
@@ -612,17 +612,17 @@ const handleClkSubmitOut = function(calleePhoneNum, rdcr) {
     outgoingSession.stateChange.addListener((newState) => {
       switch (newState) {
         case SessionState.Establishing:
-          logCall(outgoingSession, 'звонит', 'исх.')
+          logCall(outgoingSession, 'ringing', 'out')
           dispatch(CallsArrUpdate())
           break
         case SessionState.Established:
-          logCall(outgoingSession, 'разговор', 'исх.')
+          logCall(outgoingSession, 'incall', 'out')
           dispatch(CallsArrUpdate())
           rdcr.audioLocalOut.pause()
           setupRemoteMedia(outgoingSession, rdcr.audioRemote, rdcr.remoteStream)
           break
         case SessionState.Terminated:
-          logCall(outgoingSession, 'завершен', 'исх.')
+          logCall(outgoingSession, 'complete', 'out')
           dispatch(CallsArrUpdate())
           cleanupMedia(rdcr.audioRemote, rdcr.audioLocalIn, rdcr.audioLocalOut)
           const callData = {
@@ -670,7 +670,7 @@ const handleClkReset = function(callData, rdcr) {
       type: PHONECTL_CLK_RESET,
       payload: {
         'phoneHeader'     : phoneHeader,
-        'controlHeader'   : phoneHeader,
+        'icoHeader'       : phoneHeader,
         'calleePhoneNum'  : '',
         'incomeDisplay'   : false,
         'outgoCallNow'    : false,
