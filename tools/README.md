@@ -5,21 +5,14 @@
 [nodejs.org](https://nodejs.org/en/download), [fnm](https://github.com/Schniz/fnm)
 
 ```bash
-winget install Schniz.fnm
+# winget install OpenJS.NodeJS
 
-fnm list
-fnm install 22
-fnm use 22
-
-# https://github.com/Schniz/fnm#shell-setup
-if (-not (Test-Path $profile)) { New-Item $profile -Force }
-Invoke-Item $profile
-# --- вставить
-fnm env --use-on-cd --shell powershell | Out-String | Invoke-Expression
-# --- вставить
-
+winget install Volta.Volta
+volta install node@25
 node -v
-# v22.15.0
+# v25.1.0
+npm -v
+# 11.6.2
 ```
 
 
