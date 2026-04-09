@@ -63,7 +63,15 @@ const endCall = function(session) {
 }
 
 // https://sipjs.com/guides/attach-media/
+const clearRemoteStream = function(remoteStream) {
+  remoteStream.getTracks().forEach((track) => {
+    remoteStream.removeTrack(track)
+    track.stop()
+  })
+}
+
 const setupRemoteMedia = function(session, mediaElement, remoteStream) {
+  clearRemoteStream(remoteStream)
   session.sessionDescriptionHandler.peerConnection.getReceivers().forEach((receiver) => {
     if (receiver.track) {
       remoteStream.addTrack(receiver.track);
@@ -74,6 +82,9 @@ const setupRemoteMedia = function(session, mediaElement, remoteStream) {
 }
 
 const cleanupMedia = function(mediaElement, audioLocalIn, audioLocalOut) {
+  if (mediaElement.srcObject instanceof MediaStream) {
+    clearRemoteStream(mediaElement.srcObject)
+  }
   mediaElement.srcObject = null
   mediaElement.pause()
   audioLocalIn.pause()
@@ -310,6 +321,17 @@ const handleClkRegister = function(formData, rdcr) {
 
     let attemptingReconnection = false;
     let shouldBeConnected = true;
+    let registrationInFlight = false
+    let registrationAccepted = false
+
+    const stopAfterRegistrationFailure = () => {
+      shouldBeConnected = false
+      suppressReconnectOnNextDisconnect = true
+
+      return userAgent.stop().catch((e) => {
+        console.log('userAgent.stop()', e)
+      })
+    }
 
     const attemptReconnection = (reconnectionAttempt = 1) => {
 
@@ -326,6 +348,14 @@ const handleClkRegister = function(formData, rdcr) {
       }
 
       if (reconnectionAttempt > reconnectionAttempts) {
+        dispatch({
+          type: PHONECTL_CONNECT_ERROR,
+          payload: {
+            'regNow'      : false,
+            'phoneHeader' : 'Disconnected',
+            'icoHeader'   : 'Disconnected',
+          }
+        })
         return;
       }
 
@@ -358,13 +388,28 @@ const handleClkRegister = function(formData, rdcr) {
     }
 
     userAgent.delegate.onConnect = () => {
+      if (!shouldBeConnected || registrationAccepted || registrationInFlight) {
+        return
+      }
+
+      registrationInFlight = true
       registerer.register({
         requestDelegate: {
           onAccept(response) {
             // console.log('register.onAccept()',response)
+            registrationInFlight = false
+            registrationAccepted = true
             dispatch({
               type: PHONECTL_CONNECT_SUCCESS,
               payload: {
+                'audioLocalIn'      : audioLocalIn,
+                'audioLocalOut'     : audioLocalOut,
+                'audioRemote'       : audioRemote,
+                'remoteStream'      : remoteStream,
+                'userAgentOptions'  : userAgentOptions,
+                'sessionOptions'    : sessionOptions,
+                'userAgent'         : userAgent,
+                'registerer'        : registerer,
                 'regNow'          : true,
                 'displayReg'      : false,
                 'displayPad'      : true,
@@ -376,6 +421,8 @@ const handleClkRegister = function(formData, rdcr) {
           },
           onReject(response) {
             // console.log('register.onReject()',response)
+            registrationInFlight = false
+            registrationAccepted = false
             dispatch({
               type: PHONECTL_CONNECT_ERROR,
               payload: {
@@ -386,13 +433,18 @@ const handleClkRegister = function(formData, rdcr) {
             })
             // Принудительно отключаю, чтобы сбросить старые атрибуты user/secret
             setTimeout(() => {
-              userAgent.stop()
+              stopAfterRegistrationFailure()
+                .finally(() => {
+                  dispatch({ type: PHONECTL_UNREGISTER })
+                })
             }, 3000)
           },
         },
       })
       .catch((e) => {
         console.log('register.catch()',e)
+        registrationInFlight = false
+        registrationAccepted = false
         dispatch({
           type: PHONECTL_CONNECT_ERROR,
           payload: {
@@ -403,7 +455,10 @@ const handleClkRegister = function(formData, rdcr) {
         })
         // Принудительно отключаю, чтобы сбросить старые атрибуты user/secret
         setTimeout(() => {
-          userAgent.stop()
+          stopAfterRegistrationFailure()
+            .finally(() => {
+              dispatch({ type: PHONECTL_UNREGISTER })
+            })
         }, 3000)
       })
     }
@@ -433,14 +488,6 @@ const handleClkRegister = function(formData, rdcr) {
     dispatch({
       type: PHONECTL_CONNECT_REQUEST,
       payload: {
-        'audioLocalIn'      : audioLocalIn,
-        'audioLocalOut'     : audioLocalOut,
-        'audioRemote'       : audioRemote,
-        'remoteStream'      : remoteStream,
-        'userAgentOptions'  : userAgentOptions,
-        'sessionOptions'    : sessionOptions,
-        'userAgent'         : userAgent,
-        'registerer'        : registerer,
         'phoneHeader'       : 'UserAgent starting...',
         'icoHeader'         : 'UserAgent starting...',
       }
@@ -450,6 +497,7 @@ const handleClkRegister = function(formData, rdcr) {
       clearRegAlert()
     })
     .catch((e) => {
+      shouldBeConnected = false
       dispatch({
         type: PHONECTL_CONNECT_ERROR,
         payload: {
@@ -458,6 +506,7 @@ const handleClkRegister = function(formData, rdcr) {
           'icoHeader'       : 'SIP proxy WebSocket problem',
         }
       })
+      dispatch({ type: PHONECTL_UNREGISTER })
     })
 
   }
