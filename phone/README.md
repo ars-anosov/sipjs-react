@@ -1,64 +1,62 @@
 # phone
 Готовая сборка в [dist](dist).
 
-![phone](../img/phone.png)
-
 ## Логика работы приложения
 
 ```mermaid
 graph TD
-    A[Пользователь открывает приложение] --> B[App.jsx рендерит компоненты]
-    B --> C[MenuAppBar.jsx - навигация]
-    B --> D[PhoneReg.jsx - форма регистрации]
-    B --> E[PhonePad.jsx - панель звонков]
-    B --> F[PhoneHistory.jsx - история звонков]
-    B --> G[PhoneIco.jsx - статус телефона]
+    A[User opens app] --> B[App.jsx renders components]
+    B --> C[MenuAppBar.jsx - navigation]
+    B --> D[PhoneReg.jsx - registration form]
+    B --> E[PhonePad.jsx - dial pad]
+    B --> F[PhoneHistory.jsx - call history]
+    B --> G[PhoneIco.jsx - phone status]
 
-    D --> H[handleClkRegister - отправка формы]
+    D --> H[handleClkRegister - form submit]
     H --> I[phoneControlActions.handleClkRegister]
-    I --> J[Создание UserAgent + Registerer]
-    J --> K[UserAgent.start() - подключение к WebSocket]
-    K --> L{Успешно?}
-    L -->|Да| M[registerer.register() - SIP REGISTER]
-    L -->|Нет| N[Ошибка подключения]
+    I --> J[Create UserAgent + Registerer]
+    J --> K[UserAgent.start() - WebSocket connect]
+    K --> L{Success?}
+    L -->|Yes| M[registerer.register() - SIP REGISTER]
+    L -->|No| N[Connection error]
 
-    M --> O{Регистрация успешна?}
-    O -->|Да| P[PHONECTL_CONNECT_SUCCESS]
-    O -->|Нет| Q[PHONECTL_CONNECT_ERROR]
+    M --> O{Registration OK?}
+    O -->|Yes| P[PHONECTL_CONNECT_SUCCESS]
+    O -->|No| Q[PHONECTL_CONNECT_ERROR]
 
-    P --> R[phoneControlRdcr обновляет state]
-    R --> S[Компоненты перерендериваются]
+    P --> R[phoneControlRdcr updates state]
+    R --> S[Components re-render]
     S --> T[displayReg=false, displayPad=true]
 
-    E --> U[handleClkSubmitOut - исходящий звонок]
+    E --> U[handleClkSubmitOut - outgoing call]
     U --> V[phoneControlActions.handleClkSubmitOut]
-    V --> W[Создание Inviter сессии]
+    V --> W[Create Inviter session]
     W --> X[inviter.invite() - SIP INVITE]
 
-    G --> Y[Входящий звонок от SIP сервера]
+    G --> Y[Incoming call from SIP server]
     Y --> Z[userAgent.delegate.onInvite]
     Z --> AA[PHONECTL_INCOME_DISPLAY]
-    AA --> BB[Показ диалога входящего звонка]
+    AA --> BB[Show incoming call dialog]
 
-    BB --> CC[Пользователь отвечает]
+    BB --> CC[User answers]
     CC --> DD[handleClkSubmitIn]
-    DD --> EE[session.accept() - принять звонок]
+    DD --> EE[session.accept() - accept call]
 
-    X --> FF{Звонок установлен?}
-    FF -->|Да| GG[setupRemoteMedia - аудио поток]
-    FF -->|Нет| HH[Ошибка звонка]
+    X --> FF{Call established?}
+    FF -->|Yes| GG[setupRemoteMedia - audio stream]
+    FF -->|No| HH[Call error]
 
-    EE --> II{Звонок установлен?}
-    II -->|Да| JJ[setupRemoteMedia - аудио поток]
-    II -->|Нет| KK[Ошибка звонка]
+    EE --> II{Call established?}
+    II -->|Yes| JJ[setupRemoteMedia - audio stream]
+    II -->|No| KK[Call error]
 
-    GG --> LL[Звонок активен]
+    GG --> LL[Call active]
     JJ --> LL
-    LL --> MM[session.bye() или endCall - завершение]
+    LL --> MM[session.bye() or endCall - hangup]
     MM --> NN[PHONECTL_CLK_RESET]
-    NN --> OO[Сброс состояния]
+    NN --> OO[Reset state]
 
-    Q --> PP[Показ ошибки]
+    Q --> PP[Show error]
     N --> PP
     HH --> PP
     KK --> PP
