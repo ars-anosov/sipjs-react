@@ -1,73 +1,6 @@
 # phone
 Готовая сборка в [dist](dist).
 
-## Логика работы приложения
-
-```mermaid
-graph TD
-    A[User opens app] --> B[App renders components]
-    B --> C[MenuAppBar navigation]
-    B --> D[PhoneReg form]
-    B --> E[PhonePad dial]
-    B --> F[PhoneHistory calls]
-    B --> G[PhoneIco status]
-
-    D --> H[Form submit]
-    H --> I[handleClkRegister]
-    I --> J[Create UserAgent]
-    J --> K[WebSocket connect]
-    K --> L{Success?}
-    L -->|Yes| M[SIP REGISTER]
-    L -->|No| N[Connection error]
-
-    M --> O{Registration OK?}
-    O -->|Yes| P[CONNECT_SUCCESS]
-    O -->|No| Q[CONNECT_ERROR]
-
-    P --> R[Update state]
-    R --> S[Re-render]
-    S --> T[Show dial pad]
-
-    E --> U[Outgoing call]
-    U --> V[handleClkSubmitOut]
-    V --> W[Create Inviter]
-    W --> X[SIP INVITE]
-
-    G --> Y[Incoming call]
-    Y --> Z[onInvite handler]
-    Z --> AA[INCOME_DISPLAY]
-    AA --> BB[Show dialog]
-
-    BB --> CC[User answers]
-    CC --> DD[handleClkSubmitIn]
-    DD --> EE[Accept call]
-
-    X --> FF{Call established?}
-    FF -->|Yes| GG[Setup audio]
-    FF -->|No| HH[Call error]
-
-    EE --> II{Call established?}
-    II -->|Yes| JJ[Setup audio]
-    II -->|No| KK[Call error]
-
-    GG --> LL[Call active]
-    JJ --> LL
-    LL --> MM[Hangup]
-    MM --> NN[Reset state]
-
-    Q --> PP[Show error]
-    N --> PP
-    HH --> PP
-    KK --> PP
-
-    style A fill:#e1f5fe
-    style B fill:#f3e5f5
-    style I fill:#fff3e0
-    style R fill:#e8f5e8
-    style P fill:#c8e6c9
-    style Q fill:#ffcdd2
-```
-
 ## Состояние Redux store
 
 ```mermaid
@@ -104,4 +37,140 @@ flowchart TD
     classDef state fill:#e3f2fd,stroke:#1565c0,stroke-width:1px
     class CR,CS,CE,UN,RS,ID,IS,OS,CL,SV,EA action
     class Init state
+```
+
+## Sequence Diagram для SIP регистрации
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant PhoneReg
+    participant Action as phoneControlActions
+    participant UserAgent
+    participant Registerer
+    participant Dispatch
+
+    User->>PhoneReg: Fill registration form and submit
+    PhoneReg->>Action: handleClkRegister(formData, rdcr)
+    Action->>Action: Validate form fields
+    alt Valid
+        Action->>Action: Store values in localStorage and dispatch PHONECTL_STORE_VALUE
+        Action->>UserAgent: new UserAgent(userAgentOptions)
+        Action->>Registerer: new Registerer(userAgent, registererOptions)
+        Action->>Dispatch: PHONECTL_CONNECT_REQUEST
+        Action->>UserAgent: start()
+        UserAgent-->>Action: onConnect
+        Action->>Registerer: register()
+        Registerer-->>Action: onAccept
+        Action->>Dispatch: PHONECTL_CONNECT_SUCCESS
+    else Invalid
+        Action->>Dispatch: PHONECTL_ERROR_ALERT
+    end
+    Note over Registerer: If registration fails, onReject triggers CONNECT_ERROR
+```
+
+## Sequence Diagram для восстановления сетевого обрыва / перерегистрации
+
+```mermaid
+sequenceDiagram
+    participant UserAgent
+    participant Action as phoneControlActions
+    participant Registerer
+    participant Dispatch
+
+    UserAgent->>Action: onDisconnect(error)
+    Action->>Action: Check suppressReconnectOnNextDisconnect
+    alt Not suppressed
+        Action->>Dispatch: PHONECTL_CONNECT_ERROR (Disconnected)
+        Action->>Action: attemptReconnection(1)
+        Action->>Action: If reconnectionAttempt <= reconnectionAttempts
+        Action->>Dispatch: PHONECTL_RECONNECT_TRY
+        Action->>Action: setTimeout for delay
+        Action->>UserAgent: reconnect()
+        UserAgent-->>Action: reconnect success
+        Action->>Action: registrationInFlight = true
+        Action->>Registerer: register()
+        Registerer-->>Action: onAccept
+        Action->>Dispatch: PHONECTL_CONNECT_SUCCESS
+        Registerer-->>Action: onReject
+        Action->>Dispatch: PHONECTL_CONNECT_ERROR
+    else Suppressed
+        Action->>Action: Reset suppressReconnectOnNextDisconnect
+    end
+    Note over Action: If reconnect fails, increment attempt and retry
+```
+
+## Sequence Diagram для входящего вызова
+
+```mermaid
+sequenceDiagram
+    participant UserAgent
+    participant Action as phoneControlActions
+    participant IncomingSession
+    participant Dispatch
+    participant User
+    participant PhonePad
+
+    UserAgent->>Action: onInvite(invitation)
+    Action->>Dispatch: PHONECTL_SESSION_IN (incomingSession)
+    Action->>Action: Play incoming ringtone
+    Action->>Action: logCall('ringing', 'in')
+    Action->>Dispatch: CallsArrUpdate()
+    Action->>Dispatch: PHONECTL_INCOME_DISPLAY (calleePhoneNum)
+    User->>PhonePad: Click accept call
+    PhonePad->>Action: handleClkSubmitIn(rdcr)
+    Action->>Dispatch: PHONECTL_INCOME_SUBMIT (incomeDisplay=false, incomeCallNow=true)
+    Action->>Action: Pause incoming ringtone
+    Action->>IncomingSession: accept(sessionOptions)
+    IncomingSession-->>Action: stateChange: Establishing
+    IncomingSession-->>Action: stateChange: Established
+    Action->>Action: logCall('incall', 'in')
+    Action->>Dispatch: CallsArrUpdate()
+    Action->>Action: setupRemoteMedia()
+    IncomingSession-->>Action: stateChange: Terminated
+    Action->>Action: logCall('complete', 'in')
+    Action->>Dispatch: CallsArrUpdate()
+    Action->>Action: cleanupMedia()
+    Action->>Dispatch: handleClkReset()
+```
+
+## Sequence Diagram для исходящего вызова
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant PhonePad
+    participant Action as phoneControlActions
+    participant Inviter
+    participant Session
+    participant Dispatch
+
+    User->>PhonePad: Enter callee number and click call
+    PhonePad->>Action: handleClkSubmitOut(calleePhoneNum, rdcr)
+    Action->>Action: Validate registration and input
+    alt Valid
+        Action->>Dispatch: PHONECTL_OUTGO_SUBMIT (outgoCallNow: true)
+        Action->>Action: Play outgoing ringtone
+        Action->>Inviter: new Inviter(userAgent, target, sessionOptions)
+        Action->>Dispatch: PHONECTL_SESSION_OUT (outgoingSession)
+        Inviter->>Session: invite()
+        Session-->>Inviter: Establishing
+        Inviter->>Action: stateChange: Establishing
+        Action->>Action: logCall('ringing', 'out')
+        Action->>Dispatch: CallsArrUpdate()
+        Session-->>Inviter: Established
+        Inviter->>Action: stateChange: Established
+        Action->>Action: logCall('incall', 'out')
+        Action->>Dispatch: CallsArrUpdate()
+        Action->>Action: Pause outgoing ringtone
+        Action->>Action: setupRemoteMedia()
+        Session-->>Inviter: Terminated
+        Inviter->>Action: stateChange: Terminated
+        Action->>Action: logCall('complete', 'out')
+        Action->>Dispatch: CallsArrUpdate()
+        Action->>Action: cleanupMedia()
+        Action->>Dispatch: handleClkReset()
+    else Invalid
+        Action->>Dispatch: PHONECTL_ERROR_ALERT
+    end
 ```
