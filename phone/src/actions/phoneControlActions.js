@@ -28,6 +28,7 @@ import {
   // InviterOptions,
   Registerer,
   // RegistererOptions,
+  RegistererState,
   // Session,
   SessionState,
   UserAgent,
@@ -299,9 +300,6 @@ const handleClkRegister = function(formData, rdcr) {
         dispatch({
           type: PHONECTL_INCOME_DISPLAY,
           payload: {
-            'incomeDisplay'   : true,
-            'phoneHeader'     : userAgentOptions.authorizationUsername+' ⇠ '+incomingSession.remoteIdentity.uri.raw.user,
-            'icoHeader'       : incomingSession.remoteIdentity.uri.raw.user+' ⇢ '+userAgentOptions.authorizationUsername,
             'calleePhoneNum'  : incomingSession.remoteIdentity.uri.raw.user,
           }
         })
@@ -313,6 +311,28 @@ const handleClkRegister = function(formData, rdcr) {
     const registererOptions = sessionOptions
     const registerer = new Registerer(userAgent, registererOptions)
 
+    registerer.stateChange.addListener((newState) => {
+      if (newState === RegistererState.Registered) {
+        registrationAccepted = true
+      }
+
+      if (newState === RegistererState.Unregistered) {
+        registrationAccepted = false
+        registrationInFlight = false
+
+        if (shouldBeConnected && !suppressReconnectOnNextDisconnect) {
+          dispatch({
+            type: PHONECTL_CONNECT_ERROR,
+            payload: {
+              'regNow'      : false,
+              'phoneHeader' : 'Registration expired',
+              'icoHeader'   : 'Registration expired',
+            }
+          })
+          attemptReconnection()
+        }
+      }
+    })
 
 
     // ------------------------------------------------------------ Handling Changes in Network State
@@ -410,12 +430,9 @@ const handleClkRegister = function(formData, rdcr) {
                 'sessionOptions'    : sessionOptions,
                 'userAgent'         : userAgent,
                 'registerer'        : registerer,
-                'regNow'          : true,
-                'displayReg'      : false,
-                'displayPad'      : true,
-                'displayHistory'  : true,
-                'phoneHeader'     : response.message.from.displayName,
-                'icoHeader'       : response.message.from.displayName,
+                'regNow'            : true,
+                'phoneHeader'       : response.message.from.displayName,
+                'icoHeader'         : response.message.from.displayName,
               }
             })
           },
@@ -469,9 +486,13 @@ const handleClkRegister = function(formData, rdcr) {
         return
       }
 
+      registrationAccepted = false
+      registrationInFlight = false
+
       dispatch({
         type: PHONECTL_CONNECT_ERROR,
         payload: {
+          'regNow'          : false,
           'phoneHeader'     : 'Disconnected',
           'icoHeader'       : 'Disconnected',
         }
@@ -551,6 +572,7 @@ const handleClkUnregister = function(rdcr) {
     if (rdcr.audioLocalOut) rdcr.audioLocalOut.pause()
 
     const finishStop = () => {
+      shouldBeConnected = false
       suppressReconnectOnNextDisconnect = true
       return rdcr.userAgent.stop()
         .then(() => {
@@ -588,8 +610,6 @@ const handleClkSubmitIn = function(rdcr) {
       payload: {
         'incomeDisplay'   : false,
         'incomeCallNow'   : true,
-        'phoneHeader'     : rdcr.callerUserNum+' ⇠ '+rdcr.incomingSession.remoteIdentity.uri.raw.user,
-        'icoHeader'       : rdcr.incomingSession.remoteIdentity.uri.raw.user+' ⇢ '+rdcr.callerUserNum,
       }
     })
     rdcr.audioLocalIn.pause()
@@ -651,8 +671,6 @@ const handleClkSubmitOut = function(calleePhoneNum, rdcr) {
       type: PHONECTL_OUTGO_SUBMIT,
       payload: {
         'outgoCallNow'    : true,
-        'phoneHeader'     : rdcr.callerUserNum+' ⇢ '+callee,
-        'icoHeader'       : callee+' ⇠ '+rdcr.callerUserNum,
       }
     })
     rdcr.audioLocalOut.play()

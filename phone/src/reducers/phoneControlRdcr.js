@@ -86,9 +86,9 @@ export default function phoneControlRdcr(state = initialState, action) {
         'userAgent'       : action.payload.userAgent,
         'registerer'      : action.payload.registerer,
         'regNow'          : action.payload.regNow,
-        'displayReg'      : action.payload.displayReg,
-        'displayPad'      : action.payload.displayPad,
-        'displayHistory'  : action.payload.displayHistory,
+        'displayReg'      : false,
+        'displayPad'      : true,
+        'displayHistory'  : true,
         'phoneHeader'     : action.payload.phoneHeader,
         'icoHeader'       : action.payload.icoHeader,
       }
@@ -155,25 +155,25 @@ export default function phoneControlRdcr(state = initialState, action) {
 
     case PHONECTL_INCOME_DISPLAY:
       return { ...state,
-        'incomeDisplay'     : action.payload.incomeDisplay,
-        'phoneHeader'       : action.payload.phoneHeader,
-        'icoHeader'         : action.payload.icoHeader,
-        'calleePhoneNum'    : action.payload.calleePhoneNum,
+        'incomeDisplay'   : true,
+        'phoneHeader'     : state.callerUserNum+' ⇠ '+action.payload.calleePhoneNum,
+        'icoHeader'       : action.payload.calleePhoneNum+' ⇢ '+state.callerUserNum,
+        'calleePhoneNum'  : action.payload.calleePhoneNum,
       }
 
     case PHONECTL_INCOME_SUBMIT:
       return { ...state,
-        'incomeDisplay'     : action.payload.incomeDisplay,
-        'incomeCallNow'     : action.payload.incomeCallNow,
-        'phoneHeader'       : action.payload.phoneHeader,
-        'icoHeader'         : action.payload.icoHeader,
+        'incomeDisplay'   : false,
+        'incomeCallNow'   : true,
+        'phoneHeader'     : state.callerUserNum+' ⇠ '+(state.incomingSession?.remoteIdentity?.uri?.raw?.user ?? state.calleePhoneNum),
+        'icoHeader'       : (state.incomingSession?.remoteIdentity?.uri?.raw?.user ?? state.calleePhoneNum)+' ⇢ '+state.callerUserNum,
       }
 
     case PHONECTL_OUTGO_SUBMIT:
       return { ...state,
-        'outgoCallNow'      : action.payload.outgoCallNow,
-        'phoneHeader'       : action.payload.phoneHeader,
-        'icoHeader'         : action.payload.icoHeader,
+        'outgoCallNow'    : action.payload.outgoCallNow,
+        'phoneHeader'     : state.callerUserNum+' ⇢ '+state.calleePhoneNum,
+        'icoHeader'       : state.calleePhoneNum+' ⇠ '+state.callerUserNum,
       }
 
     case PHONECTL_SESSION_IN:
