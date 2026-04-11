@@ -5,56 +5,55 @@
 
 ```mermaid
 graph TD
-    A[User opens app] --> B[App.jsx renders components]
-    B --> C[MenuAppBar.jsx - navigation]
-    B --> D[PhoneReg.jsx - registration form]
-    B --> E[PhonePad.jsx - dial pad]
-    B --> F[PhoneHistory.jsx - call history]
-    B --> G[PhoneIco.jsx - phone status]
+    A[User opens app] --> B[App renders components]
+    B --> C[MenuAppBar navigation]
+    B --> D[PhoneReg form]
+    B --> E[PhonePad dial]
+    B --> F[PhoneHistory calls]
+    B --> G[PhoneIco status]
 
-    D --> H[handleClkRegister - form submit]
-    H --> I[phoneControlActions.handleClkRegister]
-    I --> J[Create UserAgent + Registerer]
-    J --> K[UserAgent.start() - WebSocket connect]
+    D --> H[Form submit]
+    H --> I[handleClkRegister]
+    I --> J[Create UserAgent]
+    J --> K[WebSocket connect]
     K --> L{Success?}
-    L -->|Yes| M[registerer.register() - SIP REGISTER]
+    L -->|Yes| M[SIP REGISTER]
     L -->|No| N[Connection error]
 
     M --> O{Registration OK?}
-    O -->|Yes| P[PHONECTL_CONNECT_SUCCESS]
-    O -->|No| Q[PHONECTL_CONNECT_ERROR]
+    O -->|Yes| P[CONNECT_SUCCESS]
+    O -->|No| Q[CONNECT_ERROR]
 
-    P --> R[phoneControlRdcr updates state]
-    R --> S[Components re-render]
-    S --> T[displayReg=false, displayPad=true]
+    P --> R[Update state]
+    R --> S[Re-render]
+    S --> T[Show dial pad]
 
-    E --> U[handleClkSubmitOut - outgoing call]
-    U --> V[phoneControlActions.handleClkSubmitOut]
-    V --> W[Create Inviter session]
-    W --> X[inviter.invite() - SIP INVITE]
+    E --> U[Outgoing call]
+    U --> V[handleClkSubmitOut]
+    V --> W[Create Inviter]
+    W --> X[SIP INVITE]
 
-    G --> Y[Incoming call from SIP server]
-    Y --> Z[userAgent.delegate.onInvite]
-    Z --> AA[PHONECTL_INCOME_DISPLAY]
-    AA --> BB[Show incoming call dialog]
+    G --> Y[Incoming call]
+    Y --> Z[onInvite handler]
+    Z --> AA[INCOME_DISPLAY]
+    AA --> BB[Show dialog]
 
     BB --> CC[User answers]
     CC --> DD[handleClkSubmitIn]
-    DD --> EE[session.accept() - accept call]
+    DD --> EE[Accept call]
 
     X --> FF{Call established?}
-    FF -->|Yes| GG[setupRemoteMedia - audio stream]
+    FF -->|Yes| GG[Setup audio]
     FF -->|No| HH[Call error]
 
     EE --> II{Call established?}
-    II -->|Yes| JJ[setupRemoteMedia - audio stream]
+    II -->|Yes| JJ[Setup audio]
     II -->|No| KK[Call error]
 
     GG --> LL[Call active]
     JJ --> LL
-    LL --> MM[session.bye() or endCall - hangup]
-    MM --> NN[PHONECTL_CLK_RESET]
-    NN --> OO[Reset state]
+    LL --> MM[Hangup]
+    MM --> NN[Reset state]
 
     Q --> PP[Show error]
     N --> PP
