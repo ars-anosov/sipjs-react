@@ -7,6 +7,27 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
+    // rollupOptions: {
+    //   output: {
+    //     manualChunks(id) {
+    //       if (id.includes('node_modules')) {
+    //         if (id.includes('react') || id.includes('redux')) {
+    //           return 'vendor';
+    //         }
+    //         if (id.includes('@mui') || id.includes('@emotion')) {
+    //           return 'mui';
+    //         }
+    //         if (id.includes('sip.js')) {
+    //           return 'sip';
+    //         }
+    //         if (id.includes('date-fns') || id.includes('redux-logger') || id.includes('redux-thunk')) {
+    //           return 'utils';
+    //         }
+    //       }
+    //     }
+    //   }
+    // },
+    chunkSizeWarningLimit: 1000 // Increase warning limit since we're splitting
   },
   server: {
     port: 3000,

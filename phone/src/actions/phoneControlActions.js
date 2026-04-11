@@ -38,6 +38,7 @@ import {
 
 /** Добровольный unregister + stop: не слать PHONECTL_CONNECT_ERROR «Disconnected» и не reconnect. */
 let suppressReconnectOnNextDisconnect = false
+let shouldBeConnected = false
 
 // https://sipjs.com/guides/end-call/
 const endCall = function(session) {
@@ -340,7 +341,7 @@ const handleClkRegister = function(formData, rdcr) {
     const reconnectionDelay = 4
 
     let attemptingReconnection = false;
-    let shouldBeConnected = true;
+    shouldBeConnected = true;
     let registrationInFlight = false
     let registrationAccepted = false
 

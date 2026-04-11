@@ -47,7 +47,7 @@ function MenuAppBar(props) {
 
   const toggleDisplay = (keyName) => {
     phoneControlActions.handleChangeStore(keyName, !phoneControlRdcr[keyName])
-    // handleCloseMenu()
+    handleCloseMenu()
   }
 
   return (
