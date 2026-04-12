@@ -1,0 +1,21 @@
+name: localhost
+version: 1.0.0
+schema: v1
+models:
+  - name: lmstudio
+    provider: lmstudio
+    model: local_model
+    apiBase: "http://localhost:1234/v1"
+    roles:
+      - chat
+      - edit
+      - apply
+
+  - name: ollama_qwen2.5-coder:7b
+    provider: ollama
+    model: qwen2.5-coder:7b
+    apiBase: "http://localhost:11434"
+    roles:
+      - chat
+      - edit
+      - apply
