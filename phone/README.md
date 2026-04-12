@@ -5,7 +5,7 @@
 
 ```mermaid
 flowchart TD
-  Init[Initial store]
+  Init@{ shape: circle, label: "Initial store" }
   CR[PHONECTL_CONNECT_REQUEST]
   CS[PHONECTL_CONNECT_SUCCESS]
   CE[PHONECTL_CONNECT_ERROR]
@@ -33,10 +33,13 @@ flowchart TD
   RS -->|restore initial UI state| Init
   UN -->|clear SIP session state, reset UI| Init
 
-  classDef action fill:#e8f5e8,stroke:#4caf50,stroke-width:1px
-  classDef state fill:#e3f2fd,stroke:#1565c0,stroke-width:1px
-  class CR,CS,CE,UN,RS,ID,IS,OS,CL,SV,EA action
-  class Init state
+  classDef initial fill:#e3f2fd,stroke:#1565c0,stroke-width:1px
+  classDef success fill:#e8f5e8,stroke:#4caf50,stroke-width:1px
+  classDef error fill:#ffebee,stroke:#f44336,stroke-width:1px
+  
+  class Init initial
+  class CS success
+  class CE error
 ```
 
 ## SIP регистрация
@@ -44,11 +47,11 @@ flowchart TD
 ```mermaid
 sequenceDiagram
   actor User
-  participant PhoneReg
-  participant Action as phoneControlActions
-  participant UserAgent
-  participant Registerer
-  participant Dispatch
+  participant PhoneReg@{ "type" : "participant", "alias": "PhoneReg.jsx" }
+  participant Action@{ "type" : "collections", "alias": "phoneControlActions.js" }
+  participant UserAgent@{ "type" : "control" }
+  participant Registerer@{ "type" : "control" }
+  participant Dispatch@{ "type" : "collections", "alias": "phoneControlRdcr.js"  }
 
   User->>PhoneReg: Fill registration form and submit
   PhoneReg->>Action: handleClkRegister(formData, rdcr)
@@ -73,10 +76,10 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-  participant UserAgent
-  participant Action as phoneControlActions
-  participant Registerer
-  participant Dispatch
+  participant UserAgent@{ "type" : "control" }
+  participant Action@{ "type" : "collections", "alias": "phoneControlActions.js" }
+  participant Registerer@{ "type" : "control" }
+  participant Dispatch@{ "type" : "collections", "alias": "phoneControlRdcr.js"  }
 
   UserAgent->>Action: onDisconnect(error)
   Action->>Action: Check suppressReconnectOnNextDisconnect
@@ -104,12 +107,12 @@ sequenceDiagram
 
 ```mermaid
 sequenceDiagram
-  participant UserAgent
-  participant Action as phoneControlActions
-  participant IncomingSession
-  participant Dispatch
+  participant UserAgent@{ "type" : "control" }
+  participant Action@{ "type" : "collections", "alias": "phoneControlActions.js" }
+  participant IncomingSession@{ "type" : "control" }
+  participant Dispatch@{ "type" : "collections", "alias": "phoneControlRdcr.js"  }
   actor User
-  participant PhonePad
+  participant PhonePad@{ "type" : "participant", "alias": "PhonePad.jsx" }
 
   UserAgent->>Action: onInvite(invitation)
   Action->>Dispatch: PHONECTL_SESSION_IN (incomingSession)
@@ -139,11 +142,11 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
   actor User
-  participant PhonePad
-  participant Action as phoneControlActions
-  participant Inviter
-  participant Session
-  participant Dispatch
+  participant PhonePad@{ "type" : "participant", "alias": "PhonePad.jsx" }
+  participant Action@{ "type" : "collections", "alias": "phoneControlActions.js" }
+  participant Inviter@{ "type" : "control" }
+  participant Session@{ "type" : "control" }
+  participant Dispatch@{ "type" : "collections", "alias": "phoneControlRdcr.js"  }
 
   User->>PhonePad: Enter callee number and click call
   PhonePad->>Action: handleClkSubmitOut(calleePhoneNum, rdcr)
