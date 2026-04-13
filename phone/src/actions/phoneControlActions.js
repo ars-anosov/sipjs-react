@@ -216,7 +216,11 @@ const handleClkRegister = function(formData, rdcr) {
       displayName: formData.callerUserNum,
       hackIpInContact: true,
       transportOptions: {
-        server: "wss://"+formData.uriHost+":"+formData.wssPort
+        server: "wss://"+formData.uriHost+":"+formData.wssPort,
+        // Эти "/r/n/r/n" ломают OpenSIPS и это не нужно т.к. REGISTER все равно будет слать запросы перергистрации через expires.
+        // Полагаемся на браузерный встроенный keep alive.
+        // keepAliveInterval: 30,
+        // keepAliveDebounce: 10  // Не слать пинг, если активность была менее 10с назад
       },
       logLevel: process.env.NODE_ENV === 'production' ? "error" : "debug"
     }

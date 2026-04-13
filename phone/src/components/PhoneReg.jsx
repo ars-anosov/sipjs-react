@@ -126,7 +126,7 @@ function PhoneReg(props) {
           <Button
             type="button"
             variant="outlined"
-            color="warning"
+            color="error"
             disabled={!phoneControlRdcr.regNow}
             onClick={handleUnregister}
             startIcon={<IconLogout />}
