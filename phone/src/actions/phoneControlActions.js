@@ -41,14 +41,34 @@ import {
 let suppressReconnectOnNextDisconnect = false
 let shouldBeConnected = false
 
+const cancelOutgoingSession = function(session) {
+  if (session.cancelSent) {
+    return
+  }
+
+  session.cancelSent = true
+  session.cancel()
+}
+
 // https://sipjs.com/guides/end-call/
 const endCall = function(session) {
   switch(session.state) {
     case SessionState.Initial:
+      if (session instanceof Inviter) {
+        session.cancelWhenProvisional = true
+      } else {
+        // An unestablished incoming session
+        session.reject();
+      }
+      break;
     case SessionState.Establishing:
       if (session instanceof Inviter) {
         // An unestablished outgoing session
-        session.cancel();
+        if (session.receivedInviteProvisional) {
+          cancelOutgoingSession(session)
+        } else {
+          session.cancelWhenProvisional = true
+        }
       } else {
         // An unestablished incoming session
         session.reject();
@@ -794,6 +814,10 @@ const handleClkSubmitOut = function(calleePhoneNum, rdcr) {
         // INVITE sent
       })
       .catch((error) => {
+        if (outgoingSession.cancelWhenEstablishing) {
+          return
+        }
+
         console.log('inviter INVITE send ERROR !', error)
         const msg = error && typeof error.message === 'string' ? error.message : String(error)
         padAlert('Не удалось отправить вызов: ' + msg)

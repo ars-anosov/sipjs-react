@@ -140,6 +140,8 @@ export default function phoneControlRdcr(state = initialState, action) {
     case PHONECTL_CLK_RESET:
       return { ...state,
         'connectStatus'     : '',
+        'incomingSession'   : null,
+        'outgoingSession'   : null,
         'phoneHeader'       : action.payload.phoneHeader,
         'icoHeader'         : action.payload.icoHeader,
         'calleePhoneNum'    : action.payload.calleePhoneNum,
