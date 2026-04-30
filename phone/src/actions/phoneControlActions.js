@@ -31,6 +31,7 @@ import {
   RegistererState,
   // Session,
   SessionState,
+  Web,
   UserAgent,
   // UserAgentOptions,
   // InvitationAcceptOptions
@@ -91,6 +92,67 @@ const cleanupMedia = function(mediaElement, audioLocalIn, audioLocalOut) {
   mediaElement.pause()
   audioLocalIn.pause()
   audioLocalOut.pause()
+}
+
+const getActiveSession = function(rdcr) {
+  const sessions = [
+    rdcr.incomingSession,
+    rdcr.outgoingSession,
+  ]
+
+  return sessions.find((session) => session && session.state === SessionState.Established)
+}
+
+const setLocalAudioEnabled = function(session, enabled) {
+  session.sessionDescriptionHandler?.peerConnection?.getSenders().forEach((sender) => {
+    if (sender.track && sender.track.kind === 'audio') {
+      sender.track.enabled = enabled
+    }
+  })
+}
+
+const opusCodecModifier = function(description) {
+  if (!description.sdp) {
+    return Promise.resolve(description)
+  }
+
+  const sections = description.sdp.split(/(?=m=)/)
+  const nextSdp = sections.map((section) => {
+    if (!section.startsWith('m=audio')) {
+      return section
+    }
+
+    const opusPayloads = []
+    section.replace(/^a=rtpmap:(\d+)\s+opus\/48000(?:\/\d+)?\r?$/gim, (line, payload) => {
+      opusPayloads.push(payload)
+      return line
+    })
+
+    if (!opusPayloads.length) {
+      return section
+    }
+
+    const allowed = new Set(opusPayloads)
+    const lines = section.split(/\r\n|\n/)
+    const filteredLines = lines
+      .map((line) => {
+        if (line.startsWith('m=audio')) {
+          return line.split(' ').slice(0, 3).concat(opusPayloads).join(' ')
+        }
+
+        const codecLine = line.match(/^a=(rtpmap|fmtp|rtcp-fb):(\d+)/)
+        if (codecLine && !allowed.has(codecLine[2])) {
+          return null
+        }
+
+        return line
+      })
+      .filter((line) => line !== null)
+
+    return filteredLines.join('\r\n')
+  }).join('')
+
+  return Promise.resolve({ ...description, sdp: nextSdp })
 }
 
 const logCall = function(session, callState, direction) {
@@ -231,6 +293,9 @@ const handleClkRegister = function(formData, rdcr) {
     }
 
     const sessionOptions = {
+      sessionDescriptionHandlerModifiers: [
+        opusCodecModifier,
+      ],
       sessionDescriptionHandlerOptions: {
         constraints: constrainsDefault,
       }
@@ -770,6 +835,116 @@ const handleClkReset = function(callData, rdcr) {
 
 
 
+const handleClkDtmf = function(tone, rdcr, options = {}) {
+  return (dispatch) => {
+    const padAlert = (errText) => {
+      dispatch({
+        type: PHONECTL_ERROR_ALERT,
+        payload: {
+          errComponent: 'PhonePad',
+          errText,
+        },
+      })
+    }
+
+    const clearPadAlert = () => {
+      dispatch({
+        type: PHONECTL_ERROR_ALERT,
+        payload: {
+          errComponent: '',
+          errText: '',
+        },
+      })
+    }
+
+    const dtmf = typeof tone === 'string' ? tone.trim() : String(tone ?? '').trim()
+    if (!/^[0-9A-D#*,]$/.test(dtmf)) {
+      padAlert('Некорректный DTMF сигнал.')
+      return
+    }
+
+    const session = getActiveSession(rdcr)
+    if (!session) {
+      padAlert('Нет активного звонка для DTMF.')
+      return
+    }
+
+    clearPadAlert()
+
+    if (options.useSessionDescriptionHandler) {
+      if (!session.sessionDescriptionHandler?.sendDtmf(dtmf, options.dtmfOptions)) {
+        padAlert('Не удалось отправить DTMF.')
+      }
+      return
+    }
+
+    const duration = options.duration ?? 200
+    const requestOptions = {
+      body: {
+        contentDisposition: 'render',
+        contentType: 'application/dtmf-relay',
+        content: 'Signal=' + dtmf + '\r\nDuration=' + duration,
+      }
+    }
+
+    session.info({ requestOptions })
+      .catch((error) => {
+        console.log('dtmf INFO send ERROR !', error)
+        padAlert('Не удалось отправить DTMF.')
+      })
+  }
+}
+
+
+
+const handleClkHold = function(rdcr, hold = true) {
+  return (dispatch) => {
+    const padAlert = (errText) => {
+      dispatch({
+        type: PHONECTL_ERROR_ALERT,
+        payload: {
+          errComponent: 'PhonePad',
+          errText,
+        },
+      })
+    }
+
+    const clearPadAlert = () => {
+      dispatch({
+        type: PHONECTL_ERROR_ALERT,
+        payload: {
+          errComponent: '',
+          errText: '',
+        },
+      })
+    }
+
+    const session = getActiveSession(rdcr)
+    if (!session) {
+      padAlert('Нет активного звонка для HOLD.')
+      return
+    }
+
+    const sessionDescriptionHandlerModifiers = hold ? [opusCodecModifier, Web.holdModifier] : [opusCodecModifier]
+
+    session.invite({ sessionDescriptionHandlerModifiers })
+      .then(() => {
+        setLocalAudioEnabled(session, !hold)
+        dispatch({
+          type: PHONECTL_STORE_VALUE,
+          payload: {'storeDataKey': 'callHoldNow', 'storeDataValue': hold}
+        })
+        clearPadAlert()
+      })
+      .catch((error) => {
+        console.log('hold re-INVITE send ERROR !', error)
+        padAlert(hold ? 'Не удалось поставить звонок на HOLD.' : 'Не удалось снять звонок с HOLD.')
+      })
+  }
+}
+
+
+
 const handleChangeStore = function(storeDataKey, storeDataValue) {
   return (dispatch) => {
     dispatch({
@@ -787,6 +962,8 @@ export {
   handleClkReset,
   handleClkSubmitIn,
   handleClkSubmitOut,
+  handleClkDtmf,
+  handleClkHold,
   handleChangeStore,
   CallsArrUpdate
 }

@@ -54,6 +54,7 @@ const initialState = {
   incomeDisplay     : false,
   incomeCallNow     : false,
   outgoCallNow      : false,
+  callHoldNow       : false,
   // PhoneHistory
   callsArr          : [],
   // Error alert
@@ -123,6 +124,7 @@ export default function phoneControlRdcr(state = initialState, action) {
         'incomeDisplay'     : false,
         'outgoCallNow'      : false,
         'incomeCallNow'     : false,
+        'callHoldNow'       : false,
         'calleePhoneNum'    : '',
         'errComponent'      : '',
         'errText'           : '',
@@ -144,6 +146,7 @@ export default function phoneControlRdcr(state = initialState, action) {
         'incomeDisplay'     : action.payload.incomeDisplay,
         'incomeCallNow'     : action.payload.incomeCallNow,
         'outgoCallNow'      : action.payload.outgoCallNow,
+        'callHoldNow'       : false,
         'errComponent'      : action.payload.errComponent,
         'errText'           : action.payload.errText,
       }
@@ -165,6 +168,7 @@ export default function phoneControlRdcr(state = initialState, action) {
       return { ...state,
         'incomeDisplay'   : false,
         'incomeCallNow'   : true,
+        'callHoldNow'     : false,
         'phoneHeader'     : state.callerUserNum+' ⇠ '+(state.incomingSession?.remoteIdentity?.uri?.raw?.user ?? state.calleePhoneNum),
         'icoHeader'       : (state.incomingSession?.remoteIdentity?.uri?.raw?.user ?? state.calleePhoneNum)+' ⇢ '+state.callerUserNum,
       }
@@ -172,6 +176,7 @@ export default function phoneControlRdcr(state = initialState, action) {
     case PHONECTL_OUTGO_SUBMIT:
       return { ...state,
         'outgoCallNow'    : action.payload.outgoCallNow,
+        'callHoldNow'     : false,
         'phoneHeader'     : state.callerUserNum+' ⇢ '+state.calleePhoneNum,
         'icoHeader'       : state.calleePhoneNum+' ⇠ '+state.callerUserNum,
       }

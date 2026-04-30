@@ -12,6 +12,7 @@ import {
   InputAdornment,
   Alert,
   Collapse,
+  Tooltip,
 } from '@mui/material'
 
 import {
@@ -19,6 +20,8 @@ import {
   Phone         as IconPhone, 
   RingVolume    as IconPhoneRing,
   PhoneDisabled as IconHangup,
+  Pause         as IconHold,
+  PlayArrow     as IconResume,
 } from '@mui/icons-material'
 
 
@@ -69,11 +72,19 @@ function PhonePad(props) {
   const handleInput = (event) => {
     setCalleeTxt(event.target.value)
   }
+  const callNow = phoneControlRdcr.incomeCallNow || phoneControlRdcr.outgoCallNow
   const handleKey = (digit) => {
+    if (callNow) {
+      phoneControlActions.handleClkDtmf(digit, phoneControlRdcr)
+      return
+    }
     setCalleeTxt((prev) => prev + digit)
   }
   const handleBackspace = () => {
     setCalleeTxt((prev) => prev.slice(0, -1))
+  }
+  const handleHold = () => {
+    phoneControlActions.handleClkHold(phoneControlRdcr, !phoneControlRdcr.callHoldNow)
   }
 
   const keys = [
@@ -123,7 +134,7 @@ function PhonePad(props) {
 
       {/* Кнопки Вызов / Сброс */}
       <Grid container spacing={2} justifyContent="center" sx={{ mb: 2 }}>
-        <Grid size={6} textAlign="center">
+        <Grid size={callNow ? 4 : 6} textAlign="center">
           {phoneControlRdcr.incomeDisplay ? (
             <Button
               type="submit"
@@ -155,7 +166,22 @@ function PhonePad(props) {
             </Button>
           )}
         </Grid>
-        <Grid size={6} textAlign="center">
+        {callNow && (
+        <Grid size={4} textAlign="center">
+          <Tooltip title={phoneControlRdcr.callHoldNow ? 'Resume' : 'Hold'}>
+            <Button
+              type="button"
+              variant="contained"
+              color={phoneControlRdcr.callHoldNow ? 'success' : 'info'}
+              onClick={handleHold}
+              sx={{ borderRadius: '50%', minWidth: 56, height: 56 }}
+            >
+              {phoneControlRdcr.callHoldNow ? <IconResume /> : <IconHold />}
+            </Button>
+          </Tooltip>
+        </Grid>
+        )}
+        <Grid size={callNow ? 4 : 6} textAlign="center">
           <Button
             type="reset"
             variant="contained"
