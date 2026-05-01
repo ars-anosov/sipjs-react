@@ -390,7 +390,7 @@ const handleClkRegister = function(formData, rdcr) {
         dispatch({
           type: PHONECTL_INCOME_DISPLAY,
           payload: {
-            'calleePhoneNum'  : incomingSession.remoteIdentity.uri.raw.user,
+            'calleePhoneNum'  : incomingSession.remoteIdentity.uri.raw.user+(incomingSession.remoteIdentity.displayName ? ' "'+incomingSession.remoteIdentity.displayName+'"' : '')
           }
         })
       }

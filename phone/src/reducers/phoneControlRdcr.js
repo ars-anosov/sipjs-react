@@ -171,8 +171,8 @@ export default function phoneControlRdcr(state = initialState, action) {
         'incomeDisplay'   : false,
         'incomeCallNow'   : true,
         'callHoldNow'     : false,
-        'phoneHeader'     : state.callerUserNum+' ⇠ '+(state.incomingSession?.remoteIdentity?.uri?.raw?.user ?? state.calleePhoneNum),
-        'icoHeader'       : (state.incomingSession?.remoteIdentity?.uri?.raw?.user ?? state.calleePhoneNum)+' ⇢ '+state.callerUserNum,
+        'phoneHeader'     : state.callerUserNum+' ⇠ '+state.calleePhoneNum,
+        'icoHeader'       : state.calleePhoneNum+' ⇢ '+state.callerUserNum,
       }
 
     case PHONECTL_OUTGO_SUBMIT:
