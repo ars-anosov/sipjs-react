@@ -41,47 +41,34 @@ import {
 let suppressReconnectOnNextDisconnect = false
 let shouldBeConnected = false
 
-const cancelOutgoingSession = function(session) {
-  if (session.cancelSent) {
-    return
-  }
-
-  session.cancelSent = true
-  session.cancel()
-}
-
 // https://sipjs.com/guides/end-call/
-const endCall = function(session) {
-  switch(session.state) {
-    case SessionState.Initial:
-      if (session instanceof Inviter) {
-        session.cancelWhenProvisional = true
-      } else {
-        // An unestablished incoming session
-        session.reject();
-      }
-      break;
-    case SessionState.Establishing:
-      if (session instanceof Inviter) {
-        // An unestablished outgoing session
-        if (session.receivedInviteProvisional) {
-          cancelOutgoingSession(session)
+const endCall = async function(session) {
+  if (!session) return
+
+  try {
+    switch(session.state) {
+      case SessionState.Initial:
+      case SessionState.Establishing:
+        // Если мы звоним — отменяем, если нам звонят — отклоняем
+        if (session instanceof Inviter) {
+          await session.cancel()
         } else {
-          session.cancelWhenProvisional = true
+          await session.reject()
         }
-      } else {
-        // An unestablished incoming session
-        session.reject();
-      }
-      break;
-    case SessionState.Established:
-      // An established session
-      session.bye();
-      break;
-    case SessionState.Terminating:
-    case SessionState.Terminated:
-      // Cannot terminate a session that is already terminated
-      break;
+        break
+      case SessionState.Established:
+        await session.bye();
+        break
+      case SessionState.Terminating:
+      case SessionState.Terminated:
+        console.log("Звонок уже в состоянии Terminating/Terminated")
+        break
+    }
+  } catch (e) {
+    console.error("Ошибка при завершении:", e);
+  } finally {
+    // Гарантированная очистка ресурсов WebRTC
+    session.dispose()
   }
 }
 
@@ -810,24 +797,30 @@ const handleClkSubmitOut = function(calleePhoneNum, rdcr) {
 
     // Send the INVITE request
     outgoingSession.invite()
-      .then(() => {
-        // INVITE sent
-      })
-      .catch((error) => {
-        if (outgoingSession.cancelWhenEstablishing) {
-          return
-        }
+    .then(() => {
+      // INVITE sent
+    })
+    .catch((error) => {
+      // ПРОВЕРКА: Если сессия закрыта нами, не считаем это ошибкой
+      const isTerminated = 
+        outgoingSession.state === SessionState.Terminating || 
+        outgoingSession.state === SessionState.Terminated
+      if (isTerminated) {
+        console.log("Игнорируем ошибку в состоянии Terminating/Terminated")
+        return
+      }
 
-        console.log('inviter INVITE send ERROR !', error)
-        const msg = error && typeof error.message === 'string' ? error.message : String(error)
-        padAlert('Не удалось отправить вызов: ' + msg)
-        const callData = {
-          outgoingSession,
-          incomingSession: false,
-          phoneHeader: rdcr.callerUserNum,
-        }
-        dispatch(handleClkReset(callData, rdcr))
-      })
+      // В противном случае — это реальная проблема (сеть, сервер и т.д.)
+      console.log('inviter INVITE send ERROR !', error)
+      const msg = error && typeof error.message === 'string' ? error.message : String(error)
+      padAlert('Не удалось отправить вызов: ' + msg)
+      const callData = {
+        outgoingSession,
+        incomingSession: false,
+        phoneHeader: rdcr.callerUserNum,
+      }
+      dispatch(handleClkReset(callData, rdcr))
+    })
   }
 }
 
