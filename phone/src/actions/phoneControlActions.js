@@ -61,7 +61,7 @@ const endCall = async function(session) {
         break
       case SessionState.Terminating:
       case SessionState.Terminated:
-        console.log("Звонок уже в состоянии Terminating/Terminated")
+        // console.log("Звонок уже в состоянии Terminating/Terminated")
         break
     }
   } catch (e) {
