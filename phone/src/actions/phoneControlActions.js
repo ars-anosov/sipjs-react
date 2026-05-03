@@ -37,9 +37,14 @@ import {
   // InvitationAcceptOptions
 } from "sip.js"
 
-/** Добровольный unregister + stop: не слать PHONECTL_CONNECT_ERROR «Disconnected» и не reconnect. */
-let suppressReconnectOnNextDisconnect = false
-let shouldBeConnected = false
+const connectionCtlByUserAgent = new WeakMap()
+
+function markVoluntaryDisconnect(userAgent) {
+  const ctl = userAgent && connectionCtlByUserAgent.get(userAgent)
+  if (!ctl) return
+  ctl.shouldBeConnected = false
+  ctl.suppressReconnectOnNextDisconnect = true
+}
 
 // https://sipjs.com/guides/end-call/
 const endCall = async function(session) {
@@ -321,10 +326,13 @@ const handleClkRegister = function(formData, rdcr) {
     const audioRemote = new Audio()
 
     const remoteStream = new MediaStream()
-    
+
     const userAgent = new UserAgent(userAgentOptions)
-
-
+    const connectionCtl = {
+      shouldBeConnected: true,
+      suppressReconnectOnNextDisconnect: false,
+    }
+    connectionCtlByUserAgent.set(userAgent, connectionCtl)
 
     // ------------------------------------------------------------ handling for incoming INVITE requests
     userAgent.delegate = {
@@ -397,7 +405,7 @@ const handleClkRegister = function(formData, rdcr) {
         registrationAccepted = false
         registrationInFlight = false
 
-        if (shouldBeConnected && !suppressReconnectOnNextDisconnect) {
+        if (connectionCtl.shouldBeConnected && !connectionCtl.suppressReconnectOnNextDisconnect) {
           dispatch({
             type: PHONECTL_CONNECT_ERROR,
             payload: {
@@ -416,14 +424,13 @@ const handleClkRegister = function(formData, rdcr) {
     const reconnectionAttempts = 2
     const reconnectionDelay = 4
 
-    let attemptingReconnection = false;
-    shouldBeConnected = true;
+    let attemptingReconnection = false
     let registrationInFlight = false
     let registrationAccepted = false
 
     const stopAfterRegistrationFailure = () => {
-      shouldBeConnected = false
-      suppressReconnectOnNextDisconnect = true
+      connectionCtl.shouldBeConnected = false
+      connectionCtl.suppressReconnectOnNextDisconnect = true
 
       return userAgent.stop().catch((e) => {
         console.log('userAgent.stop()', e)
@@ -436,7 +443,7 @@ const handleClkRegister = function(formData, rdcr) {
         return;
       }
 
-      if (!shouldBeConnected) {
+      if (!connectionCtl.shouldBeConnected) {
         return;
       }
 
@@ -467,7 +474,7 @@ const handleClkRegister = function(formData, rdcr) {
       attemptingReconnection = true;
 
       setTimeout(() => {
-        if (!shouldBeConnected) {
+        if (!connectionCtl.shouldBeConnected) {
           attemptingReconnection = false
           return;
         }
@@ -485,7 +492,7 @@ const handleClkRegister = function(formData, rdcr) {
     }
 
     userAgent.delegate.onConnect = () => {
-      if (!shouldBeConnected || registrationAccepted || registrationInFlight) {
+      if (!connectionCtl.shouldBeConnected || registrationAccepted || registrationInFlight) {
         return
       }
 
@@ -558,8 +565,8 @@ const handleClkRegister = function(formData, rdcr) {
     }
 
     userAgent.delegate.onDisconnect = (error) => {
-      if (suppressReconnectOnNextDisconnect) {
-        suppressReconnectOnNextDisconnect = false
+      if (connectionCtl.suppressReconnectOnNextDisconnect) {
+        connectionCtl.suppressReconnectOnNextDisconnect = false
         return
       }
 
@@ -595,7 +602,7 @@ const handleClkRegister = function(formData, rdcr) {
       clearRegAlert()
     })
     .catch((e) => {
-      shouldBeConnected = false
+      connectionCtl.shouldBeConnected = false
       dispatch({
         type: PHONECTL_CONNECT_ERROR,
         payload: {
@@ -648,9 +655,9 @@ const handleClkUnregister = function(rdcr) {
     if (rdcr.audioLocalIn) rdcr.audioLocalIn.pause()
     if (rdcr.audioLocalOut) rdcr.audioLocalOut.pause()
 
+    markVoluntaryDisconnect(rdcr.userAgent)
+
     const finishStop = () => {
-      shouldBeConnected = false
-      suppressReconnectOnNextDisconnect = true
       return rdcr.userAgent.stop()
         .then(() => {
           dispatch({ type: PHONECTL_UNREGISTER })
