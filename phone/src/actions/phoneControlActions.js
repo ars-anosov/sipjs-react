@@ -124,6 +124,10 @@ const setLocalAudioEnabled = function(session, enabled) {
 }
 
 const opusCodecModifier = function(description) {
+  // Ничего не модифицирую
+  return Promise.resolve(description)
+  // Ничего не модифицирую
+
   if (!description.sdp) {
     return Promise.resolve(description)
   }
