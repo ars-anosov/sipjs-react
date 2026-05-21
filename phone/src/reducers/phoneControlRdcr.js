@@ -12,28 +12,12 @@ import {
   PHONECTL_INCOME_SUBMIT,
   PHONECTL_OUTGO_SUBMIT,
 
-  PHONECTL_SESSION_IN,
-  PHONECTL_SESSION_OUT,
-
   PHONECTL_STORE_VALUE,
 
   PHONECTL_ERROR_ALERT,
 } from '../constants/all'
 
 const initialState = {
-  // sip.js
-  userAgentOptions  : null,
-  sessionOptions    : null,
-  userAgent         : null,
-  registerer        : null,
-  audioLocalIn      : null,
-  audioLocalOut     : null,
-  audioRemote       : null,
-  remoteStream      : null,
-  incomingSession   : null,
-  outgoingSession   : null,
-
-
   // --- UI ---
   // MenuAppBar
   displayReg        : true,
@@ -78,14 +62,6 @@ export default function phoneControlRdcr(state = initialState, action) {
     case PHONECTL_CONNECT_SUCCESS:
       return { ...state,
         'connectStatus'   : 'Success',
-        'audioLocalIn'    : action.payload.audioLocalIn,
-        'audioLocalOut'   : action.payload.audioLocalOut,
-        'audioRemote'     : action.payload.audioRemote,
-        'remoteStream'    : action.payload.remoteStream,
-        'userAgentOptions': action.payload.userAgentOptions,
-        'sessionOptions'  : action.payload.sessionOptions,
-        'userAgent'       : action.payload.userAgent,
-        'registerer'      : action.payload.registerer,
         'regNow'          : action.payload.regNow,
         'displayReg'      : false,
         'displayPad'      : true,
@@ -104,16 +80,6 @@ export default function phoneControlRdcr(state = initialState, action) {
 
     case PHONECTL_UNREGISTER:
       return { ...state,
-        'userAgent'         : null,
-        'registerer'        : null,
-        'userAgentOptions'  : null,
-        'sessionOptions'    : null,
-        'audioLocalIn'      : null,
-        'audioLocalOut'     : null,
-        'audioRemote'       : null,
-        'remoteStream'      : null,
-        'incomingSession'   : null,
-        'outgoingSession'   : null,
         'connectStatus'     : '',
         'regNow'            : false,
         'phoneHeader'       : 'Не зарегистрирован',
@@ -140,8 +106,6 @@ export default function phoneControlRdcr(state = initialState, action) {
     case PHONECTL_CLK_RESET:
       return { ...state,
         'connectStatus'     : '',
-        'incomingSession'   : null,
-        'outgoingSession'   : null,
         'phoneHeader'       : action.payload.phoneHeader,
         'icoHeader'         : action.payload.icoHeader,
         'calleePhoneNum'    : action.payload.calleePhoneNum,
@@ -181,16 +145,6 @@ export default function phoneControlRdcr(state = initialState, action) {
         'callHoldNow'     : false,
         'phoneHeader'     : state.callerUserNum+' ⇢ '+state.calleePhoneNum,
         'icoHeader'       : state.calleePhoneNum+' ⇠ '+state.callerUserNum,
-      }
-
-    case PHONECTL_SESSION_IN:
-      return { ...state,
-        'incomingSession'   : action.payload.incomingSession,
-      }
-
-    case PHONECTL_SESSION_OUT:
-      return { ...state,
-        'outgoingSession'   : action.payload.outgoingSession,
       }
 
     case PHONECTL_STORE_VALUE:

@@ -12,13 +12,17 @@ import {
   PHONECTL_INCOME_SUBMIT,
   PHONECTL_OUTGO_SUBMIT,
 
-  PHONECTL_SESSION_IN,
-  PHONECTL_SESSION_OUT,
-
   PHONECTL_STORE_VALUE,
 
   PHONECTL_ERROR_ALERT,
 } from '../constants/all'
+
+import {
+  getPhoneRuntime,
+  setPhoneRuntime,
+  resetPhoneRuntime,
+  resetPhoneRuntimeSessions,
+} from './phoneRuntime'
 
 // sip.js
 // https://github.com/onsip/SIP.js/blob/main/docs/api.md
@@ -106,10 +110,11 @@ const cleanupMedia = function(mediaElement, audioLocalIn, audioLocalOut) {
   audioLocalOut.pause()
 }
 
-const getActiveSession = function(rdcr) {
+const getActiveSession = function() {
+  const runtime = getPhoneRuntime()
   const sessions = [
-    rdcr.incomingSession,
-    rdcr.outgoingSession,
+    runtime.incomingSession,
+    runtime.outgoingSession,
   ]
 
   return sessions.find((session) => session && session.state === SessionState.Established)
@@ -337,19 +342,28 @@ const handleClkRegister = function(formData, rdcr) {
       suppressReconnectOnNextDisconnect: false,
     }
     connectionCtlByUserAgent.set(userAgent, connectionCtl)
+    setPhoneRuntime({
+      audioLocalIn,
+      audioLocalOut,
+      audioRemote,
+      remoteStream,
+      userAgentOptions,
+      sessionOptions,
+      userAgent,
+      registerer: null,
+      incomingSession: null,
+      outgoingSession: null,
+    })
 
     // ------------------------------------------------------------ handling for incoming INVITE requests
     userAgent.delegate = {
       onInvite(invitation) {
 
         const incomingSession = invitation
-        dispatch({
-          type: PHONECTL_SESSION_IN,
-          payload: {
-            'incomingSession' : incomingSession,
-          }
+        setPhoneRuntime({
+          incomingSession,
         })
-    
+
         incomingSession.delegate = {
           // Handle incoming REFER request.
           onRefer(referral) {
@@ -399,6 +413,7 @@ const handleClkRegister = function(formData, rdcr) {
 
     const registererOptions = sessionOptions
     const registerer = new Registerer(userAgent, registererOptions)
+    setPhoneRuntime({ registerer })
 
     registerer.stateChange.addListener((newState) => {
       if (newState === RegistererState.Registered) {
@@ -510,14 +525,6 @@ const handleClkRegister = function(formData, rdcr) {
             dispatch({
               type: PHONECTL_CONNECT_SUCCESS,
               payload: {
-                'audioLocalIn'      : audioLocalIn,
-                'audioLocalOut'     : audioLocalOut,
-                'audioRemote'       : audioRemote,
-                'remoteStream'      : remoteStream,
-                'userAgentOptions'  : userAgentOptions,
-                'sessionOptions'    : sessionOptions,
-                'userAgent'         : userAgent,
-                'registerer'        : registerer,
                 'regNow'            : true,
                 'phoneHeader'       : response.message.from.displayName,
                 'icoHeader'         : response.message.from.displayName,
@@ -541,6 +548,7 @@ const handleClkRegister = function(formData, rdcr) {
               stopAfterRegistrationFailure()
                 .finally(() => {
                   dispatch({ type: PHONECTL_UNREGISTER })
+                  resetPhoneRuntime()
                 })
             }, 3000)
           },
@@ -563,6 +571,7 @@ const handleClkRegister = function(formData, rdcr) {
           stopAfterRegistrationFailure()
             .finally(() => {
               dispatch({ type: PHONECTL_UNREGISTER })
+              resetPhoneRuntime()
             })
         }, 3000)
       })
@@ -616,6 +625,7 @@ const handleClkRegister = function(formData, rdcr) {
         }
       })
       dispatch({ type: PHONECTL_UNREGISTER })
+      resetPhoneRuntime()
     })
 
   }
@@ -625,6 +635,7 @@ const handleClkRegister = function(formData, rdcr) {
 
 const handleClkUnregister = function(rdcr) {
   return (dispatch) => {
+    const runtime = getPhoneRuntime()
     const regAlert = (errText) => {
       dispatch({
         type: PHONECTL_ERROR_ALERT,
@@ -645,7 +656,7 @@ const handleClkUnregister = function(rdcr) {
       })
     }
 
-    if (!rdcr.userAgent) {
+    if (!runtime.userAgent) {
       regAlert('Нет подключения к SIP.')
       return
     }
@@ -654,27 +665,29 @@ const handleClkUnregister = function(rdcr) {
       return
     }
 
-    if (rdcr.outgoingSession) endCall(rdcr.outgoingSession)
-    if (rdcr.incomingSession) endCall(rdcr.incomingSession)
-    if (rdcr.audioLocalIn) rdcr.audioLocalIn.pause()
-    if (rdcr.audioLocalOut) rdcr.audioLocalOut.pause()
+    if (runtime.outgoingSession) endCall(runtime.outgoingSession)
+    if (runtime.incomingSession) endCall(runtime.incomingSession)
+    if (runtime.audioLocalIn) runtime.audioLocalIn.pause()
+    if (runtime.audioLocalOut) runtime.audioLocalOut.pause()
 
-    markVoluntaryDisconnect(rdcr.userAgent)
+    markVoluntaryDisconnect(runtime.userAgent)
 
     const finishStop = () => {
-      return rdcr.userAgent.stop()
+      return runtime.userAgent.stop()
         .then(() => {
           dispatch({ type: PHONECTL_UNREGISTER })
+          resetPhoneRuntime()
           clearRegAlert()
         })
         .catch((e) => {
           console.log('userAgent.stop()', e)
           dispatch({ type: PHONECTL_UNREGISTER })
+          resetPhoneRuntime()
           clearRegAlert()
         })
     }
 
-    const registerer = rdcr.registerer
+    const registerer = runtime.registerer
     if (registerer) {
       registerer
         .unregister()
@@ -693,6 +706,7 @@ const handleClkUnregister = function(rdcr) {
 
 const handleClkSubmitIn = function(rdcr) {
   return (dispatch) => {
+    const runtime = getPhoneRuntime()
     dispatch({
       type: PHONECTL_INCOME_SUBMIT,
       payload: {
@@ -700,8 +714,8 @@ const handleClkSubmitIn = function(rdcr) {
         'incomeCallNow'   : true,
       }
     })
-    rdcr.audioLocalIn.pause()
-    rdcr.incomingSession.accept(rdcr.sessionOptions)
+    runtime.audioLocalIn.pause()
+    runtime.incomingSession.accept(runtime.sessionOptions)
   }
 }
 
@@ -711,6 +725,7 @@ const handleClkSubmitOut = function(calleePhoneNum, rdcr) {
   // calleePhoneNum передаю отдельным аргументом т.к. rdcr.calleePhoneNum прилетит позже при след.рендере.
 
   return (dispatch) => {
+    const runtime = getPhoneRuntime()
     const padAlert = (errText) => {
       dispatch({
         type: PHONECTL_ERROR_ALERT,
@@ -737,6 +752,10 @@ const handleClkSubmitOut = function(calleePhoneNum, rdcr) {
       padAlert('Нет регистрации. Сначала зарегистрируйтесь.')
       return
     }
+    if (!runtime.userAgent) {
+      padAlert('Нет подключения к SIP.')
+      return
+    }
     if (!rdcr.callerUserNum) {
       padAlert('Не задан внутренний номер.')
       return
@@ -761,14 +780,11 @@ const handleClkSubmitOut = function(calleePhoneNum, rdcr) {
         'outgoCallNow'    : true,
       }
     })
-    rdcr.audioLocalOut.play()
+    runtime.audioLocalOut.play()
 
-    const outgoingSession = new Inviter(rdcr.userAgent, target, rdcr.sessionOptions)
-    dispatch({
-      type: PHONECTL_SESSION_OUT,
-      payload: {
-        'outgoingSession' : outgoingSession,
-      }
+    const outgoingSession = new Inviter(runtime.userAgent, target, runtime.sessionOptions)
+    setPhoneRuntime({
+      outgoingSession,
     })
 
     outgoingSession.delegate = {
@@ -787,13 +803,13 @@ const handleClkSubmitOut = function(calleePhoneNum, rdcr) {
         case SessionState.Established:
           logCall(outgoingSession, 'incall', 'out')
           dispatch(CallsArrUpdate())
-          rdcr.audioLocalOut.pause()
-          setupRemoteMedia(outgoingSession, rdcr.audioRemote, rdcr.remoteStream)
+          runtime.audioLocalOut.pause()
+          setupRemoteMedia(outgoingSession, runtime.audioRemote, runtime.remoteStream)
           break
         case SessionState.Terminated:
           logCall(outgoingSession, 'complete', 'out')
           dispatch(CallsArrUpdate())
-          cleanupMedia(rdcr.audioRemote, rdcr.audioLocalIn, rdcr.audioLocalOut)
+          cleanupMedia(runtime.audioRemote, runtime.audioLocalIn, runtime.audioLocalOut)
           const callData = {
             outgoingSession,
             incomingSession: false,
@@ -813,8 +829,8 @@ const handleClkSubmitOut = function(calleePhoneNum, rdcr) {
     })
     .catch((error) => {
       // ПРОВЕРКА: Если сессия закрыта нами, не считаем это ошибкой
-      const isTerminated = 
-        outgoingSession.state === SessionState.Terminating || 
+      const isTerminated =
+        outgoingSession.state === SessionState.Terminating ||
         outgoingSession.state === SessionState.Terminated
       if (isTerminated) {
         console.log("Игнорируем ошибку в состоянии Terminating/Terminated")
@@ -839,11 +855,17 @@ const handleClkSubmitOut = function(calleePhoneNum, rdcr) {
 
 const handleClkReset = function(callData, rdcr) {
   return (dispatch) => {
-    const { outgoingSession, incomingSession, phoneHeader } = callData
+    const runtime = getPhoneRuntime()
+    const {
+      outgoingSession = runtime.outgoingSession,
+      incomingSession = runtime.incomingSession,
+      phoneHeader,
+    } = callData
     if (outgoingSession) endCall(outgoingSession)
     if (incomingSession) endCall(incomingSession)
-    if (rdcr.audioLocalIn) rdcr.audioLocalIn.pause()
-    if (rdcr.audioLocalOut) rdcr.audioLocalOut.pause()
+    if (runtime.audioLocalIn) runtime.audioLocalIn.pause()
+    if (runtime.audioLocalOut) runtime.audioLocalOut.pause()
+    resetPhoneRuntimeSessions()
 
     dispatch({
       type: PHONECTL_CLK_RESET,
@@ -891,7 +913,7 @@ const handleClkDtmf = function(tone, rdcr, options = {}) {
       return
     }
 
-    const session = getActiveSession(rdcr)
+    const session = getActiveSession()
     if (!session) {
       padAlert('Нет активного звонка для DTMF.')
       return
@@ -947,7 +969,7 @@ const handleClkHold = function(rdcr, hold = true) {
       })
     }
 
-    const session = getActiveSession(rdcr)
+    const session = getActiveSession()
     if (!session) {
       padAlert('Нет активного звонка для HOLD.')
       return

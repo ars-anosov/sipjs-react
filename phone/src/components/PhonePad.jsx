@@ -17,7 +17,7 @@ import {
 
 import {
   Backspace     as IconBackspace,
-  Phone         as IconPhone, 
+  Phone         as IconPhone,
   RingVolume    as IconPhoneRing,
   PhoneDisabled as IconHangup,
   Pause         as IconHold,
@@ -61,8 +61,6 @@ function PhonePad(props) {
   const handleReset = () => {
     setCalleeTxt('')
     const callData = {
-      outgoingSession: phoneControlRdcr.outgoingSession,
-      incomingSession: phoneControlRdcr.incomingSession,
       phoneHeader: phoneControlRdcr.callerUserNum,
     }
     phoneControlActions.handleClkReset(callData, phoneControlRdcr)
@@ -140,16 +138,16 @@ function PhonePad(props) {
               type="submit"
               variant="contained"
               color="success"
-              sx={{ 
-                borderRadius: '50%', 
-                minWidth: 56, 
+              sx={{
+                borderRadius: '50%',
+                minWidth: 56,
                 height: 56,
                 '@keyframes pulse': {
                   '0%': { transform: 'scale(1)', boxShadow: '0 0 0 0 rgba(76, 175, 80, 0.7)' },
                   '70%': { transform: 'scale(1.1)', boxShadow: '0 0 0 15px rgba(76, 175, 80, 0)' },
                   '100%': { transform: 'scale(1)', boxShadow: '0 0 0 0 rgba(76, 175, 80, 0)' },
                 },
-                animation: 'pulse 1.5s infinite' 
+                animation: 'pulse 1.5s infinite'
               }}
             >
               <IconPhoneRing />
@@ -202,9 +200,9 @@ function PhonePad(props) {
               fullWidth
               variant="outlined"
               onClick={() => handleKey(num)}
-              sx={{ 
-                height: 50, 
-                display: 'flex', 
+              sx={{
+                height: 50,
+                display: 'flex',
                 flexDirection: 'column',
                 textTransform: 'none',
                 borderColor: 'divider',
