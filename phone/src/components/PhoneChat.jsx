@@ -1,0 +1,233 @@
+import { useState, useEffect, useRef } from 'react'
+import PropTypes from 'prop-types'
+
+import {
+  Paper,
+  Typography,
+  TextField,
+  Box,
+  Stack,
+  IconButton,
+  Alert,
+  Collapse,
+  Badge,
+} from '@mui/material'
+
+import {
+  Send as IconSend,
+  Close as IconClose,
+} from '@mui/icons-material'
+
+import { useTheme, alpha } from '@mui/material/styles'
+import { format } from 'date-fns'
+
+
+
+function PhoneChat(props) {
+  if (process.env.NODE_ENV === 'development') console.log('PhoneChat hook')
+
+  const { phoneControlRdcr, phoneControlActions } = props
+  const theme = useTheme()
+  const messagesEndRef = useRef(null)
+
+  const [peerTxt, setPeerTxt] = useState(phoneControlRdcr.calleePhoneNum || '')
+  const [messageTxt, setMessageTxt] = useState('')
+
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') console.log('PhoneChat MOUNT')
+    phoneControlActions.MessagesArrUpdate()
+    phoneControlActions.handleChatUnreadClear()
+
+    return () => {
+      if (process.env.NODE_ENV === 'development') console.log('PhoneChat UNMOUNT')
+    }
+  }, [])
+
+  useEffect(() => {
+    if (phoneControlRdcr.calleePhoneNum && !peerTxt) {
+      setPeerTxt(phoneControlRdcr.calleePhoneNum)
+    }
+  }, [phoneControlRdcr.calleePhoneNum, peerTxt])
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [phoneControlRdcr.chatMessages])
+
+  const visibleMessages = peerTxt.trim()
+    ? phoneControlRdcr.chatMessages.filter((msg) => msg.peer === peerTxt.trim())
+    : phoneControlRdcr.chatMessages
+
+  const handleClose = () => {
+    phoneControlActions.handleChangeStore('displayChat', false)
+  }
+
+  const handleSubmit = (event) => {
+    event.preventDefault()
+    phoneControlActions.handleSendMessage(peerTxt, messageTxt, phoneControlRdcr)
+    setMessageTxt('')
+  }
+
+  const title = phoneControlRdcr.chatUnread > 0
+    ? `Чат (${phoneControlRdcr.chatUnread})`
+    : 'Чат'
+
+  const formatDeliveryStatus = (msg) => {
+    if (msg.direction !== 'out' || !msg.status) return null
+
+    if (msg.status === 'sending') return 'отправка...'
+    if (msg.statusCode) {
+      return msg.statusText ? `${msg.statusCode} ${msg.statusText}` : String(msg.statusCode)
+    }
+    if (msg.status === 'delivered') return 'доставлено'
+    if (msg.status === 'error') return msg.statusText || 'ошибка'
+    return null
+  }
+
+  const deliveryStatusColor = (msg) => {
+    if (msg.status === 'delivered') return 'success.main'
+    if (msg.status === 'error') return 'error.main'
+    return 'text.secondary'
+  }
+
+  return (
+    <Paper
+      elevation={8}
+      sx={{
+        p: 1,
+        mt: 2,
+        maxWidth: 480,
+        mx: 'auto',
+      }}
+    >
+      <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
+        <Badge color="error" badgeContent={phoneControlRdcr.chatUnread} invisible={!phoneControlRdcr.chatUnread}>
+          <Typography variant="h6">{title}</Typography>
+        </Badge>
+        <IconButton onClick={handleClose}>
+          <IconClose color="error" />
+        </IconButton>
+      </Stack>
+
+      <Box component="form" onSubmit={handleSubmit}>
+        <TextField
+          fullWidth
+          label="Абонент"
+          variant="standard"
+          value={peerTxt}
+          onChange={(event) => setPeerTxt(event.target.value)}
+          sx={{ mb: 2 }}
+        />
+
+        <Box
+          sx={{
+            height: 280,
+            overflowY: 'auto',
+            border: 1,
+            borderColor: 'divider',
+            borderRadius: 1,
+            p: 1,
+            mb: 2,
+            backgroundColor: alpha(theme.palette.background.default, 0.5),
+          }}
+        >
+          {visibleMessages.length === 0 ? (
+            <Typography variant="body2" color="text.secondary" sx={{ p: 1 }}>
+              Сообщений пока нет.
+            </Typography>
+          ) : (
+            visibleMessages.map((msg) => {
+              const isOutbound = msg.direction === 'out'
+              const deliveryStatus = formatDeliveryStatus(msg)
+              const bubbleColor = isOutbound
+                ? alpha(theme.palette.info.main, 0.12)
+                : alpha(theme.palette.success.main, 0.12)
+
+              return (
+                <Box
+                  key={msg.id}
+                  sx={{
+                    mb: 1,
+                    p: 1,
+                    borderRadius: 1,
+                    backgroundColor: bubbleColor,
+                  }}
+                >
+                  <Stack direction="row" justifyContent="space-between" spacing={1} sx={{ mb: 0.5 }}>
+                    <Typography variant="caption" color="text.secondary">
+                      {isOutbound ? 'Вы' : msg.peer}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {format(new Date(msg.time), 'HH:mm:ss')}
+                    </Typography>
+                  </Stack>
+                  <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                    {msg.body}
+                  </Typography>
+                  {deliveryStatus && (
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        display: 'block',
+                        mt: 0.5,
+                        textAlign: 'right',
+                        color: deliveryStatusColor(msg),
+                        fontStyle: msg.status === 'sending' ? 'italic' : 'normal',
+                      }}
+                    >
+                      {deliveryStatus}
+                    </Typography>
+                  )}
+                </Box>
+              )
+            })
+          )}
+          <div ref={messagesEndRef} />
+        </Box>
+
+        <Stack direction="row" spacing={1} alignItems="flex-end">
+          <TextField
+            fullWidth
+            label="Сообщение"
+            variant="standard"
+            value={messageTxt}
+            onChange={(event) => setMessageTxt(event.target.value)}
+            multiline
+            maxRows={4}
+          />
+          <IconButton
+            type="submit"
+            color="primary"
+            disabled={!phoneControlRdcr.regNow}
+            sx={{
+              width: 48,
+              height: 48,
+              flexShrink: 0,
+              backgroundColor: 'primary.main',
+              color: 'primary.contrastText',
+              '&:hover': { backgroundColor: 'primary.dark' },
+              '&.Mui-disabled': {
+                backgroundColor: 'action.disabledBackground',
+                color: 'action.disabled',
+              },
+            }}
+          >
+            <IconSend />
+          </IconButton>
+        </Stack>
+      </Box>
+
+      <Collapse in={phoneControlRdcr.errComponent === 'PhoneChat' && phoneControlRdcr.errText}>
+        <Alert severity="error" sx={{ mt: 2 }}>{phoneControlRdcr.errText}</Alert>
+      </Collapse>
+    </Paper>
+  )
+}
+
+
+
+PhoneChat.propTypes = {
+  phoneControlRdcr: PropTypes.object.isRequired,
+  phoneControlActions: PropTypes.object.isRequired,
+}
+
+export default PhoneChat

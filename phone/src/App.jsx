@@ -8,7 +8,8 @@ export default function App() {
     <Container
       maxWidth="sm"
       sx={{
-        padding: 2,
+        p: 2,
+        mt: 2,
         border: '1px dashed grey',
         borderRadius: 5,
       }}

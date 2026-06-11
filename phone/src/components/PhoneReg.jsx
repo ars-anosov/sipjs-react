@@ -6,6 +6,7 @@ import {
   Box,
   Button,
   Paper,
+  Typography,
   Stack,
   IconButton,
   Alert,
@@ -63,7 +64,8 @@ function PhoneReg(props) {
 
   const finalTemplate =
   <Paper elevation={8} sx={{ p: 1, mt: 2 }}>
-    <Stack direction="row" justifyContent="flex-end">
+    <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
+      <Typography variant="h6">Регистрация</Typography>
       <IconButton onClick={handleClose}>
         <IconClose color="error" />
       </IconButton>

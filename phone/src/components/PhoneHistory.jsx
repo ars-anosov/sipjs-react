@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import PropTypes from 'prop-types'
 
 import {
   Paper,
   Typography,
-
+  Stack,
+  IconButton,
   TableContainer,
   Table,
   TableBody,
@@ -16,7 +17,8 @@ import {
 
 import {
   ArrowBack as IcoIncome,
-  ArrowForward as IcoOutgo
+  ArrowForward as IcoOutgo,
+  Close as IconClose,
 } from '@mui/icons-material'
 
 import { useTheme, alpha, keyframes } from '@mui/material/styles'
@@ -44,6 +46,10 @@ function PhoneHistory(props) {
     }
   }, [])
 
+  const handleClose = () => {
+    phoneControlActions.handleChangeStore('displayHistory', false)
+  }
+
   const handleCallLogClk = (phoneNum) => {
     if (!phoneControlRdcr.incomeDisplay && !phoneControlRdcr.outgoCallNow && !phoneControlRdcr.incomeCallNow ) {
       const cleanNum = phoneNum.split(" ")[0]
@@ -70,12 +76,24 @@ function PhoneHistory(props) {
         mx: 'auto'
       }}
     >
-      <Typography variant="h6" gutterBottom>
-        История звонков
-      </Typography>
+      <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
+        <Typography variant="h6">История звонков</Typography>
+        <IconButton onClick={handleClose}>
+          <IconClose color="error" />
+        </IconButton>
+      </Stack>
 
-      <TableContainer>
-        <Table size="small" aria-label="История звонков">
+      <TableContainer
+        sx={{
+          height: 280,
+          overflowY: 'auto',
+          border: 1,
+          borderColor: 'divider',
+          borderRadius: 1,
+          backgroundColor: alpha(theme.palette.background.default, 0.5),
+        }}
+      >
+        <Table size="small" aria-label="История звонков" stickyHeader>
           <TableHead>
             <TableRow>
               <TableCell>Время</TableCell>

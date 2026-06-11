@@ -15,7 +15,12 @@ import {
   PHONECTL_STORE_VALUE,
 
   PHONECTL_ERROR_ALERT,
-} from '../constants/all'
+
+  PHONECTL_MESSAGE_ADD,
+  PHONECTL_MESSAGE_UPDATE,
+  PHONECTL_MESSAGES_LOAD,
+  PHONECTL_CHAT_UNREAD_CLEAR,
+} from '../constants/redux'
 
 import {
   getPhoneRuntime,
@@ -33,6 +38,7 @@ import {
   opusCodecModifier,
   // Call logging
   logCall,
+  loadCallsArr,
   // Audio elements
   createAudioElements,
   createRemoteStream,
@@ -47,33 +53,43 @@ import {
   Web,
   UserAgent,
   Registerer,
+  loadChatMessages,
+  saveChatMessage,
+  createChatMessage,
+  handleIncomingSipMessage,
+  transmitSipMessage,
 } from './phoneRuntime'
 
+const MessagesArrUpdate = function() {
+  return (dispatch) => {
+    dispatch({
+      type: PHONECTL_MESSAGES_LOAD,
+      payload: {
+        chatMessages: loadChatMessages(),
+      },
+    })
+  }
+}
 
+const appendChatMessage = function(message, dispatch) {
+  const chatMessages = saveChatMessage(message)
+
+  dispatch({
+    type: PHONECTL_MESSAGE_ADD,
+    payload: {
+      chatMessages,
+      incoming: message.direction === 'in',
+    },
+  })
+}
 
 const CallsArrUpdate = function() {
   return (dispatch) => {
-    let calllog = JSON.parse(localStorage.getItem('sipCalls'))
-    const rows = []
-
-    if (calllog !== null) {
-      for (const calllogObj in calllog) {
-        rows.push(calllog[calllogObj])
-      }
-    }
-
-    // Удаляю первую строчку лога (самую старую)
-    if (rows.length > 10) {
-      delete calllog[rows[0].id]
-      localStorage.setItem('sipCalls', JSON.stringify(calllog))
-    }
-
-    rows.sort((a, b) => a.start > b.start ? -1 : 1)
     dispatch({
       type: PHONECTL_CALLLOG_UPD,
       payload: {
-        'callsArr' : rows,
-      }
+        callsArr: loadCallsArr(),
+      },
     })
   }
 }
@@ -237,7 +253,18 @@ const handleClkRegister = function(formData, rdcr) {
             'calleePhoneNum'  : incomingSession.remoteIdentity.uri.raw.user+(incomingSession.remoteIdentity.displayName ? ' "'+incomingSession.remoteIdentity.displayName+'"' : '')
           }
         })
-      }
+      },
+
+      onMessage(message) {
+        const { chatMessages } = handleIncomingSipMessage(message)
+        dispatch({
+          type: PHONECTL_MESSAGE_ADD,
+          payload: {
+            chatMessages,
+            incoming: true,
+          },
+        })
+      },
     }
 
 
@@ -837,6 +864,87 @@ const handleChangeStore = function(storeDataKey, storeDataValue) {
 
 
 
+const handleChatUnreadClear = function() {
+  return (dispatch) => {
+    dispatch({ type: PHONECTL_CHAT_UNREAD_CLEAR })
+  }
+}
+
+
+
+const handleSendMessage = function(peerPhoneNum, messageBody, rdcr) {
+  return (dispatch) => {
+    const runtime = getPhoneRuntime()
+    const chatAlert = (errText) => {
+      dispatch({
+        type: PHONECTL_ERROR_ALERT,
+        payload: {
+          errComponent: 'PhoneChat',
+          errText,
+        },
+      })
+    }
+
+    const clearChatAlert = () => {
+      dispatch({
+        type: PHONECTL_ERROR_ALERT,
+        payload: {
+          errComponent: '',
+          errText: '',
+        },
+      })
+    }
+
+    const peer = typeof peerPhoneNum === 'string' ? peerPhoneNum.trim() : String(peerPhoneNum ?? '').trim()
+    const body = typeof messageBody === 'string' ? messageBody.trim() : String(messageBody ?? '').trim()
+
+    if (!rdcr.regNow) {
+      chatAlert('Нет регистрации. Сначала зарегистрируйтесь.')
+      return
+    }
+    if (!runtime.userAgent) {
+      chatAlert('Нет подключения к SIP.')
+      return
+    }
+    if (!peer) {
+      chatAlert('Введите номер абонента.')
+      return
+    }
+    if (!body) {
+      chatAlert('Введите текст сообщения.')
+      return
+    }
+
+    const targetStr = 'sip:' + peer + '@' + rdcr.uriHost
+    if (!UserAgent.makeURI(targetStr)) {
+      chatAlert('Некорректный SIP URI: ' + targetStr)
+      return
+    }
+
+    clearChatAlert()
+
+    const chatMessage = createChatMessage(peer, body, 'out', 'sending')
+    appendChatMessage(chatMessage, dispatch)
+    dispatch({
+      type: PHONECTL_STORE_VALUE,
+      payload: { storeDataKey: 'calleePhoneNum', storeDataValue: peer },
+    })
+
+    transmitSipMessage({
+      chatMessage,
+      uriHost: rdcr.uriHost,
+      onStatusChange: (chatMessages) => {
+        dispatch({
+          type: PHONECTL_MESSAGE_UPDATE,
+          payload: { chatMessages },
+        })
+      },
+    })
+  }
+}
+
+
+
 export {
   handleClkRegister,
   handleClkUnregister,
@@ -846,5 +954,8 @@ export {
   handleClkDtmf,
   handleClkHold,
   handleChangeStore,
-  CallsArrUpdate
+  handleSendMessage,
+  handleChatUnreadClear,
+  CallsArrUpdate,
+  MessagesArrUpdate,
 }

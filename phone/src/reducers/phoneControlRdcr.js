@@ -15,7 +15,11 @@ import {
   PHONECTL_STORE_VALUE,
 
   PHONECTL_ERROR_ALERT,
-} from '../constants/all'
+  PHONECTL_MESSAGE_ADD,
+  PHONECTL_MESSAGE_UPDATE,
+  PHONECTL_MESSAGES_LOAD,
+  PHONECTL_CHAT_UNREAD_CLEAR,
+} from '../constants/redux'
 
 const initialState = {
   // --- UI ---
@@ -24,6 +28,7 @@ const initialState = {
   displayPad        : false,
   displayControl    : true,
   displayHistory    : false,
+  displayChat       : false,
   // PhoneReg form fields
   uriHost           : localStorage.getItem('uriHost') ? localStorage.getItem('uriHost') : '',
   wssPort           : localStorage.getItem('wssPort') ? localStorage.getItem('wssPort') : '',
@@ -41,6 +46,9 @@ const initialState = {
   callHoldNow       : false,
   // PhoneHistory
   callsArr          : [],
+  // PhoneChat
+  chatMessages      : [],
+  chatUnread        : 0,
   // Error alert
   errComponent      : '',
   errText           : '',
@@ -66,6 +74,7 @@ export default function phoneControlRdcr(state = initialState, action) {
         'displayReg'      : false,
         'displayPad'      : true,
         'displayHistory'  : true,
+        'displayChat'     : true,
         'phoneHeader'     : action.payload.phoneHeader,
         'icoHeader'       : action.payload.icoHeader,
       }
@@ -87,6 +96,8 @@ export default function phoneControlRdcr(state = initialState, action) {
         'displayReg'        : true,
         'displayPad'        : false,
         'displayHistory'    : false,
+        'displayChat'       : false,
+        'chatUnread'        : 0,
         'incomeDisplay'     : false,
         'outgoCallNow'      : false,
         'incomeCallNow'     : false,
@@ -156,6 +167,29 @@ export default function phoneControlRdcr(state = initialState, action) {
       return { ...state,
         'errComponent'      : action.payload.errComponent,
         'errText'           : action.payload.errText,
+      }
+
+    case PHONECTL_MESSAGE_ADD:
+      return { ...state,
+        'chatMessages'  : action.payload.chatMessages,
+        'chatUnread'    : state.displayChat || !action.payload.incoming
+          ? state.chatUnread
+          : state.chatUnread + 1,
+      }
+
+    case PHONECTL_MESSAGE_UPDATE:
+      return { ...state,
+        'chatMessages'  : action.payload.chatMessages,
+      }
+
+    case PHONECTL_MESSAGES_LOAD:
+      return { ...state,
+        'chatMessages'  : action.payload.chatMessages,
+      }
+
+    case PHONECTL_CHAT_UNREAD_CLEAR:
+      return { ...state,
+        'chatUnread'    : 0,
       }
 
     default:

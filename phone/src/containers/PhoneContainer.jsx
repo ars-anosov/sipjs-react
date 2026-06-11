@@ -10,6 +10,7 @@ import { Box }                      from '@mui/material'
 import PhoneReg                     from '../components/PhoneReg.jsx'
 import PhonePad                     from '../components/PhonePad.jsx'
 import PhoneHistory                 from '../components/PhoneHistory.jsx'
+import PhoneChat                    from '../components/PhoneChat.jsx'
 
 
 
@@ -39,6 +40,10 @@ const PhoneContainer = () => {
 
       {(phoneControlRdcr.displayHistory || phoneControlRdcr.errComponent === 'PhoneHistory') && (
         <PhoneHistory {...commonProps} />
+      )}
+
+      {(phoneControlRdcr.displayChat || phoneControlRdcr.errComponent === 'PhoneChat') && (
+        <PhoneChat {...commonProps} />
       )}
 
     </Box>
