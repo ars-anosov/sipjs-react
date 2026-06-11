@@ -76,7 +76,7 @@ function PhoneHistory(props) {
         mx: 'auto'
       }}
     >
-      <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
+      <Stack direction="row" sx={{ mb: 1, alignItems: 'center', justifyContent: 'space-between' }}>
         <Typography variant="h6">История звонков</Typography>
         <IconButton onClick={handleClose}>
           <IconClose color="error" />

@@ -355,16 +355,30 @@ const handleClkRegister = function(formData, rdcr) {
           attemptingReconnection = false
           return;
         }
+        
+        if (!userAgent) {
+          console.error('userAgent is null during reconnect attempt')
+          attemptingReconnection = false
+          return;
+        }
+        
         // Attempt reconnect
-        userAgent.reconnect()
-          .then(() => {
-            // console.log('userAgent.reconnect()')
-            attemptingReconnection = false
-          })
-          .catch((error) => {
-            attemptingReconnection = false
-            attemptReconnection(++reconnectionAttempt)
-          });
+        try {
+          userAgent.reconnect()
+            .then(() => {
+              // console.log('userAgent.reconnect() success')
+              attemptingReconnection = false
+            })
+            .catch((error) => {
+              console.error('userAgent.reconnect() failed:', error.message || error)
+              attemptingReconnection = false
+              attemptReconnection(++reconnectionAttempt)
+            });
+        } catch (e) {
+          console.error('userAgent.reconnect() error:', e.message || e)
+          attemptingReconnection = false
+          attemptReconnection(++reconnectionAttempt)
+        }
       }, reconnectionAttempt === 1 ? 0 : reconnectionDelay * 1000)
     }
 
@@ -373,66 +387,77 @@ const handleClkRegister = function(formData, rdcr) {
         return
       }
 
+      if (!registerer) {
+        console.error('Registerer not available on connect')
+        return
+      }
+
       registrationInFlight = true
-      registerer.register({
-        requestDelegate: {
-          onAccept(response) {
-            // console.log('register.onAccept()',response)
-            registrationInFlight = false
-            registrationAccepted = true
-            dispatch({
-              type: PHONECTL_CONNECT_SUCCESS,
-              payload: {
-                'regNow'            : true,
-                'phoneHeader'       : response.message.from.displayName,
-                'icoHeader'         : response.message.from.displayName,
-              }
-            })
+      try {
+        registerer.register({
+          requestDelegate: {
+            onAccept(response) {
+              // console.log('register.onAccept()',response)
+              registrationInFlight = false
+              registrationAccepted = true
+              dispatch({
+                type: PHONECTL_CONNECT_SUCCESS,
+                payload: {
+                  'regNow'            : true,
+                  'phoneHeader'       : response.message.from.displayName,
+                  'icoHeader'         : response.message.from.displayName,
+                }
+              })
+            },
+            onReject(response) {
+              console.error('SIP Registration rejected:', response.message.statusCode+' '+response.message.reasonPhrase)
+              registrationInFlight = false
+              registrationAccepted = false
+              dispatch({
+                type: PHONECTL_CONNECT_ERROR,
+                payload: {
+                  'regNow'          : false,
+                  'phoneHeader'     : response.message.statusCode+' '+response.message.reasonPhrase,
+                  'icoHeader'   : response.message.statusCode+' '+response.message.reasonPhrase,
+                }
+              })
+              // Принудительно отключаю, чтобы сбросить старые атрибуты user/secret
+              setTimeout(() => {
+                stopAfterRegistrationFailure()
+                  .finally(() => {
+                    dispatch({ type: PHONECTL_UNREGISTER })
+                    resetPhoneRuntime()
+                  })
+              }, 3000)
+            },
           },
-          onReject(response) {
-            // console.log('register.onReject()',response)
-            registrationInFlight = false
-            registrationAccepted = false
-            dispatch({
-              type: PHONECTL_CONNECT_ERROR,
-              payload: {
-                'regNow'          : false,
-                'phoneHeader'     : response.message.statusCode+' '+response.message.reasonPhrase,
-                'icoHeader'   : response.message.statusCode+' '+response.message.reasonPhrase,
-              }
-            })
-            // Принудительно отключаю, чтобы сбросить старые атрибуты user/secret
-            setTimeout(() => {
-              stopAfterRegistrationFailure()
-                .finally(() => {
-                  dispatch({ type: PHONECTL_UNREGISTER })
-                  resetPhoneRuntime()
-                })
-            }, 3000)
-          },
-        },
-      })
-      .catch((e) => {
-        console.log('register.catch()',e)
+        })
+        .catch((e) => {
+          console.error('SIP Registration error:', e.message || e)
+          registrationInFlight = false
+          registrationAccepted = false
+          dispatch({
+            type: PHONECTL_CONNECT_ERROR,
+            payload: {
+              'regNow'          : false,
+              'phoneHeader'     : 'Registration error',
+              'icoHeader'       : 'Registration error',
+            }
+          })
+          // Принудительно отключаю, чтобы сбросить старые атрибуты user/secret
+          setTimeout(() => {
+            stopAfterRegistrationFailure()
+              .finally(() => {
+                dispatch({ type: PHONECTL_UNREGISTER })
+                resetPhoneRuntime()
+              })
+          }, 3000)
+        })
+      } catch (e) {
+        console.error('SIP Registerer register() error:', e.message || e)
         registrationInFlight = false
         registrationAccepted = false
-        dispatch({
-          type: PHONECTL_CONNECT_ERROR,
-          payload: {
-            'regNow'          : false,
-            'phoneHeader'     : 'Registration error',
-            'icoHeader'       : 'Registration error',
-          }
-        })
-        // Принудительно отключаю, чтобы сбросить старые атрибуты user/secret
-        setTimeout(() => {
-          stopAfterRegistrationFailure()
-            .finally(() => {
-              dispatch({ type: PHONECTL_UNREGISTER })
-              resetPhoneRuntime()
-            })
-        }, 3000)
-      })
+      }
     }
 
     userAgent.delegate.onDisconnect = (error) => {
@@ -443,6 +468,9 @@ const handleClkRegister = function(formData, rdcr) {
 
       registrationAccepted = false
       registrationInFlight = false
+      attemptingReconnection = false
+
+      console.error('WebSocket disconnected:', error ? error.message : 'unknown reason')
 
       dispatch({
         type: PHONECTL_CONNECT_ERROR,
@@ -453,9 +481,12 @@ const handleClkRegister = function(formData, rdcr) {
         }
       })
 
-      if (error) {
-        // console.log('userAgent.onDisconnect(error)', error)
-        attemptReconnection()
+      if (error && connectionCtl.shouldBeConnected) {
+        try {
+          attemptReconnection()
+        } catch (e) {
+          console.error('Error triggering reconnection:', e.message || e)
+        }
       }
     }
 
@@ -473,6 +504,7 @@ const handleClkRegister = function(formData, rdcr) {
       clearRegAlert()
     })
     .catch((e) => {
+      console.error('userAgent.start() failed:', e.message || e)
       connectionCtl.shouldBeConnected = false
       dispatch({
         type: PHONECTL_CONNECT_ERROR,

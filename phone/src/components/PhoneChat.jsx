@@ -99,7 +99,7 @@ function PhoneChat(props) {
         mx: 'auto',
       }}
     >
-      <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
+      <Stack direction="row" sx={{ mb: 1, alignItems: 'center', justifyContent: 'space-between' }}>
         <Badge color="error" badgeContent={phoneControlRdcr.chatUnread} invisible={!phoneControlRdcr.chatUnread}>
           <Typography variant="h6">{title}</Typography>
         </Badge>
@@ -152,7 +152,7 @@ function PhoneChat(props) {
                     backgroundColor: bubbleColor,
                   }}
                 >
-                  <Stack direction="row" justifyContent="space-between" spacing={1} sx={{ mb: 0.5 }}>
+                  <Stack direction="row" spacing={1} sx={{ mb: 0.5, justifyContent: 'space-between' }}>
                     <Typography variant="caption" color="text.secondary">
                       {isOutbound ? 'Вы' : msg.peer}
                     </Typography>
@@ -184,7 +184,7 @@ function PhoneChat(props) {
           <div ref={messagesEndRef} />
         </Box>
 
-        <Stack direction="row" spacing={1} alignItems="flex-end">
+        <Stack direction="row" spacing={1} sx={{ alignItems: 'flex-end' }}>
           <TextField
             fullWidth
             label="Сообщение"

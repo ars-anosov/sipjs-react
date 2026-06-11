@@ -109,8 +109,7 @@ function MenuAppBar(props) {
             <Stack 
               direction="row" 
               spacing={1} 
-              alignItems="center" 
-              sx={{ cursor: 'pointer' }}
+              sx={{ cursor: 'pointer', alignItems: 'center' }}
               onClick={(e) => setAnchorEl_phoneControl(e.currentTarget)}
             >
               <Typography variant="caption" sx={{ mr: 1 }}>

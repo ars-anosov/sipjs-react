@@ -131,8 +131,8 @@ function PhonePad(props) {
       )}
 
       {/* Кнопки Вызов / Сброс */}
-      <Grid container spacing={2} justifyContent="center" sx={{ mb: 2 }}>
-        <Grid size={callNow ? 4 : 6} textAlign="center">
+      <Grid container spacing={2} sx={{ mb: 2, justifyContent: 'center' }}>
+        <Grid size={callNow ? 4 : 6} sx={{ textAlign: 'center' }}>
           {phoneControlRdcr.incomeDisplay ? (
             <Button
               type="submit"
@@ -165,7 +165,7 @@ function PhonePad(props) {
           )}
         </Grid>
         {callNow && (
-        <Grid size={4} textAlign="center">
+        <Grid size={4} sx={{ textAlign: 'center' }}>
           <Tooltip title={phoneControlRdcr.callHoldNow ? 'Resume' : 'Hold'}>
             <Button
               type="button"
@@ -179,7 +179,7 @@ function PhonePad(props) {
           </Tooltip>
         </Grid>
         )}
-        <Grid size={callNow ? 4 : 6} textAlign="center">
+        <Grid size={callNow ? 4 : 6} sx={{ textAlign: 'center' }}>
           <Button
             type="reset"
             variant="contained"
@@ -195,7 +195,7 @@ function PhonePad(props) {
       {showInput && (
       <Grid container spacing={1}>
         {keys.map(([num, letters]) => (
-          <Grid size={4} key={num} textAlign="center">
+          <Grid size={4} key={num} sx={{ textAlign: 'center' }}>
             <Button
               fullWidth
               variant="outlined"

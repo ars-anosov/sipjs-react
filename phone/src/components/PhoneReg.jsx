@@ -64,7 +64,7 @@ function PhoneReg(props) {
 
   const finalTemplate =
   <Paper elevation={8} sx={{ p: 1, mt: 2 }}>
-    <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1 }}>
+    <Stack direction="row" sx={{ mb: 1, alignItems: 'center', justifyContent: 'space-between' }}>
       <Typography variant="h6">Регистрация</Typography>
       <IconButton onClick={handleClose}>
         <IconClose color="error" />
@@ -124,7 +124,7 @@ function PhoneReg(props) {
           />
         </Stack>
 
-        <Stack direction="row" spacing={2} justifyContent="flex-end">
+        <Stack direction="row" spacing={2} sx={{ justifyContent: 'flex-end' }}>
           <Button
             type="button"
             variant="outlined"
