@@ -16,6 +16,7 @@ import {
 import {
   Send as IconSend,
   Close as IconClose,
+  Delete as IconDelete,
 } from '@mui/icons-material'
 
 import { useTheme, alpha } from '@mui/material/styles'
@@ -30,7 +31,8 @@ function PhoneChat(props) {
   const theme = useTheme()
   const messagesEndRef = useRef(null)
 
-  const [peerTxt, setPeerTxt] = useState(phoneControlRdcr.calleePhoneNum || '')
+  const formatPhoneDigits = (value) => (value || '').replace(/\D/g, '')
+  const [peerTxt, setPeerTxt] = useState(formatPhoneDigits(phoneControlRdcr.calleePhoneNum))
   const [messageTxt, setMessageTxt] = useState('')
 
   useEffect(() => {
@@ -45,7 +47,7 @@ function PhoneChat(props) {
 
   useEffect(() => {
     if (phoneControlRdcr.calleePhoneNum && !peerTxt) {
-      setPeerTxt(phoneControlRdcr.calleePhoneNum)
+      setPeerTxt(formatPhoneDigits(phoneControlRdcr.calleePhoneNum))
     }
   }, [phoneControlRdcr.calleePhoneNum, peerTxt])
 
@@ -59,6 +61,8 @@ function PhoneChat(props) {
 
   const handleClose = () => {
     phoneControlActions.handleChangeStore('displayChat', false)
+    phoneControlActions.handleChangeStore('errComponent', '')
+    phoneControlActions.handleChangeStore('errText', '')
   }
 
   const handleSubmit = (event) => {
@@ -103,16 +107,22 @@ function PhoneChat(props) {
         <Badge color="error" badgeContent={phoneControlRdcr.chatUnread} invisible={!phoneControlRdcr.chatUnread}>
           <Typography variant="h6">{title}</Typography>
         </Badge>
-        <IconButton onClick={handleClose}>
-          <IconClose color="error" />
-        </IconButton>
+        <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
+          <IconButton onClick={phoneControlActions.handleClearChat} size="large">
+            <IconDelete color="action" />
+          </IconButton>
+          <IconButton onClick={handleClose}>
+            <IconClose color="error" />
+          </IconButton>
+        </Stack>
       </Stack>
 
       <Box component="form" onSubmit={handleSubmit}>
         <TextField
           fullWidth
-          label="Абонент"
+          label="Вн.номер"
           variant="standard"
+          id="phone-chat-peer"
           value={peerTxt}
           onChange={(event) => setPeerTxt(event.target.value)}
           sx={{ mb: 2 }}
@@ -189,8 +199,15 @@ function PhoneChat(props) {
             fullWidth
             label="Сообщение"
             variant="standard"
+            id="phone-chat-message"
             value={messageTxt}
             onChange={(event) => setMessageTxt(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' && event.ctrlKey) {
+                event.preventDefault()
+                handleSubmit(event)
+              }
+            }}
             multiline
             maxRows={4}
           />

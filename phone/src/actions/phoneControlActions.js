@@ -20,6 +20,7 @@ import {
   PHONECTL_MESSAGE_UPDATE,
   PHONECTL_MESSAGES_LOAD,
   PHONECTL_CHAT_UNREAD_CLEAR,
+  PHONECTL_CLEAR_CHAT,
 } from '../constants/redux'
 
 import {
@@ -55,6 +56,7 @@ import {
   Registerer,
   loadChatMessages,
   saveChatMessage,
+  clearChatMessages,
   createChatMessage,
   handleIncomingSipMessage,
   transmitSipMessage,
@@ -904,6 +906,15 @@ const handleChatUnreadClear = function() {
 
 
 
+const handleClearChat = function() {
+  return (dispatch) => {
+    clearChatMessages()
+    dispatch({ type: PHONECTL_CLEAR_CHAT })
+  }
+}
+
+
+
 const handleSendMessage = function(peerPhoneNum, messageBody, rdcr) {
   return (dispatch) => {
     const runtime = getPhoneRuntime()
@@ -988,6 +999,7 @@ export {
   handleChangeStore,
   handleSendMessage,
   handleChatUnreadClear,
+  handleClearChat,
   CallsArrUpdate,
   MessagesArrUpdate,
 }

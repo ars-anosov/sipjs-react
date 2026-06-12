@@ -19,6 +19,7 @@ import {
   PHONECTL_MESSAGE_UPDATE,
   PHONECTL_MESSAGES_LOAD,
   PHONECTL_CHAT_UNREAD_CLEAR,
+  PHONECTL_CLEAR_CHAT,
 } from '../constants/redux'
 
 const initialState = {
@@ -171,6 +172,7 @@ export default function phoneControlRdcr(state = initialState, action) {
 
     case PHONECTL_MESSAGE_ADD:
       return { ...state,
+        'displayChat'   : true,
         'chatMessages'  : action.payload.chatMessages,
         'chatUnread'    : state.displayChat || !action.payload.incoming
           ? state.chatUnread
@@ -189,6 +191,12 @@ export default function phoneControlRdcr(state = initialState, action) {
 
     case PHONECTL_CHAT_UNREAD_CLEAR:
       return { ...state,
+        'chatUnread'    : 0,
+      }
+
+    case PHONECTL_CLEAR_CHAT:
+      return { ...state,
+        'chatMessages'  : [],
         'chatUnread'    : 0,
       }
 

@@ -321,6 +321,11 @@ const saveChatMessage = function(message) {
   return Object.values(stored).sort((a, b) => a.time - b.time)
 }
 
+const clearChatMessages = function() {
+  localStorage.removeItem(CHAT_STORAGE_KEY)
+  return []
+}
+
 const createChatMessage = function(peer, body, direction, status = null) {
   const message = {
     id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
@@ -451,6 +456,8 @@ export {
   // MESSAGE functions
   loadChatMessages,
   saveChatMessage,
+  clearChatMessages,
+  updateChatMessageStatus,
   createChatMessage,
   handleIncomingSipMessage,
   transmitSipMessage,
