@@ -101,7 +101,7 @@ function PhonePad(props) {
   ]
 
   const finalTemplate =
-  <Paper elevation={showInput ? 8 : 0} sx={{ maxWidth: 300, mx: 'auto', p: 2, mt: 2 }}>
+  <Paper elevation={showInput ? 8 : 0} sx={{ width: 300, mx: 'auto', p: 1, mt: 2 }}>
     <Typography variant="body2" sx={{ mb: 2 }}>
       {phoneControlRdcr.phoneHeader}
     </Typography>

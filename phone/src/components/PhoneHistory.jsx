@@ -67,17 +67,9 @@ function PhoneHistory(props) {
 
 
   return (
-    <Paper
-      elevation={8} 
-      sx={{ 
-        p: 1, 
-        mt: 2, 
-        maxWidth: 480,
-        mx: 'auto'
-      }}
-    >
+    <Paper elevation={8} sx={{ width: 480, mx: 'auto', p: 1, pt: 0, mt: 2 }}>
       <Stack direction="row" sx={{ mb: 1, alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography variant="h6">История звонков</Typography>
+        <Typography variant="h6">SIP Звонки</Typography>
         <IconButton onClick={handleClose}>
           <IconClose color="error" />
         </IconButton>
@@ -85,7 +77,7 @@ function PhoneHistory(props) {
 
       <TableContainer
         sx={{
-          height: 280,
+          height: 330,
           overflowY: 'auto',
           border: 1,
           borderColor: 'divider',

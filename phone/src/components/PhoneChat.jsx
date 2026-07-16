@@ -72,8 +72,8 @@ function PhoneChat(props) {
   }
 
   const title = phoneControlRdcr.chatUnread > 0
-    ? `Чат (${phoneControlRdcr.chatUnread})`
-    : 'Чат'
+    ? `SIP Сообщения (${phoneControlRdcr.chatUnread})`
+    : 'SIP Сообщения'
 
   const formatDeliveryStatus = (msg) => {
     if (msg.direction !== 'out' || !msg.status) return null
@@ -94,21 +94,13 @@ function PhoneChat(props) {
   }
 
   return (
-    <Paper
-      elevation={8}
-      sx={{
-        p: 1,
-        mt: 2,
-        maxWidth: 480,
-        mx: 'auto',
-      }}
-    >
+    <Paper elevation={8} sx={{ width: 480, mx: 'auto', p: 1, pt: 0, mt: 2 }}>
       <Stack direction="row" sx={{ mb: 1, alignItems: 'center', justifyContent: 'space-between' }}>
         <Badge color="error" badgeContent={phoneControlRdcr.chatUnread} invisible={!phoneControlRdcr.chatUnread}>
           <Typography variant="h6">{title}</Typography>
         </Badge>
-        <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-          <IconButton onClick={phoneControlActions.handleClearChat} size="large">
+        <Stack direction="row" spacing={0} sx={{ alignItems: 'center' }}>
+          <IconButton onClick={phoneControlActions.handleClearChat}>
             <IconDelete color="action" />
           </IconButton>
           <IconButton onClick={handleClose}>
@@ -119,24 +111,24 @@ function PhoneChat(props) {
 
       <Box component="form" onSubmit={handleSubmit}>
         <TextField
-          fullWidth
+          required
           label="Вн.номер"
-          variant="standard"
+          variant="outlined"
           id="phone-chat-peer"
           value={peerTxt}
           onChange={(event) => setPeerTxt(event.target.value)}
-          sx={{ mb: 2 }}
+          sx={{ mb: 1 }}
         />
 
         <Box
           sx={{
-            height: 280,
+            height: 200,
             overflowY: 'auto',
             border: 1,
             borderColor: 'divider',
             borderRadius: 1,
             p: 1,
-            mb: 2,
+            mb: 1,
             backgroundColor: alpha(theme.palette.background.default, 0.5),
           }}
         >
@@ -213,20 +205,10 @@ function PhoneChat(props) {
           />
           <IconButton
             type="submit"
-            color="primary"
+            variant="contained"
+            color="success"
             disabled={!phoneControlRdcr.regNow}
-            sx={{
-              width: 48,
-              height: 48,
-              flexShrink: 0,
-              backgroundColor: 'primary.main',
-              color: 'primary.contrastText',
-              '&:hover': { backgroundColor: 'primary.dark' },
-              '&.Mui-disabled': {
-                backgroundColor: 'action.disabledBackground',
-                color: 'action.disabled',
-              },
-            }}
+            sx={{ borderRadius: '50%', minWidth: 56, height: 56 }}
           >
             <IconSend />
           </IconButton>

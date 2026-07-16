@@ -6,7 +6,10 @@ import { bindActionCreators }       from 'redux'
 import * as phoneActions            from '../actions/phoneControlActions.js'
 
 // Components
-import { Box }                      from '@mui/material'
+import {
+  Box,
+  Grid
+}                      							from '@mui/material'
 import PhoneReg                     from '../components/PhoneReg.jsx'
 import PhonePad                     from '../components/PhonePad.jsx'
 import PhoneHistory                 from '../components/PhoneHistory.jsx'
@@ -28,25 +31,26 @@ const PhoneContainer = () => {
 
 
   return (
-    <Box>
-
-      {(phoneControlRdcr.displayReg || phoneControlRdcr.errComponent === 'PhoneReg') && (
-        <PhoneReg {...commonProps} />
-      )}
-
-      {(phoneControlRdcr.displayPad || phoneControlRdcr.errComponent === 'PhonePad') && (
-        <PhonePad {...commonProps} showInput={true} />
-      )}
-
-      {(phoneControlRdcr.displayHistory || phoneControlRdcr.errComponent === 'PhoneHistory') && (
-        <PhoneHistory {...commonProps} />
-      )}
-
-      {(phoneControlRdcr.displayChat || phoneControlRdcr.errComponent === 'PhoneChat') && (
-        <PhoneChat {...commonProps} />
-      )}
-
-    </Box>
+    <Grid container spacing={2} sx={{ justifyContent: 'center' }}>
+      <Grid>
+        {(phoneControlRdcr.displayReg || phoneControlRdcr.errComponent === 'PhoneReg') && (
+          <PhoneReg {...commonProps} />
+        )}
+        {(phoneControlRdcr.displayPad || phoneControlRdcr.errComponent === 'PhonePad') && (
+          <PhonePad {...commonProps} showInput={true} />
+        )}
+      </Grid>
+      <Grid>
+        {(phoneControlRdcr.displayChat || phoneControlRdcr.errComponent === 'PhoneChat') && (
+          <PhoneChat {...commonProps} />
+        )}
+      </Grid>
+      <Grid>
+        {(phoneControlRdcr.displayHistory || phoneControlRdcr.errComponent === 'PhoneHistory') && (
+          <PhoneHistory {...commonProps} />
+        )}
+      </Grid>
+    </Grid>
   )
 }
 
