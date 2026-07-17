@@ -31,8 +31,8 @@ const PhoneContainer = () => {
 
 
   return (
-    <Grid container spacing={2} sx={{ justifyContent: 'center' }}>
-      <Grid>
+    <Grid container spacing={2} sx={{ justifyContent: 'center', width: '100%' }}>
+      <Grid size={{ xs: 12, md: 'auto' }}>
         {(phoneControlRdcr.displayReg || phoneControlRdcr.errComponent === 'PhoneReg') && (
           <PhoneReg {...commonProps} />
         )}
@@ -40,12 +40,14 @@ const PhoneContainer = () => {
           <PhonePad {...commonProps} showInput={true} />
         )}
       </Grid>
-      <Grid>
+
+      <Grid size={{ xs: 12, md: 'auto' }}>
         {(phoneControlRdcr.displayChat || phoneControlRdcr.errComponent === 'PhoneChat') && (
           <PhoneChat {...commonProps} />
         )}
       </Grid>
-      <Grid>
+
+      <Grid size={{ xs: 12, md: 'auto' }}>
         {(phoneControlRdcr.displayHistory || phoneControlRdcr.errComponent === 'PhoneHistory') && (
           <PhoneHistory {...commonProps} />
         )}

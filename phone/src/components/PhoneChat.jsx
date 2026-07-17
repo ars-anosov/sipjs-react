@@ -122,7 +122,7 @@ function PhoneChat(props) {
 
         <Box
           sx={{
-            height: 244,
+            height: 252,
             overflowY: 'auto',
             border: 1,
             borderColor: 'divider',

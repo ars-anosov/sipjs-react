@@ -17,12 +17,11 @@ export default function Copyright() {
         color: 'text.secondary',
       }}
     >
-      powered by
+      SIP powered by
       sip.js {dependencies['sip.js']},
       react-dom {dependencies['react-dom']},
       react-redux {dependencies['react-redux']},
-      @mui/material {dependencies['@mui/material']},
-      vite {devDependencies['vite']}
+      @mui/material {dependencies['@mui/material']}
       <br />
       <strong>v.{version}</strong>
       {' Copyright © '}

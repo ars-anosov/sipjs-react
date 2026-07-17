@@ -7,6 +7,7 @@ import {
   Button,
   Paper,
   Typography,
+  Stack,
   Grid,
   IconButton,
   InputAdornment,
@@ -22,6 +23,7 @@ import {
   PhoneDisabled as IconHangup,
   Pause         as IconHold,
   PlayArrow     as IconResume,
+  Close         as IconClose,
 } from '@mui/icons-material'
 
 
@@ -46,6 +48,10 @@ function PhonePad(props) {
   }, [])
 
 
+
+  const handleClose = function() {
+    phoneControlActions.handleChangeStore('displayPad', false)
+  }
 
   const handleSubmit = (event) => {
     event.preventDefault()
@@ -101,8 +107,15 @@ function PhonePad(props) {
   ]
 
   const finalTemplate =
-  <Paper elevation={showInput ? 8 : 0} sx={{ width: 300, mx: 'auto', p: 1, mt: 2 }}>
-    <Typography variant="h6">SIP Телефон</Typography>
+  <Paper elevation={showInput ? 8 : 0} sx={{ width: 300, mx: 'auto', p: 1, pt: 0, mt: 2 }}>
+    {showInput && (
+    <Stack direction="row" sx={{ mb: 1, alignItems: 'center', justifyContent: 'space-between' }}>
+      <Typography variant="h6">SIP Телефон</Typography>
+      <IconButton onClick={handleClose}>
+        <IconClose color="error" />
+      </IconButton>
+    </Stack>
+    )}
     <Typography variant="body2" sx={{ mb: 2 }}>
       {phoneControlRdcr.phoneHeader}
     </Typography>
