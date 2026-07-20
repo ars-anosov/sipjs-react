@@ -18,6 +18,7 @@ import {
 
 import MenuIcon         from '@mui/icons-material/Menu';
 import PhoneIco         from './PhoneIco'
+// import AdIco            from './AdIco'
 import PhonePad         from './PhonePad'
 
 
@@ -31,7 +32,7 @@ const MENU_ITEMS = [
 ]
 
 function MenuAppBar(props) {
-  const { phoneControlRdcr, phoneControlActions } = props
+  const { phoneControlRdcr, phoneControlActions, authControlRdcr } = props
 
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') console.log('MenuAppBar MOUNT')
@@ -119,6 +120,10 @@ function MenuAppBar(props) {
             </Stack>
           )}
 
+          {/* {authControlRdcr && (
+            <AdIco authControlRdcr={authControlRdcr} />
+          )} */}
+
         </Toolbar>
       </AppBar>
 
@@ -149,7 +154,8 @@ function MenuAppBar(props) {
 
 MenuAppBar.propTypes = {
   phoneControlRdcr: PropTypes.object.isRequired,
-  phoneControlActions: PropTypes.object.isRequired
+  phoneControlActions: PropTypes.object.isRequired,
+  authControlRdcr: PropTypes.object,
 }
 
 export default MenuAppBar

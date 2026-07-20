@@ -14,10 +14,9 @@ const MenuAppContainer = () => {
     [dispatch]
   )
   const phoneControlRdcr = useSelector((state) => state.phoneControlRdcr)
-  const commonProps = { phoneControlRdcr, phoneControlActions }
+  const authControlRdcr = useSelector((state) => state.authControlRdcr)
+  const commonProps = { phoneControlRdcr, phoneControlActions, authControlRdcr }
 
-
-  
   return <MenuAppBar {...commonProps} />
 }
 
