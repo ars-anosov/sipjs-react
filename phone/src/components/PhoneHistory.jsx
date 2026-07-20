@@ -77,7 +77,7 @@ function PhoneHistory(props) {
 
       <TableContainer
         sx={{
-          height: 380,
+          height: 430,
           overflowY: 'auto',
           border: 1,
           borderColor: 'divider',
