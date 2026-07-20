@@ -19,6 +19,7 @@ import {
   ArrowBack as IcoIncome,
   ArrowForward as IcoOutgo,
   Close as IconClose,
+  Delete as IconDelete,
 } from '@mui/icons-material'
 
 import { useTheme, alpha, keyframes } from '@mui/material/styles'
@@ -70,9 +71,14 @@ function PhoneHistory(props) {
     <Paper elevation={8} sx={{ width: 480, mx: 'auto', p: 1, pt: 0, mt: 2 }}>
       <Stack direction="row" sx={{ mb: 1, alignItems: 'center', justifyContent: 'space-between' }}>
         <Typography variant="h6">SIP Звонки</Typography>
-        <IconButton onClick={handleClose}>
-          <IconClose color="error" />
-        </IconButton>
+        <Stack direction="row" spacing={1}>
+          <IconButton onClick={() => phoneControlActions.handleClearHistory()}>
+            <IconDelete color="action" />
+          </IconButton>
+          <IconButton onClick={handleClose}>
+            <IconClose color="error" />
+          </IconButton>
+        </Stack>
       </Stack>
 
       <TableContainer

@@ -57,6 +57,7 @@ import {
   loadChatMessages,
   saveChatMessage,
   clearChatMessages,
+  clearCallsArr,
   createChatMessage,
   handleIncomingSipMessage,
   transmitSipMessage,
@@ -913,6 +914,15 @@ const handleClearChat = function() {
   }
 }
 
+const handleClearHistory = function() {
+  return (dispatch) => {
+    clearCallsArr()
+    dispatch({
+      type: PHONECTL_STORE_VALUE,
+      payload: { storeDataKey: 'callsArr', storeDataValue: [] },
+    })
+  }
+}
 
 
 const handleSendMessage = function(peerPhoneNum, messageBody, rdcr) {
@@ -1000,6 +1010,7 @@ export {
   handleSendMessage,
   handleChatUnreadClear,
   handleClearChat,
+  handleClearHistory,
   CallsArrUpdate,
   MessagesArrUpdate,
 }

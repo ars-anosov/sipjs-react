@@ -4,16 +4,18 @@ import { bindActionCreators }       from 'redux'
 
 // Actions
 import * as phoneActions            from '../actions/phoneControlActions.js'
+import * as authActions             from '../actions/authControlActions.js'
 
 // Components
 import {
   Box,
   Grid
-}                      							from '@mui/material'
+}                      						from '@mui/material'
 import PhoneReg                     from '../components/PhoneReg.jsx'
 import PhonePad                     from '../components/PhonePad.jsx'
 import PhoneHistory                 from '../components/PhoneHistory.jsx'
 import PhoneChat                    from '../components/PhoneChat.jsx'
+// import AdAuth                       from '../components/AdAuth.jsx'
 
 
 
@@ -25,8 +27,14 @@ const PhoneContainer = () => {
     () => bindActionCreators(phoneActions, dispatch),
     [dispatch]
   )
+  const authControlActions = useMemo(
+    () => bindActionCreators(authActions, dispatch),
+    [dispatch]
+  )
   const phoneControlRdcr = useSelector(state => state.phoneControlRdcr)
+  const authControlRdcr = useSelector(state => state.authControlRdcr)
   const commonProps = { phoneControlRdcr, phoneControlActions }
+  const authProps = { authControlRdcr, authControlActions }
 
 
 
@@ -36,6 +44,7 @@ const PhoneContainer = () => {
         {(phoneControlRdcr.displayReg || phoneControlRdcr.errComponent === 'PhoneReg') && (
           <PhoneReg {...commonProps} />
         )}
+        {/* <AdAuth {...authProps} /> */}
         {(phoneControlRdcr.displayPad || phoneControlRdcr.errComponent === 'PhonePad') && (
           <PhonePad {...commonProps} showInput={true} />
         )}

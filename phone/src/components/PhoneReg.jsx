@@ -58,6 +58,14 @@ function PhoneReg(props) {
   const [regUserPass, setRegUserPass] = useState(phoneControlRdcr.regUserPass)
   const [uriHost, setUriHost] = useState(phoneControlRdcr.uriHost)
   const [wssPort, setWssPort] = useState(phoneControlRdcr.wssPort)
+
+  useEffect(() => {
+    setCallerUserNum(phoneControlRdcr.callerUserNum)
+    setRegUserPass(phoneControlRdcr.regUserPass)
+    setUriHost(phoneControlRdcr.uriHost)
+    setWssPort(phoneControlRdcr.wssPort)
+  }, [phoneControlRdcr.callerUserNum, phoneControlRdcr.regUserPass, phoneControlRdcr.uriHost, phoneControlRdcr.wssPort])
+
   const handleChange = (setter) => (event) => {
     setter(event.target.value)
   }

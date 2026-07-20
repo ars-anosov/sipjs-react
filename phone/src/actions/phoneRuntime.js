@@ -326,6 +326,11 @@ const clearChatMessages = function() {
   return []
 }
 
+const clearCallsArr = function() {
+  localStorage.removeItem(CALLS_STORAGE_KEY)
+  return []
+}
+
 const createChatMessage = function(peer, body, direction, status = null) {
   const message = {
     id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
@@ -457,6 +462,7 @@ export {
   loadChatMessages,
   saveChatMessage,
   clearChatMessages,
+  clearCallsArr,
   updateChatMessageStatus,
   createChatMessage,
   handleIncomingSipMessage,
