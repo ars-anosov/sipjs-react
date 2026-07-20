@@ -29,21 +29,21 @@ function AdIco({ authControlRdcr }) {
       case 'loading':
         return {
           icon: <IconPending />,
-          bg: theme.palette.info.main,
-          color: '#fff',
+          bg: theme.palette.warning.main,
+          color: 'rgba(0,0,0,0.87)',
           pulse: true,
         }
       case 'success':
         return {
           icon: <IconHowToReg />,
-          bg: theme.palette.success.main,
+          bg: 'rgba(255, 255, 255, 0.2)',
           color: '#fff',
           pulse: false,
         }
       case 'error':
         return {
           icon: <IconAccountBox />,
-          bg: theme.palette.error.main,
+          bg: theme.palette.error.dark,
           color: '#fff',
           pulse: false,
         }
@@ -51,8 +51,8 @@ function AdIco({ authControlRdcr }) {
       default:
         return {
           icon: <IconAccountCircle />,
-          bg: 'rgba(255, 255, 255, 0.2)',
-          color: '#fff',
+          bg: 'rgba(0, 0, 0, 0.2)',
+          color: 'rgba(0, 0, 0, 0.4)',
           pulse: false,
         }
     }

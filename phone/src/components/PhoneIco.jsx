@@ -27,6 +27,7 @@ function PhoneIco({ phoneControlRdcr }) {
   const theme = useTheme(); // Доступ к палитре темы
 
   const getStyle = () => {
+    
     // Активный разговор
     if (phoneControlRdcr.incomeCallNow || phoneControlRdcr.outgoCallNow) {
       return { 
@@ -44,6 +45,16 @@ function PhoneIco({ phoneControlRdcr }) {
         bg: theme.palette.error.main, 
         color: '#fff', 
         pulse: true 
+      }
+    }
+
+    // Регистрация
+    if (!phoneControlRdcr.regNow) {
+      return { 
+        icon: <IconDialerSip />, 
+        bg: 'rgba(0, 0, 0, 0.2)',
+        color: 'rgba(0, 0, 0, 0.4)',
+        pulse: false 
       }
     }
 
