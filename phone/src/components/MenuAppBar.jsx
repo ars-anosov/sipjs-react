@@ -113,7 +113,7 @@ function MenuAppBar(props) {
               sx={{ cursor: 'pointer', alignItems: 'center' }}
               onClick={(e) => setAnchorEl_phoneControl(e.currentTarget)}
             >
-              <Typography variant="caption" sx={{ mr: 1 }}>
+              <Typography variant="caption">
                 {phoneControlRdcr.icoHeader}
               </Typography>
               <PhoneIco phoneControlRdcr={phoneControlRdcr} />
