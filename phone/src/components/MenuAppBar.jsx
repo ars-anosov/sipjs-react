@@ -26,7 +26,7 @@ const MENU_ITEMS = [
   { key: 'displayReg', primary: 'Карточка регистрации', secondary: 'PhoneReg.jsx' },
   { key: 'displayPad', primary: 'Телефон с кнопками', secondary: 'PhonePad.jsx' },
   { key: 'displayHistory', primary: 'История звонков', secondary: 'PhoneHistory.jsx' },
-  { key: 'displayChat', primary: 'Чат (SIP MESSAGE)', secondary: 'PhoneChat.jsx' },
+  { key: 'displayChat', primary: 'SIP Сообщения', secondary: 'PhoneChat.jsx' },
   { key: 'displayControl', primary: 'Кругляш состояния', secondary: 'PhoneIco.jsx' },
 ]
 

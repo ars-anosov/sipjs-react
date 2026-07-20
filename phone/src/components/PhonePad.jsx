@@ -24,6 +24,10 @@ import {
   Pause         as IconHold,
   PlayArrow     as IconResume,
   Close         as IconClose,
+  History       as IconHistory,
+  Chat          as IconChat,
+  WifiOff       as IconOffline,
+  Wifi          as IconOnline,
 } from '@mui/icons-material'
 
 
@@ -90,6 +94,21 @@ function PhonePad(props) {
   const handleHold = () => {
     phoneControlActions.handleClkHold(phoneControlRdcr, !phoneControlRdcr.callHoldNow)
   }
+
+  const toggleHistory = () => {
+    phoneControlActions.handleChangeStore('displayHistory', !phoneControlRdcr.displayHistory)
+  }
+
+  const toggleChat = () => {
+    phoneControlActions.handleChangeStore('displayChat', !phoneControlRdcr.displayChat)
+  }
+
+  const toggleReg = () => {
+    phoneControlActions.handleChangeStore('displayReg', !phoneControlRdcr.displayReg)
+  }
+
+  const isRegistered = phoneControlRdcr.connectStatus === 'Success'
+  const regButtonColor = isRegistered ? 'success' : 'error'
 
   const keys = [
     ['1', ''],
@@ -172,7 +191,7 @@ function PhonePad(props) {
               type="submit"
               variant="contained"
               color="success"
-              disabled={phoneControlRdcr.outgoCallNow || phoneControlRdcr.incomeCallNow}
+              disabled={!isRegistered || phoneControlRdcr.outgoCallNow || phoneControlRdcr.incomeCallNow}
               sx={{ borderRadius: '50%', minWidth: 56, height: 56 }}
             >
               <IconPhone />
@@ -199,6 +218,7 @@ function PhonePad(props) {
             type="reset"
             variant="contained"
             color="error"
+            disabled={!isRegistered}
             sx={{ borderRadius: '50%', minWidth: 56, height: 56 }}
           >
             <IconHangup />
@@ -236,6 +256,39 @@ function PhonePad(props) {
         ))}
       </Grid>
       )}
+
+      <Stack direction="row" spacing={1} sx={{ mt: 2, justifyContent: 'space-between', alignItems: 'center' }}>
+        <IconButton
+          aria-label="Регистрация"
+          size="small"
+          color={regButtonColor}
+          onClick={toggleReg}
+        >
+          {isRegistered ? <IconOnline /> : <IconOffline />}
+        </IconButton>
+
+        {showInput && (
+        <Stack direction="row" spacing={1}>
+          <IconButton
+            aria-label="Звонки" 
+            size="small"
+            color={phoneControlRdcr.displayHistory ? 'primary' : 'default'}
+            onClick={toggleHistory}
+          >
+            <IconHistory />
+          </IconButton>
+
+          <IconButton
+            aria-label="Сообщения"
+            size="small"
+            color={phoneControlRdcr.displayChat ? 'primary' : 'default'}
+            onClick={toggleChat}
+          >
+            <IconChat />
+          </IconButton>
+        </Stack>
+        )}
+      </Stack>
 
     </Box>
 
