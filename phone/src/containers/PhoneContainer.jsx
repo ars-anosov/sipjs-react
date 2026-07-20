@@ -10,12 +10,12 @@ import * as authActions             from '../actions/authControlActions.js'
 import {
   Box,
   Grid
-}                      						from '@mui/material'
+}                      							from '@mui/material'
+// import AdAuth                       from '../components/AdAuth.jsx'
 import PhoneReg                     from '../components/PhoneReg.jsx'
 import PhonePad                     from '../components/PhonePad.jsx'
 import PhoneHistory                 from '../components/PhoneHistory.jsx'
 import PhoneChat                    from '../components/PhoneChat.jsx'
-// import AdAuth                       from '../components/AdAuth.jsx'
 
 
 
@@ -41,10 +41,12 @@ const PhoneContainer = () => {
   return (
     <Grid container spacing={2} sx={{ justifyContent: 'center', width: '100%' }}>
       <Grid size={{ xs: 12, md: 'auto' }}>
+        {/* {(authControlRdcr.displayAd) && (
+          <AdAuth {...authProps} />
+        )} */}
         {(phoneControlRdcr.displayReg || phoneControlRdcr.errComponent === 'PhoneReg') && (
           <PhoneReg {...commonProps} />
         )}
-        {/* <AdAuth {...authProps} /> */}
         {(phoneControlRdcr.displayPad || phoneControlRdcr.errComponent === 'PhonePad') && (
           <PhonePad {...commonProps} showInput={true} />
         )}
