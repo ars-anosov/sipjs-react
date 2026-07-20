@@ -107,7 +107,7 @@ function PhonePad(props) {
     phoneControlActions.handleChangeStore('displayReg', !phoneControlRdcr.displayReg)
   }
 
-  const isRegistered = phoneControlRdcr.connectStatus === 'Success'
+  const isRegistered = phoneControlRdcr.regNow
   const regButtonColor = isRegistered ? 'success' : 'error'
 
   const keys = [
