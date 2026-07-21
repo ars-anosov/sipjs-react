@@ -99,8 +99,8 @@ function MenuAppBar(props) {
             <Stack direction="row" spacing={2}
               sx={{ p: 1, height: toolbarHeight }}
             >
-              <Box component="img" src="/img/Vite.png" sx={{ height: '100%', width: 'auto' }} alt="Vite" />
-              <Box component="img" src="/img/React.png" sx={{ height: '100%', width: 'auto' }} alt="React" />
+              <Box component="img" src="img/Vite.png" sx={{ height: '100%', width: 'auto' }} alt="Vite" />
+              <Box component="img" src="img/React.png" sx={{ height: '100%', width: 'auto' }} alt="React" />
               <Box sx={{ flexGrow: 1 }} />
               <IconButton onClick={handleCloseMenu} >
                 <ChevronLeftIcon color='primary' />
