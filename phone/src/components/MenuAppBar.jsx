@@ -141,6 +141,7 @@ function MenuAppBar(props) {
           </Menu>
 
 
+
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             WebRTC
           </Typography>
@@ -152,7 +153,7 @@ function MenuAppBar(props) {
               sx={{ cursor: 'pointer', alignItems: 'center' }}
               onClick={(e) => setAnchorEl_phoneControl(e.currentTarget)}
             >
-              <Typography variant="caption">
+              <Typography variant="caption" sx={{ pl: 1 }}>
                 {phoneControlRdcr.icoHeader}
               </Typography>
               <PhoneIco phoneControlRdcr={phoneControlRdcr} />
@@ -166,8 +167,8 @@ function MenuAppBar(props) {
               sx={{ cursor: 'pointer', alignItems: 'center' }}
               onClick={(e) => setAnchorEl_adControl(e.currentTarget)}
             >
-              <Typography variant="caption">
-                {authControlRdcr.icoHeader}
+              <Typography variant="caption" sx={{ pl: 1 }}>
+                {authControlRdcr?.responseData?.ad_login}
               </Typography>
               <AuthIco authControlRdcr={authControlRdcr} />
             </Stack>
@@ -188,6 +189,7 @@ function MenuAppBar(props) {
           sx={{ p: 1 }}
         >
           <Typography variant='body2'>{"wss://"+phoneControlRdcr.uriHost+":"+phoneControlRdcr.wssPort}</Typography>
+          <Divider />
           <PhonePad
             phoneControlRdcr={phoneControlRdcr}
             phoneControlActions={phoneControlActions}
@@ -208,16 +210,17 @@ function MenuAppBar(props) {
           sx={{ p: 1 }}
         >
           <Typography variant='body2'>{authControlRdcr.uriAdAuth}</Typography>
-          {authControlRdcr.responseData && (
-            <Typography variant='pre'>
-              cn: {authControlRdcr.responseData.ad_cn}
-            </Typography>
-          )}
+          <Divider />
+          <Typography component="pre">
+            {"\n"}cn: {authControlRdcr?.responseData?.ad_cn}
+            {"\n"}department: {authControlRdcr?.responseData?.ad_department}
+            {"\n"}title: {authControlRdcr?.responseData?.ad_title}
+          </Typography>
         </Box>
       </Popover>
 
     </Box>
-  );
+  )
 }
 
 MenuAppBar.propTypes = {
