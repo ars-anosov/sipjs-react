@@ -48,6 +48,7 @@ function PhoneIco({ phoneControlRdcr }) {
       }
     }
 
+<<<<<<< HEAD
     // Регистрация
     if (!phoneControlRdcr.regNow) {
       return { 
@@ -59,6 +60,9 @@ function PhoneIco({ phoneControlRdcr }) {
     }
 
     // Ошибки и статусы
+=======
+    // Статусы подключения
+>>>>>>> 79c894d6b252b922a795c028cb2fd999fdfdfe7d
     switch (phoneControlRdcr.connectStatus) {
       case 'Error':
         return {
@@ -76,13 +80,30 @@ function PhoneIco({ phoneControlRdcr }) {
           pulse: false
         }
       case 'Success':
-      default:
         return {
-          icon: <IconDialerSip />,
+          icon: <IconPhoneEnabled />,
           bg: 'rgba(255, 255, 255, 0.2)',
           color: '#fff',
           pulse: false
         }
+    }
+
+    // Регистрация по итогу
+    if (phoneControlRdcr.regNow) {
+      return {
+        icon: <IconPhoneEnabled />,
+        bg: 'rgba(255, 255, 255, 0.2)',
+        color: '#fff',
+        pulse: false
+      }
+    }
+    else {
+      return { 
+        icon: <IconDialerSip />, 
+        bg: 'rgba(0, 0, 0, 0.2)',
+        color: 'rgba(0, 0, 0, 0.4)',
+        pulse: false 
+      }
     }
   }
 

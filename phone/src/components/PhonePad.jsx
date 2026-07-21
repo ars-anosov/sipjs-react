@@ -126,7 +126,7 @@ function PhonePad(props) {
   ]
 
   const finalTemplate =
-  <Paper elevation={showInput ? 8 : 0} sx={{ width: 300, mx: 'auto', p: 1, pt: 0, mt: 2 }}>
+  <Paper elevation={showInput ? 8 : 0} sx={{ maxWidth: 300, width: '100%', mx: 'auto', p: 1, pt: 0, mt: 2 }}>
     {showInput && (
     <Stack direction="row" sx={{ mb: 1, alignItems: 'center', justifyContent: 'space-between' }}>
       <Typography variant="h6">SIP Телефон</Typography>

@@ -68,7 +68,7 @@ function PhoneHistory(props) {
 
 
   return (
-    <Paper elevation={8} sx={{ width: 480, mx: 'auto', p: 1, pt: 0, mt: 2 }}>
+    <Paper elevation={8} sx={{ maxWidth: 480, width: '100%', mx: 'auto', p: 1, pt: 0, mt: 2 }}>
       <Stack direction="row" sx={{ mb: 1, alignItems: 'center', justifyContent: 'space-between' }}>
         <Typography variant="h6">SIP Звонки</Typography>
         <Stack direction="row" spacing={1}>
