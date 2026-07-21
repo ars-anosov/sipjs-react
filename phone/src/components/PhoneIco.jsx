@@ -48,21 +48,7 @@ function PhoneIco({ phoneControlRdcr }) {
       }
     }
 
-<<<<<<< HEAD
-    // Регистрация
-    if (!phoneControlRdcr.regNow) {
-      return { 
-        icon: <IconDialerSip />, 
-        bg: 'rgba(0, 0, 0, 0.2)',
-        color: 'rgba(0, 0, 0, 0.4)',
-        pulse: false 
-      }
-    }
-
-    // Ошибки и статусы
-=======
     // Статусы подключения
->>>>>>> 79c894d6b252b922a795c028cb2fd999fdfdfe7d
     switch (phoneControlRdcr.connectStatus) {
       case 'Error':
         return {
