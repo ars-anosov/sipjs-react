@@ -56,7 +56,7 @@ function MenuAppBar(props) {
 
   const theme = useTheme()
 
-  const rawToolbarHeight = theme?.mixins?.toolbar?.minHeight
+  const rawToolbarHeight = theme?.mixins?.toolbar?.maxHeight
   const toolbarHeight = typeof rawToolbarHeight === 'number'
     ? rawToolbarHeight
     : (rawToolbarHeight ? parseInt(String(rawToolbarHeight).replace('px', ''), 10) : 64)
@@ -109,69 +109,66 @@ function MenuAppBar(props) {
             
             <Divider />
 
-            <Box role="presentation">
-              <List>
-                {MENU_ITEMS_PHONE.map((item) => {
-                  const isChecked = !!phoneControlRdcr[item.key];
-                  const labelId = `checkbox-list-label-${item.key}`;
-                  return (
-                    <ListItemButton
-                      key={item.key}
-                      onClick={() => toggleDisplayPhone(item.key)}
-                      sx={{ alignItems: 'flex-start' }}
-                    >
-                      <ListItemIcon>
-                        <Checkbox
-                          edge="start"
-                          checked={isChecked}
-                          tabIndex={-1}
-                          disableRipple
-                          slotProps={{ input: { 'aria-labelledby': labelId } }}
-                        />
-                      </ListItemIcon>
-                      <ListItemText
-                        id={labelId}
-                        primary={item.primary}
-                        secondary={item.secondary}
+            <List>
+              {MENU_ITEMS_PHONE.map((item) => {
+                const isChecked = !!phoneControlRdcr[item.key];
+                const labelId = `checkbox-list-label-${item.key}`;
+                return (
+                  <ListItemButton
+                    key={item.key}
+                    onClick={() => toggleDisplayPhone(item.key)}
+                    sx={{ alignItems: 'flex-start' }}
+                  >
+                    <ListItemIcon>
+                      <Checkbox
+                        edge="start"
+                        checked={isChecked}
+                        tabIndex={-1}
+                        disableRipple
+                        slotProps={{ input: { 'aria-labelledby': labelId } }}
                       />
-                    </ListItemButton>
-                  )
-                })}
-              </List>
+                    </ListItemIcon>
+                    <ListItemText
+                      id={labelId}
+                      primary={item.primary}
+                      secondary={item.secondary}
+                    />
+                  </ListItemButton>
+                )
+              })}
+            </List>
 
-              <Divider />
+            <Divider />
 
-              <List>
-                {MENU_ITEMS_AUTH.map((item) => {
-                  const isChecked = !!authControlRdcr[item.key];
-                  const labelId = `checkbox-list-label-${item.key}`;
-                  return (
-                    <ListItemButton
-                      key={item.key}
-                      onClick={() => toggleDisplayAuth(item.key)}
-                      sx={{ alignItems: 'flex-start' }}
-                    >
-                      <ListItemIcon>
-                        <Checkbox
-                          edge="start"
-                          checked={isChecked}
-                          tabIndex={-1}
-                          disableRipple
-                          slotProps={{ input: { 'aria-labelledby': labelId } }}
-                        />
-                      </ListItemIcon>
-                      <ListItemText
-                        id={labelId}
-                        primary={item.primary}
-                        secondary={item.secondary}
+            <List>
+              {MENU_ITEMS_AUTH.map((item) => {
+                const isChecked = !!authControlRdcr[item.key];
+                const labelId = `checkbox-list-label-${item.key}`;
+                return (
+                  <ListItemButton
+                    key={item.key}
+                    onClick={() => toggleDisplayAuth(item.key)}
+                    sx={{ alignItems: 'flex-start' }}
+                  >
+                    <ListItemIcon>
+                      <Checkbox
+                        edge="start"
+                        checked={isChecked}
+                        tabIndex={-1}
+                        disableRipple
+                        slotProps={{ input: { 'aria-labelledby': labelId } }}
                       />
-                    </ListItemButton>
-                  )
-                })}
-              </List>
-            </Box>
+                    </ListItemIcon>
+                    <ListItemText
+                      id={labelId}
+                      primary={item.primary}
+                      secondary={item.secondary}
+                    />
+                  </ListItemButton>
+                )
+              })}
+            </List>
           </Drawer>
-
 
 
 
