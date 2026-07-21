@@ -71,7 +71,7 @@ function PhoneReg(props) {
   }
 
   const finalTemplate =
-  <Paper elevation={8} sx={{ width: 480, mx: 'auto', p: 1, pt: 0, mt: 2 }}>
+  <Paper elevation={8} sx={{ maxWidth: 480, width: '100%', mx: 'auto', p: 1, pt: 0, mt: 2 }}>
     <Stack direction="row" sx={{ mb: 1, alignItems: 'center', justifyContent: 'space-between' }}>
       <Typography variant="h6">SIP Регистрация</Typography>
       <IconButton onClick={handleClose}>

@@ -6,7 +6,7 @@ import Copyright        from './Copyright'
 export default function App() {
   return (
     <Container
-      maxWidth="sm"
+      maxWidth="md"
       sx={{
         p: 2,
         mt: 2,

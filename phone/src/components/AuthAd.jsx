@@ -10,11 +10,14 @@ import {
   Typography,
   Alert,
   Collapse,
+  IconButton,
 } from '@mui/material'
 
 import {
   Login as IconLogin,
+  Close as IconClose,
 } from '@mui/icons-material'
+
 
 function AdAuth(props) {
   const {
@@ -35,12 +38,21 @@ function AdAuth(props) {
     setLogin('')
     setPassword('')
     setUriAdAuth(authControlRdcr.uriAdAuth || '')
-    authControlActions.handleAdAuthClear()
+    // authControlActions.handleAdAuthClear()
+  }
+
+  const handleClose = () => {
+    authControlActions.handleChangeStore('displayAd', false)
   }
 
   return (
-    <Paper elevation={8} sx={{ width: 480, mx: 'auto', p: 1, pt: 0, mt: 2 }}>
-      <Typography variant="h6" sx={{ mb: 2 }}>AD Авторизация</Typography>
+    <Paper elevation={8} sx={{ maxWidth: 480, width: '100%', mx: 'auto', p: 1, pt: 0, mt: 2 }}>
+      <Stack direction="row" sx={{ mb: 1, alignItems: 'center', justifyContent: 'space-between' }}>
+        <Typography variant="h6">AD Авторизация</Typography>
+        <IconButton onClick={handleClose}>
+            <IconClose color="error" />
+        </IconButton>
+      </Stack>
 
       <Box
         component="form"

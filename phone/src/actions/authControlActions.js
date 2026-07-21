@@ -3,6 +3,8 @@ import {
   AUTHCTL_SUBMIT_SUCCESS,
   AUTHCTL_SUBMIT_ERROR,
   AUTHCTL_CLEAR,
+  AUTHCTL_STORE_VALUE,
+  
   PHONECTL_STORE_VALUE,
 } from '../constants/redux'
 
@@ -110,7 +112,17 @@ const handleAdAuthClear = function() {
   }
 }
 
+const handleChangeStore = function(storeDataKey, storeDataValue) {
+  return (dispatch) => {
+    dispatch({
+      type: AUTHCTL_STORE_VALUE,
+      payload: {'storeDataKey': storeDataKey, 'storeDataValue': storeDataValue}
+    })
+  }
+}
+
 export {
   handleAdRegister,
   handleAdAuthClear,
+  handleChangeStore
 }

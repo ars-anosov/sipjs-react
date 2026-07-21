@@ -3,14 +3,16 @@ import {
   AUTHCTL_SUBMIT_SUCCESS,
   AUTHCTL_SUBMIT_ERROR,
   AUTHCTL_CLEAR,
+  AUTHCTL_STORE_VALUE,
 } from '../constants/redux'
 
 const initialState = {
-	displayAd     : true,
-  uriAdAuth     : localStorage.getItem('uriAdAuth') ? localStorage.getItem('uriAdAuth') : '',
-  status        : 'idle',
-  message       : '',
-  responseData  : null,
+  displayAd       : false,
+  displayControl  : true,
+  uriAdAuth       : localStorage.getItem('uriAdAuth') ? localStorage.getItem('uriAdAuth') : '',
+  status          : 'idle',
+  message         : '',
+  responseData    : null,
 }
 
 export default function authControlRdcr(state = initialState, action) {
@@ -19,7 +21,7 @@ export default function authControlRdcr(state = initialState, action) {
       return {
         ...state,
         status					: 'loading',
-				displayAd      	: true,
+        displayAd      	: true,
         message					: '',
         responseData		: null,
       }
@@ -28,7 +30,7 @@ export default function authControlRdcr(state = initialState, action) {
       return {
         ...state,
         status					: 'success',
-				displayAd      	: false,
+        displayAd      	: false,
         message					: action.payload.message || 'Успешно',
         responseData		: action.payload.responseData,
       }
@@ -37,13 +39,18 @@ export default function authControlRdcr(state = initialState, action) {
       return {
         ...state,
         status					: 'error',
-				displayAd      	: true,
+        displayAd      	: true,
         message					: action.payload.message || 'Ошибка',
         responseData		: null,
       }
 
     case AUTHCTL_CLEAR:
       return initialState
+
+    case AUTHCTL_STORE_VALUE:
+      return { ...state,
+        [action.payload.storeDataKey]: action.payload.storeDataValue
+      }
 
     default:
       return state

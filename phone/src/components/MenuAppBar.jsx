@@ -14,25 +14,31 @@ import {
   ListItemText,
   ListItemIcon,
   Checkbox,
+  Divider,
 } from '@mui/material'
 
 import MenuIcon         from '@mui/icons-material/Menu';
 import PhoneIco         from './PhoneIco'
-// import AdIco            from './AdIco'
+import AuthIco          from './AuthIco'
 import PhonePad         from './PhonePad'
 
 
 
-const MENU_ITEMS = [
-  { key: 'displayReg', primary: 'Карточка регистрации', secondary: 'PhoneReg.jsx' },
-  { key: 'displayPad', primary: 'Телефон с кнопками', secondary: 'PhonePad.jsx' },
-  { key: 'displayHistory', primary: 'История звонков', secondary: 'PhoneHistory.jsx' },
+const MENU_ITEMS_PHONE = [
+  { key: 'displayReg', primary: 'SIP Регистрация', secondary: 'PhoneReg.jsx' },
+  { key: 'displayPad', primary: 'SIP Телефон', secondary: 'PhonePad.jsx' },
+  { key: 'displayHistory', primary: 'SIP Звонки', secondary: 'PhoneHistory.jsx' },
   { key: 'displayChat', primary: 'SIP Сообщения', secondary: 'PhoneChat.jsx' },
-  { key: 'displayControl', primary: 'Кругляш состояния', secondary: 'PhoneIco.jsx' },
+  { key: 'displayControl', primary: 'SIP Кругляш', secondary: 'PhoneIco.jsx' },
+]
+
+const MENU_ITEMS_AUTH = [
+  { key: 'displayAd', primary: 'AD Авторизация', secondary: 'AuthAd.jsx' },
+  { key: 'displayControl', primary: 'AD Кругляш', secondary: 'AuthIco.jsx' },
 ]
 
 function MenuAppBar(props) {
-  const { phoneControlRdcr, phoneControlActions, authControlRdcr } = props
+  const { phoneControlRdcr, phoneControlActions, authControlRdcr, authControlActions } = props
 
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') console.log('MenuAppBar MOUNT')
@@ -43,15 +49,20 @@ function MenuAppBar(props) {
   }, [])
 
   const [anchorEl_phoneControl, setAnchorEl_phoneControl] = useState(null)
+  const [anchorEl_adControl, setAnchorEl_adControl] = useState(null)
   const [anchorEl_mainMenu, setAnchorEl_mainMenu] = useState(null)
   const handleOpenMenu = (event) => setAnchorEl_mainMenu(event.currentTarget)
   const handleCloseMenu = () => setAnchorEl_mainMenu(null)
 
-  const toggleDisplay = (keyName) => {
+  const toggleDisplayPhone = (keyName) => {
     phoneControlActions.handleChangeStore(keyName, !phoneControlRdcr[keyName])
     handleCloseMenu()
   }
-
+  const toggleDisplayAuth = (keyName) => {
+    authControlActions.handleChangeStore(keyName, !authControlRdcr[keyName])
+    handleCloseMenu()
+  }
+  
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
@@ -72,14 +83,13 @@ function MenuAppBar(props) {
             open={Boolean(anchorEl_mainMenu)}
             onClose={handleCloseMenu}
           >
-            {MENU_ITEMS.map((item) => {
+            {MENU_ITEMS_PHONE.map((item) => {
               const isChecked = !!phoneControlRdcr[item.key];
               const labelId = `checkbox-list-label-${item.key}`;
-
               return (
                 <MenuItem
                   key={item.key}
-                  onClick={() => toggleDisplay(item.key)}
+                  onClick={() => toggleDisplayPhone(item.key)}
                   sx={{ minWidth: 250 }}
                 >
                   <ListItemIcon>
@@ -97,7 +107,36 @@ function MenuAppBar(props) {
                     secondary={item.secondary} 
                   />
                 </MenuItem>
-              );
+              )
+            })}
+            
+            <Divider />
+            
+            {MENU_ITEMS_AUTH.map((item) => {
+              const isChecked = !!authControlRdcr[item.key];
+              const labelId = `checkbox-list-label-${item.key}`;
+              return (
+                <MenuItem
+                  key={item.key}
+                  onClick={() => toggleDisplayAuth(item.key)}
+                  sx={{ minWidth: 250 }}
+                >
+                  <ListItemIcon>
+                    <Checkbox
+                      edge="start"
+                      checked={isChecked}
+                      tabIndex={-1}
+                      disableRipple
+                      slotProps={{ input: { 'aria-labelledby': labelId } }}
+                    />
+                  </ListItemIcon>
+                  <ListItemText 
+                    id={labelId}
+                    primary={item.primary} 
+                    secondary={item.secondary} 
+                  />
+                </MenuItem>
+              )
             })}
           </Menu>
 
@@ -120,9 +159,19 @@ function MenuAppBar(props) {
             </Stack>
           )}
 
-          {/* {authControlRdcr && (
-            <AdIco authControlRdcr={authControlRdcr} />
-          )} */}
+          {authControlRdcr.displayControl && (
+            <Stack 
+              direction="row" 
+              spacing={1} 
+              sx={{ cursor: 'pointer', alignItems: 'center' }}
+              onClick={(e) => setAnchorEl_adControl(e.currentTarget)}
+            >
+              <Typography variant="caption">
+                {authControlRdcr.icoHeader}
+              </Typography>
+              <AuthIco authControlRdcr={authControlRdcr} />
+            </Stack>
+          )}
 
         </Toolbar>
       </AppBar>
@@ -135,7 +184,6 @@ function MenuAppBar(props) {
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
         transformOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
-
         <Box
           sx={{ p: 1 }}
         >
@@ -146,8 +194,28 @@ function MenuAppBar(props) {
             showInput={false}
           />
         </Box>
-
       </Popover>
+
+      <Popover
+        id='adControl_id'
+        open={Boolean(anchorEl_adControl)}
+        anchorEl={anchorEl_adControl}
+        onClose={() => setAnchorEl_adControl(null)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Box
+          sx={{ p: 1 }}
+        >
+          <Typography variant='body2'>{authControlRdcr.uriAdAuth}</Typography>
+          {authControlRdcr.responseData && (
+            <Typography variant='pre'>
+              cn: {authControlRdcr.responseData.ad_cn}
+            </Typography>
+          )}
+        </Box>
+      </Popover>
+
     </Box>
   );
 }
@@ -156,6 +224,7 @@ MenuAppBar.propTypes = {
   phoneControlRdcr: PropTypes.object.isRequired,
   phoneControlActions: PropTypes.object.isRequired,
   authControlRdcr: PropTypes.object,
+  authControlActions: PropTypes.object,
 }
 
 export default MenuAppBar
