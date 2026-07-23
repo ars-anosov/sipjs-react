@@ -43,8 +43,12 @@ const MENU_ITEMS_AUTH = [
   { key: 'displayControl', primary: 'AD Кругляш', secondary: 'AuthIco.jsx' },
 ]
 
+const MENU_ITEMS_LK = [
+  { key: 'displayLkToken', primary: 'LiveKit Приглашение', secondary: 'LkToken.jsx' },
+]
+
 function MenuAppBar(props) {
-  const { phoneControlRdcr, phoneControlActions, authControlRdcr, authControlActions } = props
+  const { phoneControlRdcr, phoneControlActions, authControlRdcr, authControlActions, lkControlRdcr, lkControlActions } = props
 
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') console.log('MenuAppBar MOUNT')
@@ -73,6 +77,9 @@ function MenuAppBar(props) {
   }
   const toggleDisplayAuth = (keyName) => {
     authControlActions.handleChangeStore(keyName, !authControlRdcr[keyName])
+  }
+  const toggleDisplayLk = (keyName) => {
+    lkControlActions.handleChangeStore(keyName, !lkControlRdcr[keyName])
   }
   
   return (
@@ -148,6 +155,37 @@ function MenuAppBar(props) {
                   <ListItemButton
                     key={item.key}
                     onClick={() => toggleDisplayAuth(item.key)}
+                    sx={{ alignItems: 'flex-start' }}
+                  >
+                    <ListItemIcon>
+                      <Checkbox
+                        edge="start"
+                        checked={isChecked}
+                        tabIndex={-1}
+                        disableRipple
+                        slotProps={{ input: { 'aria-labelledby': labelId } }}
+                      />
+                    </ListItemIcon>
+                    <ListItemText
+                      id={labelId}
+                      primary={item.primary}
+                      secondary={item.secondary}
+                    />
+                  </ListItemButton>
+                )
+              })}
+            </List>
+
+            <Divider />
+
+            <List>
+              {MENU_ITEMS_LK.map((item) => {
+                const isChecked = !!lkControlRdcr[item.key];
+                const labelId = `checkbox-list-label-${item.key}`;
+                return (
+                  <ListItemButton
+                    key={item.key}
+                    onClick={() => toggleDisplayLk(item.key)}
                     sx={{ alignItems: 'flex-start' }}
                   >
                     <ListItemIcon>
@@ -258,6 +296,8 @@ MenuAppBar.propTypes = {
   phoneControlActions: PropTypes.object.isRequired,
   authControlRdcr: PropTypes.object,
   authControlActions: PropTypes.object,
+  lkControlRdcr: PropTypes.object,
+  lkControlActions: PropTypes.object,
 }
 
 export default MenuAppBar

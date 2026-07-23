@@ -4,6 +4,7 @@ import { bindActionCreators } from 'redux'
 
 import * as phoneActions from '../actions/phoneControlActions.js'
 import * as authActions from '../actions/authControlActions.js'
+import * as lkActions from '../actions/lkControlActions.js'
 import MenuAppBar from '../components/MenuAppBar.jsx'
 
 
@@ -19,11 +20,16 @@ const MenuAppContainer = () => {
     () => bindActionCreators(authActions, dispatch),
     [dispatch]
   )
+  const lkControlActions = useMemo(
+    () => bindActionCreators(lkActions, dispatch),
+    [dispatch]
+  )
 
   const phoneControlRdcr = useSelector((state) => state.phoneControlRdcr)
   const authControlRdcr = useSelector((state) => state.authControlRdcr)
+  const lkControlRdcr = useSelector((state) => state.lkControlRdcr)
 
-  const commonProps = { phoneControlRdcr, phoneControlActions, authControlRdcr, authControlActions }
+  const commonProps = { phoneControlRdcr, phoneControlActions, authControlRdcr, authControlActions, lkControlRdcr, lkControlActions }
 
   return <MenuAppBar {...commonProps} />
 }
