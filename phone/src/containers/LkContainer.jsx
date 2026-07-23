@@ -1,11 +1,19 @@
-import { useMemo } from 'react'
+import { useMemo }                  from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { bindActionCreators } from 'redux'
+import { bindActionCreators }       from 'redux'
 
-import * as phoneActions from '../actions/phoneControlActions.js'
-import * as authActions from '../actions/authControlActions.js'
-import * as lkActions from '../actions/lkControlActions.js'
-import LkToken from '../components/LkToken.jsx'
+import * as phoneActions            from '../actions/phoneControlActions.js'
+import * as authActions             from '../actions/authControlActions.js'
+import * as lkActions               from '../actions/lkControlActions.js'
+import LkMeet                       from '../components/LkMeet.jsx'
+
+
+
+
+
+
+
+
 
 const LkContainer = () => {
   const dispatch = useDispatch()
@@ -30,8 +38,10 @@ const LkContainer = () => {
   const commonProps = { phoneControlRdcr, phoneControlActions, authControlRdcr, authControlActions, lkControlRdcr, lkControlActions }
 
   return (
-    <LkToken {...commonProps}/>
+    <LkMeet {...commonProps}/>
   )
 }
+
+
 
 export default LkContainer

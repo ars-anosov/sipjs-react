@@ -111,7 +111,7 @@ function PhoneReg(props) {
         </Stack>
 
         {/* Второй ряд */}
-        <Stack direction="row" spacing={2}>
+        <Stack direction="row" spacing={2} sx={{ display: 'none' }}>
           <TextField
             fullWidth
             required
