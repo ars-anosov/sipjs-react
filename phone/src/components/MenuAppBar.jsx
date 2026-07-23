@@ -279,10 +279,12 @@ function MenuAppBar(props) {
         >
           <Typography variant='body2'>{authControlRdcr.uriAdAuth}</Typography>
           <Divider />
-          <Typography component="pre">
-            {"\n"}cn: {authControlRdcr?.responseData?.ad_cn}
-            {"\n"}department: {authControlRdcr?.responseData?.ad_department}
-            {"\n"}title: {authControlRdcr?.responseData?.ad_title}
+          <Typography variant='body2' component="pre">
+            {"\n"}cn{"\t"}{"\t"}{"\t"}{authControlRdcr?.responseData?.ad_cn}
+            {"\n"}title:{"\t"}{"\t"}{authControlRdcr?.responseData?.ad_title}
+            {"\n"}department:{"\t"}{authControlRdcr?.responseData?.ad_department}
+            {"\n"}
+            {"\n"}SIP num:{"\t"}{authControlRdcr?.responseData?.sip_username}
           </Typography>
         </Box>
       </Popover>

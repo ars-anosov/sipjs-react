@@ -20,12 +20,13 @@ import {
 
 function LkToken(props) {
   const {
+    phoneControlRdcr,
     lkControlRdcr,
     lkControlActions,
   } = props
 
   const [num, setNum] = useState('')
-  const [room, setRoom] = useState('')
+  const [room, setRoom] = useState(phoneControlRdcr.callerUserNum || '')
   const [uriLkToken, setUriLkToken] = useState(lkControlRdcr.uriLkToken || '')
 
   const handleSubmit = (event) => {
@@ -35,8 +36,8 @@ function LkToken(props) {
 
   const handleReset = () => {
     setNum('')
-    setRoom('')
-    setUriLkToken('')
+    // setRoom('')
+    // setUriLkToken('')
   }
 
   const handleClose = () => {
@@ -44,7 +45,8 @@ function LkToken(props) {
   }
 
   return (
-    <Paper elevation={8} sx={{ maxWidth: 480, width: '100%', mx: 'auto', p: 1, pt: 0, mt: 2 }}>
+    (lkControlRdcr.displayLkToken) && (
+    <Paper elevation={8} sx={{ maxWidth: 300, width: '100%', mx: 'auto', p: 1, pt: 0, mt: 2 }}>
       <Stack direction="row" sx={{ mb: 1, alignItems: 'center', justifyContent: 'space-between' }}>
         <Typography variant="h6">Пригласить участника</Typography>
         <IconButton onClick={handleClose}>
@@ -64,7 +66,7 @@ function LkToken(props) {
               fullWidth
               required
               id="lkTokenNum"
-              label="Num"
+              label="Вн.номер"
               variant="outlined"
               value={num}
               onChange={(event) => setNum(event.target.value)}
@@ -78,6 +80,12 @@ function LkToken(props) {
               variant="outlined"
               value={room}
               onChange={(event) => setRoom(event.target.value)}
+              slotProps={{
+                input: {
+                  readOnly: true,
+                },
+              }}
+              sx={{ display: 'none' }}
             />
           </Stack>
 
@@ -89,6 +97,12 @@ function LkToken(props) {
             variant="outlined"
             value={uriLkToken}
             onChange={(event) => setUriLkToken(event.target.value)}
+            slotProps={{
+              input: {
+                readOnly: true,
+              },
+            }}
+            sx={{ display: 'none' }}
           />
 
           <Stack direction="row" spacing={2} sx={{ justifyContent: 'flex-end' }}>
@@ -99,7 +113,7 @@ function LkToken(props) {
               size="large"
               onClick={handleReset}
             >
-              Reset
+              Стереть
             </Button>
             <Button
               type="submit"
@@ -109,7 +123,7 @@ function LkToken(props) {
               size="large"
               disabled={lkControlRdcr.status === 'loading'}
             >
-              Submit
+              Пригласить
             </Button>
           </Stack>
         </Stack>
@@ -121,7 +135,7 @@ function LkToken(props) {
         </Alert>
       </Collapse>
     </Paper>
-  )
+  ))
 }
 
 LkToken.propTypes = {

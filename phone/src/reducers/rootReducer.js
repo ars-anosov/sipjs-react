@@ -1,7 +1,7 @@
 import { combineReducers }  from 'redux'
 import phoneControlRdcr     from './phoneControlRdcr'
 import authControlRdcr      from './authControlRdcr'
-import lkControlRdcr         from './lkControlRdcr'
+import lkControlRdcr        from './lkControlRdcr'
 
 export default combineReducers({
   phoneControlRdcr,
