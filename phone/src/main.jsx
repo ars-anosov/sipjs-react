@@ -1,9 +1,10 @@
-import React from 'react'
-import { createRoot } from 'react-dom/client'
-import CssBaseline from '@mui/material/CssBaseline'
-import { ThemeProvider } from '@mui/material/styles'
-import App from './App'
-import theme from './theme'
+import React                from 'react'
+import { createRoot }       from 'react-dom/client'
+import { HashRouter }       from 'react-router-dom'
+import CssBaseline          from '@mui/material/CssBaseline'
+import { ThemeProvider }    from '@mui/material/styles'
+import App                  from './App'
+import theme                from './theme'
 
 // Global error handling for WebSocket and connection issues
 window.addEventListener('error', (event) => {
@@ -34,10 +35,12 @@ const root = createRoot(rootElement)
 root.render(
   <React.StrictMode>
     <Provider store={store}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <App />
-      </ThemeProvider>
+      <HashRouter>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <App />
+        </ThemeProvider>
+      </HashRouter>
     </Provider>
   </React.StrictMode>,
 )

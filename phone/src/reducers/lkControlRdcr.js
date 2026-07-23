@@ -8,7 +8,7 @@ import {
 
 const initialState = {
   displayLkToken: false,
-  displayControl: true,
+  displayControl: false,
   uriLkToken: localStorage.getItem('uriLkToken') ? localStorage.getItem('uriLkToken') : '',
   status: 'idle',
   message: '',

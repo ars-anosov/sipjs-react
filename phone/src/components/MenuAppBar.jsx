@@ -44,7 +44,8 @@ const MENU_ITEMS_AUTH = [
 ]
 
 const MENU_ITEMS_LK = [
-  { key: 'displayLkToken', primary: 'LiveKit Приглашение', secondary: 'LkToken.jsx' },
+  // { key: 'displayLkToken', primary: 'LiveKit Приглашение', secondary: 'LkToken.jsx' },
+  { key: 'displayControl', primary: 'LiveKit Встреча', secondary: 'LkMeet.jsx' },
 ]
 
 function MenuAppBar(props) {

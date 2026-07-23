@@ -8,7 +8,7 @@ import {
 
 const initialState = {
   displayAd       : false,
-  displayControl  : true,
+  displayControl  : false,
   uriAdAuth       : localStorage.getItem('uriAdAuth') ? localStorage.getItem('uriAdAuth') : '',
   status          : 'idle',
   message         : '',
