@@ -65,6 +65,10 @@ function PhoneChat(props) {
     setMessageTxt('')
   }
 
+  const handlePeerSelect = (peer) => {
+    setPeerTxt(formatPhoneDigits(peer))
+  }
+
   const title = phoneControlRdcr.chatUnread > 0
     ? `SIP Сообщения (${phoneControlRdcr.chatUnread})`
     : 'SIP Сообщения'
@@ -126,7 +130,7 @@ function PhoneChat(props) {
             backgroundColor: alpha(theme.palette.background.default, 0.5),
           }}
         >
-          {peerTxt.trim() && visibleMessages.length > 0 ? (
+          {visibleMessages.length > 0 ? (
             visibleMessages.map((msg) => {
               const isOutbound = msg.direction === 'out'
               const deliveryStatus = formatDeliveryStatus(msg)
@@ -145,8 +149,13 @@ function PhoneChat(props) {
                   }}
                 >
                   <Stack direction="row" spacing={1} sx={{ mb: 0.5, justifyContent: 'space-between' }}>
-                    <Typography variant="caption" color="text.secondary">
-                      {isOutbound ? 'Вы' : msg.peer}
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      onClick={() => handlePeerSelect(msg.peer)}
+                      sx={{ cursor: 'pointer', userSelect: 'none' }}
+                    >
+                      {isOutbound ? `Вы → ${msg.peer}` : msg.peer}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
                       {format(new Date(msg.time), 'HH:mm:ss')}
