@@ -14,20 +14,9 @@ import {
 
 const buildInviteSipMessageBody = function(room, responseData) {
   if (responseData && typeof responseData === 'object') {
-    const lines = [`room=${room}`]
-
-    if (responseData.lk_num) {
-      lines.push(`lk_num=${responseData.lk_num}`)
-    }
-
-    if (responseData.lk_token) {
-      lines.push(`lk_token=${responseData.lk_token}`)
-    }
-
-    if (responseData.message) {
-      lines.push(`message=${responseData.message}`)
-    }
-
+    const lines = [`Приглашение на встречу`]
+    lines.push('')
+    lines.push(`<a href="https://sit.pecom.local/webrtc/#/?lk_room=${room}&lk_token=${responseData.lk_token}">${room}</a>`)
     return lines.join('\n')
   }
 
