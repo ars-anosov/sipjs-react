@@ -6,8 +6,36 @@ import {
   LK_STORE_VALUE,
 } from '../constants/redux'
 
+import {
+  createChatMessage,
+  getPhoneRuntime,
+  transmitSipMessage,
+} from './phoneRuntime'
+
+const buildInviteSipMessageBody = function(room, responseData) {
+  if (responseData && typeof responseData === 'object') {
+    const lines = [`room=${room}`]
+
+    if (responseData.lk_num) {
+      lines.push(`lk_num=${responseData.lk_num}`)
+    }
+
+    if (responseData.lk_token) {
+      lines.push(`lk_token=${responseData.lk_token}`)
+    }
+
+    if (responseData.message) {
+      lines.push(`message=${responseData.message}`)
+    }
+
+    return lines.join('\n')
+  }
+
+  return `room=${room}`
+}
+
 const handleLkTokenSubmit = function(formData = {}) {
-  return async (dispatch) => {
+  return async (dispatch, getState) => {
     const num = typeof formData.num === 'string' ? formData.num.trim() : ''
     const room = typeof formData.room === 'string' ? formData.room.trim() : ''
     const uriLkToken = typeof formData.uriLkToken === 'string' ? formData.uriLkToken.trim() : ''
@@ -69,13 +97,38 @@ const handleLkTokenSubmit = function(formData = {}) {
           responseData: responseData,
         },
       })
+
+      // Отправка SIP MESSAGE с приглашением в комнату
+      const state = getState()
+      const runtime = getPhoneRuntime()
+      const uriHost = state?.phoneControlRdcr?.uriHost || ''
+      const canSendSipMessage = Boolean(runtime?.userAgent && uriHost && num)
+
+      if (canSendSipMessage) {
+        const chatMessage = createChatMessage(
+          num,
+          buildInviteSipMessageBody(room, responseData),
+          'out',
+          'sending',
+        )
+
+        try {
+          await transmitSipMessage({
+            chatMessage,
+            uriHost,
+          })
+        } catch (sipError) {
+          console.warn('Lk invite SIP MESSAGE send error:', sipError)
+        }
+      }
+      // END OF Отправка SIP MESSAGE
     } catch (error) {
-    dispatch({
+      dispatch({
         type: LKTOKEN_SUBMIT_ERROR,
         payload: {
-        message: error && error.message ? error.message : 'Не удалось выполнить запрос.',
+          message: error && error.message ? error.message : 'Не удалось выполнить запрос.',
         },
-    })
+      })
     }
   }
 }
