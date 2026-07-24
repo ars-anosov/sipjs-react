@@ -85,6 +85,36 @@ function PhoneChat(props) {
     return null
   }
 
+  const renderMessageBody = (body) => {
+    if (!body) return null
+
+    const parts = body.split(/(<a\s+href="[^"]+">.*?<\/a>)/gi)
+    if (parts.length === 1) return body
+
+    const normalizeLinkHref = (href) => {
+      if (!href) return '#'
+      if (href.startsWith('#')) return href
+      if (/^(https?:|mailto:|tel:)/i.test(href)) return href
+      return `#/${href.replace(/^\/+/, '')}`
+    }
+
+    return parts.map((part, index) => {
+      const match = part.match(/^<a\s+href="([^"]+)">([^<]+)<\/a>$/i)
+      if (!match) return <span key={`message-body-${index}`}>{part}</span>
+
+      const [, href, text] = match
+      return (
+        <a
+          key={`message-body-${index}`}
+          href={normalizeLinkHref(href)}
+          style={{ color: 'inherit', textDecoration: 'underline' }}
+        >
+          {text}
+        </a>
+      )
+    })
+  }
+
   const deliveryStatusColor = (msg) => {
     if (msg.status === 'delivered') return 'success.main'
     if (msg.status === 'error') return 'error.main'
@@ -162,7 +192,7 @@ function PhoneChat(props) {
                     </Typography>
                   </Stack>
                   <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-                    {msg.body}
+                    {renderMessageBody(msg.body)}
                   </Typography>
                   {deliveryStatus && (
                     <Typography
