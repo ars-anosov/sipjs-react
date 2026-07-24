@@ -16,7 +16,7 @@ const buildInviteSipMessageBody = function(room, responseData) {
   if (responseData && typeof responseData === 'object') {
     const lines = [`Приглашение на встречу`]
     lines.push('')
-    lines.push(`<a href="https://sit.pecom.local/webrtc/#/?lk_room=${room}&lk_token=${responseData.lk_token}">${room}</a>`)
+    lines.push(`<a href="/?lk_room=${room}&lk_token=${responseData.lk_token}">${room}</a>`)
     return lines.join('\n')
   }
 
