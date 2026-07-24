@@ -137,6 +137,17 @@ function LkMeet(props) {
       
         {authControlRdcr?.responseData?.sip_username && authControlRdcr?.responseData?.lk_token && (
         <Grid size={{ xs: 'auto' }} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1 }}>
+          {token ? (
+          <Button
+            variant="outlined"
+            color="primary"
+            size="small"
+            component={RouterLink} 
+            to={'/'} 
+          >
+            Удалить
+          </Button>
+          ) : (
           <Button
             variant="outlined"
             color="primary"
@@ -146,6 +157,7 @@ function LkMeet(props) {
           >
             Создать
           </Button>
+          )}
           {!lkControlRdcr.displayLkToken && (
           <Button
             type="button"
@@ -161,7 +173,7 @@ function LkMeet(props) {
         </Grid>
         )}
 
-        {lkControlRdcr?.responseData?.lk_token && (
+        {lkControlRdcr?.responseData?.lk_token && token && (
         <Grid size={{ xs: 12 }} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1 }}>
           <Typography>
             Приглашение для
@@ -178,24 +190,15 @@ function LkMeet(props) {
         {token && (
         <Grid size={{ xs: 12 }} sx={{ display: 'flex', justifyContent: 'center' }}>
           {!isRoomActive ? (
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1 }}>
-              <Button
-                type="button"
-                variant="contained"
-                color="warning"
-                size="large"
-                onClick={() => setIsRoomActive(true)}
-              >
-                Подключиться к {room}
-              </Button>
-              <Button
-              variant="outlined"
-              color="warning"
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1 }}>
+            <Button
+              type="button"
+              variant="contained"
+              color="success"
               size="large"
-              component={RouterLink} 
-              to={'/'} 
+              onClick={() => setIsRoomActive(true)}
             >
-              Удалить
+              Подключиться к {room}
             </Button>
           </Box>
           ) : (

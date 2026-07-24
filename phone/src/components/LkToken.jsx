@@ -14,7 +14,7 @@ import {
 } from '@mui/material'
 
 import {
-  Login as IconLogin,
+  PersonAdd as IconPersonAdd,
   Close as IconClose,
 } from '@mui/icons-material'
 
@@ -107,20 +107,11 @@ function LkToken(props) {
 
           <Stack direction="row" spacing={2} sx={{ justifyContent: 'flex-end' }}>
             <Button
-              type="button"
-              variant="outlined"
-              color="primary"
-              size="large"
-              onClick={handleReset}
-            >
-              Стереть
-            </Button>
-            <Button
               type="submit"
               variant="contained"
               color="primary"
-              startIcon={<IconLogin />}
-              size="large"
+              startIcon={<IconPersonAdd />}
+              size="small"
               disabled={lkControlRdcr.status === 'loading'}
             >
               Пригласить
