@@ -47,6 +47,7 @@ const initialState = {
   callHoldNow       : false,
   // PhoneHistory
   callsArr          : [],
+  callUnread        : 0,
   // PhoneChat
   chatMessages      : [],
   chatUnread        : 0,
@@ -98,6 +99,7 @@ export default function phoneControlRdcr(state = initialState, action) {
         'displayPad'        : false,
         'displayHistory'    : false,
         'displayChat'       : false,
+        'callUnread'        : 0,
         'chatUnread'        : 0,
         'incomeDisplay'     : false,
         'outgoCallNow'      : false,
@@ -140,6 +142,9 @@ export default function phoneControlRdcr(state = initialState, action) {
         'phoneHeader'     : state.callerUserNum+' ⇠ '+action.payload.calleePhoneNum,
         'icoHeader'       : action.payload.calleePhoneNum+' ⇢ '+state.callerUserNum,
         'calleePhoneNum'  : action.payload.calleePhoneNum,
+        'callUnread'      : state.displayHistory
+          ? state.callUnread
+          : state.callUnread + 1,
       }
 
     case PHONECTL_INCOME_SUBMIT:
@@ -172,7 +177,6 @@ export default function phoneControlRdcr(state = initialState, action) {
 
     case PHONECTL_MESSAGE_ADD:
       return { ...state,
-        'displayChat'   : true,
         'chatMessages'  : action.payload.chatMessages,
         'chatUnread'    : state.displayChat || !action.payload.incoming
           ? state.chatUnread

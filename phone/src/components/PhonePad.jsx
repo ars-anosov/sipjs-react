@@ -10,6 +10,7 @@ import {
   Stack,
   Grid,
   IconButton,
+  Badge,
   InputAdornment,
   Alert,
   Collapse,
@@ -19,13 +20,13 @@ import {
 import {
   Backspace     as IconBackspace,
   Phone         as IconPhone,
+  History       as IconPhoneHistory,
   RingVolume    as IconPhoneRing,
   PhoneDisabled as IconHangup,
   Pause         as IconHold,
   PlayArrow     as IconResume,
   Close         as IconClose,
-  History       as IconHistory,
-  Chat          as IconChat,
+  Mail          as IconMail,
   WifiOff       as IconOffline,
   Wifi          as IconOnline,
 } from '@mui/icons-material'
@@ -96,7 +97,12 @@ function PhonePad(props) {
   }
 
   const toggleHistory = () => {
-    phoneControlActions.handleChangeStore('displayHistory', !phoneControlRdcr.displayHistory)
+    const nextDisplayHistory = !phoneControlRdcr.displayHistory
+    phoneControlActions.handleChangeStore('displayHistory', nextDisplayHistory)
+
+    if (nextDisplayHistory) {
+      phoneControlActions.handleChangeStore('callUnread', 0)
+    }
   }
 
   const toggleChat = () => {
@@ -269,23 +275,39 @@ function PhonePad(props) {
 
         {showInput && (
         <Stack direction="row" spacing={1}>
-          <IconButton
-            aria-label="Звонки" 
-            size="small"
-            color={phoneControlRdcr.displayHistory ? 'primary' : 'default'}
-            onClick={toggleHistory}
+          <Badge
+            badgeContent={phoneControlRdcr.callUnread}
+            color="error"
+            overlap="circular"
+            invisible={!phoneControlRdcr.callUnread || phoneControlRdcr.displayHistory}
+            sx={{ '& .MuiBadge-badge': { top: 6, right: 6 } }}
           >
-            <IconHistory />
-          </IconButton>
+            <IconButton
+              aria-label="Звонки"
+              size="small"
+              color={phoneControlRdcr.displayHistory ? 'primary' : 'default'}
+              onClick={toggleHistory}
+            >
+              <IconPhoneHistory />
+            </IconButton>
+          </Badge>
 
-          <IconButton
-            aria-label="Сообщения"
-            size="small"
-            color={phoneControlRdcr.displayChat ? 'primary' : 'default'}
-            onClick={toggleChat}
+          <Badge
+            badgeContent={phoneControlRdcr.chatUnread}
+            color="error"
+            overlap="circular"
+            invisible={!phoneControlRdcr.chatUnread || phoneControlRdcr.displayChat}
+            sx={{ '& .MuiBadge-badge': { top: 6, right: 6 } }}
           >
-            <IconChat />
-          </IconButton>
+            <IconButton
+              aria-label="Сообщения"
+              size="small"
+              color={phoneControlRdcr.displayChat ? 'primary' : 'default'}
+              onClick={toggleChat}
+            >
+              <IconMail />
+            </IconButton>
+          </Badge>
         </Stack>
         )}
       </Stack>

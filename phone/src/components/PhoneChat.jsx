@@ -46,12 +46,6 @@ function PhoneChat(props) {
   }, [])
 
   useEffect(() => {
-    if (phoneControlRdcr.calleePhoneNum && !peerTxt) {
-      setPeerTxt(formatPhoneDigits(phoneControlRdcr.calleePhoneNum))
-    }
-  }, [phoneControlRdcr.calleePhoneNum, peerTxt])
-
-  useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [phoneControlRdcr.chatMessages])
 
@@ -94,7 +88,7 @@ function PhoneChat(props) {
   }
 
   return (
-    <Paper elevation={8} sx={{ maxWidth: 480, width: '100%', mx: 'auto', p: 1, pt: 0, mt: 2 }}>
+    <Paper elevation={8} sx={{ minWidth: 300, maxWidth: 480, width: '100%', mx: 'auto', p: 1, pt: 0, mt: 2 }}>
       <Stack direction="row" sx={{ mb: 1, alignItems: 'center', justifyContent: 'space-between' }}>
         <Badge color="error" badgeContent={phoneControlRdcr.chatUnread} invisible={!phoneControlRdcr.chatUnread}>
           <Typography variant="h6">{title}</Typography>
@@ -132,11 +126,7 @@ function PhoneChat(props) {
             backgroundColor: alpha(theme.palette.background.default, 0.5),
           }}
         >
-          {visibleMessages.length === 0 ? (
-            <Typography variant="body2" color="text.secondary" sx={{ p: 1 }}>
-              Сообщений пока нет.
-            </Typography>
-          ) : (
+          {peerTxt.trim() && visibleMessages.length > 0 ? (
             visibleMessages.map((msg) => {
               const isOutbound = msg.direction === 'out'
               const deliveryStatus = formatDeliveryStatus(msg)
@@ -182,7 +172,7 @@ function PhoneChat(props) {
                 </Box>
               )
             })
-          )}
+          ) : null}
           <div ref={messagesEndRef} />
         </Box>
 

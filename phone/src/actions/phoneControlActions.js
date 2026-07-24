@@ -260,6 +260,11 @@ const handleClkRegister = function(formData, rdcr) {
 
       onMessage(message) {
         const { chatMessages } = handleIncomingSipMessage(message)
+
+        const incomingMessageSound = new Audio('sounds/sipjs/message.mp3')
+        incomingMessageSound.preload = 'auto'
+        incomingMessageSound.play().catch(() => {})
+
         dispatch({
           type: PHONECTL_MESSAGE_ADD,
           payload: {
