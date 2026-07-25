@@ -35,14 +35,14 @@ npm run build
 POST-запрос к серверу авторизации, ожидаемый ответ:
 ```json
 {
-  message: 'success',
-  sip_username: '1234',
-  sip_secret: 'SECRET',
-  lk_token: 'LiveKit Token',
-  ad_login: 'login',
-  ad_cn: 'ФИО',
-  ad_title: 'Должность,
-  ad_department: 'Отдел,
+  "message"       : "success",
+  "sip_username"  : "1234",
+  "sip_secret"    : "SECRET",
+  "lk_token"      : "LiveKit Token",
+  "ad_login"      : "login",
+  "ad_cn"         : "ФИО",
+  "ad_title"      : "Должность",
+  "ad_department" : "Отдел",
 }
 ```
 
