@@ -35,7 +35,7 @@ const handleAdRegister = function(formData = {}) {
       })
       return
     }
-    localStorage.setItem('uriAdAuth', formData.uriAdAuth)
+    localStorage.setItem('uriAdAuth', uriAdAuth)
 
     dispatch({ type: AUTHCTL_SUBMIT_REQUEST })
 

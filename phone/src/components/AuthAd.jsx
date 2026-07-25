@@ -93,7 +93,7 @@ function AdAuth(props) {
             variant="outlined"
             value={uriAdAuth}
             onChange={(event) => setUriAdAuth(event.target.value)}
-            sx={{ display: 'none' }}
+            sx={{ display: import.meta.env.DEV ? 'block' : 'none' }}
           />
 
           <Stack direction="row" spacing={2} sx={{ justifyContent: 'flex-end' }}>
