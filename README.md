@@ -29,16 +29,25 @@ npm run build
 ![component_PhoneIco.png](img/component_PhoneIco.png)
 
 # Доп. компоненты
+Плюшки для интеграции с внешними сервисами
 
 ## AuthAd.jsx
+POST-запрос к серверу авторизации, ожидаемый ответ:
+```json
+{
+  message: 'success',
+  sip_username: '1234',
+  sip_secret: 'SECRET',
+  lk_token: 'LiveKit Token',
+  ad_login: 'login',
+  ad_cn: 'ФИО',
+  ad_title: 'Должность,
+  ad_department: 'Отдел,
+}
+```
+
 ![component_AuthAd.png](img/component_AuthAd.png)
 
-### Dev с uriAdAuth
-Для локальной проверки авторизации без внешнего AD-сервера можно запустить mock-сервер:
-
-```bash
-node mock/ad-auth-server.mjs
-```
 
 
 
