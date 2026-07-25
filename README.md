@@ -13,6 +13,7 @@ npm run build
 ```
 
 
+
 # Компоненты
 
 ## PhoneReg.jsx
@@ -26,6 +27,18 @@ npm run build
 
 ## PhoneIco.jsx
 ![component_PhoneIco.png](img/component_PhoneIco.png)
+
+# Доп. компоненты
+
+## AuthAd.jsx
+![component_AuthAd.png](img/component_AuthAd.png)
+
+### Dev с uriAdAuth
+Для локальной проверки авторизации без внешнего AD-сервера можно запустить mock-сервер:
+
+```bash
+node mock/ad-auth-server.mjs
+```
 
 
 
