@@ -1,63 +1,78 @@
-function sendJson(res, statusCode, payload) {
-  res.writeHead(statusCode, { 'Content-Type': 'application/json' });
-  res.end(JSON.stringify(payload));
+import bodyParser from 'body-parser'
+import jwt from 'jsonwebtoken'
+
+const jsonBodyParser = bodyParser.json()
+const lkApiKey = 'devkey'
+const lkApiSecret = 'secret'
+
+function lkToken(room = '9993', num = '9993', exp = '1h') {
+  const jwtPayload = {
+    video: {
+      roomJoin: true,
+      room: room,
+    },
+  }
+
+  return jwt.sign(jwtPayload, lkApiSecret, {
+    issuer: lkApiKey,
+    subject: num,
+    expiresIn: exp,
+  })
 }
 
-function readJsonBody(req) {
-  return new Promise((resolve) => {
-    let raw = '';
-    req.on('data', (chunk) => {
-      raw += chunk;
-    });
-    req.on('end', () => {
-      if (!raw) {
-        resolve({});
-        return;
+function sendJson(res, statusCode, payload) {
+  res.writeHead(statusCode, { 'Content-Type': 'application/json' })
+  res.end(JSON.stringify(payload))
+}
+
+function parseJsonBody(req, res) {
+  return new Promise((resolve, reject) => {
+    jsonBodyParser(req, res, (err) => {
+      if (err) {
+        reject(err)
+        return
       }
-      try {
-        resolve(JSON.parse(raw));
-      } catch {
-        resolve({ rawBody: raw });
-      }
-    });
-  });
+      resolve(req.body || {})
+    })
+  })
 }
 
 export const mockEndpoints = [
   {
-    // см. исходный phone/mock/ad-auth-server.mjs
     path: '/ad',
     methods: ['POST'],
     handler(req, res, { body }) {
-      const login = typeof body.login === 'string' ? body.login : '';
-      const password = typeof body.password === 'string' ? body.password : '';
+      const login = typeof body.login === 'string' ? body.login : ''
+      const password = typeof body.password === 'string' ? body.password : ''
 
       sendJson(res, 200, {
-        message: 'Mock AD auth success',
         sip_username: '9993',
         sip_secret: '',
-        lk_token: 'Mock LK Token',
+        lk_token: lkToken('9993', '9993', '1h'),
         ad_login: login,
         ad_cn: 'Mock User',
         ad_title: 'Mock Title',
         ad_department: 'Mock Department',
-      });
+      })
     },
   },
   {
     path: '/lk',
-    methods: ['GET', 'POST'],
+    methods: ['POST'],
     handler(req, res, { body }) {
-      if (req.method === 'GET') {
-        sendJson(res, 200, { message: 'Mock test endpoint (GET)' });
-        return;
-      }
+      const room = typeof body.room === 'string' ? body.room : ''
+      const num = typeof body.num === 'string' ? body.num : ''
 
-      sendJson(res, 200, { message: 'Mock test endpoint (POST)', received: body });
+      sendJson(res, 200, {
+        lk_room: room,
+        lk_num: num,
+        lk_token: lkToken(room, num, '1h'),
+      })
     },
   },
-];
+]
 
+// Единый плагин, который навешивает все endpoints на dev-сервер Vite.
 export function mockApiPlugin(endpoints = mockEndpoints) {
   return {
     name: 'mock-api',
@@ -72,23 +87,29 @@ export function mockApiPlugin(endpoints = mockEndpoints) {
               'Access-Control-Allow-Methods': `${methods.join(', ')}, OPTIONS`,
               'Access-Control-Allow-Headers': 'Content-Type, Authorization',
               Allow: `${methods.join(', ')}, OPTIONS`,
-            });
-            res.end(JSON.stringify({ ok: true }));
-            return;
+            })
+            res.end(JSON.stringify({ ok: true }))
+            return
           }
 
           if (!methods.includes(req.method)) {
-            sendJson(res, 405, { error: `Only ${methods.join('/')} are supported` });
-            return;
+            sendJson(res, 405, { error: `Only ${methods.join('/')} are supported` })
+            return
           }
 
-          const body = ['POST', 'PUT', 'PATCH'].includes(req.method)
-            ? await readJsonBody(req)
-            : {};
+          let body = {}
+          if (['POST', 'PUT', 'PATCH'].includes(req.method)) {
+            try {
+              body = await parseJsonBody(req, res)
+            } catch {
+              sendJson(res, 400, { error: 'Invalid JSON body' })
+              return
+            }
+          }
 
-          handler(req, res, { body });
-        });
+          handler(req, res, { body })
+        })
       }
     },
-  };
+  }
 }

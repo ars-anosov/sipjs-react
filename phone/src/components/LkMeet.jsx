@@ -204,7 +204,7 @@ function LkMeet(props) {
           ) : (
           <LiveKitRoom
             token={token}
-            serverUrl="https://livekit.pecom.local:7443"
+            serverUrl={lkControlRdcr.uriLk}
             connect={isRoomActive}
             video={true}
             audio={true}

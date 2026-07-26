@@ -35,9 +35,9 @@ npm run build
 POST-запрос к серверу авторизации, ожидаемый ответ:
 ```json
 {
-  "message"       : "success",
   "sip_username"  : "1234",
   "sip_secret"    : "SECRET",
+  "lk_uri"        : "https://192-168-0-142.openvidu-local.dev:7443",
   "lk_token"      : "LiveKit Token",
   "ad_login"      : "login",
   "ad_cn"         : "ФИО",
@@ -48,6 +48,10 @@ POST-запрос к серверу авторизации, ожидаемый �
 
 ![component_AuthAd.png](img/component_AuthAd.png)
 
+## LkMeet.jsx
+Видео встреча через [LiveKit](https://github.com/OpenVidu/openvidu-local-deployment)
+
+![component_LkMeet.png](img/component_LkMeet.png)
 
 
 

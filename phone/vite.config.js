@@ -1,6 +1,6 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import { mockApiPlugin } from './mock/vite-mock-api.js';
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import { mockApiPlugin } from './mock/vite-mock-api.js'
  
 // https://vite.dev/config/
 export default defineConfig({
@@ -17,4 +17,4 @@ export default defineConfig({
     },
   },
   plugins: [react(), mockApiPlugin()],
-});
+})

@@ -42,6 +42,10 @@ function PhoneReg(props) {
 
   const handleClose = function() {
     phoneControlActions.handleChangeStore('displayReg', false)
+    if (phoneControlRdcr.errComponent === 'PhoneReg') {
+      phoneControlActions.handleChangeStore('errComponent', '')
+      phoneControlActions.handleChangeStore('errText', '')
+    }
   }
 
   const handleRegister = (event) => {
@@ -111,7 +115,7 @@ function PhoneReg(props) {
         </Stack>
 
         {/* Второй ряд */}
-        <Stack direction="row" spacing={2} sx={{ display: 'none' }}>
+        <Stack direction="row" spacing={2} sx={{ display: import.meta.env.DEV ? 'flex' : 'none' }}>
           <TextField
             fullWidth
             required

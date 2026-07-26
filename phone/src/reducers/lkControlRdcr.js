@@ -7,12 +7,13 @@ import {
 } from '../constants/redux'
 
 const initialState = {
-  displayLkToken: false,
-  displayControl: false,
-  uriLkToken: localStorage.getItem('uriLkToken') ? localStorage.getItem('uriLkToken') : '',
-  status: 'idle',
-  message: '',
-  responseData: null,
+  displayLkToken  : false,
+  displayControl  : true,
+  uriLk           : localStorage.getItem('uriLk') ? localStorage.getItem('uriLk') : '',
+  uriLkToken      : localStorage.getItem('uriLkToken') ? localStorage.getItem('uriLkToken') : '',
+  status          : 'idle',
+  message         : '',
+  responseData    : null,
 }
 
 export default function lkTokenRdcr(state = initialState, action) {
