@@ -37,7 +37,6 @@ POST-запрос к серверу авторизации, ожидаемый �
 {
   "sip_username"  : "1234",
   "sip_secret"    : "SECRET",
-  "lk_uri"        : "https://192-168-0-142.openvidu-local.dev:7443",
   "lk_token"      : "LiveKit Token",
   "ad_login"      : "login",
   "ad_cn"         : "ФИО",
