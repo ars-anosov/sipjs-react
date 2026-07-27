@@ -18,12 +18,15 @@ import {
   Typography,
   Link,
   IconButton,
+  GlobalStyles,
 }                         from '@mui/material'
 
 import {
   Close as IconClose,
   Fullscreen as IconFullscreen,
   FullscreenExit as IconFullscreenExit,
+  Mic as IconMicOn,
+  MicOff as IconMicOff,
 }                         from '@mui/icons-material'
 
 import { 
@@ -36,18 +39,54 @@ import {
   AudioTrack, 
   RoomAudioRenderer,
   ControlBar,
-  useTracks ,
+  useTracks,
+  useTrackMutedIndicator,
 }                         from '@livekit/components-react'
-import { Track }          from 'livekit-client'
+import {
+  Room,
+  Track,
+  VideoPresets,
+}                         from 'livekit-client'
 import                    '@livekit/components-styles'
+import { useTheme }       from '@mui/material/styles'
+import { getLiveKitMuiStyles } from './LkThemeStyles'
 
 import LkToken            from './LkToken'
 
 
 
+function MicrophoneStatusIcon({ trackRef }) {
+  const participant = trackRef?.participant
+  if (!participant) return null
+  const isMuted = !participant.isMicrophoneEnabled
+  const isSpeaking = participant.isSpeaking
+
+  if (isMuted) {
+    return <IconMicOff sx={{ fontSize: 14, color: 'error.main' }} />
+  }
+
+  return (
+    <IconMicOn 
+      sx={{ 
+        fontSize: 14, 
+        color: isSpeaking ? 'success.main' : 'white',
+        animation: isSpeaking ? 'lkPulse 1s infinite alternate' : 'none',
+        '@keyframes lkPulse': {
+          '0%': { transform: 'scale(1)' },
+          '100%': { transform: 'scale(1.15)' },
+        },
+      }} 
+    />
+  )
+}
+
 function ParticipantTileBox({ track }) {
-  const containerRef              = useRef(null)
+  const containerRef = useRef(null)
   const [isFullscreen, setIsFullscreen] = useState(false)
+  const isScreenShare = track.source === Track.Source.ScreenShare
+
+  // Извлекаем флаг активности голоса напрямую из объекта участника LiveKit
+  const isSpeaking = track.participant?.isSpeaking
 
   useEffect(() => {
     const handleFsChange = () => {
@@ -57,89 +96,128 @@ function ParticipantTileBox({ track }) {
     return () => document.removeEventListener('fullscreenchange', handleFsChange)
   }, [])
 
-  const toggleFullscreen = () => {
+  const toggleFullscreen = async () => {
     if (!containerRef.current) return
-
-    if (!document.fullscreenElement) {
-      containerRef.current.requestFullscreen?.()
-    } else {
-      document.exitFullscreen?.()
+    try {
+      if (!document.fullscreenElement) {
+        await containerRef.current.requestFullscreen?.()
+      } else {
+        await document.exitFullscreen?.()
+      }
+    } catch (err) {
+      console.error("Ошибка переключения полноэкранного режима:", err)
     }
   }
 
   return (
-    <Grid
-      size={{ xs: 12, md: 'auto' }}
-      sx={{
-        width: '100%',
-        height: '100%',
-        aspectRatio: '16/9',
-        maxWidth: 800,
-        maxHeight: 600,
-        borderRadius: 2,
-        overflow: 'hidden',
-        boxShadow: 3,
-        backgroundColor: 'black',
-        position: 'relative' // Критически важно для дочернего zIndex!
-      }}
-      ref={containerRef}
+    <Grid 
+      size={isScreenShare ? { xs: 12 } : { xs: 12, md: 'auto' }}
+      sx={{ border: 'none', boxShadow: 'none', overflow: 'visible' }}
     >
-      <ParticipantContext.Provider value={track.participant}>
-        <AudioTrack trackRef={track} />
+      <Box
+        ref={containerRef}
+        sx={{
+          width: '100%',
+          height: isFullscreen ? '100vh' : (isScreenShare ? 'auto' : '100%'),
+          maxWidth: isFullscreen ? 'none' : 800,
+          maxHeight: isFullscreen ? 'none' : 600,
+          aspectRatio: isScreenShare ? 'unset' : '16/9',
+          borderRadius: isFullscreen ? 0 : 4, 
+          backgroundColor: 'black',
+          position: 'relative',
+          mx: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          overflow: 'hidden',
+          isolation: 'isolate',
+          backgroundClip: 'padding-box',
 
-        {/* Видео занимает весь контейнер */}
-        <VideoTrack
-          trackRef={track}
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: isFullscreen ? 'contain' : 'cover',
-            backgroundColor: 'black'
-          }}
-        />
+          // ПЛАВНАЯ ЗЕЛЕНАЯ ПОДСВЕТКА ПРИ РАЗГОВОРЕ:
+          // Анимация перехода для тени и обводки
+          transition: 'box-shadow 0.25s ease-in-out, outline-color 0.25s ease-in-out',
+          
+          // Внешняя неоновая обводка (меняет цвет на зеленый, если говорит, иначе — черный фикс)
+          outline: '2px solid',
+          outlineColor: isSpeaking ? '#4caf50' : 'black', 
+          outlineOffset: '-2px',
 
-        {/* Плашка с именем */}
-        <div style={{
-          position: 'absolute',
-          bottom: '12px',
-          left: '12px',
-          zIndex: 2, // Поднимаем над тегом video
-          backgroundColor: 'rgba(0, 0, 0, 0.6)',
-          color: 'white',
-          padding: '4px 8px',
-          borderRadius: '4px',
-          fontFamily: 'sans-serif',
-          fontSize: '14px',
-          pointerEvents: 'none'
-        }}>
-          <ParticipantName />
-        </div>
+          // Мягкое внутреннее свечение, чтобы подсветить края видео
+          boxShadow: isFullscreen 
+            ? 0 
+            : (isSpeaking 
+                ? 'inset 0 0 20px rgba(76, 175, 80, 0.6), 0 4px 20px rgba(76, 175, 80, 0.3)' 
+                : 3
+              ),
+        }}
+      >
+        <ParticipantContext.Provider value={track.participant}>
+          <AudioTrack trackRef={track} />
+          
+          <VideoTrack 
+            trackRef={track}
+            priority={(isFullscreen || isScreenShare) ? 'high' : 'low'} 
+            style={{ 
+              width: '100%',
+              height: isFullscreen ? '100%' : (isScreenShare ? 'auto' : '100%'),
+              maxHeight: isFullscreen ? 'none' : '600px',
+              objectFit: (isFullscreen || isScreenShare) ? 'contain' : 'cover',
+              backgroundColor: 'black',
+              borderRadius: isFullscreen ? 0 : '16px', 
+              overflow: 'hidden',
+            }}
+          />
 
-        {/* Кнопка полноэкранного режима */}
-        <IconButton
-          onClick={toggleFullscreen}
-          size="small"
-          sx={{
-            position: 'absolute',
-            top: '8px',
-            right: '8px',
-            zIndex: 2,
-            color: 'white',
-            backgroundColor: 'rgba(0, 0, 0, 0.6)',
-            '&:hover': {
-              backgroundColor: 'rgba(0, 0, 0, 0.8)',
-            }
-          }}
-        >
-          {isFullscreen ? <IconFullscreenExit /> : <IconFullscreen />}
-        </IconButton>
-      </ParticipantContext.Provider>
+          {/* Плашка с именем и статусом микрофона */}
+          <Stack
+            direction="row"
+            spacing={0.5}
+            sx={{
+              position: 'absolute',
+              bottom: 12,
+              left: 12,
+              zIndex: 2,
+              alignItems: 'center',
+              color: 'white',
+              px: 1,
+              py: 0.3,
+              borderRadius: 1,
+              pointerEvents: 'none',
+              backgroundColor: 'rgba(0, 0, 0, 0.4)',
+              backdropFilter: 'blur(4px)',
+              WebkitBackdropFilter: 'blur(4px)',
+              
+              // Дополнительно подсветим плашку имени говорящего
+              transition: 'background-color 0.25s ease',
+              backgroundColor: isSpeaking ? 'rgba(76, 175, 80, 0.3)' : 'rgba(0, 0, 0, 0.4)',
+              border: isSpeaking ? '1px solid rgba(76, 175, 80, 0.5)' : '1px solid transparent',
+            }}
+          >
+            <MicrophoneStatusIcon trackRef={track} />
+            <ParticipantName component="span" sx={{ typography: 'caption', lineHeight: 1 }} />
+          </Stack>
+
+          {/* Кнопка полноэкранного режима */}
+          <IconButton 
+            onClick={toggleFullscreen} 
+            size="small" 
+            sx={{
+              position: 'absolute',
+              top: 8,
+              right: 8,
+              zIndex: 2,
+              color: 'white',
+              backgroundColor: 'rgba(0, 0, 0, 0.6)',
+              '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.8)' },
+            }}
+          >
+            {isFullscreen ? <IconFullscreenExit /> : <IconFullscreen />}
+          </IconButton>
+        </ParticipantContext.Provider>
+      </Box>
     </Grid>
   )
-}
-
-ParticipantTileBox.propTypes = {
-  track: PropTypes.object.isRequired,
 }
 
 function VideoGridSection() {
@@ -162,7 +240,32 @@ function LkMeet(props) {
   const [isRoomActive, setIsRoomActive] = useState(false)
   const [room, setRoom]                 = useState('')
   const [token, setToken]               = useState('')
+  const [customRoom] = useState(() => new Room({
+    adaptiveStream: false, 
+    dynacast: false,       
+
+    videoCaptureDefaults: {
+      resolution: { width: 1920, height: 1080 },
+    },
+
+    screenShareCaptureDefaults: {
+      resolution: {
+        width: 2560,
+        height: 1440,
+        frameRate: 30,
+      },
+    },
+
+    publishDefaults: {
+      screenShareEncoding: VideoPresets.h1440.encoding, 
+      simulcast: false, 
+      videoCodec: 'av1', 
+      backupCodec: 'vp9',
+    }
+  }))
   const location                        = useLocation()
+  const theme                           = useTheme()
+  const lkStyles                        = getLiveKitMuiStyles(theme)
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search)
@@ -186,11 +289,6 @@ function LkMeet(props) {
   return (
     (lkControlRdcr.displayControl && (authControlRdcr?.responseData?.lk_token || token) && (
     <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-    <style>{`
-      [data-lk-theme='default'] {
-        --lk-bg: #fff;
-      }
-    `}</style>
     <Paper elevation={8} sx={{ p: 1, pt: 0, mt: 2, display: 'inline-block' }}>
       <Stack direction="row" sx={{ mb: 1, alignItems: 'center', justifyContent: 'space-between' }}>
         <Typography variant="h6">Встреча {room}</Typography>
@@ -268,6 +366,8 @@ function LkMeet(props) {
             </Button>
           </Box>
           ) : (
+          <>
+          <GlobalStyles styles={lkStyles} />
           <LiveKitRoom
             data-lk-theme="default"
             token={token}
@@ -275,12 +375,20 @@ function LkMeet(props) {
             connect={isRoomActive}
             video={true}
             audio={true}
+            room={customRoom}
             onDisconnected={() => setIsRoomActive(false)}
           >
+            
             <VideoGridSection />
-              <ControlBar />
+            <ControlBar 
+              controls={{
+                screenShare: true,
+                chat: false, // пример отключения ненужных кнопок, если требуется
+              }}
+            />
             <RoomAudioRenderer />
           </LiveKitRoom>
+          </>
           )}
         </Grid>
         )}
@@ -297,6 +405,10 @@ LkMeet.propTypes = {
   phoneControlActions: PropTypes.object.isRequired,
   authControlRdcr: PropTypes.object,
   authControlActions: PropTypes.object,
+}
+
+ParticipantTileBox.propTypes = {
+  track: PropTypes.object.isRequired,
 }
 
 export default LkMeet
