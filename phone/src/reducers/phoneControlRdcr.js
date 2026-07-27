@@ -75,7 +75,7 @@ export default function phoneControlRdcr(state = initialState, action) {
         'regNow'          : action.payload.regNow,
         'displayReg'      : false,
         'displayPad'      : true,
-        'displayHistory'  : true,
+        'displayHistory'  : false,
         'displayChat'     : false,
         'phoneHeader'     : action.payload.phoneHeader,
         'icoHeader'       : action.payload.icoHeader,

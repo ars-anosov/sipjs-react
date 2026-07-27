@@ -51,16 +51,16 @@ const PhoneContainer = () => {
           <PhonePad {...commonProps} showInput={true} />
         )}
       </Grid>
+      {(phoneControlRdcr.displayHistory || phoneControlRdcr.errComponent === 'PhoneHistory') && (
       <Grid size={{ xs: 12, md: 'auto' }}>
-        {(phoneControlRdcr.displayHistory || phoneControlRdcr.errComponent === 'PhoneHistory') && (
-          <PhoneHistory {...commonProps} />
-        )}
+        <PhoneHistory {...commonProps} />
       </Grid>
+      )}
+      {(phoneControlRdcr.displayChat || phoneControlRdcr.errComponent === 'PhoneChat') && (
       <Grid size={{ xs: 12, md: 'auto' }}>
-        {(phoneControlRdcr.displayChat || phoneControlRdcr.errComponent === 'PhoneChat') && (
-          <PhoneChat {...commonProps} />
-        )}
+        <PhoneChat {...commonProps} />
       </Grid>
+      )}
     </Grid>
   )
 }
