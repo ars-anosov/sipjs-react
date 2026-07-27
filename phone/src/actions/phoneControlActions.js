@@ -21,6 +21,8 @@ import {
   PHONECTL_MESSAGES_LOAD,
   PHONECTL_CHAT_UNREAD_CLEAR,
   PHONECTL_CLEAR_CHAT,
+
+  AUTHCTL_STORE_VALUE,
 } from '../constants/redux'
 
 import {
@@ -100,7 +102,7 @@ const CallsArrUpdate = function() {
 
 
 const handleClkRegister = function(formData, rdcr) {
-  return (dispatch) => {
+  return (dispatch, getState) => {
     const regAlert = (errText) => {
       dispatch({
         type: PHONECTL_ERROR_ALERT,
@@ -141,6 +143,20 @@ const handleClkRegister = function(formData, rdcr) {
       type: PHONECTL_STORE_VALUE,
       payload: {'storeDataKey': 'callerUserNum', 'storeDataValue': formData.callerUserNum}
     })
+    // Воздействие на компоненту AuthAd
+    const state = getState()
+    dispatch({ 
+      type: AUTHCTL_STORE_VALUE, 
+      payload: { 
+        storeDataKey: 'responseData', 
+        storeDataValue: {
+          ...(state?.authControlRdcr?.responseData || {}), // Если объекта нет, берем пустой {} и раскрываем его
+          sip_username: formData.callerUserNum
+        }
+      }, 
+    })
+
+
 
 
 
