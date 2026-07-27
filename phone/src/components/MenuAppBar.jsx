@@ -27,6 +27,7 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import PhoneIco         from './PhoneIco'
 import AuthIco          from './AuthIco'
 import PhonePad         from './PhonePad'
+import Copyright        from '../Copyright'
 
 
 
@@ -207,6 +208,17 @@ function MenuAppBar(props) {
                 )
               })}
             </List>
+
+            <Box 
+              sx={{ 
+                mt: 'auto', // Выталкивает блок в самый низ контейнера
+                p: 2, 
+                textAlign: 'center' 
+              }}
+            >
+              <Divider sx={{ mb: 2 }} />
+              <Copyright showFull={false}/>
+            </Box>
           </Drawer>
 
 

@@ -18,7 +18,7 @@ export default function App() {
       <MenuAppContainer />
       <PhoneContainer />
       <LkContainer />
-      <Copyright />
+      <Copyright showFull={true}/>
     </Container>
   )
 }
