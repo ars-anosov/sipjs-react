@@ -55,7 +55,7 @@ function PhoneHistory(props) {
     if (!phoneControlRdcr.incomeDisplay && !phoneControlRdcr.outgoCallNow && !phoneControlRdcr.incomeCallNow ) {
       const cleanNum = phoneNum.split(" ")[0]
       phoneControlActions.handleChangeStore('calleePhoneNum', cleanNum)
-      phoneControlActions.handleClkSubmitOut(cleanNum, phoneControlRdcr)
+      // phoneControlActions.handleClkSubmitOut(cleanNum, phoneControlRdcr)
     }
   }
 

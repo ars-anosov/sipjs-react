@@ -58,39 +58,38 @@ function PhonePad(props) {
     phoneControlActions.handleChangeStore('displayPad', false)
   }
 
-  const handleSubmit = (event) => {
-    event.preventDefault()
-    if (phoneControlRdcr.incomeDisplay) { // Входящий
-      phoneControlActions.handleClkSubmitIn(phoneControlRdcr)
-    }
-    else { // Исходящий
-      phoneControlActions.handleChangeStore('calleePhoneNum', calleeTxt)
-      phoneControlActions.handleClkSubmitOut(calleeTxt, phoneControlRdcr)
-    }
-  }
-
-  const handleReset = () => {
-    setCalleeTxt('')
-    const callData = {
-      phoneHeader: phoneControlRdcr.callerUserNum,
-    }
-    phoneControlActions.handleClkReset(callData, phoneControlRdcr)
-  }
-
-  const [calleeTxt, setCalleeTxt] = useState("")
-  const handleInput = (event) => {
-    setCalleeTxt(event.target.value)
-  }
+  const calleeTxt = phoneControlRdcr.calleePhoneNum || ""
   const callNow = phoneControlRdcr.incomeCallNow || phoneControlRdcr.outgoCallNow
+  const updateCalleeStore = (newValue) => {
+    phoneControlActions.handleChangeStore('calleePhoneNum', newValue)
+  }
+  const handleInput = (event) => {
+    updateCalleeStore(event.target.value)
+  }
   const handleKey = (digit) => {
     if (callNow) {
       phoneControlActions.handleClkDtmf(digit, phoneControlRdcr)
       return
     }
-    setCalleeTxt((prev) => prev + digit)
+    updateCalleeStore(calleeTxt + digit)
   }
   const handleBackspace = () => {
-    setCalleeTxt((prev) => prev.slice(0, -1))
+    updateCalleeStore(calleeTxt.slice(0, -1));
+  }
+  const handleSubmit = (event) => {
+    event.preventDefault()
+    if (phoneControlRdcr.incomeDisplay) {
+      phoneControlActions.handleClkSubmitIn(phoneControlRdcr)
+    } else {
+      phoneControlActions.handleClkSubmitOut(calleeTxt, phoneControlRdcr)
+    }
+  }
+  const handleReset = () => {
+    updateCalleeStore('')
+    const callData = {
+      phoneHeader: phoneControlRdcr.callerUserNum,
+    }
+    phoneControlActions.handleClkReset(callData, phoneControlRdcr)
   }
   const handleHold = () => {
     phoneControlActions.handleClkHold(phoneControlRdcr, !phoneControlRdcr.callHoldNow)

@@ -343,8 +343,10 @@ function LkMeet(props) {
             Приглашение для
           </Typography>
           <Link 
-            component={RouterLink} 
-            to={`/?lk_room=${authControlRdcr.responseData.sip_username}&lk_token=${lkControlRdcr.responseData.lk_token}`} 
+            component={RouterLink}
+            to={`/?lk_room=${authControlRdcr.responseData.sip_username}&lk_token=${lkControlRdcr.responseData.lk_token}`}
+            target="_blank"
+            rel="noopener noreferrer"
           >
             {lkControlRdcr.responseData.lk_num}
           </Link>

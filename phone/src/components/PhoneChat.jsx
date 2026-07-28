@@ -11,12 +11,14 @@ import {
   Alert,
   Collapse,
   Badge,
+  InputAdornment,
 } from '@mui/material'
 
 import {
-  Send as IconSend,
-  Close as IconClose,
-  Delete as IconDelete,
+  Send          as IconSend,
+  Close         as IconClose,
+  Delete        as IconDelete,
+  Backspace     as IconBackspace,
 } from '@mui/icons-material'
 
 import { useTheme, alpha } from '@mui/material/styles'
@@ -141,16 +143,27 @@ function PhoneChat(props) {
         <TextField
           required
           label="Вн.номер"
-          variant="outlined"
+          variant="standard"
           id="phone-chat-peer"
           value={peerTxt}
           onChange={(event) => setPeerTxt(event.target.value)}
+          slotProps={{
+            input: {
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={() => setPeerTxt('')} size="small">
+                    <IconBackspace />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            },
+          }}
           sx={{ mb: 1 }}
         />
 
         <Box
           sx={{
-            height: 302,
+            height: 310,
             overflowY: 'auto',
             border: 1,
             borderColor: 'divider',
@@ -176,14 +189,14 @@ function PhoneChat(props) {
                     p: 1,
                     borderRadius: 1,
                     backgroundColor: bubbleColor,
+                    cursor: 'pointer',
                   }}
+                  onClick={() => handlePeerSelect(msg.peer)}
                 >
                   <Stack direction="row" spacing={1} sx={{ mb: 0.5, justifyContent: 'space-between' }}>
                     <Typography
                       variant="caption"
                       color="text.secondary"
-                      onClick={() => handlePeerSelect(msg.peer)}
-                      sx={{ cursor: 'pointer', userSelect: 'none' }}
                     >
                       {isOutbound ? `Вы → ${msg.peer}` : msg.peer}
                     </Typography>
