@@ -60,7 +60,7 @@ function PhoneDir(props) {
 
   const handleInputChange = (event, newInputValue) => {
     setDirPart(newInputValue)
-    setOpen(newInputValue.length > 0)
+    setOpen(newInputValue.length > 3)
   }
 
   return (
@@ -72,7 +72,7 @@ function PhoneDir(props) {
         forcePopupIcon={false}
         open={open}
         onOpen={() => {
-          if (dirPart.length > 0) setOpen(true)
+          if (dirPart.length > 3) setOpen(true)
         }}
         onClose={(event, reason) => {
           if (reason === 'toggleInput' || reason === 'escape' || reason === 'blur') {

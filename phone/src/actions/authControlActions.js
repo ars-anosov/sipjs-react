@@ -83,6 +83,10 @@ const handleAdRegister = function(formData = {}) {
         type: PHONECTL_STORE_VALUE,
         payload: { storeDataKey: 'regUserPass', storeDataValue: responseData.sip_secret },
       })
+      dispatch({
+        type: PHONECTL_STORE_VALUE,
+        payload: { storeDataKey: 'displayDir', storeDataValue: true },
+      })
 
       const state = getState()
       const formDataForSip = {
