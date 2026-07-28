@@ -52,6 +52,19 @@ POST-запрос к серверу авторизации, ожидаемый �
 
 ![component_LkMeet.png](img/component_LkMeet.png)
 
+## PhoneDir.jsx
+GET-запрос к серверу справочнику, ожидаемый ответ:
+```json
+[
+  { "label": 'Москва префикс', "prefix": "1999" },
+  { "label": "Спб префикс", "prefix": "1923" },
+  { "label": "Пользователь с длинным именем каким-то", "num": "9991", "email": "user@example.com" },
+  { "label": "Пользователь без почты", "num": "9992" },
+]
+```
+
+![component_PhoneDir.png](img/component_PhoneDir.png)
+
 
 
 # Пакеты
