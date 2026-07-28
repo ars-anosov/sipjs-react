@@ -148,33 +148,32 @@ function PhoneDir(props) {
                 sx={{ display: 'flex', gap: 0.5, flexShrink: 0 }}
                 onClick={(e) => e.stopPropagation()}
               >
-                <IconButton
-                  size="small"
-                  color="primary"
-                  onClick={() => {
-                    phoneControlActions.handleChangeStore('calleePhoneNum', targetValue)
-                    phoneControlActions.handleChangeStore('displayPad', true)
-                  }}
-                >
-                  {isPrefixType ? <DialpadIcon fontSize="small" /> : <PhoneIcon fontSize="small" />}
-                </IconButton>
+                <Tooltip title="Набрать в телефоне" arrow>
+                  <IconButton
+                    color="primary"
+                    onClick={() => {
+                      phoneControlActions.handleChangeStore('calleePhoneNum', targetValue)
+                      phoneControlActions.handleChangeStore('displayPad', true)
+                    }}
+                  >
+                    {isPrefixType ? <DialpadIcon fontSize="small" /> : <PhoneIcon fontSize="small" />}
+                  </IconButton>
+                </Tooltip>
 
                 {/* Проверка наличия email */}
                 {option.email && (
                   <Tooltip title="Копировать email" arrow>
                     <IconButton
-                      size="small"
-                      color="secondary"
+                      color="info"
                       onClick={(e) => {
                         e.stopPropagation();
                         
                         navigator.clipboard.writeText(option.email)
                           .then(() => {
-                            // Включаем уведомление об успехе
                             setSnackbar({
                               open: true,
                               message: 'Email скопирован!',
-                              severity: 'success'
+                              severity: 'info'
                             });
                           })
                           .catch((err) => {
