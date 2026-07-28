@@ -27,6 +27,7 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import PhoneIco         from './PhoneIco'
 import AuthIco          from './AuthIco'
 import PhonePad         from './PhonePad'
+import PhoneDir         from './PhoneDir'
 import Copyright        from '../Copyright'
 
 
@@ -37,6 +38,7 @@ const MENU_ITEMS_PHONE = [
   { key: 'displayHistory', primary: 'SIP Звонки', secondary: 'PhoneHistory.jsx' },
   { key: 'displayChat', primary: 'SIP Сообщения', secondary: 'PhoneChat.jsx' },
   { key: 'displayControl', primary: 'SIP Кругляш', secondary: 'PhoneIco.jsx' },
+  { key: 'displayDir', primary: 'Тел.Справочник', secondary: 'PhoneDir.jsx' },
 ]
 
 const MENU_ITEMS_AUTH = [
@@ -226,6 +228,13 @@ function MenuAppBar(props) {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             WebRTC
           </Typography>
+
+          {phoneControlRdcr.displayDir && (
+            <PhoneDir
+              phoneControlRdcr={phoneControlRdcr}
+              phoneControlActions={phoneControlActions}
+            />
+          )}
 
           {phoneControlRdcr.displayControl && (
             <Stack 

@@ -10,9 +10,10 @@
     <script type="text/javascript">
       if (!localStorage.getItem('uriHost')) localStorage.setItem('uriHost', 'sbc.pecom.ru')
       if (!localStorage.getItem('wssPort')) localStorage.setItem('wssPort', '9443')
-      if (!localStorage.getItem('uriAdAuth')) localStorage.setItem('uriAdAuth', 'http://localhost:3000/ad')
-      if (!localStorage.getItem('uriLkToken')) localStorage.setItem('uriLkToken', 'http://localhost:3000/lk')
+      if (!localStorage.getItem('uriAdAuth')) localStorage.setItem('uriAdAuth', 'http://localhost:3000/user/ad')
+      if (!localStorage.getItem('uriLkToken')) localStorage.setItem('uriLkToken', 'http://localhost:3000/user/lk')
       if (!localStorage.getItem('uriLk')) localStorage.setItem('uriLk', 'https://192-168-0-142.openvidu-local.dev:7443/')
+      if (!localStorage.getItem('uriPhoneDir')) localStorage.setItem('uriPhoneDir', 'http://localhost:3000/user/phonedir')
     </script>
     <div id="root"></div>
     <script type="module" src="src/main.jsx"></script>

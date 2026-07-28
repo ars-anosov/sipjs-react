@@ -1017,6 +1017,45 @@ const handleSendMessage = function(peerPhoneNum, messageBody, rdcr) {
   }
 }
 
+const getPhoneDir = function() {
+  return async () => {
+    if (localStorage.getItem('uriPhoneDir')) {
+      try {
+        const response = await fetch(localStorage.getItem('uriPhoneDir'), {
+          method: 'GET',
+        })
+
+        let responseData = null
+        const responseText = await response.text()
+
+        if (responseText) {
+          try {
+            responseData = JSON.parse(responseText)
+          } catch (error) {
+            responseData = responseText
+          }
+        }
+
+        if (!response.ok) {
+          const detailMessage = responseData && typeof responseData === 'object'
+            ? (responseData.message || responseData.error || responseData.detail || JSON.stringify(responseData))
+            : String(responseData || response.statusText || 'Request failed')
+          throw new Error(detailMessage)
+        }
+
+        return responseData
+      }
+      catch (error) {
+        console.error('Error fetching phone directory:', error)
+        throw error
+      }
+    } else {
+      console.warn('No phone directory URI found in localStorage.')
+      return []
+    }
+  }
+}
+
 
 
 export {
@@ -1034,4 +1073,5 @@ export {
   handleClearHistory,
   CallsArrUpdate,
   MessagesArrUpdate,
+  getPhoneDir,
 }

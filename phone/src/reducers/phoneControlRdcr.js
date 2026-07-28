@@ -28,6 +28,7 @@ const initialState = {
   displayReg        : true,
   displayPad        : false,
   displayControl    : true,
+  displayDir        : false,
   displayHistory    : false,
   displayChat       : false,
   // PhoneReg form fields
