@@ -37,6 +37,8 @@ const initialState = {
   callerUserNum     : localStorage.getItem('callerUserNum') ? localStorage.getItem('callerUserNum') : '',
   regUserPass       : '',
   calleePhoneNum    : '',
+  addPrefix         : false,
+  calleePrefix      : '1999',
   // PhoneIco + PhonePad
   regNow            : false,
   connectStatus     : '',

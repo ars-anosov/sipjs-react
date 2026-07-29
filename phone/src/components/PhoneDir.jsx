@@ -148,19 +148,35 @@ function PhoneDir(props) {
                 sx={{ display: 'flex', gap: 0.5, flexShrink: 0 }}
                 onClick={(e) => e.stopPropagation()}
               >
-                <Tooltip title="Набрать в телефоне" arrow>
+                {option.num && (
+                <Tooltip title="В телефон" arrow>
                   <IconButton
                     color="primary"
                     onClick={() => {
-                      phoneControlActions.handleChangeStore('calleePhoneNum', targetValue)
+                      phoneControlActions.handleChangeStore('calleePhoneNum', option.num)
                       phoneControlActions.handleChangeStore('displayPad', true)
                     }}
                   >
-                    {isPrefixType ? <DialpadIcon fontSize="small" /> : <PhoneIcon fontSize="small" />}
+                    <PhoneIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>
+                )}
 
-                {/* Проверка наличия email */}
+                {option.prefix && (
+                <Tooltip title="В телефон" arrow>
+                  <IconButton
+                    color="primary"
+                    onClick={() => {
+                      phoneControlActions.handleChangeStore('calleePrefix', option.prefix)
+                      phoneControlActions.handleChangeStore('addPrefix', true)
+                      phoneControlActions.handleChangeStore('displayPad', true)
+                    }}
+                  >
+                    <DialpadIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+                )}
+
                 {option.email && (
                   <Tooltip title="Копировать email" arrow>
                     <IconButton

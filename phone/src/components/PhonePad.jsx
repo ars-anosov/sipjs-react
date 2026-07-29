@@ -15,6 +15,7 @@ import {
   Alert,
   Collapse,
   Tooltip,
+  Fab,
 } from '@mui/material'
 
 import {
@@ -29,6 +30,7 @@ import {
   Mail          as IconMail,
   WifiOff       as IconOffline,
   Wifi          as IconOnline,
+  Dialpad       as IconDialpad,
 } from '@mui/icons-material'
 
 
@@ -58,8 +60,11 @@ function PhonePad(props) {
     phoneControlActions.handleChangeStore('displayPad', false)
   }
 
-  const calleeTxt = phoneControlRdcr.calleePhoneNum || ""
   const callNow = phoneControlRdcr.incomeCallNow || phoneControlRdcr.outgoCallNow
+
+  const handlePrefix = (event) => {
+    phoneControlActions.handleChangeStore('calleePrefix', event.target.value)
+  }
   const updateCalleeStore = (newValue) => {
     phoneControlActions.handleChangeStore('calleePhoneNum', newValue)
   }
@@ -71,17 +76,17 @@ function PhonePad(props) {
       phoneControlActions.handleClkDtmf(digit, phoneControlRdcr)
       return
     }
-    updateCalleeStore(calleeTxt + digit)
+    updateCalleeStore(phoneControlRdcr.calleePhoneNum + digit)
   }
   const handleBackspace = () => {
-    updateCalleeStore(calleeTxt.slice(0, -1));
+    updateCalleeStore(phoneControlRdcr.calleePhoneNum.slice(0, -1));
   }
   const handleSubmit = (event) => {
     event.preventDefault()
     if (phoneControlRdcr.incomeDisplay) {
       phoneControlActions.handleClkSubmitIn(phoneControlRdcr)
     } else {
-      phoneControlActions.handleClkSubmitOut(calleeTxt, phoneControlRdcr)
+      phoneControlActions.handleClkSubmitOut(phoneControlRdcr.calleePhoneNum, phoneControlRdcr)
     }
   }
   const handleReset = () => {
@@ -106,6 +111,10 @@ function PhonePad(props) {
 
   const toggleChat = () => {
     phoneControlActions.handleChangeStore('displayChat', !phoneControlRdcr.displayChat)
+  }
+
+  const togglePrefix = () => {
+    phoneControlActions.handleChangeStore('addPrefix', !phoneControlRdcr.addPrefix)
   }
 
   const toggleReg = () => {
@@ -133,54 +142,63 @@ function PhonePad(props) {
   const finalTemplate =
   <Paper elevation={showInput ? 8 : 0} sx={{ maxWidth: 300, width: '100%', mx: 'auto', p: 1, pt: 0, mt: 2 }}>
     {showInput && (
-    <Stack direction="row" sx={{ mb: 1, alignItems: 'center', justifyContent: 'space-between' }}>
+    <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
       <Typography variant="h6">SIP Телефон</Typography>
       <IconButton onClick={handleClose}>
         <IconClose color="error" />
       </IconButton>
     </Stack>
     )}
-    <Typography variant="body2" sx={{ mb: 2 }}>
+    <Typography variant="body2" color="primary" sx={{ mb: 2 }}>
       {phoneControlRdcr.phoneHeader}
     </Typography>
 
     <Box component="form" onSubmit={handleSubmit} onReset={handleReset}>
       {/* Строчка ввода номера */}
       {showInput && (
-      <TextField
-        fullWidth
-        id="phone-pad-num"
-        // label="98..."
-        variant="standard"
-        value={calleeTxt}
-        onChange={handleInput}
-        slotProps={{
-          input: {
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton onClick={handleBackspace} size="small">
-                  <IconBackspace />
-                </IconButton>
-              </InputAdornment>
-            ),
-          },
-        }}
-        sx={{ mb: 2 }}
-      />
+      <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
+        {phoneControlRdcr.addPrefix && (
+        <TextField
+          id="phone-pad-prefix"
+          variant="standard"
+          label="Префикс"
+          type="tel"
+          value={phoneControlRdcr.calleePrefix }
+          onChange={handlePrefix}
+          sx={{ width: '8ch' }}
+        />
+        )}
+        <TextField
+          fullWidth
+          id="phone-pad-num"
+          variant="standard"
+          label="Номер телефона"
+          type="tel"
+          value={phoneControlRdcr.calleePhoneNum}
+          onChange={handleInput}
+          slotProps={{
+            input: {
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton onClick={handleBackspace} size="small">
+                    <IconBackspace />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            },
+          }}
+        />
+      </Stack>
       )}
 
       {/* Кнопки Вызов / Сброс */}
       <Grid container spacing={2} sx={{ mb: 2, justifyContent: 'center' }}>
         <Grid size={callNow ? 4 : 6} sx={{ textAlign: 'center' }}>
           {phoneControlRdcr.incomeDisplay ? (
-            <Button
+            <Fab
               type="submit"
-              variant="contained"
               color="success"
               sx={{
-                borderRadius: '50%',
-                minWidth: 56,
-                height: 56,
                 '@keyframes pulse': {
                   '0%': { transform: 'scale(1)', boxShadow: '0 0 0 0 rgba(76, 175, 80, 0.7)' },
                   '70%': { transform: 'scale(1.1)', boxShadow: '0 0 0 15px rgba(76, 175, 80, 0)' },
@@ -190,44 +208,40 @@ function PhonePad(props) {
               }}
             >
               <IconPhoneRing />
-            </Button>
+            </Fab>
           ) : (
-            <Button
+            <Fab
               type="submit"
-              variant="contained"
               color="success"
               disabled={!isRegistered || phoneControlRdcr.outgoCallNow || phoneControlRdcr.incomeCallNow}
-              sx={{ borderRadius: '50%', minWidth: 56, height: 56 }}
             >
               <IconPhone />
-            </Button>
+            </Fab>
           )}
         </Grid>
+
         {callNow && (
-        <Grid size={4} sx={{ textAlign: 'center' }}>
-          <Tooltip title={phoneControlRdcr.callHoldNow ? 'Resume' : 'Hold'}>
-            <Button
-              type="button"
-              variant="contained"
-              color={phoneControlRdcr.callHoldNow ? 'success' : 'info'}
-              onClick={handleHold}
-              sx={{ borderRadius: '50%', minWidth: 56, height: 56 }}
-            >
-              {phoneControlRdcr.callHoldNow ? <IconResume /> : <IconHold />}
-            </Button>
-          </Tooltip>
-        </Grid>
+          <Grid size={4} sx={{ textAlign: 'center' }}>
+            <Tooltip title={phoneControlRdcr.callHoldNow ? 'Resume' : 'Hold'}>
+              <Fab
+                type="button"
+                color={phoneControlRdcr.callHoldNow ? 'success' : 'info'}
+                onClick={handleHold}
+              >
+                {phoneControlRdcr.callHoldNow ? <IconResume /> : <IconHold />}
+              </Fab>
+            </Tooltip>
+          </Grid>
         )}
+
         <Grid size={callNow ? 4 : 6} sx={{ textAlign: 'center' }}>
-          <Button
+          <Fab
             type="reset"
-            variant="contained"
             color="error"
             disabled={!isRegistered}
-            sx={{ borderRadius: '50%', minWidth: 56, height: 56 }}
           >
             <IconHangup />
-          </Button>
+          </Fab>
         </Grid>
       </Grid>
 
@@ -274,6 +288,14 @@ function PhonePad(props) {
 
         {showInput && (
         <Stack direction="row" spacing={1}>
+          <IconButton
+            aria-label="Регистрация"
+            color={phoneControlRdcr.addPrefix ? 'primary' : 'default'}
+            onClick={togglePrefix}
+          >
+            <IconDialpad />
+          </IconButton>
+
           <Badge
             badgeContent={phoneControlRdcr.callUnread}
             color="error"
@@ -283,7 +305,6 @@ function PhonePad(props) {
           >
             <IconButton
               aria-label="Звонки"
-              size="small"
               color={phoneControlRdcr.displayHistory ? 'primary' : 'default'}
               onClick={toggleHistory}
             >
@@ -300,7 +321,6 @@ function PhonePad(props) {
           >
             <IconButton
               aria-label="Сообщения"
-              size="small"
               color={phoneControlRdcr.displayChat ? 'primary' : 'default'}
               onClick={toggleChat}
             >

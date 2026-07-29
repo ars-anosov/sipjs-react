@@ -12,6 +12,7 @@ import {
   Collapse,
   Badge,
   InputAdornment,
+  Fab,
 } from '@mui/material'
 
 import {
@@ -125,7 +126,7 @@ function PhoneChat(props) {
 
   return (
     <Paper elevation={8} sx={{ minWidth: 300, maxWidth: 480, width: '100%', mx: 'auto', p: 1, pt: 0, mt: 2 }}>
-      <Stack direction="row" sx={{ mb: 1, alignItems: 'center', justifyContent: 'space-between' }}>
+      <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
         <Badge color="error" badgeContent={phoneControlRdcr.chatUnread} invisible={!phoneControlRdcr.chatUnread}>
           <Typography variant="h6">{title}</Typography>
         </Badge>
@@ -141,7 +142,6 @@ function PhoneChat(props) {
 
       <Box component="form" onSubmit={handleSubmit}>
         <TextField
-          required
           label="Вн.номер"
           variant="standard"
           id="phone-chat-peer"
@@ -158,12 +158,12 @@ function PhoneChat(props) {
               ),
             },
           }}
-          sx={{ mb: 1 }}
+          sx={{ width: '12ch', mb: 1 }}
         />
 
         <Box
           sx={{
-            height: 310,
+            height: 336,
             overflowY: 'auto',
             border: 1,
             borderColor: 'divider',
@@ -245,15 +245,18 @@ function PhoneChat(props) {
             multiline
             maxRows={4}
           />
-          <IconButton
-            type="submit"
-            variant="contained"
-            color="success"
+          <Fab 
+            type="submit" 
+            color="success" 
             disabled={!phoneControlRdcr.regNow}
-            sx={{ borderRadius: '50%', minWidth: 56, height: 56 }}
+            sx={{ 
+              width: 52, 
+              height: 52, 
+              minWidth: 52 
+            }}
           >
             <IconSend />
-          </IconButton>
+          </Fab>
         </Stack>
       </Box>
 
