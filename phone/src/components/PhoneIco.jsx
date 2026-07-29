@@ -23,53 +23,63 @@ function PhoneIco({ phoneControlRdcr }) {
   const theme = useTheme()
   const notificationRef = useRef(null) // Ссылка на текущее уведомление
 
-  // 1. Запрос прав на уведомления при первом рендере
+  // 1. Запрос прав на уведомления при первом рендере (Безопасно для мобильных)
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') console.log('PhoneIco MOUNT')
     
-    if ('Notification' in window && Notification.permission === 'default') {
+    const isNotificationSupported = 'Notification' in window && typeof window.Notification === 'function'
+
+    if (isNotificationSupported && Notification.permission === 'default') {
       Notification.requestPermission()
     }
 
     return () => {
       if (process.env.NODE_ENV === 'development') console.log('PhoneIco UNMOUNT')
-      // Закрываем уведомление, если компонент размонтировался
       if (notificationRef.current) notificationRef.current.close()
     }
   }, [])
 
-  // 2. Отслеживание входящего звонка и показ уведомления
+  // 2. Отслеживание входящего звонка и показ уведомлений (Безопасно для мобильных)
   useEffect(() => {
-    const { incomeDisplay, calleePhoneNum } = phoneControlRdcr
+    // Безопасное извлечение полей, чтобы избежать ошибок отсутствия свойств
+    const incomeDisplay = phoneControlRdcr?.incomeDisplay
+    const calleePhoneNum = phoneControlRdcr?.calleePhoneNum || phoneControlRdcr?.callerNumber
 
-    if (incomeDisplay && 'Notification' in window && Notification.permission === 'granted') {
+    // Проверяем, что Notification поддерживается КАК объект, и есть сам конструктор (защита для Android)
+    const isNotificationSupported = 'Notification' in window && typeof window.Notification === 'function'
+
+    if (incomeDisplay && isNotificationSupported && Notification.permission === 'granted') {
       // Чтобы уведомления не плодились, закрываем предыдущее
       if (notificationRef.current) notificationRef.current.close()
 
       const title = 'Входящий звонок'
       const options = {
         body: calleePhoneNum || 'Неизвестный номер',
-        tag: 'incoming-call', // Группирует уведомления, заменяя старые
-        requireInteraction: true, // Уведомление не скроется само, пока пользователь не закроет его
-        silent: true, // Отключаем стандартный системный звук (если у вас своя мелодия)
+        tag: 'incoming-call',
+        requireInteraction: true,
+        silent: true,
         icon: 'img/PhoneIcon.png',
       }
 
-      notificationRef.current = new Notification(title, options)
+      try {
+        // На Android этот вызов упадет в ошибку, если не обернуть в try/catch
+        notificationRef.current = new Notification(title, options)
 
-      // При клике на уведомление переводим фокус на вкладку с приложением
-      notificationRef.current.onclick = () => {
-        window.focus()
-        notificationRef.current.close()
+        // При клике на уведомление переводим фокус на вкладку с приложением
+        notificationRef.current.onclick = () => {
+          window.focus()
+          notificationRef.current.close()
+        }
+      } catch (e) {
+        console.warn('Конструктор Web Notification не поддерживается на данном устройстве:', e)
       }
     }
 
-    // Закрываем уведомление, если звонок прекратился (например, сбросили или ответили)
     if (!incomeDisplay && notificationRef.current) {
       notificationRef.current.close()
       notificationRef.current = null
     }
-  }, [phoneControlRdcr.incomeDisplay, phoneControlRdcr.calleePhoneNum])
+  }, [phoneControlRdcr?.incomeDisplay, phoneControlRdcr?.calleePhoneNum, phoneControlRdcr?.callerNumber])
 
   // Кэшируем вычисления стилей и иконки
   const cfg = useMemo(() => {
@@ -136,8 +146,9 @@ PhoneIco.propTypes = {
     incomeDisplay: PropTypes.bool,
     connectStatus: PropTypes.string,
     regNow: PropTypes.bool,
-    callerName: PropTypes.string,    // Добавлено для отображения имени
-    callerNumber: PropTypes.string,  // Добавлено для отображения номера
+    callerName: PropTypes.string,
+    callerNumber: PropTypes.string,
+    calleePhoneNum: PropTypes.string,
   }).isRequired,
 }
 
