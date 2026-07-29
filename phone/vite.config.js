@@ -2,16 +2,16 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { mockApiPlugin } from './mock/vite-mock-api.js'
  
-// https://vite.dev/config/
 export default defineConfig({
   base: './', // делает ссылки относительными
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
-    chunkSizeWarningLimit: 1000, // Increase warning limit since we're splitting
+    chunkSizeWarningLimit: 1000,
   },
   server: {
     port: 3000,
+    host: '0.0.0.0',
     watch: {
       usePolling: true, // Включает опрос для отслеживания изменений в контейнерах/WSL
     },
