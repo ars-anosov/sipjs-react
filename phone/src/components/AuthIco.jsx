@@ -65,8 +65,8 @@ function AdIco({ authControlRdcr }) {
       size="small"
       sx={{
         ml: 1,
-        width: 40,
-        height: 40,
+        width: 46,
+        height: 46,
         backgroundColor: cfg.bg,
         color: cfg.color,
         border: '1px solid rgba(255,255,255,0.3)',

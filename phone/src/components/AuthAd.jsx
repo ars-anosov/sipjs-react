@@ -48,7 +48,7 @@ function AdAuth(props) {
   return (
     <Paper elevation={8} sx={{ maxWidth: 480, width: '100%', mx: 'auto', p: 1, pt: 0, mt: 2 }}>
       <Stack direction="row" sx={{ mb: 1, alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography variant="h6">AD Авторизация</Typography>
+        <Typography variant="h6" color="primary">AD Авторизация</Typography>
         <IconButton onClick={handleClose}>
             <IconClose color="error" />
         </IconButton>

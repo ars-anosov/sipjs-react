@@ -143,7 +143,7 @@ function PhonePad(props) {
   <Paper elevation={showInput ? 8 : 0} sx={{ maxWidth: 300, width: '100%', mx: 'auto', p: 1, pt: 0, mt: 2 }}>
     {showInput && (
     <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
-      <Typography variant="h6">SIP Телефон</Typography>
+      <Typography variant="h6" color="primary">SIP Телефон</Typography>
       <IconButton onClick={handleClose}>
         <IconClose color="error" />
       </IconButton>
@@ -279,7 +279,6 @@ function PhonePad(props) {
       <Stack direction="row" spacing={1} sx={{ mt: 2, justifyContent: 'space-between', alignItems: 'center' }}>
         <IconButton
           aria-label="Регистрация"
-          size="small"
           color={regButtonColor}
           onClick={toggleReg}
         >

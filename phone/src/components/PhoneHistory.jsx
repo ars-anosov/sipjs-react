@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import PropTypes from 'prop-types'
 
 import {
@@ -24,19 +24,33 @@ import {
 
 import { useTheme, alpha, keyframes } from '@mui/material/styles'
 
-import { format } from 'date-fns'
+import { format, isValid, parseISO } from 'date-fns'
 
+
+const formatCallDate = (dateVal) => {
+  if (!dateVal) return '—'
+
+  let dateObj
+
+  if (dateVal instanceof Date) {
+    dateObj = dateVal
+  } else if (typeof dateVal === 'number') {
+    dateObj = new Date(dateVal)
+  } else if (typeof dateVal === 'string') {
+    dateObj = dateVal.includes('T') ? parseISO(dateVal) : new Date(dateVal)
+  } else {
+    return '—'
+  }
+
+  return isValid(dateObj) ? format(dateObj, 'yyyy-MM-dd HH:mm') : '—'
+}
 
 
 function PhoneHistory(props) {
   if (process.env.NODE_ENV === 'development') console.log('PhoneHistory hook')
 
-  const {
-    phoneControlRdcr, phoneControlActions
-  } = props
+  const { phoneControlRdcr, phoneControlActions } = props
   const theme = useTheme()
-
-
 
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') console.log('PhoneHistory MOUNT')
@@ -45,37 +59,87 @@ function PhoneHistory(props) {
     return () => {
       if (process.env.NODE_ENV === 'development') console.log('PhoneHistory UNMOUNT')
     }
-  }, [])
+  }, [phoneControlActions])
 
   const handleClose = () => {
     phoneControlActions.handleChangeStore('displayHistory', false)
   }
 
   const handleCallLogClk = (phoneNum) => {
-    if (!phoneControlRdcr.incomeDisplay && !phoneControlRdcr.outgoCallNow && !phoneControlRdcr.incomeCallNow ) {
+    const { incomeDisplay, outgoCallNow, incomeCallNow } = phoneControlRdcr
+    if (!incomeDisplay && !outgoCallNow && !incomeCallNow && phoneNum) {
       const cleanNum = phoneNum.split(" ")[0]
       phoneControlActions.handleChangeStore('calleePhoneNum', cleanNum)
-      // phoneControlActions.handleClkSubmitOut(cleanNum, phoneControlRdcr)
     }
   }
 
-  const blink = keyframes`
+  const blink = useMemo(() => keyframes`
     0% { opacity: 1; }
     50% { opacity: 0.5; }
     100% { opacity: 1; }
-  `
+  `, [])
 
+  const processedCalls = useMemo(() => {
+    return (phoneControlRdcr.callsArr || []).map((row, index) => {
+      const state = row.callState?.toLowerCase() || ''
+      const flow = row.flow?.toLowerCase() || ''
 
+      const isRinging = state.includes('ringing')
+      const isInCall  = state.includes('incall')
+      const isLost    = state.includes('lost')
+      const isInbound = flow.includes('in')
+
+      const basePalette = isInbound ? theme.palette.success : theme.palette.info
+
+      let rowBgColor = 'transparent'
+      let rowTextColor = basePalette.main
+
+      if (isInCall) {
+        // 1. Активный разговор
+        rowBgColor = basePalette.main 
+        rowTextColor = basePalette.contrastText
+      } else if (isLost && isInbound) {
+        // 2. Входящий НЕОТВЕЧЕННЫЙ (Красная строка)
+        rowBgColor = alpha(theme.palette.error.main, 0.05)
+        rowTextColor = theme.palette.error.dark 
+      } else if (isLost && !isInbound) {
+        // 3. Исходящий НЕОТВЕЧЕННЫЙ (Серая строка)
+        rowBgColor = alpha(theme.palette.action.disabledBackground || '#dddddd', 0.02)
+        rowTextColor = theme.palette.text.disabled
+      } else if (isRinging) {
+        // 4. Идет вызов/мигание
+        rowBgColor = alpha(theme.palette.warning.light, 0.4)
+        rowTextColor = theme.palette.warning.dark
+      } else {
+        // 5. Успешный завершенный звонок
+        rowBgColor = alpha(basePalette.light, 0.05)
+        rowTextColor = alpha(basePalette.dark, 0.8) 
+      }
+
+      return {
+        ...row,
+        id: row.id || `${row.start || index}-${row.uri || index}`,
+        isRinging,
+        isInCall,
+        isLost,
+        isInbound,
+        basePalette,
+        rowBgColor,
+        rowTextColor,
+        formattedDate: formatCallDate(row.start)
+      }
+    })
+  }, [phoneControlRdcr.callsArr, theme])
 
   return (
     <Paper elevation={8} sx={{ minWidth: 300, maxWidth: 480, width: '100%', mx: 'auto', p: 1, pt: 0, mt: 2 }}>
       <Stack direction="row" sx={{ mb: 1, alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography variant="h6">SIP Звонки</Typography>
+        <Typography variant="h6" color="primary">SIP Звонки</Typography>
         <Stack direction="row" spacing={1}>
-          <IconButton onClick={() => phoneControlActions.handleClearHistory()}>
+          <IconButton onClick={() => phoneControlActions.handleClearHistory()} aria-label="Clear history">
             <IconDelete color="action" />
           </IconButton>
-          <IconButton onClick={handleClose}>
+          <IconButton onClick={handleClose} aria-label="Close history">
             <IconClose color="error" />
           </IconButton>
         </Stack>
@@ -101,87 +165,65 @@ function PhoneHistory(props) {
           </TableHead>
 
           <TableBody>
-            {phoneControlRdcr.callsArr.map((row) => {
-              const isRinging = row.callState?.toLowerCase().includes('ringing')
-              const isInCall  = row.callState?.toLowerCase().includes('incall')
-              const isLost    = row.callState?.toLowerCase().includes('lost')
-              const isInbound = row.flow?.toLowerCase().includes('in')
+            {processedCalls.map((row) => (
+              <TableRow
+                key={row.id}
+                onClick={() => handleCallLogClk(row.uri)}
+                sx={{
+                  cursor: 'pointer',
+                  backgroundColor: row.rowBgColor,
+                  transition: theme.transitions.create(['background-color', 'color']),
+                  animation: row.isRinging ? `${blink} 1s infinite ease-in-out` : 'none',
+                  '& .MuiTableCell-root': { 
+                    color: row.rowTextColor,
+                    fontWeight: row.isLost ? 'medium' : 'normal' 
+                  },
+                  '&:hover': {
+                    backgroundColor: row.isInCall 
+                      ? row.basePalette.dark 
+                      : (row.isLost && row.isInbound 
+                          ? alpha(theme.palette.error.main, 0.15) 
+                          : (row.isLost && !row.isInbound 
+                              ? alpha(theme.palette.action.disabledBackground || '#dddddd', 0.2)
+                              : alpha(row.basePalette.light, 0.25)))
+                  }
+                }}
+              >
+                <TableCell sx={{ whiteSpace: 'nowrap' }}>
+                  <small>{row.formattedDate}</small>
+                </TableCell>
 
-              const basePalette = isInbound ? theme.palette.success : theme.palette.info
+                <TableCell align="right">
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 0.5 }}>
+                    {row.isInbound ? (
+                      <IcoIncome 
+                        fontSize="small" 
+                        sx={{ 
+                          color: row.isInCall ? 'inherit' : (row.isLost ? 'error.dark' : 'success.main') 
+                        }} 
+                      />
+                    ) : (
+                      <IcoOutgo 
+                        fontSize="small" 
+                        sx={{ 
+                          color: row.isInCall ? 'inherit' : (row.isLost ? 'text.disabled' : 'info.main') 
+                        }} 
+                      />
+                    )}
+                  </Box>
+                </TableCell>
 
-              let rowBgColor = 'transparent'
-              let rowTextColor = basePalette.main
-
-              if (isInCall) {
-                rowBgColor = basePalette.main 
-                rowTextColor = basePalette.contrastText
-              } else if (isLost) {
-                rowBgColor = alpha(theme.palette.error.main, 0.08)
-                rowTextColor = theme.palette.error.dark 
-              } else if (isRinging) {
-                rowBgColor = alpha(theme.palette.warning.light, 0.4)
-                rowTextColor = theme.palette.warning.dark
-              } else {
-                rowBgColor = alpha(basePalette.light, 0.05)
-                rowTextColor = alpha(basePalette.dark, 0.8) 
-              }
-
-              return (
-                <TableRow
-                  key={row.start + row.uri}
-                  onClick={() => handleCallLogClk(row.uri)}
-                  sx={{
-                    cursor: 'pointer',
-                    backgroundColor: rowBgColor,
-                    transition: theme.transitions.create(['background-color', 'color']),
-                    animation: isRinging ? `${blink} 1s infinite ease-in-out` : 'none',
-                    '& .MuiTableCell-root': { 
-                      color: rowTextColor,
-                      fontWeight: isLost ? 'medium' : 'normal' 
-                    },
-                    '&:hover': {
-                      backgroundColor: isInCall 
-                        ? basePalette.dark 
-                        : (isLost ? alpha(theme.palette.error.main, 0.15) : alpha(basePalette.light, 0.25))
-                    }
-                  }}
-                >
-                  <TableCell sx={{ whiteSpace: 'nowrap' }}>
-                    <small>{row.start ? format(new Date(row.start), 'yyyy-MM-dd HH:mm') : '—'}</small>
-                  </TableCell>
-
-                  <TableCell align="right">
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 0.5 }}>
-                      {isInbound ? (
-                        <IcoIncome 
-                          fontSize="small" 
-                          sx={{ color: isInCall ? 'inherit' : 'success.main' }} 
-                        />
-                      ) : (
-                        <IcoOutgo 
-                          fontSize="small" 
-                          sx={{ color: isInCall ? 'inherit' : 'info.main' }} 
-                        />
-                      )}
-                    </Box>
-                  </TableCell>
-
-                  <TableCell sx={{ width: '100%', color: rowTextColor, pl: 2 }}>
-                    {row.uri}
-                  </TableCell>
-
-                </TableRow>
-              )
-            })}
+                <TableCell sx={{ width: '100%', pl: 2 }}>
+                  {row.uri}
+                </TableCell>
+              </TableRow>
+            ))}
           </TableBody>
-
         </Table>
       </TableContainer>
     </Paper>
   )
 }
-
-
 
 PhoneHistory.propTypes = {
   phoneControlRdcr      : PropTypes.object.isRequired,

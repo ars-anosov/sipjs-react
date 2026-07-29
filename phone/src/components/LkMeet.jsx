@@ -291,7 +291,7 @@ function LkMeet(props) {
     <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
     <Paper elevation={8} sx={{ minWidth: 300, p: 1, pt: 0, mt: 2, display: 'inline-block' }}>
       <Stack direction="row" sx={{ mb: 1, alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography variant="h6">Встреча {room}</Typography>
+        <Typography variant="h6" color="primary">Встреча {room}</Typography>
         <IconButton onClick={handleClose}>
           <IconClose color="error" />
         </IconButton>

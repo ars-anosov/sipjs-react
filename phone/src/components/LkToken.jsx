@@ -46,9 +46,9 @@ function LkToken(props) {
 
   return (
     (lkControlRdcr.displayLkToken) && (
-    <Paper elevation={8} sx={{ maxWidth: 300, width: '100%', mx: 'auto', p: 1, pt: 0, mt: 2 }}>
-      <Stack direction="row" sx={{ mb: 1, alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography variant="h6">Пригласить участника</Typography>
+    <Paper elevation={8} sx={{ maxWidth: 150, width: '100%', mx: 'auto', p: 1, pt: 0, mt: 2 }}>
+      <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
+        <Typography color="primary"></Typography>
         <IconButton onClick={handleClose}>
           <IconClose color="error" />
         </IconButton>
@@ -68,6 +68,7 @@ function LkToken(props) {
               id="lkTokenNum"
               label="Вн.номер"
               variant="outlined"
+              size="small"
               value={num}
               onChange={(event) => setNum(event.target.value)}
             />

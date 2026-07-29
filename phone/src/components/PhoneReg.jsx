@@ -77,7 +77,7 @@ function PhoneReg(props) {
   const finalTemplate =
   <Paper elevation={8} sx={{ maxWidth: 480, width: '100%', mx: 'auto', p: 1, pt: 0, mt: 2 }}>
     <Stack direction="row" sx={{ mb: 1, alignItems: 'center', justifyContent: 'space-between' }}>
-      <Typography variant="h6">SIP Регистрация</Typography>
+      <Typography variant="h6" color="primary">SIP Регистрация</Typography>
       <IconButton onClick={handleClose}>
         <IconClose color="error" />
       </IconButton>
@@ -139,7 +139,7 @@ function PhoneReg(props) {
         <Stack direction="row" spacing={2} sx={{ justifyContent: 'flex-end' }}>
           <Button
             type="button"
-            variant="outlined"
+            variant="contained"
             color="error"
             disabled={!phoneControlRdcr.regNow}
             onClick={handleUnregister}
