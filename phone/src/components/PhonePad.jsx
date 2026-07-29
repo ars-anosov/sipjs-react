@@ -86,7 +86,7 @@ function PhonePad(props) {
     if (phoneControlRdcr.incomeDisplay) {
       phoneControlActions.handleClkSubmitIn(phoneControlRdcr)
     } else {
-      phoneControlActions.handleClkSubmitOut(phoneControlRdcr.calleePhoneNum, phoneControlRdcr)
+      phoneControlActions.handleClkSubmitOut(phoneControlRdcr.addPrefix ? phoneControlRdcr.calleePrefix+phoneControlRdcr.calleePhoneNum : phoneControlRdcr.calleePhoneNum, phoneControlRdcr)
     }
   }
   const handleReset = () => {
