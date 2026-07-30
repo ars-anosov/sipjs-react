@@ -12,7 +12,7 @@ import {
   Collapse,
   Badge,
   InputAdornment,
-  Fab,
+  Button,
 } from '@mui/material'
 
 import {
@@ -125,17 +125,28 @@ function PhoneChat(props) {
   }
 
   return (
-    <Paper elevation={8} sx={{ minWidth: 300, maxWidth: 480, width: '100%', mx: 'auto', p: 1, pt: 0, mt: 2 }}>
+    <Paper 
+      elevation={8} 
+      sx={{ 
+        minWidth: 350, maxWidth: 500,
+        width: '100%', 
+        mx: 'auto', 
+        mt: 2,
+        p: 1, 
+        borderRadius: 3, 
+        position: 'relative'
+      }}
+    >
       <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
         <Badge color="error" badgeContent={phoneControlRdcr.chatUnread} invisible={!phoneControlRdcr.chatUnread}>
           <Typography variant="h6" color="primary">{title}</Typography>
         </Badge>
         <Stack direction="row" spacing={0} sx={{ alignItems: 'center' }}>
-          <IconButton onClick={phoneControlActions.handleClearChat}>
+          <IconButton onClick={phoneControlActions.handleClearChat} sx={{ position: 'absolute', top: 4, right: 54 }}>
             <IconDelete color="action" />
           </IconButton>
-          <IconButton onClick={handleClose}>
-            <IconClose color="error" />
+          <IconButton onClick={handleClose} sx={{ position: 'absolute', top: 4, right: 4 }}>
+            <IconClose color="action" />
           </IconButton>
         </Stack>
       </Stack>
@@ -245,7 +256,7 @@ function PhoneChat(props) {
             multiline
             maxRows={4}
           />
-          <Fab 
+          <Button 
             type="submit" 
             color="success" 
             disabled={!phoneControlRdcr.regNow}
@@ -256,7 +267,7 @@ function PhoneChat(props) {
             }}
           >
             <IconSend />
-          </Fab>
+          </Button>
         </Stack>
       </Box>
 

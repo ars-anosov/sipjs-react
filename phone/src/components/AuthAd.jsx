@@ -83,7 +83,7 @@ function AdAuth(props) {
       <IconButton 
         onClick={handleClose} 
         disabled={isLoading}
-        sx={{ position: 'absolute', top: 12, right: 12 }}
+        sx={{ position: 'absolute', top: 4, right: 4 }}
       >
         <IconClose color="action" />
       </IconButton>

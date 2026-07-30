@@ -6,11 +6,11 @@ import {
   useTheme,
 }                 from '@mui/material'
 import {
-  DialerSip as IconDialerSip,
-  PhoneDisabled as IconPhoneDisabled,
-  SettingsPhone as IconSettingsPhone,
-  RingVolume as IconRingVolume,
-  PhoneEnabled as IconPhoneEnabled,
+  DialerSip       as IconDialerSip,
+  PhoneDisabled   as IconPhoneDisabled,
+  SettingsPhone   as IconSettingsPhone,
+  RingVolume      as IconRingVolume,
+  Phone           as IconPhone,
 }                 from '@mui/icons-material'
 
 const pulse = keyframes`
@@ -86,7 +86,7 @@ function PhoneIco({ phoneControlRdcr }) {
     const { incomeCallNow, outgoCallNow, incomeDisplay, connectStatus, regNow } = phoneControlRdcr
 
     if (incomeCallNow || outgoCallNow) {
-      return { Icon: IconPhoneEnabled, bg: theme.palette.success.main, color: '#fff', pulse: false }
+      return { Icon: IconPhone, bg: theme.palette.success.main, color: '#fff', pulse: false }
     }
 
     if (incomeDisplay) {
@@ -100,11 +100,11 @@ function PhoneIco({ phoneControlRdcr }) {
       case 'Request':
         return { Icon: IconSettingsPhone, bg: theme.palette.warning.main, color: 'rgba(0,0,0,0.87)', pulse: false }
       case 'Success':
-        return { Icon: IconPhoneEnabled, bg: 'rgba(255, 255, 255, 0.2)', color: '#fff', pulse: false }
+        return { Icon: IconPhone, bg: 'rgba(255, 255, 255, 0.2)', color: '#fff', pulse: false }
     }
 
     if (regNow) {
-      return { Icon: IconPhoneEnabled, bg: 'rgba(255, 255, 255, 0.2)', color: '#fff', pulse: false }
+      return { Icon: IconPhone, bg: 'rgba(255, 255, 255, 0.2)', color: '#fff', pulse: false }
     }
 
     return { Icon: IconDialerSip, bg: 'rgba(0, 0, 0, 0.2)', color: 'rgba(0, 0, 0, 0.4)', pulse: false }

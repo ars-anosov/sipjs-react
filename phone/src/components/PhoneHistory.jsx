@@ -132,15 +132,26 @@ function PhoneHistory(props) {
   }, [phoneControlRdcr.callsArr, theme])
 
   return (
-    <Paper elevation={8} sx={{ minWidth: 300, maxWidth: 480, width: '100%', mx: 'auto', p: 1, pt: 0, mt: 2 }}>
+    <Paper 
+      elevation={8} 
+      sx={{ 
+        minWidth: 350, maxWidth: 500,
+        width: '100%', 
+        mx: 'auto', 
+        mt: 2,
+        p: 1, 
+        borderRadius: 3, 
+        position: 'relative'
+      }}
+    >
       <Stack direction="row" sx={{ mb: 1, alignItems: 'center', justifyContent: 'space-between' }}>
         <Typography variant="h6" color="primary">SIP Звонки</Typography>
         <Stack direction="row" spacing={1}>
-          <IconButton onClick={() => phoneControlActions.handleClearHistory()} aria-label="Clear history">
+          <IconButton onClick={() => phoneControlActions.handleClearHistory()} sx={{ position: 'absolute', top: 4, right: 54 }}>
             <IconDelete color="action" />
           </IconButton>
-          <IconButton onClick={handleClose} aria-label="Close history">
-            <IconClose color="error" />
+          <IconButton onClick={handleClose} sx={{ position: 'absolute', top: 4, right: 4 }}>
+            <IconClose color="action" />
           </IconButton>
         </Stack>
       </Stack>

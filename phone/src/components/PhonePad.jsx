@@ -15,7 +15,6 @@ import {
   Alert,
   Collapse,
   Tooltip,
-  Fab,
 } from '@mui/material'
 
 import {
@@ -140,12 +139,23 @@ function PhonePad(props) {
   ]
 
   const finalTemplate =
-  <Paper elevation={showInput ? 8 : 0} sx={{ maxWidth: 300, width: '100%', mx: 'auto', p: 1, pt: 0, mt: 2 }}>
+    <Paper 
+      elevation={8} 
+      sx={{ 
+        maxWidth: 300, 
+        width: '100%', 
+        mx: 'auto', 
+        mt: 2,
+        p: 1, 
+        borderRadius: 3, 
+        position: 'relative'
+      }}
+    >
     {showInput && (
     <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
       <Typography variant="h6" color="primary">SIP Телефон</Typography>
-      <IconButton onClick={handleClose}>
-        <IconClose color="error" />
+      <IconButton onClick={handleClose} sx={{ position: 'absolute', top: 4, right: 4 }}>
+        <IconClose color="action" />
       </IconButton>
     </Stack>
     )}
@@ -191,14 +201,19 @@ function PhonePad(props) {
       </Stack>
       )}
 
-      {/* Кнопки Вызов / Сброс */}
-      <Grid container spacing={2} sx={{ mb: 2, justifyContent: 'center' }}>
-        <Grid size={callNow ? 4 : 6} sx={{ textAlign: 'center' }}>
+      <Grid container spacing={2} sx={{ mb: 2, justifyContent: 'center', alignItems: 'center' }}>
+        {/* Кнопка Вызов / Ответить */}
+        <Grid size={callNow ? 4 : 6} sx={{ display: 'flex', justifyContent: 'center' }}>
           {phoneControlRdcr.incomeDisplay ? (
-            <Fab
+            <Button
               type="submit"
+              variant="contained" // Сплошной цветной фон
               color="success"
               sx={{
+                minWidth: 56,      // Делаем кнопку идеально круглой, как Fab
+                height: 56,
+                borderRadius: '50%',
+                p: 0,
                 '@keyframes pulse': {
                   '0%': { transform: 'scale(1)', boxShadow: '0 0 0 0 rgba(76, 175, 80, 0.7)' },
                   '70%': { transform: 'scale(1.1)', boxShadow: '0 0 0 15px rgba(76, 175, 80, 0)' },
@@ -208,42 +223,66 @@ function PhonePad(props) {
               }}
             >
               <IconPhoneRing />
-            </Fab>
+            </Button>
           ) : (
-            <Fab
+            <Button
               type="submit"
+              variant="contained"
               color="success"
               disabled={!isRegistered || phoneControlRdcr.outgoCallNow || phoneControlRdcr.incomeCallNow}
+              sx={{
+                minWidth: 56,
+                height: 56,
+                borderRadius: '50%',
+                p: 0
+              }}
             >
               <IconPhone />
-            </Fab>
+            </Button>
           )}
         </Grid>
 
+        {/* Кнопка Удержания (Hold / Resume) */}
         {callNow && (
-          <Grid size={4} sx={{ textAlign: 'center' }}>
+          <Grid size={4} sx={{ display: 'flex', justifyContent: 'center' }}>
             <Tooltip title={phoneControlRdcr.callHoldNow ? 'Resume' : 'Hold'}>
-              <Fab
+              <Button
                 type="button"
+                variant="contained"
                 color={phoneControlRdcr.callHoldNow ? 'success' : 'info'}
                 onClick={handleHold}
+                sx={{
+                  minWidth: 56,
+                  height: 56,
+                  borderRadius: '50%',
+                  p: 0
+                }}
               >
                 {phoneControlRdcr.callHoldNow ? <IconResume /> : <IconHold />}
-              </Fab>
+              </Button>
             </Tooltip>
           </Grid>
         )}
 
-        <Grid size={callNow ? 4 : 6} sx={{ textAlign: 'center' }}>
-          <Fab
+        {/* Кнопка Сброс */}
+        <Grid size={callNow ? 4 : 6} sx={{ display: 'flex', justifyContent: 'center' }}>
+          <Button
             type="reset"
+            variant="contained"
             color="error"
             disabled={!isRegistered}
+            sx={{
+              minWidth: 56,
+              height: 56,
+              borderRadius: '50%',
+              p: 0
+            }}
           >
             <IconHangup />
-          </Fab>
+          </Button>
         </Grid>
       </Grid>
+
 
       {/* Цифровая панель */}
       {showInput && (
@@ -277,23 +316,25 @@ function PhonePad(props) {
       )}
 
       <Stack direction="row" spacing={1} sx={{ mt: 2, justifyContent: 'space-between', alignItems: 'center' }}>
-        <IconButton
-          aria-label="Регистрация"
-          color={regButtonColor}
-          onClick={toggleReg}
-        >
-          {isRegistered ? <IconOnline /> : <IconOffline />}
-        </IconButton>
+        <Tooltip title="Регистрация">
+          <IconButton
+            color={regButtonColor}
+            onClick={toggleReg}
+          >
+            {isRegistered ? <IconOnline /> : <IconOffline />}
+          </IconButton>
+        </Tooltip>
 
         {showInput && (
         <Stack direction="row" spacing={1}>
-          <IconButton
-            aria-label="Регистрация"
-            color={phoneControlRdcr.addPrefix ? 'primary' : 'default'}
-            onClick={togglePrefix}
-          >
-            <IconDialpad />
-          </IconButton>
+          <Tooltip title="Префикс">
+            <IconButton
+              color={phoneControlRdcr.addPrefix ? 'primary' : 'default'}
+              onClick={togglePrefix}
+            >
+              <IconDialpad />
+            </IconButton>
+          </Tooltip>
 
           <Badge
             badgeContent={phoneControlRdcr.callUnread}
@@ -302,13 +343,14 @@ function PhonePad(props) {
             invisible={!phoneControlRdcr.callUnread || phoneControlRdcr.displayHistory}
             sx={{ '& .MuiBadge-badge': { top: 6, right: 6 } }}
           >
-            <IconButton
-              aria-label="Звонки"
-              color={phoneControlRdcr.displayHistory ? 'primary' : 'default'}
-              onClick={toggleHistory}
-            >
-              <IconPhoneHistory />
-            </IconButton>
+            <Tooltip title="История">
+              <IconButton
+                color={phoneControlRdcr.displayHistory ? 'primary' : 'default'}
+                onClick={toggleHistory}
+              >
+                <IconPhoneHistory />
+              </IconButton>
+            </Tooltip>
           </Badge>
 
           <Badge
@@ -318,13 +360,14 @@ function PhonePad(props) {
             invisible={!phoneControlRdcr.chatUnread || phoneControlRdcr.displayChat}
             sx={{ '& .MuiBadge-badge': { top: 6, right: 6 } }}
           >
-            <IconButton
-              aria-label="Сообщения"
-              color={phoneControlRdcr.displayChat ? 'primary' : 'default'}
-              onClick={toggleChat}
-            >
-              <IconMail />
-            </IconButton>
+            <Tooltip title="Сообщения">
+              <IconButton
+                color={phoneControlRdcr.displayChat ? 'primary' : 'default'}
+                onClick={toggleChat}
+              >
+                <IconMail />
+              </IconButton>
+            </Tooltip>
           </Badge>
         </Stack>
         )}

@@ -88,7 +88,7 @@ function PhoneReg(props) {
       {/* Кнопка закрытия сверху справа */}
       <IconButton 
         onClick={handleClose} 
-        sx={{ position: 'absolute', top: 12, right: 12 }}
+        sx={{ position: 'absolute', top: 4, right: 4 }}
       >
         <IconClose color="action" />
       </IconButton>

@@ -289,11 +289,22 @@ function LkMeet(props) {
   return (
     (lkControlRdcr.displayControl && (authControlRdcr?.responseData?.lk_token || token) && (
     <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-    <Paper elevation={8} sx={{ minWidth: 300, p: 1, pt: 0, mt: 2, display: 'inline-block' }}>
+    <Paper 
+      elevation={8} 
+      sx={{ 
+        maxWidth: 300, 
+        width: '100%', 
+        mx: 'auto', 
+        mt: 2,
+        p: 1, 
+        borderRadius: 3, 
+        position: 'relative'
+      }}
+    >
       <Stack direction="row" sx={{ mb: 1, alignItems: 'center', justifyContent: 'space-between' }}>
         <Typography variant="h6" color="primary">Встреча {room}</Typography>
-        <IconButton onClick={handleClose}>
-          <IconClose color="error" />
+        <IconButton onClick={handleClose} sx={{ position: 'absolute', top: 4, right: 4 }}>
+          <IconClose color="action" />
         </IconButton>
       </Stack>
 
