@@ -19,7 +19,6 @@ import {
   Login as IconLogin,
   Logout as IconLogout,
   Close as IconClose,
-  PhoneInTalk, // Иконка для логотипа SIP
   DialerSip,
   Lock,
   Dns,
@@ -77,12 +76,17 @@ function PhoneReg(props) {
       elevation={12} 
       sx={{ 
         maxWidth: 400, 
-        width: '100%', 
+        // На мобильных берем ширину от самого экрана устройства, на десктопе — обычные 100%
+        width: { xs: '80vw', sm: '100%' }, 
+        // Центрируем элемент по горизонтали в любых условиях
         mx: 'auto', 
         mt: 2,
-        p: 4, 
+        // Минимальный паддинг для мобильных (16px вместо 32px), чтобы инпутам внутри было просторно
+        p: { xs: 2, sm: 4 }, 
         borderRadius: 3, 
-        position: 'relative'
+        position: 'relative',
+        // Важно: гарантирует, что паддинги считаются внутрь ширины и не раздувают форму
+        boxSizing: 'border-box' 
       }}
     >
       {/* Кнопка закрытия сверху справа */}
@@ -104,7 +108,7 @@ function PhoneReg(props) {
             transition: 'background-color 0.3s ease'
           }}
         >
-          <PhoneInTalk sx={{ fontSize: 32, color: isRegistered ? 'success.main' : 'primary.main' }} />
+          <DialerSip sx={{ fontSize: 32, color: isRegistered ? 'success.main' : 'primary.main' }} />
         </Avatar>
         <Typography variant="h5" fontWeight="600" color="text.primary">
           SIP Регистрация
@@ -162,7 +166,7 @@ function PhoneReg(props) {
 
           {/* Безопасный условный рендеринг: инпуты вырезаются из DOM в продакшене */}
           {import.meta.env.DEV && (
-            <Stack direction="row" spacing={2}>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
               <TextField
                 fullWidth
                 required
