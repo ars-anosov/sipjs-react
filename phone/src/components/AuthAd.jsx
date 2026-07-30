@@ -11,11 +11,19 @@ import {
   Alert,
   Collapse,
   IconButton,
+  InputAdornment,
+  Avatar
 } from '@mui/material'
 
 import {
   Login as IconLogin,
+  Logout as IconLogout,
   Close as IconClose,
+  AccountCircle,
+  Lock,
+  Visibility,
+  VisibilityOff,
+  AdminPanelSettings
 } from '@mui/icons-material'
 
 function AdAuth(props) {
@@ -24,15 +32,17 @@ function AdAuth(props) {
     authControlActions,
   } = props
   
-  // Подтягиваем adLogin из localStorage при инициализации
   const [login, setLogin] = useState(() => localStorage.getItem('adLogin') || '')
   const [password, setPassword] = useState('')
   const [uriAdAuth, setUriAdAuth] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
 
   const isLoading = authControlRdcr.status === 'loading'
   const isError = authControlRdcr.status === 'error'
+  const isSuccess = authControlRdcr.status === 'success'
+  const responseData = authControlRdcr.responseData
 
-  // Синхронизируем URI из стора при его изменении
+  // Синхронизируем URI из глобального стора при его изменении
   useEffect(() => {
     setUriAdAuth(authControlRdcr.uriAdAuth || '')
   }, [authControlRdcr.uriAdAuth])
@@ -54,85 +64,168 @@ function AdAuth(props) {
     authControlActions.handleChangeStore('displayAd', false)
   }
 
-  // Валидация кнопки отправки
-  const isSubmitDisabled = isLoading || !login.trim() || !password.trim() || (import.meta.env.DEV && !uriAdAuth.trim())
+  const isSubmitDisabled = isLoading || isSuccess || !login.trim() || !password.trim() || (import.meta.env.DEV && !uriAdAuth.trim())
 
   return (
-    <Paper elevation={8} sx={{ maxWidth: 480, width: '100%', mx: 'auto', p: 2, pt: 1, mt: 2 }}>
-      <Stack direction="row" sx={{ mb: 2, alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography variant="h6" color="primary">AD Авторизация</Typography>
-        <IconButton onClick={handleClose} disabled={isLoading}>
-          <IconClose color="error" />
-        </IconButton>
+    <Paper 
+      elevation={12} 
+      sx={{ 
+        maxWidth: 400, 
+        width: '100%', 
+        mx: 'auto', 
+        mt: 2,
+        p: 4, 
+        borderRadius: 3, 
+        position: 'relative'
+      }}
+    >
+      {/* Кнопка закрытия формы сверху справа */}
+      <IconButton 
+        onClick={handleClose} 
+        disabled={isLoading}
+        sx={{ position: 'absolute', top: 12, right: 12 }}
+      >
+        <IconClose color="action" />
+      </IconButton>
+
+      {/* Блок Логотипа и Заголовка */}
+      <Stack spacing={1} sx={{ alignItems: 'center', mb: 4 }}>
+        <Avatar 
+          sx={{ 
+            width: 56, 
+            height: 56, 
+            backgroundColor: isSuccess ? 'success.light' : 'primary.light', 
+            mb: 1,
+            transition: 'background-color 0.3s ease'
+          }}
+        >
+          <AdminPanelSettings sx={{ fontSize: 32, color: isSuccess ? 'success.main' : 'primary.main' }} />
+        </Avatar>
+        <Typography variant="h5" fontWeight="600">
+          AD Авторизация
+        </Typography>
+        
+        {/* ИСПРАВЛЕНО: Динамический текст подзаголовка на основе ответа API */}
+        <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
+          {isSuccess
+            ? `Вы вошли как: ${responseData.ad_cn}`
+            : 'Введите учетные данные Active Directory'
+          }
+        </Typography>
       </Stack>
 
       <Box component="form" onSubmit={handleSubmit} noValidate>
-        <Stack spacing={2}>
-          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-            <TextField
-              fullWidth
-              required
-              disabled={isLoading}
-              id="adAuthLogin"
-              label="Login"
-              variant="outlined"
-              value={login}
-              onChange={(event) => setLogin(event.target.value)}
-            />
+        <Stack spacing={2.5}>
+          
+          {/* Поле ввода Логина */}
+          <TextField
+            fullWidth
+            required
+            disabled={isLoading || isSuccess}
+            id="adAuthLogin"
+            label="Логин"
+            variant="outlined"
+            value={login}
+            onChange={(event) => setLogin(event.target.value)}
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <AccountCircle color="action" />
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
 
-            <TextField
-              fullWidth
-              required
-              disabled={isLoading}
-              id="adAuthPassword"
-              label="Password"
-              type="password"
-              variant="outlined"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-            />
-          </Stack>
+          {/* Поле ввода Пароля */}
+          <TextField
+            fullWidth
+            required
+            disabled={isLoading || isSuccess}
+            id="adAuthPassword"
+            label="Пароль"
+            type={showPassword ? 'text' : 'password'}
+            variant="outlined"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Lock color="action" />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="переключить видимость пароля"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      onMouseDown={(event) => event.preventDefault()}
+                      edge="end"
+                      disabled={isLoading || isSuccess}
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
 
+          {/* Безопасный инпут API URI — рендерится только в DEV режиме */}
           {import.meta.env.DEV && (
             <TextField
               fullWidth
               required
-              disabled={isLoading}
+              disabled={isLoading || isSuccess}
               id="uriAdAuth"
               label="API URI (Dev Only)"
               variant="outlined"
+              size="small"
               value={uriAdAuth}
               onChange={(event) => setUriAdAuth(event.target.value)}
+              sx={{ opacity: 0.8 }}
             />
           )}
 
-          <Stack direction="row" spacing={2} sx={{ justifyContent: 'flex-end' }}>
-            <Button
-              type="button"
-              variant="outlined"
-              color="primary"
-              size="large"
-              onClick={handleReset}
-              disabled={isLoading}
-            >
-              Reset
-            </Button>
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              startIcon={<IconLogin />}
-              size="large"
-              disabled={isSubmitDisabled}
-            >
-              Login
-            </Button>
+          {/* Блок управляющих кнопок */}
+          <Stack spacing={1.5} sx={{ pt: 1 }}>
+            {!isSuccess ? (
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                startIcon={<IconLogin />}
+                size="large"
+                fullWidth
+                disabled={isSubmitDisabled}
+                sx={{ py: 1.3, fontWeight: 'bold', borderRadius: 2 }}
+              >
+                Войти в систему
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                variant="contained"
+                color="error"
+                startIcon={<IconLogout />}
+                size="large"
+                fullWidth
+                onClick={handleReset}
+                disabled={isLoading}
+                sx={{ py: 1.3, fontWeight: 'bold', borderRadius: 2 }}
+              >
+                Выйти
+              </Button>
+            )}
           </Stack>
+
         </Stack>
       </Box>
 
-      <Collapse in={!!authControlRdcr.message}>
-        <Alert severity={isError ? 'error' : 'success'} sx={{ mt: 2 }}>
+      <Collapse in={isError}>
+        <Alert severity="error" sx={{ mt: 3, borderRadius: 2 }}>
           {authControlRdcr.message}
         </Alert>
       </Collapse>
@@ -145,6 +238,10 @@ AdAuth.propTypes = {
     uriAdAuth: PropTypes.string,
     status: PropTypes.string,
     message: PropTypes.string,
+    responseData: PropTypes.shape({
+      sip_username: PropTypes.string,
+      sip_secret: PropTypes.string,
+    }),
   }).isRequired,
   authControlActions: PropTypes.shape({
     handleAdRegister: PropTypes.func.isRequired,
