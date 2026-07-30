@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 
 import {
@@ -18,19 +18,28 @@ import {
   Close as IconClose,
 } from '@mui/icons-material'
 
-
 function AdAuth(props) {
   const {
     authControlRdcr,
     authControlActions,
   } = props
-
-  const [login, setLogin] = useState('')
+  
+  // Подтягиваем adLogin из localStorage при инициализации
+  const [login, setLogin] = useState(() => localStorage.getItem('adLogin') || '')
   const [password, setPassword] = useState('')
-  const [uriAdAuth, setUriAdAuth] = useState(authControlRdcr.uriAdAuth || '')
+  const [uriAdAuth, setUriAdAuth] = useState('')
+
+  const isLoading = authControlRdcr.status === 'loading'
+  const isError = authControlRdcr.status === 'error'
+
+  // Синхронизируем URI из стора при его изменении
+  useEffect(() => {
+    setUriAdAuth(authControlRdcr.uriAdAuth || '')
+  }, [authControlRdcr.uriAdAuth])
 
   const handleSubmit = (event) => {
     event.preventDefault()
+    if (!login.trim() || !password.trim()) return
     authControlActions.handleAdRegister({ login, password, uriAdAuth })
   }
 
@@ -38,34 +47,32 @@ function AdAuth(props) {
     setLogin('')
     setPassword('')
     setUriAdAuth(authControlRdcr.uriAdAuth || '')
-    // authControlActions.handleAdAuthClear()
+    authControlActions.handleAdAuthClear()
   }
 
   const handleClose = () => {
     authControlActions.handleChangeStore('displayAd', false)
   }
 
+  // Валидация кнопки отправки
+  const isSubmitDisabled = isLoading || !login.trim() || !password.trim() || (import.meta.env.DEV && !uriAdAuth.trim())
+
   return (
-    <Paper elevation={8} sx={{ maxWidth: 480, width: '100%', mx: 'auto', p: 1, pt: 0, mt: 2 }}>
-      <Stack direction="row" sx={{ mb: 1, alignItems: 'center', justifyContent: 'space-between' }}>
+    <Paper elevation={8} sx={{ maxWidth: 480, width: '100%', mx: 'auto', p: 2, pt: 1, mt: 2 }}>
+      <Stack direction="row" sx={{ mb: 2, alignItems: 'center', justifyContent: 'space-between' }}>
         <Typography variant="h6" color="primary">AD Авторизация</Typography>
-        <IconButton onClick={handleClose}>
-            <IconClose color="error" />
+        <IconButton onClick={handleClose} disabled={isLoading}>
+          <IconClose color="error" />
         </IconButton>
       </Stack>
 
-      <Box
-        component="form"
-        onSubmit={handleSubmit}
-        noValidate
-        autoComplete="off"
-      >
+      <Box component="form" onSubmit={handleSubmit} noValidate>
         <Stack spacing={2}>
-
-          <Stack direction="row" spacing={2}>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
             <TextField
               fullWidth
               required
+              disabled={isLoading}
               id="adAuthLogin"
               label="Login"
               variant="outlined"
@@ -76,6 +83,7 @@ function AdAuth(props) {
             <TextField
               fullWidth
               required
+              disabled={isLoading}
               id="adAuthPassword"
               label="Password"
               type="password"
@@ -85,16 +93,18 @@ function AdAuth(props) {
             />
           </Stack>
 
-          <TextField
-            fullWidth
-            required
-            id="uriAdAuth"
-            label="API URI"
-            variant="outlined"
-            value={uriAdAuth}
-            onChange={(event) => setUriAdAuth(event.target.value)}
-            sx={{ display: import.meta.env.DEV ? 'block' : 'none' }}
-          />
+          {import.meta.env.DEV && (
+            <TextField
+              fullWidth
+              required
+              disabled={isLoading}
+              id="uriAdAuth"
+              label="API URI (Dev Only)"
+              variant="outlined"
+              value={uriAdAuth}
+              onChange={(event) => setUriAdAuth(event.target.value)}
+            />
+          )}
 
           <Stack direction="row" spacing={2} sx={{ justifyContent: 'flex-end' }}>
             <Button
@@ -103,6 +113,7 @@ function AdAuth(props) {
               color="primary"
               size="large"
               onClick={handleReset}
+              disabled={isLoading}
             >
               Reset
             </Button>
@@ -112,17 +123,16 @@ function AdAuth(props) {
               color="primary"
               startIcon={<IconLogin />}
               size="large"
-              disabled={authControlRdcr.status === 'loading'}
+              disabled={isSubmitDisabled}
             >
               Login
             </Button>
           </Stack>
-
         </Stack>
       </Box>
 
       <Collapse in={!!authControlRdcr.message}>
-        <Alert severity={authControlRdcr.status === 'error' ? 'error' : 'success'} sx={{ mt: 2 }}>
+        <Alert severity={isError ? 'error' : 'success'} sx={{ mt: 2 }}>
           {authControlRdcr.message}
         </Alert>
       </Collapse>
@@ -131,8 +141,16 @@ function AdAuth(props) {
 }
 
 AdAuth.propTypes = {
-  authControlRdcr: PropTypes.object.isRequired,
-  authControlActions: PropTypes.object.isRequired,
+  authControlRdcr: PropTypes.shape({
+    uriAdAuth: PropTypes.string,
+    status: PropTypes.string,
+    message: PropTypes.string,
+  }).isRequired,
+  authControlActions: PropTypes.shape({
+    handleAdRegister: PropTypes.func.isRequired,
+    handleChangeStore: PropTypes.func.isRequired,
+    handleAdAuthClear: PropTypes.func.isRequired,
+  }).isRequired,
 }
 
 export default AdAuth

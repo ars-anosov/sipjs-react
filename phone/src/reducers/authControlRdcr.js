@@ -9,8 +9,8 @@ import {
 const initialState = {
   displayAd       : false,
   displayControl  : false,
-  uriAdAuth       : localStorage.getItem('uriAdAuth') ? localStorage.getItem('uriAdAuth') : '',
-  status          : 'idle',
+  uriAdAuth       : localStorage.getItem('uriAdAuth') || '',
+  status          : 'idle', // 'idle' | 'loading' | 'success' | 'error'
   message         : '',
   responseData    : null,
 }
@@ -20,35 +20,39 @@ export default function authControlRdcr(state = initialState, action) {
     case AUTHCTL_SUBMIT_REQUEST:
       return {
         ...state,
-        status					: 'loading',
-        displayAd      	: true,
-        message					: '',
-        responseData		: null,
+        status         : 'loading',
+        displayAd      : true,
+        message        : '',
+        responseData   : null,
       }
 
     case AUTHCTL_SUBMIT_SUCCESS:
       return {
         ...state,
-        status					: 'success',
-        displayAd      	: false,
-        message					: action.payload.message || 'Успешно',
-        responseData		: action.payload.responseData,
+        status         : 'success',
+        displayAd      : false,
+        message        : action.payload.message || 'Успешно',
+        responseData   : action.payload.responseData,
       }
 
     case AUTHCTL_SUBMIT_ERROR:
       return {
         ...state,
-        status					: 'error',
-        displayAd      	: true,
-        message					: action.payload.message || 'Ошибка',
-        responseData		: null,
+        status         : 'error',
+        displayAd      : true,
+        message        : action.payload.message || 'Ошибка',
+        responseData   : null,
       }
 
     case AUTHCTL_CLEAR:
-      return initialState
+      return {
+        ...initialState,
+        uriAdAuth      : localStorage.getItem('uriAdAuth') || '',
+      }
 
     case AUTHCTL_STORE_VALUE:
-      return { ...state,
+      return { 
+        ...state,
         [action.payload.storeDataKey]: action.payload.storeDataValue
       }
 

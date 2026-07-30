@@ -1,3 +1,5 @@
+import axios from 'axios' // Импортируем Axios
+
 import {
   AUTHCTL_SUBMIT_REQUEST,
   AUTHCTL_SUBMIT_SUCCESS,
@@ -19,9 +21,7 @@ const handleAdRegister = function(formData = {}) {
     if (!login || !password) {
       dispatch({
         type: AUTHCTL_SUBMIT_ERROR,
-        payload: {
-          message: 'Заполните логин и пароль.',
-        },
+        payload: { message: 'Заполните логин и пароль.' },
       })
       return
     }
@@ -29,9 +29,7 @@ const handleAdRegister = function(formData = {}) {
     if (!uriAdAuth) {
       dispatch({
         type: AUTHCTL_SUBMIT_ERROR,
-        payload: {
-          message: 'Не задан uriAdAuth.',
-        },
+        payload: { message: 'Не задан uriAdAuth.' },
       })
       return
     }
@@ -40,30 +38,15 @@ const handleAdRegister = function(formData = {}) {
     dispatch({ type: AUTHCTL_SUBMIT_REQUEST })
 
     try {
-      const response = await fetch(uriAdAuth, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ login, password }),
-      })
+      // Отправляем POST запрос через Axios с таймаутом 10 секунд
+      const response = await axios.post(uriAdAuth, { login, password }, { timeout: 10000 })
+      
+      // Axios автоматически парсит JSON и кладет его в response.data
+      const responseData = response.data
 
-      let responseData = null
-      const responseText = await response.text()
-
-      if (responseText) {
-        try {
-          responseData = JSON.parse(responseText)
-        } catch (error) {
-          responseData = responseText
-        }
-      }
-
-      if (!response.ok) {
-        const detailMessage = responseData && typeof responseData === 'object'
-          ? (responseData.message || responseData.error || responseData.detail || JSON.stringify(responseData))
-          : String(responseData || response.statusText || 'Request failed')
-        throw new Error(detailMessage)
+      // При успешном ответе (статусы 2xx) сохраняем логин в localStorage
+      if (login) {
+        localStorage.setItem('adLogin', login)
       }
 
       dispatch({
@@ -100,11 +83,27 @@ const handleAdRegister = function(formData = {}) {
       // END OF Воздействие на компоненту PhoneReg
 
     } catch (error) {
+      let detailMessage = 'Не удалось выполнить запрос.'
+
+      if (error.response) {
+        // Сервер ответил кодом ошибки (4xx, 5xx)
+        const serverData = error.response.data
+        detailMessage = serverData && typeof serverData === 'object'
+          ? (serverData.message || serverData.error || serverData.detail || JSON.stringify(serverData))
+          : String(serverData || error.response.statusText || detailMessage)
+      } else if (error.request) {
+        // Запрос был отправлен, но ответ не получен (например, таймаут или упала сеть)
+        detailMessage = error.code === 'ECONNABORTED' 
+          ? 'Время ожидания запроса истекло. Сервер не отвечает.' 
+          : 'Сетевая ошибка. Проверьте подключение к интернету.'
+      } else {
+        // Произошло что-то непредвиденное при настройке запроса
+        detailMessage = error.message || detailMessage
+      }
+
       dispatch({
         type: AUTHCTL_SUBMIT_ERROR,
-        payload: {
-          message: error && error.message ? error.message : 'Не удалось выполнить запрос.',
-        },
+        payload: { message: detailMessage },
       })
     }
   }
@@ -112,6 +111,7 @@ const handleAdRegister = function(formData = {}) {
 
 const handleAdAuthClear = function() {
   return (dispatch) => {
+    localStorage.removeItem('adLogin')
     dispatch({ type: AUTHCTL_CLEAR })
   }
 }
@@ -120,7 +120,7 @@ const handleChangeStore = function(storeDataKey, storeDataValue) {
   return (dispatch) => {
     dispatch({
       type: AUTHCTL_STORE_VALUE,
-      payload: {'storeDataKey': storeDataKey, 'storeDataValue': storeDataValue}
+      payload: { 'storeDataKey': storeDataKey, 'storeDataValue': storeDataValue }
     })
   }
 }
