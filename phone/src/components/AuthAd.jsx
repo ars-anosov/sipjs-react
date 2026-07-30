@@ -105,10 +105,9 @@ function AdAuth(props) {
           AD Авторизация
         </Typography>
         
-        {/* ИСПРАВЛЕНО: Динамический текст подзаголовка на основе ответа API */}
         <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center' }}>
           {isSuccess
-            ? `Вы вошли как: ${responseData.ad_cn}`
+            ? responseData.ad_cn
             : 'Введите учетные данные Active Directory'
           }
         </Typography>
