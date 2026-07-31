@@ -259,8 +259,8 @@ function LkMeet(props) {
     publishDefaults: {
       screenShareEncoding: VideoPresets.h1440.encoding, 
       simulcast: false, 
-      videoCodec: 'av1', 
-      backupCodec: 'vp9',
+      videoCodec: 'vp8', 
+      backupCodec: 'h264',
     }
   }))
   const location                        = useLocation()
@@ -375,8 +375,8 @@ function LkMeet(props) {
             token={token}
             serverUrl={lkControlRdcr.uriLk}
             connect={isRoomActive}
-            video={true}
-            audio={true}
+            video={false}
+            audio={false}
             room={customRoom}
             onDisconnected={() => setIsRoomActive(false)}
           >
@@ -385,7 +385,7 @@ function LkMeet(props) {
             <ControlBar 
               controls={{
                 screenShare: true,
-                chat: false, // пример отключения ненужных кнопок, если требуется
+                chat: false,
               }}
             />
             <RoomAudioRenderer />
