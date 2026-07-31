@@ -1,6 +1,6 @@
 {
   "name": "material-ui-vite",
-  "version": "2.0.6",
+  "version": "2.1.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -15,22 +15,22 @@
     "@livekit/components-styles": "^1.2.0",
     "@mui/icons-material": "^9.2.0",
     "@mui/material": "^9.2.0",
-    "axios": "^1.19.0",
     "date-fns": "^4.4.0",
+    "ky": "^2.0.2",
     "livekit-client": "^2.21.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-redux": "^9.3.0",
-    "react-router-dom": "^7.18.1",
+    "react-router-dom": "^7.18.2",
     "redux": "^5.0.1",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^3.1.0",
     "sip.js": "^0.21.2"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^6.0.4",
+    "@vitejs/plugin-react": "^6.0.5",
     "body-parser": "^2.3.0",
     "jsonwebtoken": "^9.0.3",
-    "vite": "^8.1.5"
+    "vite": "^8.2.0"
   }
 }

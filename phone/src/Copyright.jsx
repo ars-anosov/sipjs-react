@@ -45,7 +45,7 @@ function Copyright(props) {
         Powered by
         sip.js {dependencies['sip.js']},
         livekit-client {dependencies['livekit-client']},
-        axios {dependencies['axios']}
+        ky {dependencies['ky']}
         <br />
         react-dom {dependencies['react-dom']},
         react-redux {dependencies['react-redux']},

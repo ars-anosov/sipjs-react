@@ -1,3 +1,6 @@
+import ky from 'ky'
+import { getApiErrorMessage } from './utils/kyError'
+
 import {
   LKTOKEN_SUBMIT_REQUEST,
   LKTOKEN_SUBMIT_SUCCESS,
@@ -32,9 +35,7 @@ const handleLkTokenSubmit = function(formData = {}) {
     if (!num || !room) {
       dispatch({
         type: LKTOKEN_SUBMIT_ERROR,
-        payload: {
-          message: 'Заполните num и room.',
-        },
+        payload: { message: 'Заполните num и room.' },
       })
       return
     }
@@ -42,9 +43,7 @@ const handleLkTokenSubmit = function(formData = {}) {
     if (!uriLkToken) {
       dispatch({
         type: LKTOKEN_SUBMIT_ERROR,
-        payload: {
-          message: 'Не задан uriLkToken.',
-        },
+        payload: { message: 'Не задан uriLkToken.' },
       })
       return
     }
@@ -53,31 +52,7 @@ const handleLkTokenSubmit = function(formData = {}) {
     dispatch({ type: LKTOKEN_SUBMIT_REQUEST })
 
     try {
-      const response = await fetch(uriLkToken, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ num, room }),
-      })
-
-      let responseData = null
-      const responseText = await response.text()
-
-      if (responseText) {
-        try {
-          responseData = JSON.parse(responseText)
-        } catch (error) {
-          responseData = responseText
-        }
-      }
-
-      if (!response.ok) {
-        const detailMessage = responseData && typeof responseData === 'object'
-          ? (responseData.message || responseData.error || responseData.detail || JSON.stringify(responseData))
-          : String(responseData || response.statusText || 'Request failed')
-        throw new Error(detailMessage)
-      }
+      const responseData = await ky.post(uriLkToken, { json: { num, room } }).json()
 
       dispatch({
         type: LKTOKEN_SUBMIT_SUCCESS,
@@ -102,21 +77,19 @@ const handleLkTokenSubmit = function(formData = {}) {
         )
 
         try {
-          await transmitSipMessage({
-            chatMessage,
-            uriHost,
-          })
+          await transmitSipMessage({ chatMessage, uriHost })
         } catch (sipError) {
           console.warn('Lk invite SIP MESSAGE send error:', sipError)
         }
       }
       // END OF Отправка SIP MESSAGE
+
     } catch (error) {
+      const detailMessage = await getApiErrorMessage(error)
+
       dispatch({
         type: LKTOKEN_SUBMIT_ERROR,
-        payload: {
-          message: error && error.message ? error.message : 'Не удалось выполнить запрос.',
-        },
+        payload: { message: detailMessage },
       })
     }
   }

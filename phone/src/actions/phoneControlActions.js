@@ -1,3 +1,6 @@
+import ky from 'ky'
+import { getApiErrorMessage } from './utils/kyError'
+
 import {
   PHONECTL_CONNECT_REQUEST,
   PHONECTL_CONNECT_SUCCESS,
@@ -1019,42 +1022,23 @@ const handleSendMessage = function(peerPhoneNum, messageBody, rdcr) {
 
 const getPhoneDir = function() {
   return async () => {
-    if (localStorage.getItem('uriPhoneDir')) {
-      try {
-        const response = await fetch(localStorage.getItem('uriPhoneDir'), {
-          method: 'GET',
-        })
+    const url = localStorage.getItem('uriPhoneDir');
 
-        let responseData = null
-        const responseText = await response.text()
-
-        if (responseText) {
-          try {
-            responseData = JSON.parse(responseText)
-          } catch (error) {
-            responseData = responseText
-          }
-        }
-
-        if (!response.ok) {
-          const detailMessage = responseData && typeof responseData === 'object'
-            ? (responseData.message || responseData.error || responseData.detail || JSON.stringify(responseData))
-            : String(responseData || response.statusText || 'Request failed')
-          throw new Error(detailMessage)
-        }
-
-        return responseData
-      }
-      catch (error) {
-        console.error('Error fetching phone directory:', error)
-        throw error
-      }
-    } else {
-      console.warn('No phone directory URI found in localStorage.')
-      return []
+    if (!url) {
+      console.warn('No phone directory URI found in localStorage.');
+      return [];
     }
-  }
-}
+
+    try {
+      return await ky.get(url).json();
+    } catch (error) {
+      const detailMessage = await getApiErrorMessage(error, 'Ошибка загрузки телефонного справочника.');
+      
+      console.error('Error fetching phone directory:', detailMessage);
+      throw new Error(detailMessage);
+    }
+  };
+};
 
 
 

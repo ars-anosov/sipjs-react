@@ -1,4 +1,5 @@
-import axios from 'axios' // Импортируем Axios
+import ky from 'ky'
+import { getApiErrorMessage } from './utils/kyError'
 
 import {
   AUTHCTL_SUBMIT_REQUEST,
@@ -38,13 +39,11 @@ const handleAdRegister = function(formData = {}) {
     dispatch({ type: AUTHCTL_SUBMIT_REQUEST })
 
     try {
-      // Отправляем POST запрос через Axios с таймаутом 10 секунд
-      const response = await axios.post(uriAdAuth, { login, password }, { timeout: 10000 })
-      
-      // Axios автоматически парсит JSON и кладет его в response.data
-      const responseData = response.data
+      const responseData = await ky.post(uriAdAuth, { 
+        json: { login, password }, 
+        timeout: 10000 
+      }).json() // Сразу вызываем .json() для разбора тела ответа
 
-      // При успешном ответе (статусы 2xx) сохраняем логин в localStorage
       if (login) {
         localStorage.setItem('adLogin', login)
       }
@@ -83,24 +82,8 @@ const handleAdRegister = function(formData = {}) {
       // END OF Воздействие на компоненту PhoneReg
 
     } catch (error) {
-      let detailMessage = 'Не удалось выполнить запрос.'
-
-      if (error.response) {
-        // Сервер ответил кодом ошибки (4xx, 5xx)
-        const serverData = error.response.data
-        detailMessage = serverData && typeof serverData === 'object'
-          ? (serverData.message || serverData.error || serverData.detail || JSON.stringify(serverData))
-          : String(serverData || error.response.statusText || detailMessage)
-      } else if (error.request) {
-        // Запрос был отправлен, но ответ не получен (например, таймаут или упала сеть)
-        detailMessage = error.code === 'ECONNABORTED' 
-          ? 'Время ожидания запроса истекло. Сервер не отвечает.' 
-          : 'Сетевая ошибка. Проверьте подключение к интернету.'
-      } else {
-        // Произошло что-то непредвиденное при настройке запроса
-        detailMessage = error.message || detailMessage
-      }
-
+      const detailMessage = await getApiErrorMessage(error)
+      
       dispatch({
         type: AUTHCTL_SUBMIT_ERROR,
         payload: { message: detailMessage },
