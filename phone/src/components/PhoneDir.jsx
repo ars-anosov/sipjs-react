@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 import {
   Autocomplete,
+  createFilterOptions,
   TextField,
   Box,
   IconButton,
@@ -14,7 +15,7 @@ import PhoneIcon    from '@mui/icons-material/Phone'
 import DialpadIcon  from '@mui/icons-material/Dialpad'
 import MailIcon     from '@mui/icons-material/Mail'
 
-
+const filter = createFilterOptions()
 
 function PhoneDir(props) {
   if (process.env.NODE_ENV === 'development') console.log('PhoneDir hook')
@@ -22,26 +23,31 @@ function PhoneDir(props) {
   const { phoneControlRdcr, phoneControlActions } = props
 
   const [dirPart, setDirPart] = useState('')
-  const [open, setOpen] = useState(false)
   const [options, setOptions] = useState([])
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: '',
-    severity: 'success' // 'success' или 'error'
+    severity: 'success'
   })
+
+  const getPhoneDirRef = useRef(phoneControlActions.getPhoneDir)
+  useEffect(() => {
+    getPhoneDirRef.current = phoneControlActions.getPhoneDir
+  }, [phoneControlActions.getPhoneDir])
 
   const handleCloseSnackbar = (event, reason) => {
     if (reason === 'clickaway') return
-    setSnackbar({ ...snackbar, open: false })
+    setSnackbar((prev) => ({ ...prev, open: false }))
   }
 
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') console.log('PhoneDir MOUNT')
     
     const fetchData = async () => {
-      if (phoneControlActions?.getPhoneDir) {
+      const fetchFn = getPhoneDirRef.current
+      if (fetchFn) {
         try {
-          const data = await phoneControlActions.getPhoneDir()
+          const data = await fetchFn()
           if (Array.isArray(data)) {
             setOptions(data)
           }
@@ -55,33 +61,41 @@ function PhoneDir(props) {
     return () => {
       if (process.env.NODE_ENV === 'development') console.log('PhoneDir UNMOUNT')
     }
-  }, [phoneControlActions?.getPhoneDir])
-
-
-  const handleInputChange = (event, newInputValue) => {
-    setDirPart(newInputValue)
-    setOpen(newInputValue.length > 3)
-  }
+  }, [])
 
   return (
     <>
       <Autocomplete
+        freeSolo
         disablePortal
         options={options}
         size="small"
         forcePopupIcon={false}
-        open={open}
-        onOpen={() => {
-          if (dirPart.length > 3) setOpen(true)
-        }}
-        onClose={(event, reason) => {
-          if (reason === 'toggleInput' || reason === 'escape' || reason === 'blur') {
-            setOpen(false)
+        openOnFocus={false} // Запрещает открывать список при пустом клике мышкой
+        disableClearable={dirPart.length === 0}
+        
+        inputValue={dirPart}
+        onInputChange={(event, newInputValue, reason) => {
+          if (reason === 'clear') {
+            setDirPart('')
+          } else {
+            setDirPart(newInputValue)
           }
         }}
-        inputValue={dirPart}
-        onInputChange={handleInputChange}
-        getOptionLabel={(option) => option.label || ''}
+        
+        // Условие "> 3" теперь живет в одном месте и управляет выдачей результатов
+        filterOptions={(options, params) => {
+          if (dirPart.length <= 3) return [] // Если символов мало — результатов нет
+          return filter(options, {
+            ...params,
+            inputValue: dirPart,
+          })
+        }}
+
+        getOptionLabel={(option) => {
+          if (typeof option === 'string') return option
+          return option.label || ''
+        }}
         onChange={(event, newValue, reason) => {
           if (reason === 'selectOption') {
             event.preventDefault()
@@ -91,10 +105,15 @@ function PhoneDir(props) {
           popper: {
             sx: {
               width: '350px !important',
+              // Если результатов нет (длина < 4), полностью скрываем Popper, чтобы не было пустого окна
+              display: dirPart.length <= 3 ? 'none !important' : 'block',
               '& .MuiAutocomplete-listbox': {
                 width: '100%',
               }
             }
+          },
+          clearIndicator: {
+            sx: { color: '#ffffff !important' }
           }
         }}
         sx={{ 
@@ -105,7 +124,6 @@ function PhoneDir(props) {
         renderOption={(propsOption, option) => {
           const { key, ...optionProps } = propsOption
           const targetValue = option.num || option.prefix || ''
-          const isPrefixType = !option.num && option.prefix
 
           return (
             <Box
@@ -120,12 +138,11 @@ function PhoneDir(props) {
                 gap: 1
               }}
             >
-              {/* Текст контакта */}
               <Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1, minWidth: 0 }}>
                 <Typography 
                   component="span"
                   variant="body2"
-                  style={{ 
+                  sx={{ 
                     fontWeight: 'bold', 
                     overflow: 'hidden', 
                     textOverflow: 'ellipsis', 
@@ -137,44 +154,43 @@ function PhoneDir(props) {
                 <Typography 
                   component="span"
                   variant="caption"
-                  style={{ color: 'gray' }}
+                  sx={{ color: 'text.secondary' }}
                 >
                   {targetValue} {option.email}
                 </Typography>
               </Box>
 
-              {/* Кнопки действий */}
               <Box 
                 sx={{ display: 'flex', gap: 0.5, flexShrink: 0 }}
                 onClick={(e) => e.stopPropagation()}
               >
                 {option.num && (
-                <Tooltip title="В телефон" arrow>
-                  <IconButton
-                    color="primary"
-                    onClick={() => {
-                      phoneControlActions.handleChangeStore('calleePhoneNum', option.num)
-                      phoneControlActions.handleChangeStore('displayPad', true)
-                    }}
-                  >
-                    <PhoneIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
+                  <Tooltip title="В телефон" arrow>
+                    <IconButton
+                      color="primary"
+                      onClick={() => {
+                        phoneControlActions.handleChangeStore('calleePhoneNum', option.num)
+                        phoneControlActions.handleChangeStore('displayPad', true)
+                      }}
+                    >
+                      <PhoneIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
                 )}
 
                 {option.prefix && (
-                <Tooltip title="В телефон" arrow>
-                  <IconButton
-                    color="primary"
-                    onClick={() => {
-                      phoneControlActions.handleChangeStore('calleePrefix', option.prefix)
-                      phoneControlActions.handleChangeStore('addPrefix', true)
-                      phoneControlActions.handleChangeStore('displayPad', true)
-                    }}
-                  >
-                    <DialpadIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
+                  <Tooltip title="В телефон" arrow>
+                    <IconButton
+                      color="primary"
+                      onClick={() => {
+                        phoneControlActions.handleChangeStore('calleePrefix', option.prefix)
+                        phoneControlActions.handleChangeStore('addPrefix', true)
+                        phoneControlActions.handleChangeStore('displayPad', true)
+                      }}
+                    >
+                      <DialpadIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
                 )}
 
                 {option.email && (
@@ -182,25 +198,23 @@ function PhoneDir(props) {
                     <IconButton
                       color="info"
                       onClick={(e) => {
-                        e.stopPropagation();
-                        
+                        e.stopPropagation()
                         navigator.clipboard.writeText(option.email)
                           .then(() => {
                             setSnackbar({
                               open: true,
                               message: 'Email скопирован!',
                               severity: 'info'
-                            });
+                            })
                           })
                           .catch((err) => {
-                            console.error('Ошибка копирования:', err);
-                            // Включаем уведомление об ошибке
+                            console.error('Ошибка копирования:', err)
                             setSnackbar({
                               open: true,
                               message: 'Не удалось скопировать email',
                               severity: 'error'
-                            });
-                          });
+                            })
+                          })
                       }}
                     >
                       <MailIcon fontSize="small" />
@@ -229,13 +243,11 @@ function PhoneDir(props) {
         )}
       />
 
-
-
       <Snackbar 
         open={snackbar.open} 
-        autoHideDuration={3000} // Скроется через 3 секунды
+        autoHideDuration={1000} 
         onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }} // Позиция на экране
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
       >
         <Alert 
           onClose={handleCloseSnackbar} 
@@ -254,8 +266,8 @@ PhoneDir.propTypes = {
   phoneControlRdcr: PropTypes.object.isRequired,
   phoneControlActions: PropTypes.shape({
     getPhoneDir: PropTypes.func.isRequired,
+    handleChangeStore: PropTypes.func.isRequired,
   }).isRequired,
 }
-
 
 export default PhoneDir

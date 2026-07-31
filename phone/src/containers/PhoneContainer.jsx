@@ -23,13 +23,12 @@ const PhoneContainer = () => {
   const phoneControlActions = useMemo(() => bindActionCreators(phoneActions, dispatch), [dispatch])
   const authControlActions = useMemo(() => bindActionCreators(authActions, dispatch), [dispatch])
 
-  const commonProps = useMemo(() => ({ phoneControlRdcr, phoneControlActions }), [phoneControlRdcr, phoneControlActions])
-  const authProps = useMemo(() => ({ authControlRdcr, authControlActions }), [authControlRdcr, authControlActions])
-
   const { displayAd } = authControlRdcr
   const { displayReg, displayPad, displayHistory, displayChat, errComponent } = phoneControlRdcr
 
-  // Стили для оверлеев
+  const isOverlayActive = displayAd || displayReg || errComponent === 'PhoneReg'
+
+  // Стили для оверлеев вынесены из тела рендера для производительности
   const centerOverlayStyle = {
     position: 'absolute',
     top: '50%',
@@ -41,14 +40,13 @@ const PhoneContainer = () => {
   }
 
   return (
-    // Задаем minHeight и flex-центрирование для самого родителя
     <Box 
       sx={{ 
         position: 'relative', 
         width: '100%', 
-        minHeight: '400px', // Гарантирует минимальную высоту, чтобы "центр" не схлопывался в 0
+        minHeight: isOverlayActive ? '400px' : 'auto',
         display: 'flex',
-        alignItems: 'center', // Центрирует содержимое, если оно меньше minHeight
+        alignItems: 'center',
         justifyContent: 'center'
       }}
     >
@@ -56,38 +54,45 @@ const PhoneContainer = () => {
       {/* Центрирование AuthAd */}
       {displayAd && (
         <Box sx={centerOverlayStyle}>
-          <AuthAd {...authProps} />
+          <AuthAd authControlRdcr={authControlRdcr} authControlActions={authControlActions} />
         </Box>
       )}
 
       {/* Центрирование PhoneReg */}
       {(displayReg || errComponent === 'PhoneReg') && (
         <Box sx={centerOverlayStyle}>
-          <PhoneReg {...commonProps} />
+          <PhoneReg phoneControlRdcr={phoneControlRdcr} phoneControlActions={phoneControlActions} />
         </Box>
       )}
 
-      {/* Основная сетка интерфейса */}
-      <Grid container spacing={2} sx={{ justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+      <Grid 
+        container 
+        spacing={2} 
+        sx={{ 
+          justifyContent: 'center', 
+          alignItems: 'center', 
+          width: '100%' 
+        }}
+      >
         
-        {/* Телефон*/}
-        <Grid size={{ xs: 12, md: 'auto' }}>
-          {(displayPad || errComponent === 'PhonePad') && (
-            <PhonePad {...commonProps} showInput />
-          )}
-        </Grid>
+        {/* Телефон */}
+        {(displayPad || errComponent === 'PhonePad') && (
+          <Grid size={{ xs: 12, md: 'auto' }}>
+            <PhonePad phoneControlRdcr={phoneControlRdcr} phoneControlActions={phoneControlActions} showInput />
+          </Grid>
+        )}
 
         {/* История */}
         {(displayHistory || errComponent === 'PhoneHistory') && (
           <Grid size={{ xs: 12, md: 'auto' }}>
-            <PhoneHistory {...commonProps} />
+            <PhoneHistory phoneControlRdcr={phoneControlRdcr} phoneControlActions={phoneControlActions} />
           </Grid>
         )}
 
         {/* Чат */}
         {(displayChat || errComponent === 'PhoneChat') && (
           <Grid size={{ xs: 12, md: 'auto' }}>
-            <PhoneChat {...commonProps} />
+            <PhoneChat phoneControlRdcr={phoneControlRdcr} phoneControlActions={phoneControlActions} />
           </Grid>
         )}
       </Grid>

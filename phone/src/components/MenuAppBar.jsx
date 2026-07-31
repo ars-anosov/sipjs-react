@@ -103,9 +103,14 @@ function MenuAppBar(props) {
 
           <Drawer
             anchor="left"
-            variant="persistent"
+            variant="temporary"
             open={drawerOpen}
             onClose={handleCloseMenu}
+            slotProps={{
+              backdrop: {
+                sx: { backgroundColor: 'transparent' } 
+              }
+            }}
           >
             <Stack direction="row" spacing={2}
               sx={{ p: 1, height: toolbarHeight }}
