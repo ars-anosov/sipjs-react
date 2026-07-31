@@ -319,7 +319,7 @@ function LkMeet(props) {
   return (
     (lkControlRdcr.displayControl && (authControlRdcr?.responseData?.lk_token || token) && (
     <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
-    <Paper elevation={8} sx={{ minWidth: 300, p: 1, pt: 0, mt: 2, borderRadius: 3, display: 'inline-block' }}>
+    <Paper elevation={8} sx={{ minWidth: 320, p: 1, pt: 0, mt: 2, borderRadius: 3, display: 'inline-block' }}>
       <Stack direction="row" sx={{ mb: 1, alignItems: 'center', justifyContent: 'space-between' }}>
         <Typography variant="h6" color="primary">Встреча {room}</Typography>
         <IconButton onClick={handleClose}>
@@ -347,6 +347,7 @@ function LkMeet(props) {
             variant="outlined"
             color="error"
             size="medium"
+            disabled={isRoomActive}
             component={RouterLink} 
             to="/" 
             startIcon={<DeleteOutlinedIcon />}
@@ -355,12 +356,12 @@ function LkMeet(props) {
           </Button>
           ) : (
           <Button
-            variant="contained"
+            variant="outlined"
             color="primary" 
             size="medium"
             component={RouterLink} 
             to={`/?lk_room=${authControlRdcr.responseData.sip_username}&lk_token=${authControlRdcr.responseData.lk_token}`} 
-            startIcon={<AddCircleOutlinedIcon />} // Иконка создания/добавления
+            startIcon={<AddCircleOutlinedIcon />}
           >
             Создать
           </Button>
