@@ -27,7 +27,12 @@ import {
   FullscreenExit as IconFullscreenExit,
   Mic as IconMicOn,
   MicOff as IconMicOff,
-}                         from '@mui/icons-material'
+  DeleteOutlined as DeleteOutlinedIcon,
+  AddCircleOutlined as AddCircleOutlinedIcon,
+  GroupAdd as GroupAddIcon,
+  VideoCallOutlined as VideoCallOutlinedIcon,
+}                         from '@mui/icons-material';
+
 
 import { 
   LiveKitRoom, 
@@ -53,8 +58,6 @@ import { getLiveKitMuiStyles } from './LkThemeStyles'
 
 import LkToken            from './LkToken'
 
-
-
 function MicrophoneStatusIcon({ trackRef }) {
   const participant = trackRef?.participant
   if (!participant) return null
@@ -62,18 +65,21 @@ function MicrophoneStatusIcon({ trackRef }) {
   const isSpeaking = participant.isSpeaking
 
   if (isMuted) {
-    return <IconMicOff sx={{ fontSize: 14, color: 'error.main' }} />
+    // Используем CSS-переменную ошибки v9 и более утонченный размер
+    return <IconMicOff sx={{ fontSize: 13, color: 'var(--mui-palette-error-main)' }} />
   }
 
   return (
     <IconMicOn 
       sx={{ 
-        fontSize: 14, 
-        color: isSpeaking ? 'success.main' : 'white',
-        animation: isSpeaking ? 'lkPulse 1s infinite alternate' : 'none',
+        fontSize: 13, 
+        // Используем CSS-переменную успеха v9
+        color: isSpeaking ? 'var(--mui-palette-success-main)' : '#ffffff',
+        animation: isSpeaking ? 'lkPulse 1.4s infinite cubic-bezier(0.4, 0, 0.2, 1)' : 'none',
         '@keyframes lkPulse': {
           '0%': { transform: 'scale(1)' },
-          '100%': { transform: 'scale(1.15)' },
+          '50%': { transform: 'scale(1.18)' },
+          '100%': { transform: 'scale(1)' },
         },
       }} 
     />
@@ -84,8 +90,6 @@ function ParticipantTileBox({ track }) {
   const containerRef = useRef(null)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const isScreenShare = track.source === Track.Source.ScreenShare
-
-  // Извлекаем флаг активности голоса напрямую из объекта участника LiveKit
   const isSpeaking = track.participant?.isSpeaking
 
   useEffect(() => {
@@ -122,8 +126,12 @@ function ParticipantTileBox({ track }) {
           maxWidth: isFullscreen ? 'none' : 800,
           maxHeight: isFullscreen ? 'none' : 600,
           aspectRatio: isScreenShare ? 'unset' : '16/9',
-          borderRadius: isFullscreen ? 0 : 4, 
-          backgroundColor: 'black',
+          
+          // ТРЕНД: Увеличенный современный радиус скругления (16px) вместо жестких углов
+          borderRadius: isFullscreen ? 0 : '16px', 
+          
+          // Смягчаем фоновый цвет: глубокий графитовый вместо глухого черного
+          backgroundColor: '#0f172a', 
           position: 'relative',
           mx: 'auto',
           display: 'flex',
@@ -134,22 +142,24 @@ function ParticipantTileBox({ track }) {
           isolation: 'isolate',
           backgroundClip: 'padding-box',
 
-          // ПЛАВНАЯ ЗЕЛЕНАЯ ПОДСВЕТКА ПРИ РАЗГОВОРЕ:
-          // Анимация перехода для тени и обводки
-          transition: 'box-shadow 0.25s ease-in-out, outline-color 0.25s ease-in-out',
-          
-          // Внешняя неоновая обводка (меняет цвет на зеленый, если говорит, иначе — черный фикс)
-          outline: '2px solid',
-          outlineColor: isSpeaking ? '#4caf50' : 'black', 
-          outlineOffset: '-2px',
+          // СОВРЕМЕННАЯ ИНДИКАЦИЯ ГОЛОСА:
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          border: '1px solid',
+          borderColor: isSpeaking ? 'rgba(74, 222, 128, 0.4)' : 'rgba(255, 255, 255, 0.08)',
 
-          // Мягкое внутреннее свечение, чтобы подсветить края видео
+          // Динамическое неоновое свечение (Glow effect) вокруг карточки говорящего
           boxShadow: isFullscreen 
-            ? 0 
+            ? 'none' 
             : (isSpeaking 
-                ? 'inset 0 0 20px rgba(76, 175, 80, 0.6), 0 4px 20px rgba(76, 175, 80, 0.3)' 
-                : 3
+                ? '0 0 0 2px rgba(74, 222, 128, 0.2), 0 10px 30px -10px rgba(74, 222, 128, 0.3)' 
+                : '0 4px 20px -5px rgba(0, 0, 0, 0.3)'
               ),
+
+          '&:hover': {
+            // Мягкий интерактивный подъем карточки при наведении, если нет полноэкранного режима
+            transform: isFullscreen ? 'none' : 'translateY(-2px)',
+            borderColor: isSpeaking ? 'rgba(74, 222, 128, 0.6)' : 'rgba(255, 255, 255, 0.2)',
+          }
         }}
       >
         <ParticipantContext.Provider value={track.participant}>
@@ -163,56 +173,75 @@ function ParticipantTileBox({ track }) {
               height: isFullscreen ? '100%' : (isScreenShare ? 'auto' : '100%'),
               maxHeight: isFullscreen ? 'none' : '600px',
               objectFit: (isFullscreen || isScreenShare) ? 'contain' : 'cover',
-              backgroundColor: 'black',
-              borderRadius: isFullscreen ? 0 : '16px', 
+              backgroundColor: 'transparent',
+              // Наследуем скругление родителя
+              borderRadius: 'inherit', 
               overflow: 'hidden',
             }}
           />
 
-          {/* Плашка с именем и статусом микрофона */}
+          {/* Плашка с именем (Стиль: Glassmorphism / Матовое стекло) */}
           <Stack
             direction="row"
-            spacing={0.5}
+            spacing={1}
             sx={{
               position: 'absolute',
-              bottom: 12,
-              left: 12,
+              bottom: 14,
+              left: 14,
               zIndex: 2,
               alignItems: 'center',
-              color: 'white',
-              px: 1,
-              py: 0.3,
-              borderRadius: 1,
+              color: '#ffffff',
+              px: 1.5,
+              py: 0.6,
+              borderRadius: '20px', // Полностью скругленная pill-плашка
               pointerEvents: 'none',
-              backgroundColor: 'rgba(0, 0, 0, 0.4)',
-              backdropFilter: 'blur(4px)',
-              WebkitBackdropFilter: 'blur(4px)',
               
-              // Дополнительно подсветим плашку имени говорящего
-              transition: 'background-color 0.25s ease',
-              backgroundColor: isSpeaking ? 'rgba(76, 175, 80, 0.3)' : 'rgba(0, 0, 0, 0.4)',
-              border: isSpeaking ? '1px solid rgba(76, 175, 80, 0.5)' : '1px solid transparent',
+              // Размытие заднего плана (Glassmorphism)
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              
+              // Эволюция цвета при разговоре через CSS-переменные v9
+              transition: 'all 0.25s ease',
+              backgroundColor: isSpeaking ? 'rgba(34, 197, 94, 0.2)' : 'rgba(15, 23, 42, 0.6)',
+              border: '1px solid',
+              borderColor: isSpeaking ? 'rgba(74, 222, 128, 0.4)' : 'rgba(255, 255, 255, 0.1)',
             }}
           >
             <MicrophoneStatusIcon trackRef={track} />
-            <ParticipantName component="span" sx={{ typography: 'caption', lineHeight: 1 }} />
+            <ParticipantName 
+              component="span" 
+              sx={{ 
+                typography: 'caption', 
+                fontWeight: 500, // Чуть более плотный современный шрифт
+                letterSpacing: '0.02em',
+                lineHeight: 1 
+              }} 
+            />
           </Stack>
 
-          {/* Кнопка полноэкранного режима */}
+          {/* Кнопка полноэкранного режима (Утонченный стеклянный дизайн) */}
           <IconButton 
             onClick={toggleFullscreen} 
             size="small" 
             sx={{
               position: 'absolute',
-              top: 8,
-              right: 8,
+              top: 14,
+              right: 14,
               zIndex: 2,
-              color: 'white',
-              backgroundColor: 'rgba(0, 0, 0, 0.6)',
-              '&:hover': { backgroundColor: 'rgba(0, 0, 0, 0.8)' },
+              color: '#ffffff',
+              borderRadius: '10px',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
+              backgroundColor: 'rgba(15, 23, 42, 0.5)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              transition: 'all 0.2s ease',
+              '&:hover': { 
+                backgroundColor: 'rgba(15, 23, 42, 0.8)',
+                transform: 'scale(1.05)'
+              },
             }}
           >
-            {isFullscreen ? <IconFullscreenExit /> : <IconFullscreen />}
+            {isFullscreen ? <IconFullscreenExit sx={{ fontSize: 18 }} /> : <IconFullscreen sx={{ fontSize: 18 }} />}
           </IconButton>
         </ParticipantContext.Provider>
       </Box>
@@ -227,7 +256,8 @@ function VideoGridSection() {
   ])
 
   return (
-    <Grid container spacing={2} sx={{ justifyContent: 'center', width: '100%' }}>
+    // Увеличенное расстояние между карточками (spacing={3}) добавляет интерфейсу "воздуха"
+    <Grid container spacing={3} sx={{ justifyContent: 'center', width: '100%', p: 2 }}>
       {tracks.map((track, uniqueKey) => (
         <ParticipantTileBox key={uniqueKey} track={track} />
       ))}
@@ -297,43 +327,60 @@ function LkMeet(props) {
         </IconButton>
       </Stack>
 
-      <Grid container direction="column" spacing={2} sx={{ justifyContent: 'center' }}>
-      
+      <Grid 
+        container 
+        direction="column" 
+        spacing={2} 
+      >
         {authControlRdcr?.responseData?.sip_username && authControlRdcr?.responseData?.lk_token && (
-        <Grid size={{ xs: 'auto' }} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1 }}>
+        <Grid 
+          size={{ xs: 'auto' }} 
+          sx={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'center', 
+            gap: 1.5,
+          }}
+        >
           {token ? (
           <Button
             variant="outlined"
-            color="primary"
-            size="small"
+            color="error"
+            size="medium"
             component={RouterLink} 
-            to={'/'} 
+            to="/" 
+            startIcon={<DeleteOutlinedIcon />}
           >
             Удалить
           </Button>
           ) : (
           <Button
-            variant="outlined"
-            color="primary"
-            size="small"
+            variant="contained"
+            color="primary" 
+            size="medium"
             component={RouterLink} 
             to={`/?lk_room=${authControlRdcr.responseData.sip_username}&lk_token=${authControlRdcr.responseData.lk_token}`} 
+            startIcon={<AddCircleOutlinedIcon />} // Иконка создания/добавления
           >
             Создать
           </Button>
           )}
-          {!lkControlRdcr.displayLkToken && (
+
+          {!lkControlRdcr.displayLkToken ? (
           <Button
             type="button"
             variant="outlined"
-            color="primary"
-            size="small"
+            color="primary" 
+            size="medium"
             onClick={handleInvite}
+            startIcon={<GroupAddIcon />}
           >
             Пригласить
           </Button>
+          ) : (
+          <LkToken {...props} />
           )}
-          <LkToken {...props}/>
+
         </Grid>
         )}
 
@@ -356,13 +403,15 @@ function LkMeet(props) {
         {token && (
         <Grid size={{ xs: 12 }} sx={{ display: 'flex', justifyContent: 'center' }}>
           {!isRoomActive ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', mt: 1 }}>
             <Button
               type="button"
+              size="large"
               variant="contained"
               color="success"
-              size="large"
               onClick={() => setIsRoomActive(true)}
+              startIcon={<VideoCallOutlinedIcon />}
+              sx={{ bgcolor: 'success.light', p: 2, borderRadius: 2 }}
             >
               Подключиться к {room}
             </Button>
