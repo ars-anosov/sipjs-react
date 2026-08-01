@@ -188,6 +188,22 @@ const opusCodecModifier = function(description) {
 // SIP.js Call Logging
 // ============================================================
 
+const normalizeCallLog = function(calllog = {}) {
+  if (!calllog || typeof calllog !== 'object' || Array.isArray(calllog)) {
+    return {}
+  }
+
+  return Object.fromEntries(Object.entries(calllog).map(([callId, callRecord]) => {
+    const normalizedRecord = {
+      ...callRecord,
+      id: callId,
+      read: typeof callRecord.read === 'boolean' ? callRecord.read : true,
+    }
+
+    return [callId, normalizedRecord]
+  }))
+}
+
 const logCall = function(session, callState, direction) {
   const log = {
     id   : session.id,
@@ -195,8 +211,7 @@ const logCall = function(session, callState, direction) {
     uri  : session.remoteIdentity.uri.raw.user+(session.remoteIdentity.displayName ? ' "'+session.remoteIdentity.displayName+'"' : ''),
     time : new Date().getTime()
   }
-  let calllog = JSON.parse(localStorage.getItem(CALLS_STORAGE_KEY))
-  if (!calllog) { calllog = {} }
+  let calllog = normalizeCallLog(JSON.parse(localStorage.getItem(CALLS_STORAGE_KEY)))
 
   if (!calllog.hasOwnProperty(session.id)) {
     calllog[log.id] = {
@@ -204,7 +219,8 @@ const logCall = function(session, callState, direction) {
       clid  : log.clid,
       uri   : log.uri,
       start : log.time,
-      flow  : direction
+      flow  : direction,
+      read  : true,
     }
   }
 
@@ -218,22 +234,20 @@ const logCall = function(session, callState, direction) {
 
   if (callState === 'complete' && calllog[log.id].callState === 'ringing') {
       calllog[log.id].callState = 'lost'
+      calllog[log.id].read = false
   } else {
       calllog[log.id].callState = callState
+      if (callState === 'incall' || callState === 'complete') {
+        calllog[log.id].read = true
+      }
   }
 
   localStorage.setItem(CALLS_STORAGE_KEY, JSON.stringify(calllog))
 }
 
 const loadCallsArr = function() {
-  let calllog = JSON.parse(localStorage.getItem(CALLS_STORAGE_KEY))
-  const rows = []
-
-  if (calllog !== null) {
-    for (const calllogObj in calllog) {
-      rows.push(calllog[calllogObj])
-    }
-  }
+  let calllog = normalizeCallLog(JSON.parse(localStorage.getItem(CALLS_STORAGE_KEY)))
+  const rows = Object.values(calllog)
 
   // Удаляю первую строчку лога (самую старую)
   if (rows.length > CALLS_MAX_CALLS) {
@@ -243,6 +257,22 @@ const loadCallsArr = function() {
 
   rows.sort((a, b) => a.start > b.start ? -1 : 1)
   return rows
+}
+
+const markCallsRead = function() {
+  let calllog = normalizeCallLog(JSON.parse(localStorage.getItem(CALLS_STORAGE_KEY)))
+  const rows = Object.values(calllog)
+
+  if (rows.length > 0) {
+    Object.values(calllog).forEach((callRecord) => {
+      callRecord.read = true
+    })
+
+    localStorage.setItem(CALLS_STORAGE_KEY, JSON.stringify(calllog))
+  }
+
+  rows.sort((a, b) => a.start > b.start ? -1 : 1)
+  return rows.map((row) => ({ ...row, read: true }))
 }
 
 // ============================================================
@@ -455,6 +485,7 @@ export {
   // Call logging
   logCall,
   loadCallsArr,
+  markCallsRead,
   // Audio elements
   createAudioElements,
   createRemoteStream,

@@ -21,7 +21,7 @@ import {
   Backspace     as IconBackspace,
   Phone         as IconPhone,
   History       as IconPhoneHistory,
-  RingVolume    as IconPhoneRing,
+  PhoneInTalk   as IconPhoneInTalk,
   PhoneDisabled as IconHangup,
   Pause         as IconHold,
   PlayArrow     as IconResume,
@@ -263,7 +263,7 @@ function PhonePad(props) {
                 animation: 'pulse 1.5s infinite'
               }}
             >
-              <IconPhoneRing />
+              <IconPhoneInTalk />
             </Button>
           ) : (
             <Button

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react'
 import PropTypes from 'prop-types'
 import {
+  Badge,
   IconButton,
   keyframes,
   useTheme,
@@ -9,7 +10,7 @@ import {
   DialerSip       as IconDialerSip,
   PhoneDisabled   as IconPhoneDisabled,
   SettingsPhone   as IconSettingsPhone,
-  RingVolume      as IconRingVolume,
+  PhoneInTalk     as IconPhoneInTalk,
   Phone           as IconPhone,
 }                 from '@mui/icons-material'
 
@@ -86,11 +87,11 @@ function PhoneIco({ phoneControlRdcr }) {
     const { incomeCallNow, outgoCallNow, incomeDisplay, connectStatus, regNow } = phoneControlRdcr
 
     if (incomeCallNow || outgoCallNow) {
-      return { Icon: IconPhone, bg: theme.palette.success.main, color: '#fff', pulse: false }
+      return { Icon: IconPhoneInTalk, bg: theme.palette.success.main, color: '#fff', pulse: false }
     }
 
     if (incomeDisplay) {
-      return { Icon: IconRingVolume, bg: theme.palette.error.main, color: '#fff', pulse: true }
+      return { Icon: IconPhoneInTalk, bg: theme.palette.success.main, color: '#fff', pulse: true }
     }
 
     switch (connectStatus) {
@@ -111,31 +112,49 @@ function PhoneIco({ phoneControlRdcr }) {
   }, [phoneControlRdcr, theme])
 
   const { Icon, bg, color, pulse: isSwelling } = cfg
+  const totalUnread = Number(phoneControlRdcr?.callUnread || 0) + Number(phoneControlRdcr?.chatUnread || 0)
 
   return (
-    <IconButton
-      size="small"
+    <Badge
+      badgeContent={totalUnread}
+      color="error"
+      overlap="circular"
+      invisible={!totalUnread}
       sx={{
-        ml: 1,
-        width: 46,
-        height: 46,
-        backgroundColor: bg,
-        color: color,
-        border: '1px solid rgba(255,255,255,0.3)',
-        animation: isSwelling ? `${pulse} 1.5s infinite` : 'none',
-        transition: 'all 0.2s ease-in-out',
-        '&:hover': {
-          backgroundColor: bg,
-          filter: 'brightness(1.1)',
-          transform: 'translateY(-1px)',
+        '& .MuiBadge-badge': {
+          top: 5,
+          right: 4,
+          minWidth: 18,
+          height: 18,
+          fontSize: '0.7rem',
+          fontWeight: 700,
         },
-        '& .MuiSvgIcon-root': {
-          fontSize: '1.6rem',
-        }
       }}
     >
-      <Icon />
-    </IconButton>
+      <IconButton
+        size="small"
+        sx={{
+          ml: 1,
+          width: 46,
+          height: 46,
+          backgroundColor: bg,
+          color: color,
+          border: '1px solid rgba(255,255,255,0.3)',
+          animation: isSwelling ? `${pulse} 1.5s infinite` : 'none',
+          transition: 'all 0.2s ease-in-out',
+          '&:hover': {
+            backgroundColor: bg,
+            filter: 'brightness(1.1)',
+            transform: 'translateY(-1px)',
+          },
+          '& .MuiSvgIcon-root': {
+            fontSize: '1.6rem',
+          }
+        }}
+      >
+        <Icon />
+      </IconButton>
+    </Badge>
   )
 }
 
@@ -149,6 +168,8 @@ PhoneIco.propTypes = {
     callerName: PropTypes.string,
     callerNumber: PropTypes.string,
     calleePhoneNum: PropTypes.string,
+    callUnread: PropTypes.number,
+    chatUnread: PropTypes.number,
   }).isRequired,
 }
 

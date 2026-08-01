@@ -45,6 +45,7 @@ import {
   // Call logging
   logCall,
   loadCallsArr,
+  markCallsRead as markCallsReadInStorage,
   // Audio elements
   createAudioElements,
   createRemoteStream,
@@ -110,6 +111,17 @@ const CallsArrUpdate = function() {
       type: PHONECTL_CALLLOG_UPD,
       payload: {
         callsArr: loadCallsArr(),
+      },
+    })
+  }
+}
+
+const markCallsRead = function() {
+  return (dispatch) => {
+    dispatch({
+      type: PHONECTL_CALLLOG_UPD,
+      payload: {
+        callsArr: markCallsReadInStorage(),
       },
     })
   }
@@ -1082,6 +1094,7 @@ export {
   handleClearChat,
   handleClearHistory,
   CallsArrUpdate,
+  markCallsRead,
   MessagesArrUpdate,
   getPhoneDir,
 }

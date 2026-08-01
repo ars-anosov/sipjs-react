@@ -69,6 +69,7 @@ function PhoneHistory(props) {
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') console.log('PhoneHistory MOUNT')
     phoneControlActions.CallsArrUpdate()
+    phoneControlActions.markCallsRead()
 
     return () => {
       if (process.env.NODE_ENV === 'development') console.log('PhoneHistory UNMOUNT')
@@ -102,13 +103,17 @@ function PhoneHistory(props) {
       const isInCall  = state.includes('incall')
       const isLost    = state.includes('lost')
       const isInbound = flow.includes('in')
+      const isUnread  = row.read === false
 
       const basePalette = isInbound ? theme.palette.success : theme.palette.info
 
       let rowBgColor = 'transparent'
       let rowTextColor = basePalette.main
 
-      if (isInCall) {
+      if (isUnread) {
+        rowBgColor = alpha(theme.palette.warning.main, 0.22)
+        rowTextColor = theme.palette.warning.dark
+      } else if (isInCall) {
         // 1. Активный разговор
         rowBgColor = basePalette.main 
         rowTextColor = basePalette.contrastText
@@ -137,6 +142,7 @@ function PhoneHistory(props) {
         isInCall,
         isLost,
         isInbound,
+        isUnread,
         basePalette,
         rowBgColor,
         rowTextColor,
@@ -201,9 +207,10 @@ function PhoneHistory(props) {
                   backgroundColor: row.rowBgColor,
                   transition: theme.transitions.create(['background-color', 'color']),
                   animation: row.isRinging ? `${blink} 1s infinite ease-in-out` : 'none',
+                  boxShadow: row.isUnread ? `inset 0 0 0 1px ${alpha(theme.palette.warning.main, 0.75)}` : 'none',
                   '& .MuiTableCell-root': { 
                     color: row.rowTextColor,
-                    fontWeight: row.isLost ? 'medium' : 'normal' 
+                    fontWeight: row.isUnread ? 'bold' : (row.isLost ? 'medium' : 'normal')
                   },
                   '&:hover': {
                     backgroundColor: row.isInCall 

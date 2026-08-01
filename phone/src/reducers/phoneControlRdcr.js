@@ -22,8 +22,27 @@ import {
   PHONECTL_CLEAR_CHAT,
 } from '../constants/redux'
 
+import { CALLS_STORAGE_KEY } from '../constants/storage'
+
 const parseUriWebRtcValue = function(uriWebRtc = '') {
   return typeof uriWebRtc === 'string' ? uriWebRtc.trim() : ''
+}
+
+const getUnreadMissedCallsCount = function(callsArr = []) {
+  return (callsArr || []).filter((row) => {
+    const flow = String(row?.flow || '').toLowerCase()
+    const state = String(row?.callState || '').toLowerCase()
+    return row?.read === false && flow.includes('in') && state.includes('lost')
+  }).length
+}
+
+const persistCallsArr = function(callsArr = []) {
+  const storageObject = (callsArr || []).reduce((accumulator, row) => {
+    accumulator[row.id] = row
+    return accumulator
+  }, {})
+
+  localStorage.setItem(CALLS_STORAGE_KEY, JSON.stringify(storageObject))
 }
 
 const initialState = {
@@ -138,10 +157,27 @@ export default function phoneControlRdcr(state = initialState, action) {
         'errText'           : action.payload.errText,
       }
 
-    case PHONECTL_CALLLOG_UPD:
-      return { ...state,
-        'callsArr'          : action.payload.callsArr,
+    case PHONECTL_CALLLOG_UPD: {
+      const visibleCallsArr = (action.payload.callsArr || []).map((row) => {
+        if (state.displayHistory && row?.read === false) {
+          return { ...row, read: true }
+        }
+
+        return row
+      })
+      const nextCallUnread = state.displayHistory
+        ? 0
+        : getUnreadMissedCallsCount(visibleCallsArr)
+
+      if (state.displayHistory) {
+        persistCallsArr(visibleCallsArr)
       }
+
+      return { ...state,
+        'callsArr'          : visibleCallsArr,
+        'callUnread'        : nextCallUnread,
+      }
+    }
 
     case PHONECTL_INCOME_DISPLAY:
       return { ...state,
@@ -149,9 +185,6 @@ export default function phoneControlRdcr(state = initialState, action) {
         'phoneHeader'     : state.callerUserNum+' ⇠ '+action.payload.calleePhoneNum,
         'icoHeader'       : action.payload.calleePhoneNum+' ⇢ '+state.callerUserNum,
         'calleePhoneNum'  : action.payload.calleePhoneNum,
-        'callUnread'      : state.displayHistory
-          ? state.callUnread
-          : state.callUnread + 1,
       }
 
     case PHONECTL_INCOME_SUBMIT:
@@ -171,10 +204,12 @@ export default function phoneControlRdcr(state = initialState, action) {
         'icoHeader'       : state.calleePhoneNum+' ⇠ '+state.callerUserNum,
       }
 
-    case PHONECTL_STORE_VALUE:
-      return { ...state,
-        [action.payload.storeDataKey]: action.payload.storeDataValue
+    case PHONECTL_STORE_VALUE: {
+      return {
+        ...state,
+        [action.payload.storeDataKey]: action.payload.storeDataValue,
       }
+    }
 
     case PHONECTL_ERROR_ALERT:
       return { ...state,
