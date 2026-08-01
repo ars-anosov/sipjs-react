@@ -120,16 +120,6 @@ function PhoneIco({ phoneControlRdcr }) {
       color="error"
       overlap="circular"
       invisible={!totalUnread}
-      sx={{
-        '& .MuiBadge-badge': {
-          top: 5,
-          right: 4,
-          minWidth: 18,
-          height: 18,
-          fontSize: '0.7rem',
-          fontWeight: 700,
-        },
-      }}
     >
       <IconButton
         size="small"

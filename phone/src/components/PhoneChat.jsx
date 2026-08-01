@@ -10,7 +10,6 @@ import {
   IconButton,
   Alert,
   Collapse,
-  Badge,
   InputAdornment,
   Button,
 } from '@mui/material'
@@ -138,9 +137,7 @@ function PhoneChat(props) {
       }}
     >
       <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
-        <Badge color="error" badgeContent={phoneControlRdcr.chatUnread} invisible={!phoneControlRdcr.chatUnread}>
-          <Typography variant="h6" color="primary">{title}</Typography>
-        </Badge>
+        <Typography variant="h6" color="primary">{title}</Typography>
         <Stack direction="row" spacing={0} sx={{ alignItems: 'center' }}>
           <IconButton onClick={phoneControlActions.handleClearChat} sx={{ position: 'absolute', top: 4, right: 54 }}>
             <IconDelete color="action" />

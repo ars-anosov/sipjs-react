@@ -367,7 +367,6 @@ function PhonePad(props) {
             color="error"
             overlap="circular"
             invisible={!phoneControlRdcr.callUnread || phoneControlRdcr.displayHistory}
-            sx={{ '& .MuiBadge-badge': { top: 6, right: 6 } }}
           >
             <Tooltip title="История">
               <IconButton
@@ -384,7 +383,6 @@ function PhonePad(props) {
             color="error"
             overlap="circular"
             invisible={!phoneControlRdcr.chatUnread || phoneControlRdcr.displayChat}
-            sx={{ '& .MuiBadge-badge': { top: 6, right: 6 } }}
           >
             <Tooltip title="Сообщения">
               <IconButton
