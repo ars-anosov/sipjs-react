@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 
 import {
@@ -42,7 +42,8 @@ function PhonePad(props) {
     showInput
   } = props
 
-
+  const [callDuration, setCallDuration] = useState(0)
+  const callStartRef = useRef(null)
 
   useEffect(() => {
     if (process.env.NODE_ENV === 'development') console.log('PhonePad MOUNT')
@@ -60,6 +61,31 @@ function PhonePad(props) {
   }
 
   const callNow = phoneControlRdcr.incomeCallNow || phoneControlRdcr.outgoCallNow
+
+  useEffect(() => {
+    if (!callNow) {
+      setCallDuration(0)
+      callStartRef.current = null
+      return undefined
+    }
+
+    if (!callStartRef.current) {
+      callStartRef.current = Date.now()
+    }
+
+    const intervalId = window.setInterval(() => {
+      const elapsedSeconds = Math.floor((Date.now() - callStartRef.current) / 1000)
+      setCallDuration(elapsedSeconds)
+    }, 1000)
+
+    return () => window.clearInterval(intervalId)
+  }, [callNow])
+
+  const formatDuration = (seconds = 0) => {
+    const minutes = Math.floor(seconds / 60).toString().padStart(2, '0')
+    const remainingSeconds = (seconds % 60).toString().padStart(2, '0')
+    return `${minutes}:${remainingSeconds}`
+  }
 
   const handlePrefix = (event) => {
     phoneControlActions.handleChangeStore('calleePrefix', event.target.value)
@@ -123,6 +149,24 @@ function PhonePad(props) {
   const isRegistered = phoneControlRdcr.regNow
   const regButtonColor = isRegistered ? 'success' : 'error'
 
+  const callActionSx = {
+    minWidth: 64,
+    height: 64,
+    borderRadius: '50%',
+    p: 0,
+    boxShadow: 6,
+    transition: 'transform 120ms ease, box-shadow 120ms ease, filter 120ms ease',
+    '&:hover': {
+      transform: 'translateY(-1px) scale(1.03)',
+      boxShadow: 10,
+      filter: 'brightness(1.04)'
+    },
+    '&:active': {
+      transform: 'scale(0.98)',
+      boxShadow: 4,
+    },
+  }
+
   const keys = [
     ['1', ''],
     ['2', 'abc'],
@@ -142,7 +186,7 @@ function PhonePad(props) {
     <Paper 
       elevation={8} 
       sx={{ 
-        maxWidth: 300, 
+        maxWidth: 320, 
         width: '100%', 
         mx: 'auto', 
         mt: 2,
@@ -159,8 +203,8 @@ function PhonePad(props) {
       </IconButton>
     </Stack>
     )}
-    <Typography variant="body2" color="primary" sx={{ mb: 2 }}>
-      {phoneControlRdcr.phoneHeader}
+    <Typography variant="body2" color="primary" sx={{ mb: 0.5 }}>
+      {callNow && (formatDuration(callDuration))} {phoneControlRdcr.phoneHeader}
     </Typography>
 
     <Box component="form" onSubmit={handleSubmit} onReset={handleReset}>
@@ -207,13 +251,10 @@ function PhonePad(props) {
           {phoneControlRdcr.incomeDisplay ? (
             <Button
               type="submit"
-              variant="contained" // Сплошной цветной фон
+              variant="contained"
               color="success"
               sx={{
-                minWidth: 56,      // Делаем кнопку идеально круглой, как Fab
-                height: 56,
-                borderRadius: '50%',
-                p: 0,
+                ...callActionSx,
                 '@keyframes pulse': {
                   '0%': { transform: 'scale(1)', boxShadow: '0 0 0 0 rgba(76, 175, 80, 0.7)' },
                   '70%': { transform: 'scale(1.1)', boxShadow: '0 0 0 15px rgba(76, 175, 80, 0)' },
@@ -230,12 +271,7 @@ function PhonePad(props) {
               variant="contained"
               color="success"
               disabled={!isRegistered || phoneControlRdcr.outgoCallNow || phoneControlRdcr.incomeCallNow}
-              sx={{
-                minWidth: 56,
-                height: 56,
-                borderRadius: '50%',
-                p: 0
-              }}
+              sx={callActionSx}
             >
               <IconPhone />
             </Button>
@@ -251,12 +287,7 @@ function PhonePad(props) {
                 variant="contained"
                 color={phoneControlRdcr.callHoldNow ? 'success' : 'info'}
                 onClick={handleHold}
-                sx={{
-                  minWidth: 56,
-                  height: 56,
-                  borderRadius: '50%',
-                  p: 0
-                }}
+                sx={callActionSx}
               >
                 {phoneControlRdcr.callHoldNow ? <IconResume /> : <IconHold />}
               </Button>
@@ -271,12 +302,7 @@ function PhonePad(props) {
             variant="contained"
             color="error"
             disabled={!isRegistered}
-            sx={{
-              minWidth: 56,
-              height: 56,
-              borderRadius: '50%',
-              p: 0
-            }}
+            sx={callActionSx}
           >
             <IconHangup />
           </Button>

@@ -209,7 +209,11 @@ const logCall = function(session, callState, direction) {
   }
 
   if (callState === 'complete') {
-    calllog[log.id].stop = log.time
+    const stop = log.time
+    const start = calllog[log.id].start ?? stop
+
+    calllog[log.id].stop = stop
+    calllog[log.id].duration = Math.max(0, stop - start)
   }
 
   if (callState === 'complete' && calllog[log.id].callState === 'ringing') {

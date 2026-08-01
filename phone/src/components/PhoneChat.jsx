@@ -174,12 +174,12 @@ function PhoneChat(props) {
 
         <Box
           sx={{
-            height: 336,
+            height: 330,
             overflowY: 'auto',
             border: 1,
             borderColor: 'divider',
             borderRadius: 1,
-            p: 1,
+            p: 0,
             mb: 1,
             backgroundColor: alpha(theme.palette.background.default, 0.5),
           }}
@@ -189,8 +189,8 @@ function PhoneChat(props) {
               const isOutbound = msg.direction === 'out'
               const deliveryStatus = formatDeliveryStatus(msg)
               const bubbleColor = isOutbound
-                ? alpha(theme.palette.info.main, 0.12)
-                : alpha(theme.palette.success.main, 0.12)
+                ? alpha(theme.palette.info.main, 0.05)
+                : alpha(theme.palette.success.main, 0.05)
 
               return (
                 <Box

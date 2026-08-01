@@ -45,6 +45,20 @@ const formatCallDate = (dateVal) => {
   return isValid(dateObj) ? format(dateObj, 'yyyy-MM-dd HH:mm') : '—'
 }
 
+const formatCallDuration = (durationMs) => {
+  if (!Number.isFinite(durationMs) || durationMs < 0) return '—'
+
+  const totalSeconds = Math.max(0, Math.round(durationMs / 1000))
+  const hours = Math.floor(totalSeconds / 3600)
+  const minutes = Math.floor((totalSeconds % 3600) / 60)
+  const seconds = totalSeconds % 60
+
+  if (hours > 0) {
+    return `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+  }
+
+  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`
+}
 
 function PhoneHistory(props) {
   if (process.env.NODE_ENV === 'development') console.log('PhoneHistory hook')
@@ -126,7 +140,8 @@ function PhoneHistory(props) {
         basePalette,
         rowBgColor,
         rowTextColor,
-        formattedDate: formatCallDate(row.start)
+        formattedDate: formatCallDate(row.start),
+        formattedDuration: formatCallDuration(row.duration)
       }
     })
   }, [phoneControlRdcr.callsArr, theme])
@@ -158,7 +173,7 @@ function PhoneHistory(props) {
 
       <TableContainer
         sx={{
-          height: 444,
+          height: 440,
           overflowY: 'auto',
           border: 1,
           borderColor: 'divider',
@@ -166,12 +181,13 @@ function PhoneHistory(props) {
           backgroundColor: alpha(theme.palette.background.default, 0.5),
         }}
       >
-        <Table size="small" aria-label="История звонков" stickyHeader>
+        <Table size="small" aria-label="История звонков" stickyHeader sx={{ tableLayout: 'fixed' }}>
           <TableHead>
             <TableRow>
-              <TableCell>Время</TableCell>
-              <TableCell></TableCell>
-              <TableCell sx={{ width: '100%' }}>Абонент</TableCell>
+              <TableCell sx={{ width: 110, py: 0.5 }}>Время</TableCell>
+              <TableCell sx={{ width: 50, py: 0.5 }}></TableCell>
+              <TableCell sx={{ width: 34, py: 0.5 }}></TableCell>
+              <TableCell sx={{ width: '100%', py: 0.5 }}>Абонент</TableCell>
             </TableRow>
           </TableHead>
 
@@ -200,31 +216,35 @@ function PhoneHistory(props) {
                   }
                 }}
               >
-                <TableCell sx={{ whiteSpace: 'nowrap' }}>
+                <TableCell sx={{ whiteSpace: 'nowrap', py: 0.5 }}>
                   <small>{row.formattedDate}</small>
                 </TableCell>
 
-                <TableCell align="right">
-                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 0.5 }}>
+                <TableCell sx={{ whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums', py: 0.5 }}>
+                  <small>{row.formattedDuration}</small>
+                </TableCell>
+
+                <TableCell align="right" sx={{ py: 0.25, px: 0.5 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 0.25 }}>
                     {row.isInbound ? (
                       <IcoIncome 
                         fontSize="small" 
                         sx={{ 
-                          color: row.isInCall ? 'inherit' : (row.isLost ? 'error.dark' : 'success.main') 
+                          color: row.isInCall ? 'inherit' : (row.isLost ? 'error.dark' : 'success.main')
                         }} 
                       />
                     ) : (
                       <IcoOutgo 
                         fontSize="small" 
                         sx={{ 
-                          color: row.isInCall ? 'inherit' : (row.isLost ? 'text.disabled' : 'info.main') 
+                          color: row.isInCall ? 'inherit' : (row.isLost ? 'text.disabled' : 'info.main')
                         }} 
                       />
                     )}
                   </Box>
                 </TableCell>
 
-                <TableCell sx={{ width: '100%', pl: 2 }}>
+                <TableCell sx={{ width: '100%', pl: 1.5, py: 0.5, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {row.uri}
                 </TableCell>
               </TableRow>
