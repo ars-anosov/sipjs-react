@@ -22,6 +22,10 @@ import {
   PHONECTL_CLEAR_CHAT,
 } from '../constants/redux'
 
+const parseUriWebRtcValue = function(uriWebRtc = '') {
+  return typeof uriWebRtc === 'string' ? uriWebRtc.trim() : ''
+}
+
 const initialState = {
   // --- UI ---
   // MenuAppBar
@@ -32,10 +36,10 @@ const initialState = {
   displayHistory    : false,
   displayChat       : false,
   // PhoneReg form fields
-  uriHost           : localStorage.getItem('uriHost') ? localStorage.getItem('uriHost') : '',
-  wssPort           : localStorage.getItem('wssPort') ? localStorage.getItem('wssPort') : '',
+  uriWebRtc         : parseUriWebRtcValue(localStorage.getItem('uriWebRtc')),
   callerUserNum     : localStorage.getItem('callerUserNum') ? localStorage.getItem('callerUserNum') : '',
   regUserPass       : '',
+  useIce            : localStorage.getItem('useIce') === null ? true : localStorage.getItem('useIce') === 'true',
   calleePhoneNum    : '',
   addPrefix         : false,
   calleePrefix      : '1999',

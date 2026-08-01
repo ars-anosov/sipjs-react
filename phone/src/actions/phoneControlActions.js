@@ -68,6 +68,19 @@ import {
   transmitSipMessage,
 } from './phoneRuntime'
 
+const getUriHostFromWebRtc = function(uriWebRtc = '') {
+  if (!uriWebRtc) {
+    return ''
+  }
+
+  try {
+    return new URL(uriWebRtc).hostname || ''
+  } catch {
+    const match = String(uriWebRtc).match(/^wss?:\/\/([^:/]+)/i)
+    return match?.[1] || ''
+  }
+}
+
 const MessagesArrUpdate = function() {
   return (dispatch) => {
     dispatch({
@@ -126,21 +139,19 @@ const handleClkRegister = function(formData, rdcr) {
       })
     }
 
+    const normalizedUriWebRtc = typeof formData.uriWebRtc === 'string' ? formData.uriWebRtc.trim() : ''
+    const uriHostFromWebRtc = getUriHostFromWebRtc(normalizedUriWebRtc)
+
     // Checks
-    if (!formData.uriHost || !formData.wssPort || !formData.callerUserNum || !formData.regUserPass) {
+    if (!normalizedUriWebRtc || !formData.callerUserNum || !formData.regUserPass) {
       regAlert('Заполните все поля.')
       return
     }
-    localStorage.setItem('uriHost', formData.uriHost)
-    localStorage.setItem('wssPort', formData.wssPort)
+    localStorage.setItem('uriWebRtc', normalizedUriWebRtc)
     localStorage.setItem('callerUserNum', formData.callerUserNum)
     dispatch({
       type: PHONECTL_STORE_VALUE,
-      payload: {'storeDataKey': 'uriHost', 'storeDataValue': formData.uriHost}
-    })
-    dispatch({
-      type: PHONECTL_STORE_VALUE,
-      payload: {'storeDataKey': 'wssPort', 'storeDataValue': formData.wssPort}
+      payload: {'storeDataKey': 'uriWebRtc', 'storeDataValue': normalizedUriWebRtc}
     })
     dispatch({
       type: PHONECTL_STORE_VALUE,
@@ -163,7 +174,7 @@ const handleClkRegister = function(formData, rdcr) {
 
 
 
-    const uriStr = "sip:"+formData.callerUserNum+"@"+formData.uriHost
+    const uriStr = `sip:${formData.callerUserNum}@${uriHostFromWebRtc}`
     const uri = UserAgent.makeURI(uriStr)
     if (!uri) {
       regAlert('UserAgent URI:'+uriStr)
@@ -179,7 +190,7 @@ const handleClkRegister = function(formData, rdcr) {
       displayName: formData.callerUserNum,
       hackIpInContact: true,
       transportOptions: {
-        server: "wss://"+formData.uriHost+":"+formData.wssPort,
+        server: normalizedUriWebRtc,
         // Эти "/r/n/r/n" ломают OpenSIPS и это не нужно т.к. REGISTER все равно будет слать запросы перергистрации через expires.
         // Полагаемся на браузерный встроенный keep alive.
         // keepAliveInterval: 30,
@@ -199,6 +210,19 @@ const handleClkRegister = function(formData, rdcr) {
       ],
       sessionDescriptionHandlerOptions: {
         constraints: constrainsDefault,
+      },
+    }
+
+    if (!rdcr.useIce) {
+      // 1. Ставим 1 мс. SIP.js мгновенно завершит ожидание и сформирует INVITE.
+      sessionOptions.sessionDescriptionHandlerOptions.iceGatheringTimeout = 1
+      sessionOptions.sessionDescriptionHandlerOptions.peerConnectionConfiguration = {
+        // 2. Используем стандартную политику
+        iceTransportPolicy: 'all',
+        // 3. Вырезаем STUN/TURN, чтобы браузер не тратил время на внешние запросы
+        iceServers: [],
+        // 4. Ограничиваем пул кандидатов до нуля, блокируя сбор на уровне WebRTC
+        iceCandidatePoolSize: 0,
       }
     }
 
@@ -682,7 +706,8 @@ const handleClkSubmitOut = function(calleePhoneNum, rdcr) {
       return
     }
 
-    const targetStr = 'sip:' + callee + '@' + rdcr.uriHost
+    const uriHost = getUriHostFromWebRtc(rdcr.uriWebRtc)
+    const targetStr = 'sip:' + callee + '@' + uriHost
     const target = UserAgent.makeURI(targetStr)
     if (!target) {
       padAlert('Некорректный SIP URI: ' + targetStr)
@@ -992,7 +1017,8 @@ const handleSendMessage = function(peerPhoneNum, messageBody, rdcr) {
       return
     }
 
-    const targetStr = 'sip:' + peer + '@' + rdcr.uriHost
+    const uriHost = getUriHostFromWebRtc(rdcr.uriWebRtc)
+    const targetStr = 'sip:' + peer + '@' + uriHost
     if (!UserAgent.makeURI(targetStr)) {
       chatAlert('Некорректный SIP URI: ' + targetStr)
       return
@@ -1009,7 +1035,7 @@ const handleSendMessage = function(peerPhoneNum, messageBody, rdcr) {
 
     transmitSipMessage({
       chatMessage,
-      uriHost: rdcr.uriHost,
+      uriHost,
       onStatusChange: (chatMessages) => {
         dispatch({
           type: PHONECTL_MESSAGE_UPDATE,

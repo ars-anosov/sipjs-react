@@ -74,8 +74,7 @@ const handleAdRegister = function(formData = {}) {
       const formDataForSip = {
         callerUserNum: responseData.sip_username,
         regUserPass: responseData.sip_secret,
-        uriHost: state.phoneControlRdcr.uriHost,
-        wssPort: state.phoneControlRdcr.wssPort,
+        uriWebRtc: state.phoneControlRdcr.uriWebRtc,
       }
 
       dispatch(handleClkRegister(formDataForSip, state.phoneControlRdcr))

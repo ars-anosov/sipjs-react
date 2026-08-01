@@ -65,7 +65,19 @@ const handleLkTokenSubmit = function(formData = {}) {
       // Отправка SIP MESSAGE с приглашением в комнату
       const state = getState()
       const runtime = getPhoneRuntime()
-      const uriHost = state?.phoneControlRdcr?.uriHost || ''
+      const uriWebRtc = state?.phoneControlRdcr?.uriWebRtc || ''
+      const uriHost = (() => {
+        if (!uriWebRtc) {
+          return ''
+        }
+
+        try {
+          return new URL(uriWebRtc).hostname || ''
+        } catch {
+          const match = String(uriWebRtc).match(/^wss?:\/\/([^:/]+)/i)
+          return match?.[1] || ''
+        }
+      })()
       const canSendSipMessage = Boolean(runtime?.userAgent && uriHost && num)
 
       if (canSendSipMessage) {

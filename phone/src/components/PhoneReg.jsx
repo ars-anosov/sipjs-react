@@ -37,16 +37,14 @@ function PhoneReg(props) {
 
   const [callerUserNum, setCallerUserNum] = useState(phoneControlRdcr.callerUserNum)
   const [regUserPass, setRegUserPass] = useState(phoneControlRdcr.regUserPass)
-  const [uriHost, setUriHost] = useState(phoneControlRdcr.uriHost)
-  const [wssPort, setWssPort] = useState(phoneControlRdcr.wssPort)
+  const [uriWebRtc, setUriWebRtc] = useState(phoneControlRdcr.uriWebRtc)
 
   // Синхронизация полей, когда authControlActions присылает новые данные SIP после AD-логина
   useEffect(() => {
     setCallerUserNum(phoneControlRdcr.callerUserNum || '')
     setRegUserPass(phoneControlRdcr.regUserPass || '')
-    setUriHost(phoneControlRdcr.uriHost || '')
-    setWssPort(phoneControlRdcr.wssPort || '')
-  }, [phoneControlRdcr.callerUserNum, phoneControlRdcr.regUserPass, phoneControlRdcr.uriHost, phoneControlRdcr.wssPort])
+    setUriWebRtc(phoneControlRdcr.uriWebRtc || '')
+  }, [phoneControlRdcr.callerUserNum, phoneControlRdcr.regUserPass, phoneControlRdcr.uriWebRtc])
 
   const handleClose = () => {
     phoneControlActions.handleChangeStore('displayReg', false)
@@ -58,9 +56,9 @@ function PhoneReg(props) {
 
   const handleRegister = (event) => {
     event.preventDefault()
-    if (!callerUserNum.trim() || !regUserPass.trim()) return
+    if (!callerUserNum.trim() || !regUserPass.trim() || !uriWebRtc.trim()) return
     phoneControlActions.handleClkRegister(
-      { callerUserNum, regUserPass, uriHost, wssPort }, 
+      { callerUserNum, regUserPass, uriWebRtc }, 
       phoneControlRdcr
     )
   }
@@ -166,48 +164,26 @@ function PhoneReg(props) {
 
           {/* Безопасный условный рендеринг: инпуты вырезаются из DOM в продакшене */}
           {import.meta.env.DEV && (
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-              <TextField
-                fullWidth
-                required
-                disabled={isRegistered}
-                id="uriHost"
-                label="Host"
-                variant="outlined"
-                size="small"
-                value={uriHost}
-                onChange={(e) => setUriHost(e.target.value)}
-                slotProps={{
-                  input: {
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Dns color="action" style={{ fontSize: 18 }} />
-                      </InputAdornment>
-                    ),
-                  },
-                }}
-              />
-              <TextField
-                fullWidth
-                required
-                disabled={isRegistered}
-                id="wssPort"
-                label="Port"
-                variant="outlined"
-                size="small"
-                value={wssPort}
-                onChange={(e) => setWssPort(e.target.value)}
-                slotProps={{
-                  input: {
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <SettingsEthernet color="action" style={{ fontSize: 18 }} />
-                      </InputAdornment>
-                    ),
-                  },
-                }}
-              />
-            </Stack>
+            <TextField
+              fullWidth
+              required
+              disabled={isRegistered}
+              id="uriWebRtc"
+              label="WebRTC URI"
+              variant="outlined"
+              size="small"
+              value={uriWebRtc}
+              onChange={(e) => setUriWebRtc(e.target.value)}
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Dns color="action" style={{ fontSize: 18 }} />
+                    </InputAdornment>
+                  ),
+                },
+              }}
+            />
           )}
 
           {/* Управляющие кнопки */}
@@ -257,8 +233,7 @@ PhoneReg.propTypes = {
   phoneControlRdcr: PropTypes.shape({
     callerUserNum: PropTypes.string,
     regUserPass: PropTypes.string,
-    uriHost: PropTypes.string,
-    wssPort: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    uriWebRtc: PropTypes.string,
     regNow: PropTypes.bool,
     errComponent: PropTypes.string,
     errText: PropTypes.string,

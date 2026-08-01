@@ -285,7 +285,7 @@ function MenuAppBar(props) {
         <Box
           sx={{ p: 1 }}
         >
-          <Typography variant='body2'>{"wss://"+phoneControlRdcr.uriHost+":"+phoneControlRdcr.wssPort}</Typography>
+          <Typography variant='body2'>{phoneControlRdcr.uriWebRtc || ''}</Typography>
           <Divider />
           <PhonePad
             phoneControlRdcr={phoneControlRdcr}
