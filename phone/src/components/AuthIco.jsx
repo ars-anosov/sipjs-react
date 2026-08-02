@@ -1,6 +1,6 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import PropTypes from 'prop-types'
-import { IconButton, keyframes, useTheme } from '@mui/material'
+import { IconButton, keyframes, useTheme, alpha } from '@mui/material'
 
 import IconAccountCircle from '@mui/icons-material/AccountCircle'
 import IconHowToReg from '@mui/icons-material/HowToReg'
@@ -14,51 +14,51 @@ const pulse = keyframes`
 `
 
 function AdIco({ authControlRdcr }) {
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'development') console.log('AdIco MOUNT')
+  const theme = useTheme()
+  const status = authControlRdcr?.status
 
-    return () => {
-      if (process.env.NODE_ENV === 'development') console.log('AdIco UNMOUNT')
+  // Логирование монтирования только для разработки
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      console.log('AdIco MOUNT')
+      return () => console.log('AdIco UNMOUNT')
     }
   }, [])
 
-  const theme = useTheme()
-
-  const getStyle = () => {
-    switch (authControlRdcr?.status) {
+  // Кэшируем конфигурацию стиля, чтобы не пересчитывать при каждом рендере
+  const cfg = useMemo(() => {
+    switch (status) {
       case 'loading':
         return {
           icon: <IconPending />,
           bg: theme.palette.warning.main,
-          color: 'rgba(0,0,0,0.87)',
+          color: theme.palette.warning.contrastText,
           pulse: true,
         }
       case 'success':
         return {
           icon: <IconHowToReg />,
-          bg: 'rgba(255, 255, 255, 0.2)',
-          color: '#fff',
+          bg: alpha(theme.palette.common.white, 0.2),
+          color: theme.palette.common.white,
           pulse: false,
         }
       case 'error':
         return {
           icon: <IconAccountBox />,
           bg: theme.palette.error.dark,
-          color: '#fff',
+          color: theme.palette.error.contrastText,
           pulse: false,
         }
       case 'idle':
       default:
         return {
           icon: <IconAccountCircle />,
-          bg: 'rgba(0, 0, 0, 0.2)',
-          color: 'rgba(0, 0, 0, 0.4)',
+          bg: alpha(theme.palette.common.black, 0.2),
+          color: theme.palette.action.disabled,
           pulse: false,
         }
     }
-  }
-
-  const cfg = getStyle()
+  }, [status, theme])
 
   return (
     <IconButton
@@ -69,9 +69,11 @@ function AdIco({ authControlRdcr }) {
         height: 46,
         backgroundColor: cfg.bg,
         color: cfg.color,
-        border: '1px solid rgba(255,255,255,0.3)',
+        border: `1px solid ${alpha(theme.palette.common.white, 0.3)}`,
         animation: cfg.pulse ? `${pulse} 1.2s infinite` : 'none',
-        transition: 'all 0.2s ease-in-out',
+        transition: theme.transitions.create(['background-color', 'transform', 'box-shadow'], {
+          duration: theme.transitions.duration.short,
+        }),
 
         '&:hover': {
           backgroundColor: cfg.bg,
@@ -89,7 +91,9 @@ function AdIco({ authControlRdcr }) {
 }
 
 AdIco.propTypes = {
-  authControlRdcr: PropTypes.object.isRequired,
+  authControlRdcr: PropTypes.shape({
+    status: PropTypes.oneOf(['idle', 'loading', 'success', 'error']),
+  }).isRequired,
 }
 
 export default AdIco

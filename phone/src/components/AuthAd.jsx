@@ -54,7 +54,7 @@ function AdAuth(props) {
   }
 
   const handleReset = () => {
-    setLogin('')
+    // setLogin('')
     setPassword('')
     setUriAdAuth(authControlRdcr.uriAdAuth || '')
     authControlActions.handleAdAuthClear()

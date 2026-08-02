@@ -350,9 +350,9 @@ function PhonePad(props) {
             {isRegistered ? <IconOnline /> : <IconOffline />}
           </IconButton>
         </Tooltip>
-
-        {showInput && (
+       
         <Stack direction="row" spacing={1}>
+          {showInput && (
           <Tooltip title="Префикс">
             <IconButton
               color={phoneControlRdcr.addPrefix ? 'primary' : 'default'}
@@ -361,7 +361,7 @@ function PhonePad(props) {
               <IconDialpad />
             </IconButton>
           </Tooltip>
-
+          )}
           <Badge
             badgeContent={phoneControlRdcr.callUnread}
             color="error"
@@ -377,7 +377,6 @@ function PhonePad(props) {
               </IconButton>
             </Tooltip>
           </Badge>
-
           <Badge
             badgeContent={phoneControlRdcr.chatUnread}
             color="error"
@@ -394,7 +393,7 @@ function PhonePad(props) {
             </Tooltip>
           </Badge>
         </Stack>
-        )}
+
       </Stack>
 
     </Box>

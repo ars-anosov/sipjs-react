@@ -41,12 +41,12 @@ const handleAdRegister = function(formData = {}) {
     try {
       const responseData = await ky.post(uriAdAuth, { 
         json: { login, password }, 
-        timeout: 10000 
-      }).json() // Сразу вызываем .json() для разбора тела ответа
+        timeout: 5000 
+      }).json()
 
-      if (login) {
-        localStorage.setItem('adLogin', login)
-      }
+      localStorage.setItem('adLogin', login)
+      const expireTime = Date.now() + 24 * 60 * 60 * 1000
+      localStorage.setItem('adAuthExpireTime', expireTime)
 
       dispatch({
         type: AUTHCTL_SUBMIT_SUCCESS,
@@ -93,7 +93,8 @@ const handleAdRegister = function(formData = {}) {
 
 const handleAdAuthClear = function() {
   return (dispatch) => {
-    localStorage.removeItem('adLogin')
+    // localStorage.removeItem('adLogin')
+    localStorage.removeItem('adAuthExpireTime')
     dispatch({ type: AUTHCTL_CLEAR })
   }
 }

@@ -46,8 +46,10 @@ export default function authControlRdcr(state = initialState, action) {
 
     case AUTHCTL_CLEAR:
       return {
-        ...initialState,
-        uriAdAuth      : localStorage.getItem('uriAdAuth') || '',
+        ...state,
+        status          : 'idle',
+        message         : '',
+        responseData    : null,
       }
 
     case AUTHCTL_STORE_VALUE:
