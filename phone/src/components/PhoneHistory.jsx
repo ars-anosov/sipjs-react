@@ -61,18 +61,18 @@ const formatCallDuration = (durationMs) => {
 }
 
 function PhoneHistory(props) {
-  if (process.env.NODE_ENV === 'development') console.log('PhoneHistory hook')
+  if (import.meta.env.DEV) console.log('PhoneHistory hook')
 
   const { phoneControlRdcr, phoneControlActions } = props
   const theme = useTheme()
 
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development') console.log('PhoneHistory MOUNT')
+    if (import.meta.env.DEV) console.log('PhoneHistory MOUNT')
     phoneControlActions.CallsArrUpdate()
     phoneControlActions.markCallsRead()
 
     return () => {
-      if (process.env.NODE_ENV === 'development') console.log('PhoneHistory UNMOUNT')
+      if (import.meta.env.DEV) console.log('PhoneHistory UNMOUNT')
     }
   }, [phoneControlActions])
 

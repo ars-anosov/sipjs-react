@@ -169,7 +169,7 @@ function PhoneReg(props) {
               required
               disabled={isRegistered}
               id="uriWebRtc"
-              label="WebRTC URI"
+              label="WebRTC URI (Dev Only)"
               variant="outlined"
               size="small"
               value={uriWebRtc}

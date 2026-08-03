@@ -27,7 +27,7 @@ import { format } from 'date-fns'
 
 
 function PhoneChat(props) {
-  if (process.env.NODE_ENV === 'development') console.log('PhoneChat hook')
+  if (import.meta.env.DEV) console.log('PhoneChat hook')
 
   const { phoneControlRdcr, phoneControlActions } = props
   const theme = useTheme()
@@ -38,12 +38,12 @@ function PhoneChat(props) {
   const [messageTxt, setMessageTxt] = useState('')
 
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development') console.log('PhoneChat MOUNT')
+    if (import.meta.env.DEV) console.log('PhoneChat MOUNT')
     phoneControlActions.MessagesArrUpdate()
     phoneControlActions.handleChatUnreadClear()
 
     return () => {
-      if (process.env.NODE_ENV === 'development') console.log('PhoneChat UNMOUNT')
+      if (import.meta.env.DEV) console.log('PhoneChat UNMOUNT')
     }
   }, [])
 

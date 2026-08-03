@@ -14,7 +14,7 @@ export default function configureStore(initialState) {
   const store = createStore(
     rootReducer,
     initialState,
-    process.env.NODE_ENV === 'production' 
+    import.meta.env.PROD 
       ? applyMiddleware(...middlewareProd) 
       : applyMiddleware(...middlewareDev)
   )

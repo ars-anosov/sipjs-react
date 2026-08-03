@@ -18,7 +18,7 @@ import MailIcon     from '@mui/icons-material/Mail'
 const filter = createFilterOptions()
 
 function PhoneDir(props) {
-  if (process.env.NODE_ENV === 'development') console.log('PhoneDir hook')
+  if (import.meta.env.DEV) console.log('PhoneDir hook')
 
   const { phoneControlRdcr, phoneControlActions } = props
 
@@ -41,7 +41,7 @@ function PhoneDir(props) {
   }
 
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development') console.log('PhoneDir MOUNT')
+    if (import.meta.env.DEV) console.log('PhoneDir MOUNT')
     
     const fetchData = async () => {
       const fetchFn = getPhoneDirRef.current
@@ -59,7 +59,7 @@ function PhoneDir(props) {
     fetchData()
 
     return () => {
-      if (process.env.NODE_ENV === 'development') console.log('PhoneDir UNMOUNT')
+      if (import.meta.env.DEV) console.log('PhoneDir UNMOUNT')
     }
   }, [])
 

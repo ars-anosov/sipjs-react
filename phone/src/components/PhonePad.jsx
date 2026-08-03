@@ -35,7 +35,7 @@ import {
 
 
 function PhonePad(props) {
-  if (process.env.NODE_ENV === 'development') console.log('PhonePad hook')
+  if (import.meta.env.DEV) console.log('PhonePad hook')
 
   const {
     phoneControlRdcr, phoneControlActions,
@@ -46,11 +46,11 @@ function PhonePad(props) {
   const callStartRef = useRef(null)
 
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development') console.log('PhonePad MOUNT')
+    if (import.meta.env.DEV) console.log('PhonePad MOUNT')
     phoneControlActions.CallsArrUpdate()
 
     return () => {
-      if (process.env.NODE_ENV === 'development') console.log('PhonePad UNMOUNT')
+      if (import.meta.env.DEV) console.log('PhonePad UNMOUNT')
     }
   }, [])
 
@@ -184,13 +184,13 @@ function PhonePad(props) {
 
   const finalTemplate =
     <Paper 
-      elevation={8} 
+      elevation={ showInput ? 8 : 0 } 
       sx={{ 
         maxWidth: 320, 
         width: '100%', 
         mx: 'auto', 
         mt: 2,
-        p: 1, 
+        p: showInput ? 1 : 0, 
         borderRadius: 3, 
         position: 'relative'
       }}
@@ -342,7 +342,7 @@ function PhonePad(props) {
       )}
 
       <Stack direction="row" spacing={1} sx={{ mt: 2, justifyContent: 'space-between', alignItems: 'center' }}>
-        <Tooltip title="Регистрация">
+        <Tooltip title={isRegistered ? "Разрегистрироваться" : "Зарегистрироваться"}>
           <IconButton
             color={regButtonColor}
             onClick={toggleReg}

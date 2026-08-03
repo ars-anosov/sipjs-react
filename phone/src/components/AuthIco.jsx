@@ -2,10 +2,10 @@ import { useEffect, useMemo } from 'react'
 import PropTypes from 'prop-types'
 import { IconButton, keyframes, useTheme, alpha } from '@mui/material'
 
-import IconAccountCircle from '@mui/icons-material/AccountCircle'
+import IconAdminPanelSettings from '@mui/icons-material/AdminPanelSettings'
 import IconHowToReg from '@mui/icons-material/HowToReg'
-import IconAccountBox from '@mui/icons-material/AccountBox'
-import IconPending from '@mui/icons-material/Pending'
+import IconPersonOff from '@mui/icons-material/PersonOff'
+import IconSync from '@mui/icons-material/Sync'
 
 const pulse = keyframes`
   0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.3); transform: scale(1); }
@@ -19,7 +19,7 @@ function AdIco({ authControlRdcr }) {
 
   // Логирование монтирования только для разработки
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.DEV) {
       console.log('AdIco MOUNT')
       return () => console.log('AdIco UNMOUNT')
     }
@@ -30,7 +30,7 @@ function AdIco({ authControlRdcr }) {
     switch (status) {
       case 'loading':
         return {
-          icon: <IconPending />,
+          icon: <IconSync />,
           bg: theme.palette.warning.main,
           color: theme.palette.warning.contrastText,
           pulse: true,
@@ -44,7 +44,7 @@ function AdIco({ authControlRdcr }) {
         }
       case 'error':
         return {
-          icon: <IconAccountBox />,
+          icon: <IconPersonOff />,
           bg: theme.palette.error.dark,
           color: theme.palette.error.contrastText,
           pulse: false,
@@ -52,7 +52,7 @@ function AdIco({ authControlRdcr }) {
       case 'idle':
       default:
         return {
-          icon: <IconAccountCircle />,
+          icon: <IconAdminPanelSettings />,
           bg: alpha(theme.palette.common.black, 0.2),
           color: theme.palette.action.disabled,
           pulse: false,

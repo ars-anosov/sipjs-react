@@ -13,7 +13,7 @@ export const authTimeoutMiddleware = (store) => {
       const now = Date.now()
       
       if (now > Number(expireTime)) {
-        if (process.env.NODE_ENV === 'development') {
+        if (import.meta.env.DEV) {
           console.warn('Время сессии истекло (вызов из Middleware). Очищаем данные.')
         }
 

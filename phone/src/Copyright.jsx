@@ -11,7 +11,7 @@ import { version, dependencies, devDependencies } from '../package.json'
 
 
 function Copyright(props) {
-  if (process.env.NODE_ENV === 'development') console.log('Copyright hook')
+  if (import.meta.env.DEV) console.log('Copyright hook')
 
   const {
     showFull
@@ -20,10 +20,10 @@ function Copyright(props) {
 
 
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development') console.log('Copyright MOUNT')
+    if (import.meta.env.DEV) console.log('Copyright MOUNT')
 
     return () => {
-      if (process.env.NODE_ENV === 'development') console.log('Copyright UNMOUNT')
+      if (import.meta.env.DEV) console.log('Copyright UNMOUNT')
     }
   }, [])
 

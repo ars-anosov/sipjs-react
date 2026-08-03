@@ -26,7 +26,7 @@ function PhoneIco({ phoneControlRdcr }) {
 
   // 1. Запрос прав на уведомления при первом рендере (Безопасно для мобильных)
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development') console.log('PhoneIco MOUNT')
+    if (import.meta.env.DEV) console.log('PhoneIco MOUNT')
     
     const isNotificationSupported = 'Notification' in window && typeof window.Notification === 'function'
 
@@ -35,7 +35,7 @@ function PhoneIco({ phoneControlRdcr }) {
     }
 
     return () => {
-      if (process.env.NODE_ENV === 'development') console.log('PhoneIco UNMOUNT')
+      if (import.meta.env.DEV) console.log('PhoneIco UNMOUNT')
       if (notificationRef.current) notificationRef.current.close()
     }
   }, [])

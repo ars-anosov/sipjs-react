@@ -24,8 +24,9 @@ import MenuIcon         from '@mui/icons-material/Menu'
 import ChevronLeftIcon  from '@mui/icons-material/ChevronLeft'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 
-import PhoneIco         from './PhoneIco'
 import AuthIco          from './AuthIco'
+import AuthAdInfo       from './AuthAdInfo'
+import PhoneIco         from './PhoneIco'
 import PhonePad         from './PhonePad'
 import PhoneDir         from './PhoneDir'
 import Copyright        from '../Copyright'
@@ -55,10 +56,10 @@ function MenuAppBar(props) {
   const { phoneControlRdcr, phoneControlActions, authControlRdcr, authControlActions, lkControlRdcr, lkControlActions } = props
 
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development') console.log('MenuAppBar MOUNT')
+    if (import.meta.env.DEV) console.log('MenuAppBar MOUNT')
 
     return () => {
-      if (process.env.NODE_ENV === 'development') console.log('MenuAppBar UNMOUNT')
+      if (import.meta.env.DEV) console.log('MenuAppBar UNMOUNT')
     }
   }, [])
 
@@ -308,13 +309,11 @@ function MenuAppBar(props) {
         >
           <Typography variant='body2'>{authControlRdcr.uriAdAuth}</Typography>
           <Divider />
-          <Typography variant='body2' component="pre">
-            {"\n"}cn{"\t"}{"\t"}{"\t"}{authControlRdcr?.responseData?.ad_cn}
-            {"\n"}title:{"\t"}{"\t"}{authControlRdcr?.responseData?.ad_title}
-            {"\n"}department:{"\t"}{authControlRdcr?.responseData?.ad_department}
-            {"\n"}
-            {"\n"}SIP num:{"\t"}{authControlRdcr?.responseData?.sip_username}
-          </Typography>
+          <AuthAdInfo
+            authControlRdcr={authControlRdcr}
+            authControlActions={authControlActions}
+            showFull={false}
+          />
         </Box>
       </Popover>
 
