@@ -22,65 +22,61 @@ const pulse = keyframes`
 
 function PhoneIco({ phoneControlRdcr }) {
   const theme = useTheme()
-  const notificationRef = useRef(null) // Ссылка на текущее уведомление
+  const swRegistrationRef = useRef(null); // Ссылка на регистрацию воркера
 
-  // 1. Запрос прав на уведомления при первом рендере (Безопасно для мобильных)
+  // 1. Регистрация Service Worker и запрос прав
   useEffect(() => {
-    if (import.meta.env.DEV) console.log('PhoneIco MOUNT')
-    
-    const isNotificationSupported = 'Notification' in window && typeof window.Notification === 'function'
+    if (import.meta.env.DEV) console.log('PhoneIco MOUNT');
 
-    if (isNotificationSupported && Notification.permission === 'default') {
-      Notification.requestPermission()
+    // Регистрируем воркер, если он поддерживается браузером
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js')
+        .then((reg) => {
+          swRegistrationRef.current = reg;
+          if (import.meta.env.DEV) console.log('Service Worker успешно зарегистрирован');
+        })
+        .catch((err) => console.error('Ошибка регистрации Service Worker:', err));
+    }
+
+    // Запрашиваем права на уведомления
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
     }
 
     return () => {
-      if (import.meta.env.DEV) console.log('PhoneIco UNMOUNT')
-      if (notificationRef.current) notificationRef.current.close()
-    }
-  }, [])
+      if (import.meta.env.DEV) console.log('PhoneIco UNMOUNT');
+    };
+  }, []);
 
-  // 2. Отслеживание входящего звонка и показ уведомлений (Безопасно для мобильных)
+  // 2. Отслеживание входящего звонка и показ уведомлений
   useEffect(() => {
-    // Безопасное извлечение полей, чтобы избежать ошибок отсутствия свойств
-    const incomeDisplay = phoneControlRdcr?.incomeDisplay
-    const calleePhoneNum = phoneControlRdcr?.calleePhoneNum || phoneControlRdcr?.callerNumber
+    const incomeDisplay = phoneControlRdcr?.incomeDisplay;
+    const calleePhoneNum = phoneControlRdcr?.calleePhoneNum || phoneControlRdcr?.callerNumber;
 
-    // Проверяем, что Notification поддерживается КАК объект, и есть сам конструктор (защита для Android)
-    const isNotificationSupported = 'Notification' in window && typeof window.Notification === 'function'
+    const title = 'Входящий звонок';
+    const options = {
+      body: calleePhoneNum || 'Неизвестный номер',
+      tag: 'incoming-call',       // Заменяет прошлые пуши, предотвращая дубликаты
+      requireInteraction: true,   // Пуш не закроется сам, пока не кликнет юзер
+      silent: false,              // false, чтобы Windows 11 вывела баннер на экран со звуком
+      icon: 'img/PhoneIcon.png',
+    };
 
-    if (incomeDisplay && isNotificationSupported && Notification.permission === 'granted') {
-      // Чтобы уведомления не плодились, закрываем предыдущее
-      if (notificationRef.current) notificationRef.current.close()
-
-      const title = 'Входящий звонок'
-      const options = {
-        body: calleePhoneNum || 'Неизвестный номер',
-        tag: 'incoming-call',
-        requireInteraction: true,
-        silent: true,
-        icon: 'img/PhoneIcon.png',
-      }
-
-      try {
-        // На Android этот вызов упадет в ошибку, если не обернуть в try/catch
-        notificationRef.current = new Notification(title, options)
-
-        // При клике на уведомление переводим фокус на вкладку с приложением
-        notificationRef.current.onclick = () => {
-          window.focus()
-          notificationRef.current.close()
-        }
-      } catch (e) {
-        console.warn('Конструктор Web Notification не поддерживается на данном устройстве:', e)
-      }
+    // Показываем уведомление, если есть входящий и права получены
+    if (incomeDisplay && Notification.permission === 'granted' && swRegistrationRef.current) {
+      swRegistrationRef.current.showNotification(title, options);
     }
 
-    if (!incomeDisplay && notificationRef.current) {
-      notificationRef.current.close()
-      notificationRef.current = null
+    // Если звонок завершен/сброшен — даем команду воркеру закрыть пуш
+    if (!incomeDisplay && navigator.serviceWorker?.controller) {
+      navigator.serviceWorker.controller.postMessage({
+        action: 'close-notification',
+        tag: 'incoming-call'
+      });
     }
-  }, [phoneControlRdcr?.incomeDisplay, phoneControlRdcr?.calleePhoneNum, phoneControlRdcr?.callerNumber])
+  }, [phoneControlRdcr?.incomeDisplay, phoneControlRdcr?.calleePhoneNum, phoneControlRdcr?.callerNumber]);
+
+
 
   // Кэшируем вычисления стилей и иконки
   const cfg = useMemo(() => {
