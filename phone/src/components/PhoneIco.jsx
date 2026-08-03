@@ -30,7 +30,7 @@ function PhoneIco({ phoneControlRdcr }) {
 
     // Регистрируем воркер, если он поддерживается браузером
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js')
+      navigator.serviceWorker.register('sw.js')
         .then((reg) => {
           swRegistrationRef.current = reg;
           if (import.meta.env.DEV) console.log('Service Worker успешно зарегистрирован');
