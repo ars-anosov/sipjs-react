@@ -12,9 +12,11 @@ import {
   IconButton,
   Badge,
   InputAdornment,
-  Alert,
   Collapse,
   Tooltip,
+  Snackbar,
+  Alert,
+  AlertTitle,
 } from '@mui/material'
 
 import {
@@ -26,6 +28,7 @@ import {
   Pause         as IconHold,
   PlayArrow     as IconResume,
   Close         as IconClose,
+  InfoOutlined  as IconInfoOutlined,
   Mail          as IconMail,
   WifiOff       as IconOffline,
   Wifi          as IconOnline,
@@ -41,8 +44,7 @@ function PhonePad(props) {
     phoneControlRdcr, phoneControlActions,
     showInput
   } = props
-
-  const [callDuration, setCallDuration] = useState(0)
+  const callNow = phoneControlRdcr.incomeCallNow || phoneControlRdcr.outgoCallNow
   const callStartRef = useRef(null)
 
   useEffect(() => {
@@ -53,14 +55,6 @@ function PhonePad(props) {
       if (import.meta.env.DEV) console.log('PhonePad UNMOUNT')
     }
   }, [])
-
-
-
-  const handleClose = function() {
-    phoneControlActions.handleChangeStore('displayPad', false)
-  }
-
-  const callNow = phoneControlRdcr.incomeCallNow || phoneControlRdcr.outgoCallNow
 
   useEffect(() => {
     if (!callNow) {
@@ -80,6 +74,19 @@ function PhonePad(props) {
 
     return () => window.clearInterval(intervalId)
   }, [callNow])
+
+  const [callDuration, setCallDuration] = useState(0)
+  const [info, setInfo] = useState({
+    open: false,
+  })
+
+  const handleClose = function() {
+    phoneControlActions.handleChangeStore('displayPad', false)
+  }
+  const handleCloseInfo = (event, reason) => {
+    if (reason === 'clickaway') return
+    setInfo((prev) => ({ ...prev, open: !prev.open }))
+  }
 
   const formatDuration = (seconds = 0) => {
     const minutes = Math.floor(seconds / 60).toString().padStart(2, '0')
@@ -198,6 +205,9 @@ function PhonePad(props) {
     {showInput && (
     <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
       <Typography variant="h6" color="primary">SIP Телефон</Typography>
+      <IconButton onClick={handleCloseInfo} sx={{ position: 'absolute', top: 4, right: 54  }}>
+        <IconInfoOutlined color="action" />
+      </IconButton>
       <IconButton onClick={handleClose} sx={{ position: 'absolute', top: 4, right: 4 }}>
         <IconClose color="action" />
       </IconButton>
@@ -401,9 +411,39 @@ function PhonePad(props) {
     <Collapse in={phoneControlRdcr.errComponent == 'PhonePad' && phoneControlRdcr.errText}>
       <Alert severity="error" sx={{ mt: 2 }}>{phoneControlRdcr.errText}</Alert>
     </Collapse>
+
+    <Snackbar 
+      open={info.open}
+      onClose={handleCloseInfo}
+      anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+    >
+      <Alert 
+        onClose={handleCloseInfo}
+        severity="info"
+        sx={{ width: '100%' }}
+      >
+        <AlertTitle>Если нет системных уведомлений о звонках:</AlertTitle>
+        Проверьте настройки вашей Windows:
+        <ol style={{ margin: '8px 0 0 20px', padding: 0 }}>
+          <li>
+            <strong>Режим «Не беспокоить» (Focus Assist)</strong>: 
+            Нажмите комбинацию клавиш <kbd>Win + N</kbd>. 
+            Убедитесь, что значок колокольчика / полумесяца <strong>выключен</strong>.
+          </li>
+          <li>
+            <strong>Системные разрешения для браузера</strong>: 
+            Нажмите комбинацию клавиш <kbd>Win + I</kbd> → Система → Уведомления. 
+            Найдите в списке ваш браузер (Chrome / Edge) и убедитесь, что переключатель для него находится в положении <strong>«Вкл»</strong>.
+          </li>
+          <li>
+            <strong>Приоритет баннеров</strong>: 
+            Там же нажмите на стрелочку рядом с браузером и проверьте, стоит ли галочка на пункте 
+            <em>«Показывать баннеры уведомлений»</em>, иначе пуши будут падать в историю скрытно.
+          </li>
+        </ol>
+      </Alert>
+    </Snackbar>
   </Paper>
-
-
 
   return finalTemplate
 }

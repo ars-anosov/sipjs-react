@@ -1,10 +1,13 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useState, useMemo, useRef } from 'react'
 import PropTypes from 'prop-types'
 import {
   Badge,
   IconButton,
   keyframes,
   useTheme,
+  Snackbar,
+  Alert,
+  AlertTitle,
 }                 from '@mui/material'
 import {
   DialerSip       as IconDialerSip,
@@ -22,25 +25,93 @@ const pulse = keyframes`
 
 function PhoneIco({ phoneControlRdcr }) {
   const theme = useTheme()
-  const swRegistrationRef = useRef(null); // Ссылка на регистрацию воркера
+  const swRegistrationRef = useRef(null);
+
+  const [toast, setToast] = useState({
+    open: false,
+    message: '',
+    severity: 'warning', // 'error', 'warning', 'info'
+    title: ''
+  });
+  const handleCloseToast = (event, reason) => {
+    if (reason === 'clickaway') return;
+    setToast((prev) => ({ ...prev, open: false }));
+  };
 
   // 1. Регистрация Service Worker и запрос прав
   useEffect(() => {
     if (import.meta.env.DEV) console.log('PhoneIco MOUNT');
 
-    // Регистрируем воркер, если он поддерживается браузером
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js')
+    const isSwSupported = 'serviceWorker' in navigator;
+    const isNotificationSupported = 'Notification' in window;
+
+    // 1. Проверка поддержки браузером
+    if (!isSwSupported || !isNotificationSupported) {
+      setToast({
+        open: true,
+        title: 'Уведомления не поддерживаются',
+        message: 'Ваш браузер слишком старый или запущен в режиме Инкогнито.',
+        severity: 'error'
+      });
+      return; // Останавливаемся
+    }
+
+    // 2. Проверка HTTPS
+    if (!window.isSecureContext) {
+      setToast({
+        open: true,
+        title: 'Незащищенное соединение (HTTP)',
+        message: 'Для работы системных уведомлений о звонках обязателен HTTPS.',
+        severity: 'error'
+      });
+      return; // Останавливаемся
+    }
+
+    // Функция для регистрации воркера
+    const registerSW = () => {
+      navigator.serviceWorker.register('/sw.js')
         .then((reg) => {
           swRegistrationRef.current = reg;
           if (import.meta.env.DEV) console.log('Service Worker успешно зарегистрирован');
         })
-        .catch((err) => console.error('Ошибка регистрации Service Worker:', err));
-    }
+        .catch((err) => {
+          console.error(err);
+          setToast({
+            open: true,
+            title: 'Ошибка Service Worker',
+            message: 'Не удалось запустить фоновый модуль. Попробуйте обновить страницу.',
+            severity: 'error'
+          });
+        });
+    };
 
-    // Запрашиваем права на уведомления
-    if ('Notification' in window && Notification.permission === 'default') {
-      Notification.requestPermission();
+    // 3. Проверка и запрос прав + запуск регистрации
+    if (Notification.permission === 'denied') {
+      setToast({
+        open: true,
+        title: 'Уведомления заблокированы',
+        message: 'Нажмите на значок в начале адресной строки и разрешите «Уведомления».',
+        severity: 'warning'
+      });
+      // Воркер всё равно регистрируем, чтобы он был готов, если пользователь вернет права
+      registerSW(); 
+    } else if (Notification.permission === 'default') {
+      // Запрашиваем права
+      Notification.requestPermission().then((permission) => {
+        if (permission === 'denied') {
+          setToast({
+            open: true,
+            title: 'Уведомления отклонены',
+            message: 'Вы запретили уведомления. Звонки не будут отображаться в фоне.',
+            severity: 'warning'
+          });
+        }
+        // Независимо от выбора (разрешил или запретил) регистрируем воркер
+        registerSW();
+      });
+    } else {
+      // Если права уже были даны (Notification.permission === 'granted')
+      registerSW();
     }
 
     return () => {
@@ -48,33 +119,37 @@ function PhoneIco({ phoneControlRdcr }) {
     };
   }, []);
 
-  // 2. Отслеживание входящего звонка и показ уведомлений
+  // 2. Отслеживание входящего звонка и показ/скрытие уведомлений
   useEffect(() => {
     const incomeDisplay = phoneControlRdcr?.incomeDisplay;
     const calleePhoneNum = phoneControlRdcr?.calleePhoneNum || phoneControlRdcr?.callerNumber;
-
+    
     const title = 'Входящий звонок';
     const options = {
       body: calleePhoneNum || 'Неизвестный номер',
-      tag: 'incoming-call',       // Заменяет прошлые пуши, предотвращая дубликаты
-      requireInteraction: true,   // Пуш не закроется сам, пока не кликнет юзер
-      silent: false,              // false, чтобы Windows 11 вывела баннер на экран со звуком
+      tag: 'incoming-call',
+      requireInteraction: true,
+      silent: false,
       icon: 'img/PhoneIcon.png',
     };
 
-    // Показываем уведомление, если есть входящий и права получены
-    if (incomeDisplay && Notification.permission === 'granted' && swRegistrationRef.current) {
-      swRegistrationRef.current.showNotification(title, options);
-    }
-
-    // Если звонок завершен/сброшен — даем команду воркеру закрыть пуш
-    if (!incomeDisplay && navigator.serviceWorker?.controller) {
-      navigator.serviceWorker.controller.postMessage({
-        action: 'close-notification',
-        tag: 'incoming-call'
-      });
+    if (incomeDisplay) {
+      if (Notification.permission === 'granted' && swRegistrationRef.current) {
+        swRegistrationRef.current.showNotification(title, options);
+      }
+    } else {
+      // Используем .active, чтобы гарантировать отправку, пока идет claim()
+      const activeWorker = swRegistrationRef.current?.active || navigator.serviceWorker?.controller;
+      
+      if (activeWorker) {
+        activeWorker.postMessage({ 
+          action: 'close-notification', 
+          tag: 'incoming-call' 
+        });
+      }
     }
   }, [phoneControlRdcr?.incomeDisplay, phoneControlRdcr?.calleePhoneNum, phoneControlRdcr?.callerNumber]);
+
 
 
 
@@ -111,6 +186,7 @@ function PhoneIco({ phoneControlRdcr }) {
   const totalUnread = Number(phoneControlRdcr?.callUnread || 0) + Number(phoneControlRdcr?.chatUnread || 0)
 
   return (
+  <>
     <Badge
       badgeContent={totalUnread}
       color="error"
@@ -141,6 +217,22 @@ function PhoneIco({ phoneControlRdcr }) {
         <Icon />
       </IconButton>
     </Badge>
+
+    <Snackbar 
+      open={toast.open} 
+      onClose={handleCloseToast}
+      anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
+    >
+      <Alert 
+        onClose={handleCloseToast}
+        severity={toast.severity}
+        sx={{ width: '100%' }}
+      >
+        <AlertTitle sx={{ fontWeight: 'bold' }}>{toast.title}</AlertTitle>
+        {toast.message}
+      </Alert>
+    </Snackbar>
+  </>
   )
 }
 
