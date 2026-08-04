@@ -57,6 +57,8 @@ const handleAdRegister = function(formData = {}) {
       })
 
       // Воздействие на компоненту PhoneReg
+      const state = getState()
+      
       dispatch({
         type: PHONECTL_STORE_VALUE,
         payload: { storeDataKey: 'callerUserNum', storeDataValue: responseData.sip_username },
@@ -69,15 +71,15 @@ const handleAdRegister = function(formData = {}) {
         type: PHONECTL_STORE_VALUE,
         payload: { storeDataKey: 'displayDir', storeDataValue: true },
       })
-
-      const state = getState()
-      const formDataForSip = {
-        callerUserNum: responseData.sip_username,
-        regUserPass: responseData.sip_secret,
-        uriWebRtc: state.phoneControlRdcr.uriWebRtc,
+        
+      if (!state.phoneControlRdcr.regNow) {
+        const formDataForSip = {
+          callerUserNum: responseData.sip_username,
+          regUserPass: responseData.sip_secret,
+          uriWebRtc: state.phoneControlRdcr.uriWebRtc,
+        }
+        dispatch(handleClkRegister(formDataForSip, state.phoneControlRdcr))
       }
-
-      dispatch(handleClkRegister(formDataForSip, state.phoneControlRdcr))
       // END OF Воздействие на компоненту PhoneReg
 
     } catch (error) {
