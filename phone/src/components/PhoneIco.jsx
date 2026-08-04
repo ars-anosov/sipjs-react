@@ -69,7 +69,7 @@ function PhoneIco({ phoneControlRdcr }) {
 
     // Функция для регистрации воркера
     const registerSW = () => {
-      navigator.serviceWorker.register('/sw.js')
+      navigator.serviceWorker.register('sw.js')
         .then((reg) => {
           swRegistrationRef.current = reg;
           if (import.meta.env.DEV) console.log('Service Worker успешно зарегистрирован');
