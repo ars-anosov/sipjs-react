@@ -367,19 +367,21 @@ function LkMeet(props) {
           </Button>
           )}
 
-          {!lkControlRdcr.displayLkToken ? (
-          <Button
-            type="button"
-            variant="outlined"
-            color="primary" 
-            size="medium"
-            onClick={handleInvite}
-            startIcon={<GroupAddIcon />}
-          >
-            Пригласить
-          </Button>
-          ) : (
-          <LkToken {...props} />
+          {authControlRdcr.responseData.sip_username == room && (
+            !lkControlRdcr.displayLkToken ? (
+            <Button
+              type="button"
+              variant="outlined"
+              color="primary" 
+              size="medium"
+              onClick={handleInvite}
+              startIcon={<GroupAddIcon />}
+            >
+              Пригласить
+            </Button>
+            ) : (
+            <LkToken {...props} />
+            )
           )}
 
         </Grid>
