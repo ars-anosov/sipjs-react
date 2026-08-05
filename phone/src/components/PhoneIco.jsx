@@ -45,23 +45,21 @@ function PhoneIco({ phoneControlRdcr }) {
     const isSwSupported = 'serviceWorker' in navigator;
     const isNotificationSupported = 'Notification' in window;
 
-    // 1. Проверка поддержки браузером
-    if (!isSwSupported || !isNotificationSupported) {
-      setToast({
-        open: true,
-        title: 'Уведомления не поддерживаются',
-        message: 'Что-то с браузером или HTTPS.',
-        severity: 'error'
-      });
-      return;
-    }
-
-    // 2. Проверка HTTPS
     if (!window.isSecureContext) {
       setToast({
         open: true,
         title: 'Незащищенное соединение (HTTP)',
         message: 'Для работы системных уведомлений о звонках обязателен HTTPS.',
+        severity: 'error'
+      });
+      return;
+    }
+
+    if (!isSwSupported || !isNotificationSupported) {
+      setToast({
+        open: true,
+        title: 'Уведомления не поддерживаются',
+        message: 'Ваш браузер не поддерживает Service Worker или Notifications API.',
         severity: 'error'
       });
       return;
@@ -85,7 +83,7 @@ function PhoneIco({ phoneControlRdcr }) {
         });
     };
 
-    // 3. Проверка и запрос прав + запуск регистрации
+    // Проверка и запрос прав + запуск регистрации
     if (Notification.permission === 'denied') {
       setToast({
         open: true,

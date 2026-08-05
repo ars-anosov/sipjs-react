@@ -22,7 +22,9 @@ import {
   DialerSip,
   Lock,
   Dns,
-  SettingsEthernet
+  SettingsEthernet,
+  Visibility,
+  VisibilityOff,
 } from '@mui/icons-material'
 
 function PhoneReg(props) {
@@ -38,6 +40,7 @@ function PhoneReg(props) {
   const [callerUserNum, setCallerUserNum] = useState(phoneControlRdcr.callerUserNum)
   const [regUserPass, setRegUserPass] = useState(phoneControlRdcr.regUserPass)
   const [uriWebRtc, setUriWebRtc] = useState(phoneControlRdcr.uriWebRtc)
+  const [showPassword, setShowPassword] = useState(false)
 
   // Синхронизация полей, когда authControlActions присылает новые данные SIP после AD-логина
   useEffect(() => {
@@ -147,15 +150,28 @@ function PhoneReg(props) {
             disabled={isRegistered}
             id="regUserPass"
             label="Пароль (Secret)"
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             variant="outlined"
             value={regUserPass}
-            onChange={(e) => setRegUserPass(e.target.value)}
+            onChange={(event) => setRegUserPass(event.target.value)}
             slotProps={{
               input: {
                 startAdornment: (
                   <InputAdornment position="start">
                     <Lock color="action" />
+                  </InputAdornment>
+                ),
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="переключить видимость пароля"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      onMouseDown={(event) => event.preventDefault()}
+                      edge="end"
+                      disabled={isRegistered}
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
                   </InputAdornment>
                 ),
               },
