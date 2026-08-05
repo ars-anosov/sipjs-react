@@ -35,6 +35,18 @@ import {
   Dialpad       as IconDialpad,
 } from '@mui/icons-material'
 
+const kbdStyles = {
+  '& kbd': {
+    display: 'inline-block',
+    backgroundColor: 'action.hover',
+    border: '1px solid',
+    borderColor: 'divider',
+    borderRadius: '5px',
+    px: 0.8,
+    fontSize: '0.85em',
+    verticalAlign: 'baseline',
+  }
+}
 
 
 function PhonePad(props) {
@@ -420,23 +432,23 @@ function PhonePad(props) {
       <Alert 
         onClose={handleCloseInfo}
         severity="info"
-        sx={{ width: '100%' }}
+        sx={{ ...kbdStyles, width: '100%' }}
       >
         <AlertTitle>Если нет системных уведомлений.</AlertTitle>
         Проверьте настройки вашей Windows:
-        <ol style={{ margin: '8px 0 0 20px', padding: 0 }}>
+        <ol>
           <li>
             <strong>Режим «Не беспокоить» (Фокусировка внимания)</strong>:
             <ul>
-              <li>Windows 11: Нажмите <kbd>Win + N</kbd>. Убедитесь, что значок <em>колокольчика/полумесяца</em> отключен.</li>
-              <li>Windows 10: Нажмите комбинацию <kbd>Win + A</kbd>. Убедитесь, что плитка <em>«Фокусировка внимания»</em> отключена.</li>
+              <li>Windows 11: Нажмите <kbd>Win + N</kbd>. Убедитесь, что значок <kbd>колокольчика/полумесяца</kbd> отключен.</li>
+              <li>Windows 10: Нажмите <kbd>Win + A</kbd>. Убедитесь, что плитка <kbd>«Фокусировка внимания»</kbd> отключена.</li>
             </ul>
           </li>
           <li>
             <strong>Системные разрешения для браузера</strong>:
             <ul>
               <li>Нажмите <kbd>Win + I</kbd> → Система → Уведомления.</li>
-              <li>Найдите в списке ваш браузер (Chrome / Edge) и убедитесь, что переключатель для него находится в положении <strong>«Вкл»</strong>.</li>
+              <li>Найдите в списке ваш браузер (Chrome / Edge) и убедитесь, что переключатель для него находится в положении <kbd>«Вкл»</kbd>.</li>
             </ul>
           </li>
           <li>
@@ -445,7 +457,7 @@ function PhonePad(props) {
             <ul>
               <li>Windows 11: нажмите на стрелочку рядом с браузером</li>
               <li>Windows 10: нажмите прямо на название вашего браузера</li>
-              <li>проверьте, стоит ли галочка на пункте <em>«Показывать баннеры уведомлений»</em>, иначе пуши будут падать в историю скрытно.</li>
+              <li>проверьте, стоит ли галочка на пункте <kbd>«Показывать баннеры уведомлений»</kbd>, иначе пуши будут падать в историю скрытно.</li>
             </ul>
           </li>
         </ol>

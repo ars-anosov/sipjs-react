@@ -50,10 +50,10 @@ function PhoneIco({ phoneControlRdcr }) {
       setToast({
         open: true,
         title: 'Уведомления не поддерживаются',
-        message: 'Ваш браузер слишком старый или запущен в режиме Инкогнито.',
+        message: 'Что-то с браузером или HTTPS.',
         severity: 'error'
       });
-      return; // Останавливаемся
+      return;
     }
 
     // 2. Проверка HTTPS
@@ -64,7 +64,7 @@ function PhoneIco({ phoneControlRdcr }) {
         message: 'Для работы системных уведомлений о звонках обязателен HTTPS.',
         severity: 'error'
       });
-      return; // Останавливаемся
+      return;
     }
 
     // Функция для регистрации воркера
