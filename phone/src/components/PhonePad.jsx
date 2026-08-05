@@ -29,7 +29,7 @@ import {
   PlayArrow     as IconResume,
   Close         as IconClose,
   InfoOutlined  as IconInfoOutlined,
-  Mail          as IconMail,
+  ChatOutlined  as IconChatOutlined,
   WifiOff       as IconOffline,
   Wifi          as IconOnline,
   Dialpad       as IconDialpad,
@@ -410,7 +410,7 @@ function PhonePad(props) {
                 color={phoneControlRdcr.displayChat ? 'primary' : 'default'}
                 onClick={toggleChat}
               >
-                <IconMail />
+                <IconChatOutlined />
               </IconButton>
             </Tooltip>
           </Badge>
