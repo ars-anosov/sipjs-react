@@ -156,7 +156,7 @@ function PhoneHistory(props) {
     <Paper 
       elevation={8} 
       sx={{ 
-        minWidth: 350, maxWidth: 500,
+        minWidth: 320, maxWidth: 500,
         width: '100%', 
         mx: 'auto', 
         mt: 2,
@@ -179,7 +179,7 @@ function PhoneHistory(props) {
 
       <TableContainer
         sx={{
-          height: 440,
+          height: 452,
           overflowY: 'auto',
           border: 1,
           borderColor: 'divider',

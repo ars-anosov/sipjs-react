@@ -33,6 +33,7 @@ import {
   WifiOff       as IconOffline,
   Wifi          as IconOnline,
   Dialpad       as IconDialpad,
+  InstallMobile as IconInstallMobile,
 } from '@mui/icons-material'
 
 const kbdStyles = {
@@ -98,6 +99,9 @@ function PhonePad(props) {
   const handleCloseInfo = (event, reason) => {
     if (reason === 'clickaway') return
     setInfo((prev) => ({ ...prev, open: !prev.open }))
+  }
+  const handleShowPad= function() {
+    phoneControlActions.handleChangeStore('displayPad', true)
   }
 
   const formatDuration = (seconds = 0) => {
@@ -208,13 +212,13 @@ function PhonePad(props) {
         maxWidth: 320, 
         width: '100%', 
         mx: 'auto', 
-        mt: 2,
+        mt: showInput ? 2 : 1,
         p: showInput ? 1 : 0, 
         borderRadius: 3, 
         position: 'relative'
       }}
     >
-    {showInput && (
+    {showInput ? (
     <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
       <Typography variant="h6" color="primary">SIP Телефон</Typography>
       <IconButton onClick={handleCloseInfo} sx={{ position: 'absolute', top: 4, right: 54  }}>
@@ -224,8 +228,16 @@ function PhonePad(props) {
         <IconClose color="action" />
       </IconButton>
     </Stack>
+    ) : (
+      !phoneControlRdcr.displayPad && (
+      <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'flex-end' }}>
+        <IconButton onClick={handleShowPad}>
+          <IconInstallMobile color="action" />
+        </IconButton>
+      </Stack>
+      )
     )}
-    <Typography variant="body2" color="primary" sx={{ mb: 0.5 }}>
+    <Typography variant="body2" color="primary" sx={{ mb: 2 }}>
       {callNow && (formatDuration(callDuration))} {phoneControlRdcr.phoneHeader}
     </Typography>
 
