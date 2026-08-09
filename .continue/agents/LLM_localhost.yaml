@@ -1,6 +1,9 @@
+# yaml-language-server: $schema=none
 name: localhost
 version: 1.0.0
 schema: v1
+
+# Модель для окна чата (слева)
 models:
   - name: lmstudio
     provider: lmstudio
@@ -19,3 +22,22 @@ models:
       - chat
       - edit
       - apply
+
+  - name: qwen2.5-coder-7b-instruct-openvino-npu:4
+    provider: openai
+    model: qwen2.5-coder-7b-instruct-openvino-npu:4
+    apiBase: "http://localhost:5272/v1"
+    contextLength: 32768
+    roles:
+      - chat
+      - edit
+      - apply
+
+# Модель для автодополнения кода "на лету"
+tabAutocompleteModel:
+  name: qwen2.5-coder-7b-instruct-openvino-npu:4
+  provider: openai
+  model: qwen2.5-coder-7b-instruct-openvino-npu:4
+  apiBase: "http://localhost:5272/v1"
+  roles:
+    - autocomplete
