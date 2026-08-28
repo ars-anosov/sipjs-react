@@ -1,0 +1,47 @@
+---
+description: "Контекст репозитория и общие правила"
+alwaysApply: true
+---
+
+# Контекст репозитория
+
+- Цель: ReactJS-компоненты на базе sip.js и livekit.
+- Рабочее приложение и сборка — в каталоге `phone/`.
+- Готовая сборка: `phone/dist`.
+- Документация и комментарии — на русском.
+
+## Структура
+
+```
+phone/src/
+  components/   — UI-компоненты (PhoneReg, PhonePad, AuthAd, …)
+  containers/   — связка с Redux (MtrxContainer, MenuAppContainer)
+  actions/      — Redux actions (thunk)
+  reducers/     — Redux reducers (*Rdcr)
+  store/        — configureStore
+  constants/    — константы action types, storage keys
+  mock/         — mock API для dev (vite plugin)
+```
+
+## Стек
+
+- React 19, Vite 8, Material UI 9
+- Redux (thunk, logger), react-redux, react-router-dom
+- matrix-js-sdk, ky
+
+## Команды
+
+```bash
+cd phone
+npm install
+npm run dev      # http://0.0.0.0:3000
+npm run build    # → phone/dist
+npm run serve    # preview, порт 4173
+```
+
+## Правила работы
+
+- Действуй как senior FullStack-разработчик.
+- Не расширяй объём правок без запроса. Для критичных изменений указывай риски и проверки.
+- Не добавляй TypeScript без явного запроса — проект на JavaScript (`.jsx`/`.js`).
+- Не меняй `phone/dist` вручную — только через `npm run build`.

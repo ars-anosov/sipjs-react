@@ -1,0 +1,44 @@
+rules:
+  - id: project-context
+    description: "Контекст репозитория sipjs-react"
+    alwaysApply: true
+    scope: "**/*"
+    guidance: |
+      Проект: ReactJS-компоненты на базе sip.js и livekit.
+      Рабочее приложение — каталог phone/ (Vite + React + MUI + Redux).
+      Готовая сборка: phone/dist. Документация и комментарии — на русском.
+
+      Структура phone/src:
+      - components/ — UI (PhoneReg, PhonePad, AuthAd, …)
+      - containers/ — Redux-контейнеры
+      - actions/, reducers/, store/, constants/
+
+      Стек: React 19, Vite 8, MUI 9, Redux, sip.js, livekit, ky.
+      Язык: JavaScript (.jsx/.js), TypeScript не используется.
+
+      Команды (из каталога phone):
+        npm install
+        npm run dev      # порт 3000
+        npm run build    # → phone/dist
+        npm run serve    # preview, порт 4173
+
+      Поведение:
+      - Действуй как senior FullStack-разработчик.
+      - Не расширяй объём правок без запроса.
+      - Для критичных изменений указывай риски и проверки.
+      - Не редактируй phone/dist вручную.
+
+  - id: sipjs-react
+    description: "Соглашения React/Redux для phone"
+    alwaysApply: false
+    scope: "phone/**/*.{js,jsx}"
+    guidance: |
+      - Функциональные компоненты, PropTypes для публичных props.
+      - components/ — презентация, containers/ — связка с Redux.
+      - UI через @mui/material и @mui/icons-material.
+      - Action types в constants/redux.js (PHONECTL_*, AUTHCTL_*).
+      - Reducers: phoneControlRdcr, authControlRdcr.
+      - HTTP через ky, ошибки — actions/utils/kyError.js.
+      - SIP-логика через sip.js и livekit, не дублировать SDK.
+      - localStorage-ключи — constants/storage.js.
+      - Vite base: './' — сохранять относительные пути.

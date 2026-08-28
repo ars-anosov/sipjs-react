@@ -1,0 +1,34 @@
+---
+description: "Соглашения React/Redux/MUI для phone"
+globs: phone/**/*.{jsx,js}
+alwaysApply: false
+---
+
+# Соглашения кода phone
+
+## Компоненты
+
+- Функциональные компоненты, `PropTypes` для публичных props.
+- Презентационные — в `components/`, подключённые к store — в `containers/`.
+- UI — Material UI (`@mui/material`, `@mui/icons-material`).
+
+## Redux
+
+- Action types — константы в `constants/redux.js` (префиксы `PHONECTL_`, `AUTHCTL_`).
+- Reducers: `phoneControlRdcr`, `authControlRdcr`; actions: `phoneControlActions`, `authControlActions`.
+- В контейнерах: `useSelector`, `bindActionCreators` + `useMemo`.
+
+## Matrix
+
+- Работа с протоколом — через `matrix-js-sdk`; не дублировать низкоуровневую логику SDK.
+- Ключевые компоненты: `PhoneReg` (регистрация/вход), `PhonePad` (чат), `AuthAd` (интеграция с AD).
+
+## HTTP
+
+- Запросы — через `ky`; ошибки — `actions/utils/kyError.js`.
+
+## Стиль
+
+- Комментарии на русском, кратко и по делу.
+- `localStorage`-ключи — в `constants/storage.js`.
+- Vite: `base: './'` — сохранять относительные пути для деплоя из `dist`.
