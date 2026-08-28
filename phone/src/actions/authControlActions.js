@@ -7,11 +7,20 @@ import {
   AUTHCTL_SUBMIT_ERROR,
   AUTHCTL_CLEAR,
   AUTHCTL_STORE_VALUE,
-  
+
   PHONECTL_STORE_VALUE,
 } from '../constants/redux'
 
 import { handleClkRegister } from './phoneControlActions'
+
+import { AD_URI_AUTH_KEY } from '../constants/storage'
+
+function dispatchAdAuthError(dispatch, errText) {
+  dispatch({
+    type: AUTHCTL_SUBMIT_ERROR,
+    payload: { errText },
+  })
+}
 
 const handleAdRegister = function(formData = {}) {
   return async (dispatch, getState) => {
@@ -20,28 +29,22 @@ const handleAdRegister = function(formData = {}) {
     const uriAdAuth = typeof formData.uriAdAuth === 'string' ? formData.uriAdAuth.trim() : ''
 
     if (!login || !password) {
-      dispatch({
-        type: AUTHCTL_SUBMIT_ERROR,
-        payload: { message: 'Заполните логин и пароль.' },
-      })
+      dispatchAdAuthError(dispatch, 'Заполните логин и пароль.')
       return
     }
 
     if (!uriAdAuth) {
-      dispatch({
-        type: AUTHCTL_SUBMIT_ERROR,
-        payload: { message: 'Не задан uriAdAuth.' },
-      })
+      dispatchAdAuthError(dispatch, 'Не задан uriAdAuth.')
       return
     }
-    localStorage.setItem('uriAdAuth', uriAdAuth)
+    localStorage.setItem(AD_URI_AUTH_KEY, uriAdAuth)
 
     dispatch({ type: AUTHCTL_SUBMIT_REQUEST })
 
     try {
-      const responseData = await ky.post(uriAdAuth, { 
-        json: { login, password }, 
-        timeout: 5000 
+      const responseData = await ky.post(uriAdAuth, {
+        json: { login, password },
+        timeout: 5000,
       }).json()
 
       localStorage.setItem('adLogin', login)
@@ -50,10 +53,7 @@ const handleAdRegister = function(formData = {}) {
 
       dispatch({
         type: AUTHCTL_SUBMIT_SUCCESS,
-        payload: {
-          message: 'Успешно',
-          responseData: responseData,
-        },
+        payload: { responseData },
       })
 
       // Воздействие на компоненту PhoneReg
@@ -84,11 +84,7 @@ const handleAdRegister = function(formData = {}) {
 
     } catch (error) {
       const detailMessage = await getApiErrorMessage(error)
-      
-      dispatch({
-        type: AUTHCTL_SUBMIT_ERROR,
-        payload: { message: detailMessage },
-      })
+      dispatchAdAuthError(dispatch, detailMessage)
     }
   }
 }
@@ -105,7 +101,7 @@ const handleChangeStore = function(storeDataKey, storeDataValue) {
   return (dispatch) => {
     dispatch({
       type: AUTHCTL_STORE_VALUE,
-      payload: { 'storeDataKey': storeDataKey, 'storeDataValue': storeDataValue }
+      payload: { storeDataKey, storeDataValue },
     })
   }
 }
@@ -113,5 +109,5 @@ const handleChangeStore = function(storeDataKey, storeDataValue) {
 export {
   handleAdRegister,
   handleAdAuthClear,
-  handleChangeStore
+  handleChangeStore,
 }
