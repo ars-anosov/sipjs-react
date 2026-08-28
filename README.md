@@ -70,13 +70,23 @@ GET-запрос к серверу справочнику, ожидаемый о
 # Пакеты
 Использую Node.js + Vite, см. [tools](tools)
 
+node модули
 ```bash
-npm install --save react react-dom
+npm install --save react react-dom react-router-dom
 npm install --save react-redux redux redux-logger redux-thunk
 npm install --save @mui/material @emotion/react @emotion/styled @mui/icons-material
-npm install --save sip.js date-fns
-npm install --save-dev vite @vitejs/plugin-react
+npm install --save sip.js date-fns ky
+npm install --save-dev vite @vitejs/plugin-react body-parser
 
 # Перепрыгнуть за мажорные версии
 npx npm-check-updates
+```
+
+npm скрипты
+```json
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "serve": "vite preview --host 0.0.0.0"
+  }
 ```
