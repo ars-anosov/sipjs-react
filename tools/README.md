@@ -5,14 +5,12 @@
 [nodejs.org](https://nodejs.org/en/download), [fnm](https://github.com/Schniz/fnm)
 
 ```bash
-# winget install OpenJS.NodeJS
+sudo apt install -y unzip
+curl -o- https://fnm.vercel.app/install | bash
+fnm install 24
 
-winget install Volta.Volta
-volta install node@25
 node -v
-# v25.1.0
-npm -v
-# 11.6.2
+# v24.20.0
 ```
 
 

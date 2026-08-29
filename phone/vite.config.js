@@ -8,6 +8,38 @@ export default defineConfig({
     outDir: 'dist',
     assetsDir: 'assets',
     chunkSizeWarningLimit: 1000,
+    rolldownOptions: {
+      output: {
+        codeSplitting: {
+          groups: [
+            {
+              name: 'react',
+              test: /node_modules\/(react|react-dom)\//,
+            },
+            {
+              name: 'redux',
+              test: /node_modules\/(redux|react-redux|redux-thunk|redux-logger)\//,
+            },
+            {
+              name: 'mui',
+              test: /node_modules\/(@mui|@emotion)\//,
+            },
+            {
+              name: 'sipjs',
+              test: /node_modules\/(sip\.js)\//,
+            },
+            {
+              name: 'livekit',
+              test: /node_modules\/(@livekit|livekit-client)\//,
+            },
+            {
+              name: 'vendor',
+              test: /node_modules/,
+            },
+          ],
+        },
+      }
+    },
   },
   server: {
     port: 3000,
