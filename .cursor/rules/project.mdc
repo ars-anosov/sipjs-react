@@ -1,33 +1,21 @@
 ---
-description: "Контекст репозитория и общие правила"
+description: "Контекст репозитория sipjs-react"
 alwaysApply: true
 ---
 
-# Контекст репозитория
+# sipjs-react
 
-- Цель: ReactJS-компоненты на базе sip.js и livekit.
-- Рабочее приложение и сборка — в каталоге `phone/`.
-- Готовая сборка: `phone/dist`.
-- Документация и комментарии — на русском.
+WebRTC-телефон: SPA на sip.js и LiveKit. Канон — `CLAUDE.md`.
+Документация и комментарии — на русском.
 
-## Структура
-
-```
-phone/src/
-  components/   — UI-компоненты (PhoneReg, PhonePad, AuthAd, …)
-  containers/   — связка с Redux (MtrxContainer, MenuAppContainer)
-  actions/      — Redux actions (thunk)
-  reducers/     — Redux reducers (*Rdcr)
-  store/        — configureStore
-  constants/    — константы action types, storage keys
-  mock/         — mock API для dev (vite plugin)
-```
+- код: `phone/src/`
+- mock: `phone/mock/`
+- сборка: `npm run build` → `phone/dist` (не править вручную)
 
 ## Стек
 
-- React 19, Vite 8, Material UI 9
-- Redux (thunk, logger), react-redux, react-router-dom
-- matrix-js-sdk, ky
+React 19, Vite 8, MUI 9, Redux 5 + thunk, sip.js, livekit-client, ky.
+JavaScript (`.js` / `.jsx`), без TypeScript. Отступ — 2 пробела.
 
 ## Команды
 
@@ -39,9 +27,8 @@ npm run build    # → phone/dist
 npm run serve    # preview, порт 4173
 ```
 
-## Правила работы
+## Правила
 
-- Действуй как senior FullStack-разработчик.
-- Не расширяй объём правок без запроса. Для критичных изменений указывай риски и проверки.
-- Не добавляй TypeScript без явного запроса — проект на JavaScript (`.jsx`/`.js`).
-- Не меняй `phone/dist` вручную — только через `npm run build`.
+- минимальный diff
+- без TS, тестов, CI и новых зависимостей без явного запроса
+- для критичных изменений — риски и шаги проверки

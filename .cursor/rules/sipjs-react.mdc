@@ -4,31 +4,25 @@ globs: phone/**/*.{jsx,js}
 alwaysApply: false
 ---
 
-# Соглашения кода phone
+# Соглашения phone
 
-## Компоненты
-
-- Функциональные компоненты, `PropTypes` для публичных props.
-- Презентационные — в `components/`, подключённые к store — в `containers/`.
-- UI — Material UI (`@mui/material`, `@mui/icons-material`).
+- Компоненты функциональные; публичные props — `PropTypes`.
+- Презентация — `components/`, store — `containers/` (`useSelector`, `bindActionCreators` + `useMemo`).
+- UI — Material UI.
 
 ## Redux
 
-- Action types — константы в `constants/redux.js` (префиксы `PHONECTL_`, `AUTHCTL_`).
-- Reducers: `phoneControlRdcr`, `authControlRdcr`; actions: `phoneControlActions`, `authControlActions`.
-- В контейнерах: `useSelector`, `bindActionCreators` + `useMemo`.
+- types: `constants/redux.js` (`PHONECTL_`, `AUTHCTL_`, `LKTOKEN_` / `LK_`)
+- `phoneControl`, `authControl`, `lkControl` — `*Rdcr` / `*Actions`
+- объекты sip.js — в `phoneRuntime.js`, не в store
+- HTTP: `ky` + `actions/utils/kyError.js`
+- ключи `localStorage` — `constants/storage.js`
+- Vite `base: './'` — относительные пути в `dist`
 
-## Matrix
+## Компоненты
 
-- Работа с протоколом — через `matrix-js-sdk`; не дублировать низкоуровневую логику SDK.
-- Ключевые компоненты: `PhoneReg` (регистрация/вход), `PhonePad` (чат), `AuthAd` (интеграция с AD).
-
-## HTTP
-
-- Запросы — через `ky`; ошибки — `actions/utils/kyError.js`.
-
-## Стиль
-
-- Комментарии на русском, кратко и по делу.
-- `localStorage`-ключи — в `constants/storage.js`.
-- Vite: `base: './'` — сохранять относительные пути для деплоя из `dist`.
+- `PhoneReg` — SIP-регистрация
+- `PhonePad` — набор номера и звонки
+- `PhoneChat` — SIP-чат
+- `AuthAd` — AD-авторизация
+- `LkMeet` — видеовстреча LiveKit

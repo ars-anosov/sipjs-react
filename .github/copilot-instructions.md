@@ -1,26 +1,38 @@
-# Инструкции для GitHub Copilot
+# sipjs-react
 
-Репозиторий **sipjs-react** — ReactJS-компоненты на базе sip.js и livekit.
+WebRTC-телефон: SPA на sip.js и LiveKit. Канон — `CLAUDE.md`.
 
 ## Где код
 
-- Основное приложение: `phone/`
-- Исходники: `phone/src/`
-- Сборка: `npm run build` → `phone/dist`
+- приложение: `phone/`
+- исходники: `phone/src/`
+- mock API: `phone/mock/`
+- сборка: `npm run build` → `phone/dist` (не править вручную)
 
-## Компоненты Matrix
+## Компоненты
 
-- `PhoneReg` — регистрация и вход
-- `PhonePad` — телефон
-- `AuthAd` — интеграция с AD-авторизацией
+- `PhoneReg` — SIP-регистрация
+- `PhonePad` — набор номера и звонки
+- `PhoneChat` — SIP-чат
+- `AuthAd` — AD-авторизация
+- `LkMeet` — видеовстреча LiveKit
 
-## Технологии
+Контейнеры: `PhoneContainer`, `LkContainer`, `MenuAppContainer`.
 
-React 19, Vite 8, Material UI 9, Redux (thunk), matrix-js-sdk, ky.  
-Проект на **JavaScript** — не предлагать миграцию на TypeScript без запроса.
+## Стек
 
-## Стиль
+React 19, Vite 8, MUI 9, Redux 5 + thunk, sip.js, livekit-client, ky.
+JavaScript — без TypeScript. Отступ — 2 пробела.
 
-- Документация и комментарии — на русском
-- Redux: action types в `constants/redux.js`, reducers с суффиксом `Rdcr`
-- Минимальный объём правок; не добавлять зависимости и инфраструктуру без запроса
+## Redux
+
+- types: `constants/redux.js` (`PHONECTL_`, `AUTHCTL_`, `LKTOKEN_` / `LK_`)
+- reducers: `phoneControlRdcr`, `authControlRdcr`, `lkControlRdcr`
+- actions: `*Actions`; объекты sip.js — в `phoneRuntime.js`, не в store
+- HTTP: `ky` + `actions/utils/kyError.js`
+
+## Правила
+
+- минимальный diff
+- без новых зависимостей, TS, тестов и CI без явного запроса
+- ответы и комментарии — на русском

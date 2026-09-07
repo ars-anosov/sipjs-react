@@ -1,87 +1,35 @@
-# CODEX — sipjs-react
+# sipjs-react — Codex
 
-**Проект:** ReactJS-компоненты на базе sip.js и livekit
-**Язык общения и документации:** русский
+WebRTC-телефон: SPA на sip.js и LiveKit. Канон — `CLAUDE.md`.
+Документация и комментарии — на русском.
 
----
+**Код:** `phone/src/`  
+**Mock:** `phone/mock/`  
+**Сборка:** `npm run build` → `phone/dist` (не править вручную)
 
-## Назначение
+## Компоненты
 
-Библиотека/демо React-компонентов для работы с sip.js и livekit. Основной код — SPA в `phone/`, готовая сборка — `phone/dist`.
+- `PhoneReg` — SIP-регистрация
+- `PhonePad` — набор номера и звонки
+- `PhoneChat` — SIP-чат
+- `AuthAd` — AD-авторизация
+- `LkMeet` — видеовстреча LiveKit
 
----
-
-## Структура репозитория
-
-```
-sipjs-react/
-├── phone/                # рабочее приложение (Vite + React)
-│   ├── src/
-│   │   ├── components/   # UI-компоненты
-│   │   ├── containers/   # Redux-контейнеры
-│   │   ├── actions/      # Redux actions
-│   │   ├── reducers/     # Redux reducers
-│   │   ├── store/        # store
-│   │   └── constants/    # константы
-│   ├── mock/             # mock API (vite plugin)
-│   ├── dist/             # результат npm run build
-│   └── package.json
-├── tools/                # заметки по Node.js, Vite, MUI
-└── img/                  # скриншоты для README
-```
-
----
+Контейнеры: `PhoneContainer`, `LkContainer`, `MenuAppContainer`.
 
 ## Стек
 
-- **Runtime:** Node.js 24 (см. `.devcontainer/devcontainer.json`)
-- **Сборка:** Vite 8, `@vitejs/plugin-react`
-- **UI:** React 19, Material UI 9, Emotion
-- **Состояние:** Redux 5, redux-thunk, redux-logger, react-redux
-- **sipjs:** sip.js
-- **HTTP:** ky
-- **Язык:** JavaScript (`.jsx`/`.js`), без TypeScript
+React 19, Vite 8, MUI 9, Redux 5 + thunk, sip.js, livekit-client, ky.  
+JavaScript — без TypeScript. Отступ — 2 пробела.
 
----
+## Redux
 
-## Команды
+- types: `constants/redux.js` (`PHONECTL_`, `AUTHCTL_`, `LKTOKEN_` / `LK_`)
+- reducers / actions: `phoneControl`, `authControl`, `lkControl` (`*Rdcr` / `*Actions`)
+- объекты sip.js — в `phoneRuntime.js`, не в store
+- HTTP: `ky` + `actions/utils/kyError.js`
 
-```bash
-cd phone
-npm install
-npm run dev      # dev-сервер, порт 3000, host 0.0.0.0
-npm run build    # сборка в phone/dist
-npm run serve    # preview, порт 4173
-```
+## Правила
 
----
-
-## Соглашения кода
-
-### Redux
-
-- Action types: `constants/redux.js` (`PHONECTL_*`, `AUTHCTL_*`)
-- Reducers: `*Rdcr` (`phoneControlRdcr`, `authControlRdcr`)
-- Actions передаются в компоненты через `bindActionCreators` в контейнерах
-
-### React
-
-- Функциональные компоненты, `PropTypes` для props
-- Презентация — `components/`, логика store — `containers/`
-
-### Прочее
-
-- Ключи `localStorage` — `constants/storage.js`
-- Ошибки HTTP — `actions/utils/kyError.js`
-- Vite `base: './'` — относительные пути для статического деплоя
-
----
-
-## Правила для агента
-
-1. Действуй как senior FullStack-разработчик.
-2. Не расширяй объём правок без запроса.
-3. Для критичных изменений указывай риски и шаги проверки.
-4. Не добавляй TypeScript, тесты, CI и новые зависимости без явного запроса.
-5. Не редактируй `phone/dist` вручную — только `npm run build`.
-6. Сохраняй русский язык в документации и комментариях.
+- минимальный diff
+- без новых зависимостей, TS, тестов и CI без явного запроса

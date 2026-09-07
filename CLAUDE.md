@@ -1,112 +1,84 @@
-# CLAUDE.md — matrix-react
+# CLAUDE.md — sipjs-react
 
-**Проект:** ReactJS-компоненты на базе sip.js и livekit
-**Язык общения, документации и комментариев:** русский
+WebRTC-телефон: SPA на sip.js и LiveKit.
+Язык документации, комментариев и ответов — русский.
 
-Файл — основной источник правил для AI-агентов. Дублирующие инструкции для других
-инструментов: `.github/copilot-instructions.md`, `.cursor/rules/*.mdc`, `.codex/codex.md`.
-При изменении соглашений синхронизировать их с этим файлом.
+Канон для агентов. Копии: `.github/copilot-instructions.md`, `.github/copilot.yml`,
+`.cursor/rules/*.mdc`, `.codex/codex.md`. При смене соглашений синхронизировать.
 
----
+## Где код
 
-## Назначение
+- приложение: `phone/`
+- исходники: `phone/src/`
+- mock API (dev): `phone/mock/`
+- сборка: `npm run build` → `phone/dist` (не править вручную)
 
-Библиотека/демо React-компонентов для работы с sipjs и livekit. Рабочее приложение — SPA в `phone/`,
-готовая сборка — `phone/dist`.
+## Компоненты
 
-### Ключевые компоненты
+| Файл | Назначение |
+|------|------------|
+| `PhoneReg.jsx` | SIP-регистрация |
+| `PhonePad.jsx` | набор номера и звонки |
+| `PhoneChat.jsx` | SIP-чат |
+| `PhoneHistory.jsx` | история звонков |
+| `PhoneDir.jsx` | справочник |
+| `AuthAd.jsx` | AD-авторизация (POST) |
+| `LkMeet.jsx` | видеовстреча LiveKit |
+| `MenuAppBar.jsx` | верхнее меню |
 
-| Компонент | Назначение |
-|-----------|------------|
-| `PhoneReg.jsx` | Регистрация и вход в sipjs |
-| `PhonePad.jsx` | Чат-панель sipjs |
-| `AuthAd.jsx` | Авторизация через внешний AD-сервис (POST, JSON: `ad_login`, `ad_cn`, `ad_title`, `ad_department`) |
-| `AuthAdInfo.jsx`, `AuthIco.jsx` | Вспомогательные элементы авторизации |
-| `MenuAppBar.jsx` | Верхнее меню приложения |
+Контейнеры: `PhoneContainer`, `LkContainer`, `MenuAppContainer`.
 
----
+`AuthAd` ожидает JSON: `sip_username`, `sip_secret`, `lk_token`, `ad_login`, `ad_cn`, `ad_title`, `ad_department`.
 
-## Структура репозитория
+## Структура
 
 ```
-matrix-react/
-├── phone/                 # рабочее приложение (Vite + React)
+sipjs-react/
+├── phone/
 │   ├── src/
-│   │   ├── components/   # UI-компоненты (PhoneReg, PhonePad, AuthAd, …)
-│   │   ├── containers/   # Redux-контейнеры (PhoneContainer, MenuAppContainer)
-│   │   ├── actions/      # Redux actions (thunk)
-│   │   ├── reducers/     # Redux reducers (*Rdcr)
-│   │   ├── store/        # configureStore
-│   │   ├── constants/    # action types, storage keys
-│   │   └── theme.js      # тема MUI
-│   ├── mock/             # mock API для dev (vite plugin)
-│   ├── dist/             # результат npm run build
-│   └── package.json
-├── tools/                # заметки по Node.js, Vite, MUI
-└── img/                  # скриншоты для README
+│   │   ├── components/
+│   │   ├── containers/
+│   │   ├── actions/          # *Actions; SIP runtime — phoneRuntime.js
+│   │   ├── reducers/         # *Rdcr
+│   │   ├── store/
+│   │   ├── constants/        # redux.js, storage.js
+│   │   └── theme.js
+│   ├── mock/
+│   └── dist/
+└── tools/                    # заметки по Node.js, Vite, MUI
 ```
-
----
 
 ## Стек
 
-- **Runtime:** Node.js 24 (см. `.devcontainer/devcontainer.json`)
-- **Сборка:** Vite 8, `@vitejs/plugin-react`
-- **UI:** React 19, Material UI 9 (`@mui/material`, `@mui/icons-material`), Emotion
-- **Состояние:** Redux 5, redux-thunk, redux-logger, react-redux, react-router-dom
-- **sip.js:** sip.js
-- **HTTP:** ky
-- **Язык:** JavaScript (`.jsx` / `.js`), без TypeScript
-
----
+React 19, Vite 8, MUI 9, Redux 5 + thunk, sip.js, livekit-client, `@livekit/components-react`, ky.
+JavaScript (`.js` / `.jsx`), без TypeScript.
 
 ## Команды
 
 ```bash
-cd mtrx
+cd phone
 npm install
-npm run dev      # dev-сервер, http://0.0.0.0:3000
-npm run build    # сборка в mtrx/dist
+npm run dev      # http://0.0.0.0:3000
+npm run build    # → phone/dist
 npm run serve    # preview, порт 4173
 ```
 
----
+## Соглашения
 
-## Соглашения кода
-
-### React
-
-- Функциональные компоненты, `PropTypes` для публичных props.
-- Презентационные компоненты — в `components/`, подключённые к store — в `containers/`.
-- UI — только Material UI.
-
-### Redux
-
-- Action types — константы в `constants/redux.js` (префиксы `PHONECTL_`, `AUTHCTL_`).
-- Reducers: `phoneControlRdcr`, `authControlRdcr`; actions: `phoneControlActions`, `authControlActions`.
+- Компоненты функциональные; публичные props — `PropTypes`.
+- UI — Material UI. Презентация в `components/`, store — в `containers/`.
 - В контейнерах: `useSelector`, `bindActionCreators` + `useMemo`.
-
-### Прочее
-
-- Ключи `localStorage` — в `constants/storage.js`.
-- Ошибки HTTP — `actions/utils/kyError.js`; запросы — через `ky`.
-- Vite `base: './'` — сохранять относительные пути для статического деплоя из `dist`.
-
----
-
-## Стиль оформления
-
-- Отступ — `2` пробела.
-- Для отступов использовать только символы `Space`; символы табуляции `Tab` в код не добавлять.
-- Комментарии и документация — на русском, кратко и по делу.
-
----
+- Action types — `constants/redux.js`: `PHONECTL_`, `AUTHCTL_`, `LKTOKEN_` / `LK_`.
+- Reducers / actions: `phoneControl`, `authControl`, `lkControl` (`*Rdcr` / `*Actions`).
+- Объекты sip.js живут в `phoneRuntime.js`, не в Redux.
+- HTTP — `ky`; ошибки — `actions/utils/kyError.js`.
+- Ключи `localStorage` — `constants/storage.js`.
+- Vite `base: './'` — относительные пути в `dist`.
+- Отступ — 2 пробела, без Tab.
 
 ## Правила для агента
 
-1. Действовать как senior FullStack-разработчик.
-2. Не расширять объём правок без запроса — минимальный необходимый диff.
-3. Для критичных изменений указывать риски и шаги проверки.
-4. Не добавлять TypeScript, тесты, CI, новые зависимости и инфраструктуру без явного запроса.
-5. Не редактировать `phone/dist` вручную — только через `npm run build`.
-6. Сохранять русский язык в документации, комментариях и ответах.
+1. Минимальный diff, без расширения объёма.
+2. Для критичных изменений — риски и шаги проверки.
+3. Без TypeScript, тестов, CI, новых зависимостей и инфраструктуры без явного запроса.
+4. `phone/dist` не редактировать вручную.
