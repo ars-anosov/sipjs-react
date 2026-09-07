@@ -1,148 +1,169 @@
-import { useState, useEffect, useRef } from 'react'
-import PropTypes from 'prop-types'
-
 import {
-  Paper,
-  Typography,
-  TextField,
-  Box,
-  Stack,
-  IconButton,
+  Backspace as IconBackspace,
+  Close as IconClose,
+  Delete as IconDelete,
+  Send as IconSend,
+} from "@mui/icons-material";
+import {
   Alert,
-  Collapse,
-  InputAdornment,
+  Box,
   Button,
-} from '@mui/material'
-
-import {
-  Send          as IconSend,
-  Close         as IconClose,
-  Delete        as IconDelete,
-  Backspace     as IconBackspace,
-} from '@mui/icons-material'
-
-import { useTheme, alpha } from '@mui/material/styles'
-import { format } from 'date-fns'
-
-
+  Collapse,
+  IconButton,
+  InputAdornment,
+  Paper,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { alpha, useTheme } from "@mui/material/styles";
+import { format } from "date-fns";
+import PropTypes from "prop-types";
+import { useEffect, useRef, useState } from "react";
 
 function PhoneChat(props) {
-  if (import.meta.env.DEV) console.log('PhoneChat hook')
+  if (import.meta.env.DEV) console.log("PhoneChat hook");
 
-  const { phoneControlRdcr, phoneControlActions } = props
-  const theme = useTheme()
-  const messagesEndRef = useRef(null)
+  const { phoneControlRdcr, phoneControlActions } = props;
+  const theme = useTheme();
+  const messagesEndRef = useRef(null);
 
-  const formatPhoneDigits = (value) => (value || '').replace(/\D/g, '')
-  const [peerTxt, setPeerTxt] = useState(formatPhoneDigits(phoneControlRdcr.calleePhoneNum))
-  const [messageTxt, setMessageTxt] = useState('')
+  const formatPhoneDigits = (value) => (value || "").replace(/\D/g, "");
+  const [peerTxt, setPeerTxt] = useState(
+    formatPhoneDigits(phoneControlRdcr.calleePhoneNum),
+  );
+  const [messageTxt, setMessageTxt] = useState("");
 
   useEffect(() => {
-    if (import.meta.env.DEV) console.log('PhoneChat MOUNT')
-    phoneControlActions.MessagesArrUpdate()
-    phoneControlActions.handleChatUnreadClear()
+    if (import.meta.env.DEV) console.log("PhoneChat MOUNT");
+    phoneControlActions.MessagesArrUpdate();
+    phoneControlActions.handleChatUnreadClear();
 
     return () => {
-      if (import.meta.env.DEV) console.log('PhoneChat UNMOUNT')
-    }
-  }, [])
+      if (import.meta.env.DEV) console.log("PhoneChat UNMOUNT");
+    };
+  }, [
+    phoneControlActions.MessagesArrUpdate,
+    phoneControlActions.handleChatUnreadClear,
+  ]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [phoneControlRdcr.chatMessages])
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, []);
 
   const visibleMessages = peerTxt.trim()
     ? phoneControlRdcr.chatMessages.filter((msg) => msg.peer === peerTxt.trim())
-    : phoneControlRdcr.chatMessages
+    : phoneControlRdcr.chatMessages;
 
   const handleClose = () => {
-    phoneControlActions.handleChangeStore('displayChat', false)
-    phoneControlActions.handleChangeStore('errComponent', '')
-    phoneControlActions.handleChangeStore('errText', '')
-  }
+    phoneControlActions.handleChangeStore("displayChat", false);
+    phoneControlActions.handleChangeStore("errComponent", "");
+    phoneControlActions.handleChangeStore("errText", "");
+  };
 
   const handleSubmit = (event) => {
-    event.preventDefault()
-    phoneControlActions.handleSendMessage(peerTxt, messageTxt, phoneControlRdcr)
-    setMessageTxt('')
-  }
+    event.preventDefault();
+    phoneControlActions.handleSendMessage(
+      peerTxt,
+      messageTxt,
+      phoneControlRdcr,
+    );
+    setMessageTxt("");
+  };
 
   const handlePeerSelect = (peer) => {
-    setPeerTxt(formatPhoneDigits(peer))
-  }
+    setPeerTxt(formatPhoneDigits(peer));
+  };
 
-  const title = phoneControlRdcr.chatUnread > 0
-    ? `SIP Сообщения (${phoneControlRdcr.chatUnread})`
-    : 'SIP Сообщения'
+  const title =
+    phoneControlRdcr.chatUnread > 0
+      ? `SIP Сообщения (${phoneControlRdcr.chatUnread})`
+      : "SIP Сообщения";
 
   const formatDeliveryStatus = (msg) => {
-    if (msg.direction !== 'out' || !msg.status) return null
+    if (msg.direction !== "out" || !msg.status) return null;
 
-    if (msg.status === 'sending') return 'отправка...'
+    if (msg.status === "sending") return "отправка...";
     if (msg.statusCode) {
-      return msg.statusText ? `${msg.statusCode} ${msg.statusText}` : String(msg.statusCode)
+      return msg.statusText
+        ? `${msg.statusCode} ${msg.statusText}`
+        : String(msg.statusCode);
     }
-    if (msg.status === 'delivered') return 'доставлено'
-    if (msg.status === 'error') return msg.statusText || 'ошибка'
-    return null
-  }
+    if (msg.status === "delivered") return "доставлено";
+    if (msg.status === "error") return msg.statusText || "ошибка";
+    return null;
+  };
 
   const renderMessageBody = (body) => {
-    if (!body) return null
+    if (!body) return null;
 
-    const parts = body.split(/(<a\s+href="[^"]+">.*?<\/a>)/gi)
-    if (parts.length === 1) return body
+    const parts = body.split(/(<a\s+href="[^"]+">.*?<\/a>)/gi);
+    if (parts.length === 1) return body;
 
     const normalizeLinkHref = (href) => {
-      if (!href) return '#'
-      if (href.startsWith('#')) return href
-      if (/^(https?:|mailto:|tel:)/i.test(href)) return href
-      return `#/${href.replace(/^\/+/, '')}`
-    }
+      if (!href) return "#";
+      if (href.startsWith("#")) return href;
+      if (/^(https?:|mailto:|tel:)/i.test(href)) return href;
+      return `#/${href.replace(/^\/+/, "")}`;
+    };
 
     return parts.map((part, index) => {
-      const match = part.match(/^<a\s+href="([^"]+)">([^<]+)<\/a>$/i)
-      if (!match) return <span key={`message-body-${index}`}>{part}</span>
+      const match = part.match(/^<a\s+href="([^"]+)">([^<]+)<\/a>$/i);
+      // biome-ignore lint/suspicious/noArrayIndexKey: <объяснение>
+      if (!match) return <span key={`message-body-${index}`}>{part}</span>;
 
-      const [, href, text] = match
+      const [, href, text] = match;
       return (
         <a
+          // biome-ignore lint/suspicious/noArrayIndexKey: <объяснение>
           key={`message-body-${index}`}
           href={normalizeLinkHref(href)}
-          style={{ color: 'inherit', textDecoration: 'underline' }}
+          style={{ color: "inherit", textDecoration: "underline" }}
         >
           {text}
         </a>
-      )
-    })
-  }
+      );
+    });
+  };
 
   const deliveryStatusColor = (msg) => {
-    if (msg.status === 'delivered') return 'success.main'
-    if (msg.status === 'error') return 'error.main'
-    return 'text.secondary'
-  }
+    if (msg.status === "delivered") return "success.main";
+    if (msg.status === "error") return "error.main";
+    return "text.secondary";
+  };
 
   return (
-    <Paper 
-      elevation={8} 
-      sx={{ 
-        minWidth: 320, maxWidth: 500,
-        width: '100%', 
-        mx: 'auto', 
+    <Paper
+      elevation={8}
+      sx={{
+        minWidth: 320,
+        maxWidth: 500,
+        width: "100%",
+        mx: "auto",
         mt: 2,
-        p: 1, 
-        borderRadius: 3, 
-        position: 'relative'
+        p: 1,
+        borderRadius: 3,
+        position: "relative",
       }}
     >
-      <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
-        <Typography variant="h6" color="primary">{title}</Typography>
-        <Stack direction="row" spacing={0} sx={{ alignItems: 'center' }}>
-          <IconButton onClick={phoneControlActions.handleClearChat} sx={{ position: 'absolute', top: 4, right: 54 }}>
+      <Stack
+        direction="row"
+        sx={{ alignItems: "center", justifyContent: "space-between" }}
+      >
+        <Typography variant="h6" color="primary">
+          {title}
+        </Typography>
+        <Stack direction="row" spacing={0} sx={{ alignItems: "center" }}>
+          <IconButton
+            onClick={phoneControlActions.handleClearChat}
+            sx={{ position: "absolute", top: 4, right: 54 }}
+          >
             <IconDelete color="action" />
           </IconButton>
-          <IconButton onClick={handleClose} sx={{ position: 'absolute', top: 4, right: 4 }}>
+          <IconButton
+            onClick={handleClose}
+            sx={{ position: "absolute", top: 4, right: 4 }}
+          >
             <IconClose color="action" />
           </IconButton>
         </Stack>
@@ -159,84 +180,89 @@ function PhoneChat(props) {
             input: {
               endAdornment: (
                 <InputAdornment position="end">
-                  <IconButton onClick={() => setPeerTxt('')} size="small">
+                  <IconButton onClick={() => setPeerTxt("")} size="small">
                     <IconBackspace />
                   </IconButton>
                 </InputAdornment>
               ),
             },
           }}
-          sx={{ width: '12ch', mb: 1 }}
+          sx={{ width: "12ch", mb: 1 }}
         />
 
         <Box
           sx={{
             height: 344,
-            overflowY: 'auto',
+            overflowY: "auto",
             border: 1,
-            borderColor: 'divider',
+            borderColor: "divider",
             borderRadius: 1,
             p: 0,
             mb: 1,
             backgroundColor: alpha(theme.palette.background.default, 0.5),
           }}
         >
-          {visibleMessages.length > 0 ? (
-            visibleMessages.map((msg) => {
-              const isOutbound = msg.direction === 'out'
-              const deliveryStatus = formatDeliveryStatus(msg)
-              const bubbleColor = isOutbound
-                ? alpha(theme.palette.info.main, 0.05)
-                : alpha(theme.palette.success.main, 0.05)
+          {visibleMessages.length > 0
+            ? visibleMessages.map((msg) => {
+                const isOutbound = msg.direction === "out";
+                const deliveryStatus = formatDeliveryStatus(msg);
+                const bubbleColor = isOutbound
+                  ? alpha(theme.palette.info.main, 0.05)
+                  : alpha(theme.palette.success.main, 0.05);
 
-              return (
-                <Box
-                  key={msg.id}
-                  sx={{
-                    mb: 1,
-                    p: 1,
-                    borderRadius: 1,
-                    backgroundColor: bubbleColor,
-                    cursor: 'pointer',
-                  }}
-                  onClick={() => handlePeerSelect(msg.peer)}
-                >
-                  <Stack direction="row" spacing={1} sx={{ mb: 0.5, justifyContent: 'space-between' }}>
-                    <Typography
-                      variant="caption"
-                      color="text.secondary"
+                return (
+                  <Box
+                    key={msg.id}
+                    sx={{
+                      mb: 1,
+                      p: 1,
+                      borderRadius: 1,
+                      backgroundColor: bubbleColor,
+                      cursor: "pointer",
+                    }}
+                    onClick={() => handlePeerSelect(msg.peer)}
+                  >
+                    <Stack
+                      direction="row"
+                      spacing={1}
+                      sx={{ mb: 0.5, justifyContent: "space-between" }}
                     >
-                      {isOutbound ? `Вы → ${msg.peer}` : msg.peer}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {format(new Date(msg.time), 'HH:mm:ss')}
-                    </Typography>
-                  </Stack>
-                  <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-                    {renderMessageBody(msg.body)}
-                  </Typography>
-                  {deliveryStatus && (
+                      <Typography variant="caption" color="text.secondary">
+                        {isOutbound ? `Вы → ${msg.peer}` : msg.peer}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {format(new Date(msg.time), "HH:mm:ss")}
+                      </Typography>
+                    </Stack>
                     <Typography
-                      variant="caption"
-                      sx={{
-                        display: 'block',
-                        mt: 0.5,
-                        textAlign: 'right',
-                        color: deliveryStatusColor(msg),
-                        fontStyle: msg.status === 'sending' ? 'italic' : 'normal',
-                      }}
+                      variant="body2"
+                      sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
                     >
-                      {deliveryStatus}
+                      {renderMessageBody(msg.body)}
                     </Typography>
-                  )}
-                </Box>
-              )
-            })
-          ) : null}
+                    {deliveryStatus && (
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          display: "block",
+                          mt: 0.5,
+                          textAlign: "right",
+                          color: deliveryStatusColor(msg),
+                          fontStyle:
+                            msg.status === "sending" ? "italic" : "normal",
+                        }}
+                      >
+                        {deliveryStatus}
+                      </Typography>
+                    )}
+                  </Box>
+                );
+              })
+            : null}
           <div ref={messagesEndRef} />
         </Box>
 
-        <Stack direction="row" spacing={1} sx={{ alignItems: 'flex-end' }}>
+        <Stack direction="row" spacing={1} sx={{ alignItems: "flex-end" }}>
           <TextField
             fullWidth
             label="Сообщение"
@@ -245,22 +271,22 @@ function PhoneChat(props) {
             value={messageTxt}
             onChange={(event) => setMessageTxt(event.target.value)}
             onKeyDown={(event) => {
-              if (event.key === 'Enter' && event.ctrlKey) {
-                event.preventDefault()
-                handleSubmit(event)
+              if (event.key === "Enter" && event.ctrlKey) {
+                event.preventDefault();
+                handleSubmit(event);
               }
             }}
             multiline
             maxRows={4}
           />
-          <Button 
-            type="submit" 
-            color="success" 
+          <Button
+            type="submit"
+            color="success"
             disabled={!phoneControlRdcr.regNow}
-            sx={{ 
-              width: 52, 
-              height: 52, 
-              minWidth: 52 
+            sx={{
+              width: 52,
+              height: 52,
+              minWidth: 52,
             }}
           >
             <IconSend />
@@ -268,18 +294,23 @@ function PhoneChat(props) {
         </Stack>
       </Box>
 
-      <Collapse in={phoneControlRdcr.errComponent === 'PhoneChat' && phoneControlRdcr.errText}>
-        <Alert severity="error" sx={{ mt: 2 }}>{phoneControlRdcr.errText}</Alert>
+      <Collapse
+        in={
+          phoneControlRdcr.errComponent === "PhoneChat" &&
+          phoneControlRdcr.errText
+        }
+      >
+        <Alert severity="error" sx={{ mt: 2 }}>
+          {phoneControlRdcr.errText}
+        </Alert>
       </Collapse>
     </Paper>
-  )
+  );
 }
-
-
 
 PhoneChat.propTypes = {
   phoneControlRdcr: PropTypes.object.isRequired,
   phoneControlActions: PropTypes.object.isRequired,
-}
+};
 
-export default PhoneChat
+export default PhoneChat;

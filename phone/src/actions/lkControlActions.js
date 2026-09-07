@@ -1,129 +1,123 @@
-import ky from 'ky'
-import { getApiErrorMessage } from './utils/kyError'
-
+import ky from "ky";
 import {
+  LK_STORE_VALUE,
+  LKTOKEN_CLEAR,
+  LKTOKEN_SUBMIT_ERROR,
   LKTOKEN_SUBMIT_REQUEST,
   LKTOKEN_SUBMIT_SUCCESS,
-  LKTOKEN_SUBMIT_ERROR,
-  LKTOKEN_CLEAR,
-  LK_STORE_VALUE,
-} from '../constants/redux'
-
+} from "../constants/redux";
 import {
   createChatMessage,
   getPhoneRuntime,
   transmitSipMessage,
-} from './phoneRuntime'
+} from "./phoneRuntime";
+import { getApiErrorMessage } from "./utils/kyError";
 
-const buildInviteSipMessageBody = function(room, responseData) {
-  if (responseData && typeof responseData === 'object') {
-    const lines = [`Приглашение на встречу`]
-    lines.push('')
-    lines.push(`<a href="/?lk_room=${room}&lk_token=${responseData.lk_token}">${room}</a>`)
-    return lines.join('\n')
+const buildInviteSipMessageBody = (room, responseData) => {
+  if (responseData && typeof responseData === "object") {
+    const lines = [`Приглашение на встречу`];
+    lines.push("");
+    lines.push(
+      `<a href="/?lk_room=${room}&lk_token=${responseData.lk_token}">${room}</a>`,
+    );
+    return lines.join("\n");
   }
 
-  return `room=${room}`
-}
+  return `room=${room}`;
+};
 
-const handleLkTokenSubmit = function(formData = {}) {
-  return async (dispatch, getState) => {
-    const num = typeof formData.num === 'string' ? formData.num.trim() : ''
-    const room = typeof formData.room === 'string' ? formData.room.trim() : ''
-    const uriLkToken = typeof formData.uriLkToken === 'string' ? formData.uriLkToken.trim() : ''
+const handleLkTokenSubmit =
+  (formData = {}) =>
+  async (dispatch, getState) => {
+    const num = typeof formData.num === "string" ? formData.num.trim() : "";
+    const room = typeof formData.room === "string" ? formData.room.trim() : "";
+    const uriLkToken =
+      typeof formData.uriLkToken === "string" ? formData.uriLkToken.trim() : "";
 
     if (!num || !room) {
       dispatch({
         type: LKTOKEN_SUBMIT_ERROR,
-        payload: { message: 'Заполните num и room.' },
-      })
-      return
+        payload: { message: "Заполните num и room." },
+      });
+      return;
     }
 
     if (!uriLkToken) {
       dispatch({
         type: LKTOKEN_SUBMIT_ERROR,
-        payload: { message: 'Не задан uriLkToken.' },
-      })
-      return
+        payload: { message: "Не задан uriLkToken." },
+      });
+      return;
     }
-    localStorage.setItem('uriLkToken', formData.uriLkToken)
+    localStorage.setItem("uriLkToken", formData.uriLkToken);
 
-    dispatch({ type: LKTOKEN_SUBMIT_REQUEST })
+    dispatch({ type: LKTOKEN_SUBMIT_REQUEST });
 
     try {
-      const responseData = await ky.post(uriLkToken, { json: { num, room } }).json()
+      const responseData = await ky
+        .post(uriLkToken, { json: { num, room } })
+        .json();
 
       dispatch({
         type: LKTOKEN_SUBMIT_SUCCESS,
         payload: {
-          message: 'Успешно',
+          message: "Успешно",
           responseData: responseData,
         },
-      })
+      });
 
       // Отправка SIP MESSAGE с приглашением в комнату
-      const state = getState()
-      const runtime = getPhoneRuntime()
-      const uriWebRtc = state?.phoneControlRdcr?.uriWebRtc || ''
+      const state = getState();
+      const runtime = getPhoneRuntime();
+      const uriWebRtc = state?.phoneControlRdcr?.uriWebRtc || "";
       const uriHost = (() => {
         if (!uriWebRtc) {
-          return ''
+          return "";
         }
 
         try {
-          return new URL(uriWebRtc).hostname || ''
+          return new URL(uriWebRtc).hostname || "";
         } catch {
-          const match = String(uriWebRtc).match(/^wss?:\/\/([^:/]+)/i)
-          return match?.[1] || ''
+          const match = String(uriWebRtc).match(/^wss?:\/\/([^:/]+)/i);
+          return match?.[1] || "";
         }
-      })()
-      const canSendSipMessage = Boolean(runtime?.userAgent && uriHost && num)
+      })();
+      const canSendSipMessage = Boolean(runtime?.userAgent && uriHost && num);
 
       if (canSendSipMessage) {
         const chatMessage = createChatMessage(
           num,
           buildInviteSipMessageBody(room, responseData),
-          'out',
-          'sending',
-        )
+          "out",
+          "sending",
+        );
 
         try {
-          await transmitSipMessage({ chatMessage, uriHost })
+          await transmitSipMessage({ chatMessage, uriHost });
         } catch (sipError) {
-          console.warn('Lk invite SIP MESSAGE send error:', sipError)
+          console.warn("Lk invite SIP MESSAGE send error:", sipError);
         }
       }
       // END OF Отправка SIP MESSAGE
-
     } catch (error) {
-      const detailMessage = await getApiErrorMessage(error)
+      const detailMessage = await getApiErrorMessage(error);
 
       dispatch({
         type: LKTOKEN_SUBMIT_ERROR,
         payload: { message: detailMessage },
-      })
+      });
     }
-  }
-}
+  };
 
-const handleLkTokenClear = function() {
-  return (dispatch) => {
-    dispatch({ type: LKTOKEN_CLEAR })
-  }
-}
+const handleLkTokenClear = () => (dispatch) => {
+  dispatch({ type: LKTOKEN_CLEAR });
+};
 
-const handleChangeStore = function(storeDataKey, storeDataValue) {
-  return (dispatch) => {
-    dispatch({
-      type: LK_STORE_VALUE,
-      payload: { storeDataKey, storeDataValue },
-    })
-  }
-}
+const handleChangeStore = (storeDataKey, storeDataValue) => (dispatch) => {
+  dispatch({
+    type: LK_STORE_VALUE,
+    payload: { storeDataKey, storeDataValue },
+  });
+};
 
-export {
-  handleLkTokenSubmit,
-  handleLkTokenClear,
-  handleChangeStore,
-}
+export { handleChangeStore, handleLkTokenClear, handleLkTokenSubmit };

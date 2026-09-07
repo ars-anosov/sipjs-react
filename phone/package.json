@@ -1,12 +1,15 @@
 {
   "name": "material-ui-vite",
-  "version": "2.1.4",
+  "version": "2.1.5",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
-    "serve": "vite preview --host 0.0.0.0"
+    "serve": "vite preview --host 0.0.0.0",
+    "lint": "biome lint .",
+    "format": "biome format --write .",
+    "check": "biome check --write ."
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -28,6 +31,7 @@
     "sip.js": "^0.21.2"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.5.12",
     "@vitejs/plugin-react": "^6.0.5",
     "body-parser": "^2.3.0",
     "jsonwebtoken": "^9.0.3",

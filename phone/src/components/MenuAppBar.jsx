@@ -1,92 +1,103 @@
-import { useState, useEffect } from 'react'
-import PropTypes from 'prop-types'
-
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import MenuIcon from "@mui/icons-material/Menu";
 import {
-  Box,
-  Stack,
   AppBar,
-  Toolbar,
-  Typography,
-  IconButton,
-  Popover,
-  Drawer,
-  List,
-  ListItemButton,
-  ListItemText,
-  ListItemIcon,
+  Box,
   Checkbox,
   Divider,
-} from '@mui/material'
-
-import { useTheme } from '@mui/material/styles'
-
-import MenuIcon         from '@mui/icons-material/Menu'
-import ChevronLeftIcon  from '@mui/icons-material/ChevronLeft'
-import ChevronRightIcon from '@mui/icons-material/ChevronRight'
-
-import AuthIco          from './AuthIco'
-import AuthAdInfo       from './AuthAdInfo'
-import PhoneIco         from './PhoneIco'
-import PhonePad         from './PhonePad'
-import PhoneDir         from './PhoneDir'
-import Copyright        from '../Copyright'
-
-
+  Drawer,
+  IconButton,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Popover,
+  Stack,
+  Toolbar,
+  Typography,
+} from "@mui/material";
+import { useTheme } from "@mui/material/styles";
+import PropTypes from "prop-types";
+import { useEffect, useState } from "react";
+import Copyright from "../Copyright";
+import AuthAdInfo from "./AuthAdInfo";
+import AuthIco from "./AuthIco";
+import PhoneDir from "./PhoneDir";
+import PhoneIco from "./PhoneIco";
+import PhonePad from "./PhonePad";
 
 const MENU_ITEMS_PHONE = [
-  { key: 'displayReg', primary: 'SIP Регистрация', secondary: 'PhoneReg.jsx' },
-  { key: 'displayPad', primary: 'SIP Телефон', secondary: 'PhonePad.jsx' },
-  { key: 'displayHistory', primary: 'SIP Звонки', secondary: 'PhoneHistory.jsx' },
-  { key: 'displayChat', primary: 'SIP Сообщения', secondary: 'PhoneChat.jsx' },
-  { key: 'displayControl', primary: 'SIP Кругляш', secondary: 'PhoneIco.jsx' },
-  { key: 'displayDir', primary: 'Тел.Справочник', secondary: 'PhoneDir.jsx' },
-]
+  { key: "displayReg", primary: "SIP Регистрация", secondary: "PhoneReg.jsx" },
+  { key: "displayPad", primary: "SIP Телефон", secondary: "PhonePad.jsx" },
+  {
+    key: "displayHistory",
+    primary: "SIP Звонки",
+    secondary: "PhoneHistory.jsx",
+  },
+  { key: "displayChat", primary: "SIP Сообщения", secondary: "PhoneChat.jsx" },
+  { key: "displayControl", primary: "SIP Кругляш", secondary: "PhoneIco.jsx" },
+  { key: "displayDir", primary: "Тел.Справочник", secondary: "PhoneDir.jsx" },
+];
 
 const MENU_ITEMS_AUTH = [
-  { key: 'displayAd', primary: 'AD Авторизация', secondary: 'AuthAd.jsx' },
-  { key: 'displayControl', primary: 'AD Кругляш', secondary: 'AuthIco.jsx' },
-]
+  { key: "displayAd", primary: "AD Авторизация", secondary: "AuthAd.jsx" },
+  { key: "displayControl", primary: "AD Кругляш", secondary: "AuthIco.jsx" },
+];
 
 const MENU_ITEMS_LK = [
   // { key: 'displayLkToken', primary: 'LiveKit Приглашение', secondary: 'LkToken.jsx' },
-  { key: 'displayControl', primary: 'LiveKit Встреча', secondary: 'LkMeet.jsx' },
-]
+  {
+    key: "displayControl",
+    primary: "LiveKit Встреча",
+    secondary: "LkMeet.jsx",
+  },
+];
 
 function MenuAppBar(props) {
-  const { phoneControlRdcr, phoneControlActions, authControlRdcr, authControlActions, lkControlRdcr, lkControlActions } = props
+  const {
+    phoneControlRdcr,
+    phoneControlActions,
+    authControlRdcr,
+    authControlActions,
+    lkControlRdcr,
+    lkControlActions,
+  } = props;
 
   useEffect(() => {
-    if (import.meta.env.DEV) console.log('MenuAppBar MOUNT')
+    if (import.meta.env.DEV) console.log("MenuAppBar MOUNT");
 
     return () => {
-      if (import.meta.env.DEV) console.log('MenuAppBar UNMOUNT')
-    }
-  }, [])
+      if (import.meta.env.DEV) console.log("MenuAppBar UNMOUNT");
+    };
+  }, []);
 
-  const theme = useTheme()
+  const theme = useTheme();
 
-  const rawToolbarHeight = theme?.mixins?.toolbar?.maxHeight
-  const toolbarHeight = typeof rawToolbarHeight === 'number'
-    ? rawToolbarHeight
-    : (rawToolbarHeight ? parseInt(String(rawToolbarHeight).replace('px', ''), 10) : 64)
+  const rawToolbarHeight = theme?.mixins?.toolbar?.maxHeight;
+  const toolbarHeight =
+    typeof rawToolbarHeight === "number"
+      ? rawToolbarHeight
+      : rawToolbarHeight
+        ? parseInt(String(rawToolbarHeight).replace("px", ""), 10)
+        : 64;
 
-  const [anchorEl_phoneControl, setAnchorEl_phoneControl] = useState(null)
-  const [anchorEl_adControl, setAnchorEl_adControl] = useState(null)
-  const [drawerOpen, setDrawerOpen] = useState(false)
+  const [anchorEl_phoneControl, setAnchorEl_phoneControl] = useState(null);
+  const [anchorEl_adControl, setAnchorEl_adControl] = useState(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
-  const handleOpenMenu = () => setDrawerOpen(true)
-  const handleCloseMenu = () => setDrawerOpen(false)
+  const handleOpenMenu = () => setDrawerOpen(true);
+  const handleCloseMenu = () => setDrawerOpen(false);
 
   const toggleDisplayPhone = (keyName) => {
-    phoneControlActions.handleChangeStore(keyName, !phoneControlRdcr[keyName])
-  }
+    phoneControlActions.handleChangeStore(keyName, !phoneControlRdcr[keyName]);
+  };
   const toggleDisplayAuth = (keyName) => {
-    authControlActions.handleChangeStore(keyName, !authControlRdcr[keyName])
-  }
+    authControlActions.handleChangeStore(keyName, !authControlRdcr[keyName]);
+  };
   const toggleDisplayLk = (keyName) => {
-    lkControlActions.handleChangeStore(keyName, !lkControlRdcr[keyName])
-  }
-  
+    lkControlActions.handleChangeStore(keyName, !lkControlRdcr[keyName]);
+  };
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
@@ -109,21 +120,36 @@ function MenuAppBar(props) {
             onClose={handleCloseMenu}
             slotProps={{
               backdrop: {
-                sx: { backgroundColor: 'transparent' } 
-              }
+                sx: { backgroundColor: "transparent" },
+              },
             }}
           >
-            <Stack direction="row" spacing={2}
+            <Stack
+              direction="row"
+              spacing={2}
               sx={{ p: 1, height: toolbarHeight }}
             >
-              <Box component="img" src="img/Vite.png" sx={{ height: '100%', width: 'auto' }} alt="Vite" />
-              <Box component="img" src="img/React.png" sx={{ height: '100%', width: 'auto' }} alt="React" />
+              <Box
+                component="img"
+                src="img/Vite.png"
+                sx={{ height: "100%", width: "auto" }}
+                alt="Vite"
+              />
+              <Box
+                component="img"
+                src="img/React.png"
+                sx={{ height: "100%", width: "auto" }}
+                alt="React"
+              />
               <Box sx={{ flexGrow: 1 }} />
-              <IconButton onClick={handleCloseMenu} >
-                <ChevronLeftIcon color='primary' sx={{ height: '100%', width: 'auto' }} />
+              <IconButton onClick={handleCloseMenu}>
+                <ChevronLeftIcon
+                  color="primary"
+                  sx={{ height: "100%", width: "auto" }}
+                />
               </IconButton>
             </Stack>
-            
+
             <Divider />
 
             <List>
@@ -134,7 +160,7 @@ function MenuAppBar(props) {
                   <ListItemButton
                     key={item.key}
                     onClick={() => toggleDisplayPhone(item.key)}
-                    sx={{ alignItems: 'flex-start' }}
+                    sx={{ alignItems: "flex-start" }}
                   >
                     <ListItemIcon>
                       <Checkbox
@@ -142,7 +168,7 @@ function MenuAppBar(props) {
                         checked={isChecked}
                         tabIndex={-1}
                         disableRipple
-                        slotProps={{ input: { 'aria-labelledby': labelId } }}
+                        slotProps={{ input: { "aria-labelledby": labelId } }}
                       />
                     </ListItemIcon>
                     <ListItemText
@@ -151,7 +177,7 @@ function MenuAppBar(props) {
                       secondary={item.secondary}
                     />
                   </ListItemButton>
-                )
+                );
               })}
             </List>
 
@@ -165,7 +191,7 @@ function MenuAppBar(props) {
                   <ListItemButton
                     key={item.key}
                     onClick={() => toggleDisplayAuth(item.key)}
-                    sx={{ alignItems: 'flex-start' }}
+                    sx={{ alignItems: "flex-start" }}
                   >
                     <ListItemIcon>
                       <Checkbox
@@ -173,7 +199,7 @@ function MenuAppBar(props) {
                         checked={isChecked}
                         tabIndex={-1}
                         disableRipple
-                        slotProps={{ input: { 'aria-labelledby': labelId } }}
+                        slotProps={{ input: { "aria-labelledby": labelId } }}
                       />
                     </ListItemIcon>
                     <ListItemText
@@ -182,7 +208,7 @@ function MenuAppBar(props) {
                       secondary={item.secondary}
                     />
                   </ListItemButton>
-                )
+                );
               })}
             </List>
 
@@ -196,7 +222,7 @@ function MenuAppBar(props) {
                   <ListItemButton
                     key={item.key}
                     onClick={() => toggleDisplayLk(item.key)}
-                    sx={{ alignItems: 'flex-start' }}
+                    sx={{ alignItems: "flex-start" }}
                   >
                     <ListItemIcon>
                       <Checkbox
@@ -204,7 +230,7 @@ function MenuAppBar(props) {
                         checked={isChecked}
                         tabIndex={-1}
                         disableRipple
-                        slotProps={{ input: { 'aria-labelledby': labelId } }}
+                        slotProps={{ input: { "aria-labelledby": labelId } }}
                       />
                     </ListItemIcon>
                     <ListItemText
@@ -213,23 +239,21 @@ function MenuAppBar(props) {
                       secondary={item.secondary}
                     />
                   </ListItemButton>
-                )
+                );
               })}
             </List>
 
-            <Box 
-              sx={{ 
-                mt: 'auto', // Выталкивает блок в самый низ контейнера
-                p: 2, 
-                textAlign: 'center' 
+            <Box
+              sx={{
+                mt: "auto", // Выталкивает блок в самый низ контейнера
+                p: 2,
+                textAlign: "center",
               }}
             >
               <Divider sx={{ mb: 2 }} />
-              <Copyright showFull={false}/>
+              <Copyright showFull={false} />
             </Box>
           </Drawer>
-
-
 
           <Typography variant="h6" component="div">
             WebRTC
@@ -245,10 +269,10 @@ function MenuAppBar(props) {
           <Box sx={{ flexGrow: 1 }} />
 
           {phoneControlRdcr.displayControl && (
-            <Stack 
-              direction="row" 
-              spacing={1} 
-              sx={{ cursor: 'pointer', alignItems: 'center' }}
+            <Stack
+              direction="row"
+              spacing={1}
+              sx={{ cursor: "pointer", alignItems: "center" }}
               onClick={(e) => setAnchorEl_phoneControl(e.currentTarget)}
             >
               <Typography variant="caption" sx={{ pl: 1 }}>
@@ -259,10 +283,10 @@ function MenuAppBar(props) {
           )}
 
           {authControlRdcr.displayControl && (
-            <Stack 
-              direction="row" 
-              spacing={1} 
-              sx={{ cursor: 'pointer', alignItems: 'center' }}
+            <Stack
+              direction="row"
+              spacing={1}
+              sx={{ cursor: "pointer", alignItems: "center" }}
               onClick={(e) => setAnchorEl_adControl(e.currentTarget)}
             >
               <Typography variant="caption" sx={{ pl: 1 }}>
@@ -271,22 +295,21 @@ function MenuAppBar(props) {
               <AuthIco authControlRdcr={authControlRdcr} />
             </Stack>
           )}
-
         </Toolbar>
       </AppBar>
 
       <Popover
-        id='phoneControl_id'
+        id="phoneControl_id"
         open={Boolean(anchorEl_phoneControl)}
         anchorEl={anchorEl_phoneControl}
         onClose={() => setAnchorEl_phoneControl(null)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'center' }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        transformOrigin={{ vertical: "top", horizontal: "center" }}
       >
-        <Box
-          sx={{ p: 1 }}
-        >
-          <Typography variant='body2'>{phoneControlRdcr.uriWebRtc || ''}</Typography>
+        <Box sx={{ p: 1 }}>
+          <Typography variant="body2">
+            {phoneControlRdcr.uriWebRtc || ""}
+          </Typography>
           <Divider />
           <PhonePad
             phoneControlRdcr={phoneControlRdcr}
@@ -297,17 +320,15 @@ function MenuAppBar(props) {
       </Popover>
 
       <Popover
-        id='adControl_id'
+        id="adControl_id"
         open={Boolean(anchorEl_adControl)}
         anchorEl={anchorEl_adControl}
         onClose={() => setAnchorEl_adControl(null)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'center' }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        transformOrigin={{ vertical: "top", horizontal: "center" }}
       >
-        <Box
-          sx={{ p: 1 }}
-        >
-          <Typography variant='body2'>{authControlRdcr.uriAdAuth}</Typography>
+        <Box sx={{ p: 1 }}>
+          <Typography variant="body2">{authControlRdcr.uriAdAuth}</Typography>
           <Divider />
           <AuthAdInfo
             authControlRdcr={authControlRdcr}
@@ -316,9 +337,8 @@ function MenuAppBar(props) {
           />
         </Box>
       </Popover>
-
     </Box>
-  )
+  );
 }
 
 MenuAppBar.propTypes = {
@@ -328,6 +348,6 @@ MenuAppBar.propTypes = {
   authControlActions: PropTypes.object,
   lkControlRdcr: PropTypes.object,
   lkControlActions: PropTypes.object,
-}
+};
 
-export default MenuAppBar
+export default MenuAppBar;

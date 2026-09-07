@@ -1,47 +1,41 @@
-import { useMemo }                  from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import { bindActionCreators }       from 'redux'
-
-import * as phoneActions            from '../actions/phoneControlActions.js'
-import * as authActions             from '../actions/authControlActions.js'
-import * as lkActions               from '../actions/lkControlActions.js'
-import LkMeet                       from '../components/LkMeet.jsx'
-
-
-
-
-
-
-
-
+import { useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { bindActionCreators } from "redux";
+import * as authActions from "../actions/authControlActions.js";
+import * as lkActions from "../actions/lkControlActions.js";
+import * as phoneActions from "../actions/phoneControlActions.js";
+import LkMeet from "../components/LkMeet.jsx";
 
 const LkContainer = () => {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   const phoneControlActions = useMemo(
     () => bindActionCreators(phoneActions, dispatch),
-    [dispatch]
-  )
+    [dispatch],
+  );
   const authControlActions = useMemo(
     () => bindActionCreators(authActions, dispatch),
-    [dispatch]
-  )
+    [dispatch],
+  );
   const lkControlActions = useMemo(
     () => bindActionCreators(lkActions, dispatch),
-    [dispatch]
-  )
+    [dispatch],
+  );
 
-  const phoneControlRdcr = useSelector((state) => state.phoneControlRdcr)
-  const authControlRdcr = useSelector((state) => state.authControlRdcr)
-  const lkControlRdcr = useSelector((state) => state.lkControlRdcr)
+  const phoneControlRdcr = useSelector((state) => state.phoneControlRdcr);
+  const authControlRdcr = useSelector((state) => state.authControlRdcr);
+  const lkControlRdcr = useSelector((state) => state.lkControlRdcr);
 
-  const commonProps = { phoneControlRdcr, phoneControlActions, authControlRdcr, authControlActions, lkControlRdcr, lkControlActions }
+  const commonProps = {
+    phoneControlRdcr,
+    phoneControlActions,
+    authControlRdcr,
+    authControlActions,
+    lkControlRdcr,
+    lkControlActions,
+  };
 
-  return (
-    <LkMeet {...commonProps}/>
-  )
-}
+  return <LkMeet {...commonProps} />;
+};
 
-
-
-export default LkContainer
+export default LkContainer;
