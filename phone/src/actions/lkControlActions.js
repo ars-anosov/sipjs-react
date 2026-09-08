@@ -6,6 +6,7 @@ import {
   LKTOKEN_SUBMIT_REQUEST,
   LKTOKEN_SUBMIT_SUCCESS,
 } from "../constants/redux";
+import { LK_URI_TOKEN_KEY } from "../constants/storage";
 import {
   createChatMessage,
   getPhoneRuntime,
@@ -49,7 +50,7 @@ const handleLkTokenSubmit =
       });
       return;
     }
-    localStorage.setItem("uriLkToken", formData.uriLkToken);
+    localStorage.setItem(LK_URI_TOKEN_KEY, formData.uriLkToken);
 
     dispatch({ type: LKTOKEN_SUBMIT_REQUEST });
 

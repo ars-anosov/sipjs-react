@@ -20,6 +20,11 @@ import {
   PHONECTL_UNREGISTER,
 } from "../constants/redux";
 import {
+  PHONE_CALLER_USER_NUM_KEY,
+  PHONE_URI_DIR_KEY,
+  PHONE_URI_WEBRTC_KEY,
+} from "../constants/storage";
+import {
   cleanupMedia,
   clearCallsArr,
   clearChatMessages,
@@ -146,8 +151,8 @@ const handleClkRegister = (formData, rdcr) => (dispatch, getState) => {
     regAlert("Заполните все поля.");
     return;
   }
-  localStorage.setItem("uriWebRtc", normalizedUriWebRtc);
-  localStorage.setItem("callerUserNum", formData.callerUserNum);
+  localStorage.setItem(PHONE_URI_WEBRTC_KEY, normalizedUriWebRtc);
+  localStorage.setItem(PHONE_CALLER_USER_NUM_KEY, formData.callerUserNum);
   dispatch({
     type: PHONECTL_STORE_VALUE,
     payload: { storeDataKey: "uriWebRtc", storeDataValue: normalizedUriWebRtc },
@@ -1070,7 +1075,7 @@ const handleSendMessage = (peerPhoneNum, messageBody, rdcr) => (dispatch) => {
 };
 
 const getPhoneDir = () => async () => {
-  const url = localStorage.getItem("uriPhoneDir");
+  const url = localStorage.getItem(PHONE_URI_DIR_KEY);
 
   if (!url) {
     console.warn("No phone directory URI found in localStorage.");

@@ -5,13 +5,14 @@ import {
   LKTOKEN_SUBMIT_REQUEST,
   LKTOKEN_SUBMIT_SUCCESS,
 } from "../constants/redux";
+import { LK_URI_KEY, LK_URI_TOKEN_KEY } from "../constants/storage";
 
 const initialState = {
   displayLkToken: false,
   displayControl: true,
-  uriLk: localStorage.getItem("uriLk") ? localStorage.getItem("uriLk") : "",
-  uriLkToken: localStorage.getItem("uriLkToken")
-    ? localStorage.getItem("uriLkToken")
+  uriLk: localStorage.getItem(LK_URI_KEY) ? localStorage.getItem(LK_URI_KEY) : "",
+  uriLkToken: localStorage.getItem(LK_URI_TOKEN_KEY)
+    ? localStorage.getItem(LK_URI_TOKEN_KEY)
     : "",
   status: "idle",
   message: "",
