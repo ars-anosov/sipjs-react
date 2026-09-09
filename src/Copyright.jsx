@@ -38,7 +38,8 @@ function Copyright(props) {
           {dependencies["@livekit/components-react"]}
           <br />
           vite {devDependencies.vite}, @vitejs/plugin-react{" "}
-          {devDependencies["@vitejs/plugin-react"]}
+          {devDependencies["@vitejs/plugin-react"]}, biome{" "}
+          {devDependencies["@biomejs/biome"]}
           <br />
           <br />
         </span>
