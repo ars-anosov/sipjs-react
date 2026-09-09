@@ -3,9 +3,9 @@
 WebRTC-телефон: SPA на sip.js и LiveKit. Канон — `CLAUDE.md`.
 Документация и комментарии — на русском.
 
-**Код:** `phone/src/`  
-**Mock:** `phone/mock/`  
-**Сборка:** `npm run build` → `phone/dist` (не править вручную)
+**Код:** `src/`  
+**Mock:** `mock/`  
+**Сборка:** `npm run build` → `dist` (не править вручную)
 
 ## Компоненты
 

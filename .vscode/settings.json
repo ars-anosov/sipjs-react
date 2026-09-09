@@ -17,19 +17,10 @@
     "editor.defaultFormatter": "biomejs.biome"
   },
   "[jsonc]": {
-    "editor.defaultFormatter": "vscode.json-language-features"
+    "editor.defaultFormatter": "biomejs.biome"
   },
   "editor.codeActionsOnSave": {
     "source.fixAll.biome": "explicit",
     "source.organizeImports.biome": "explicit"
-  },
-  "biome.configurationPath": "phone/biome.json",
-  "biome.lsp.bin": {
-    "linux-x64": "./phone/node_modules/@biomejs/cli-linux-x64/biome",
-    "linux-arm64": "./phone/node_modules/@biomejs/cli-linux-arm64/biome",
-    "darwin-arm64": "./phone/node_modules/@biomejs/cli-darwin-arm64/biome",
-    "darwin-x64": "./phone/node_modules/@biomejs/cli-darwin-x64/biome",
-    "win32-x64": "./phone/node_modules/@biomejs/cli-win32-x64/biome.exe",
-    "win32-arm64": "./phone/node_modules/@biomejs/cli-win32-arm64/biome.exe"
   }
 }

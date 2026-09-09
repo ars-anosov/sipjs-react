@@ -8,10 +8,9 @@ WebRTC-телефон: SPA на sip.js и LiveKit.
 
 ## Где код
 
-- приложение: `phone/`
-- исходники: `phone/src/`
-- mock API (dev): `phone/mock/`
-- сборка: `npm run build` → `phone/dist` (не править вручную)
+- исходники: `src/`
+- mock API (dev): `mock/`
+- сборка: `npm run build` → `dist` (не править вручную)
 
 ## Компоненты
 
@@ -34,18 +33,17 @@ WebRTC-телефон: SPA на sip.js и LiveKit.
 
 ```
 sipjs-react/
-├── phone/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── containers/
-│   │   ├── actions/          # *Actions; SIP runtime — phoneRuntime.js
-│   │   ├── reducers/         # *Rdcr
-│   │   ├── store/
-│   │   ├── constants/        # redux.js, storage.js
-│   │   └── theme.js
-│   ├── mock/
-│   └── dist/
-└── tools/                    # заметки по Node.js, Vite, MUI
+├── src/
+│   ├── components/
+│   ├── containers/
+│   ├── actions/          # *Actions; SIP runtime — phoneRuntime.js
+│   ├── reducers/         # *Rdcr
+│   ├── store/
+│   ├── constants/        # redux.js, storage.js
+│   └── theme.js
+├── mock/
+├── dist/
+└── tools/                # заметки по Node.js, Vite, MUI
 ```
 
 ## Стек
@@ -56,10 +54,9 @@ JavaScript (`.js` / `.jsx`), без TypeScript.
 ## Команды
 
 ```bash
-cd phone
 npm install
 npm run dev      # http://0.0.0.0:3000
-npm run build    # → phone/dist
+npm run build    # → dist
 npm run serve    # preview, порт 4173
 ```
 
@@ -81,4 +78,4 @@ npm run serve    # preview, порт 4173
 1. Минимальный diff, без расширения объёма.
 2. Для критичных изменений — риски и шаги проверки.
 3. Без TypeScript, тестов, CI, новых зависимостей и инфраструктуры без явного запроса.
-4. `phone/dist` не редактировать вручную.
+4. `dist` не редактировать вручную.

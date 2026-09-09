@@ -2,8 +2,8 @@
 
 Канон — `CLAUDE.md`. Дублировать факты здесь не нужно.
 
-- код: `phone/src/`
-- mock: `phone/mock/`
-- сборка: `npm run build` → `phone/dist`
+- код: `src/`
+- mock: `mock/`
+- сборка: `npm run build` → `dist`
 - JS без TypeScript, отступ — 2 пробела
 - минимальный diff; без TS, тестов, CI и новых deps без запроса

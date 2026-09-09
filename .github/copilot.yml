@@ -5,16 +5,16 @@ rules:
     scope: "**/*"
     guidance: |
       WebRTC-телефон: SPA на sip.js и LiveKit. Канон — CLAUDE.md.
-      Код: phone/src/. Mock: phone/mock/. Сборка: npm run build → phone/dist (не править вручную).
+      Код: src/. Mock: mock/. Сборка: npm run build → dist (не править вручную).
       JavaScript (.js/.jsx), без TypeScript. Документация и комментарии — на русском.
       Стек: React 19, Vite 8, MUI 9, Redux 5+thunk, sip.js, livekit-client, ky.
-      Команды из phone/: npm run dev (порт 3000), npm run build, npm run serve (4173).
+      Команды: npm run dev (порт 3000), npm run build, npm run serve (4173).
       Минимальный diff. Без TS, тестов, CI и новых зависимостей без явного запроса.
 
   - id: sipjs-react
-    description: "Соглашения React/Redux для phone"
+    description: "Соглашения React/Redux для проекта"
     alwaysApply: false
-    scope: "phone/**/*.{js,jsx}"
+    scope: "src/**/*.{js,jsx}"
     guidance: |
       Функциональные компоненты, PropTypes для публичных props.
       components/ — презентация, containers/ — Redux (useSelector, bindActionCreators + useMemo).

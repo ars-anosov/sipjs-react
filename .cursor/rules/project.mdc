@@ -8,9 +8,9 @@ alwaysApply: true
 WebRTC-телефон: SPA на sip.js и LiveKit. Канон — `CLAUDE.md`.
 Документация и комментарии — на русском.
 
-- код: `phone/src/`
-- mock: `phone/mock/`
-- сборка: `npm run build` → `phone/dist` (не править вручную)
+- код: `src/`
+- mock: `mock/`
+- сборка: `npm run build` → `dist` (не править вручную)
 
 ## Стек
 
@@ -20,10 +20,9 @@ JavaScript (`.js` / `.jsx`), без TypeScript. Отступ — 2 пробел�
 ## Команды
 
 ```bash
-cd phone
 npm install
 npm run dev      # http://0.0.0.0:3000
-npm run build    # → phone/dist
+npm run build    # → dist
 npm run serve    # preview, порт 4173
 ```
 

@@ -4,10 +4,6 @@ on:
   push:
     branches: [main, master]
 
-defaults:
-  run:
-    working-directory: phone
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -18,7 +14,6 @@ jobs:
         with:
           node-version: 24
           cache: npm
-          cache-dependency-path: phone/package-lock.json
 
       - name: Install dependencies
         run: npm ci

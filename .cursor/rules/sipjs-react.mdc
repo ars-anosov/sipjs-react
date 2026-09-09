@@ -1,10 +1,10 @@
 ---
-description: "Соглашения React/Redux/MUI для phone"
-globs: phone/**/*.{jsx,js}
+description: "Соглашения React/Redux/MUI"
+globs: src/**/*.{jsx,js}
 alwaysApply: false
 ---
 
-# Соглашения phone
+# Соглашения React/Redux/MUI
 
 - Компоненты функциональные; публичные props — `PropTypes`.
 - Презентация — `components/`, store — `containers/` (`useSelector`, `bindActionCreators` + `useMemo`).
