@@ -15,7 +15,13 @@ import {
   useTheme,
 } from "@mui/material";
 import PropTypes from "prop-types";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import {
+  closeIncomingCallNotification,
+  disposePhoneNotifications,
+  initPhoneNotifications,
+  showIncomingCallNotification,
+} from "../services/phoneNotifications";
 
 const pulse = keyframes`
   0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); transform: scale(1); }
@@ -25,7 +31,6 @@ const pulse = keyframes`
 
 function PhoneIco({ phoneControlRdcr }) {
   const theme = useTheme();
-  const swRegistrationRef = useRef(null);
 
   const [toast, setToast] = useState({
     open: false,
@@ -38,122 +43,35 @@ function PhoneIco({ phoneControlRdcr }) {
     setToast((prev) => ({ ...prev, open: false }));
   };
 
-  // 1. Регистрация Service Worker и запрос прав
+  // 1. Инициализация Service Worker и запрос прав на уведомления
   useEffect(() => {
     if (import.meta.env.DEV) console.log("PhoneIco MOUNT");
 
-    const isSwSupported = "serviceWorker" in navigator;
-    const isNotificationSupported = "Notification" in window;
-
-    if (!window.isSecureContext) {
-      setToast({
-        open: true,
-        title: "Незащищенное соединение (HTTP)",
-        message: "Для работы системных уведомлений о звонках обязателен HTTPS.",
-        severity: "error",
-      });
-      return;
-    }
-
-    if (!isSwSupported || !isNotificationSupported) {
-      setToast({
-        open: true,
-        title: "Уведомления не поддерживаются",
-        message:
-          "Ваш браузер не поддерживает Service Worker или Notifications API.",
-        severity: "error",
-      });
-      return;
-    }
-
-    // Функция для регистрации воркера
-    const registerSW = () => {
-      navigator.serviceWorker
-        .register("sw.js")
-        .then((reg) => {
-          swRegistrationRef.current = reg;
-          if (import.meta.env.DEV)
-            console.log("Service Worker успешно зарегистрирован");
-        })
-        .catch((err) => {
-          console.error(err);
-          setToast({
-            open: true,
-            title: "Ошибка Service Worker",
-            message:
-              "Не удалось запустить фоновый модуль. Попробуйте обновить страницу.",
-            severity: "error",
-          });
-        });
-    };
-
-    // Проверка и запрос прав + запуск регистрации
-    if (Notification.permission === "denied") {
-      setToast({
-        open: true,
-        title: "Уведомления заблокированы",
-        message:
-          "Нажмите на значок в начале адресной строки и разрешите «Уведомления».",
-        severity: "warning",
-      });
-      // Воркер всё равно регистрируем, чтобы он был готов, если пользователь вернет права
-      registerSW();
-    } else if (Notification.permission === "default") {
-      // Запрашиваем права
-      Notification.requestPermission().then((permission) => {
-        if (permission === "denied") {
-          setToast({
-            open: true,
-            title: "Уведомления отклонены",
-            message:
-              "Вы запретили уведомления. Звонки не будут отображаться в фоне.",
-            severity: "warning",
-          });
-        }
-        // Независимо от выбора (разрешил или запретил) регистрируем воркер
-        registerSW();
-      });
-    } else {
-      // Если права уже были даны (Notification.permission === 'granted')
-      registerSW();
-    }
+    initPhoneNotifications({
+      onToast: (next) =>
+        setToast({
+          open: true,
+          message: next.message,
+          severity: next.severity,
+          title: next.title,
+        }),
+    });
 
     return () => {
       if (import.meta.env.DEV) console.log("PhoneIco UNMOUNT");
+      disposePhoneNotifications();
     };
   }, []);
 
   // 2. Отслеживание входящего звонка и показ/скрытие уведомлений
   useEffect(() => {
-    const incomeDisplay = phoneControlRdcr?.incomeDisplay;
     const calleePhoneNum =
       phoneControlRdcr?.calleePhoneNum || phoneControlRdcr?.callerNumber;
 
-    const title = "Входящий звонок";
-    const options = {
-      body: calleePhoneNum || "Неизвестный номер",
-      tag: "incoming-call",
-      requireInteraction: true,
-      silent: false,
-      icon: "img/PhoneIcon.png",
-    };
-
-    if (incomeDisplay) {
-      if (Notification.permission === "granted" && swRegistrationRef.current) {
-        swRegistrationRef.current.showNotification(title, options);
-      }
+    if (phoneControlRdcr?.incomeDisplay) {
+      showIncomingCallNotification(calleePhoneNum);
     } else {
-      // Используем .active, чтобы гарантировать отправку, пока идет claim()
-      const activeWorker =
-        swRegistrationRef.current?.active ||
-        navigator.serviceWorker?.controller;
-
-      if (activeWorker) {
-        activeWorker.postMessage({
-          action: "close-notification",
-          tag: "incoming-call",
-        });
-      }
+      closeIncomingCallNotification();
     }
   }, [
     phoneControlRdcr?.incomeDisplay,
