@@ -43,7 +43,8 @@ SPA-телефон: SIP-регистрация и звонки через sip.js
 src/
 ├── components/      # UI-компоненты (PhoneReg, PhonePad, AuthAd, LkMeet, …)
 ├── containers/      # Redux-контейнеры (PhoneContainer, LkContainer, MenuAppContainer)
-├── actions/         # *Actions; SIP runtime — phoneRuntime.js; utils/ — kyError.js
+├── actions/         # *Actions; utils/ — kyError.js
+├── services/        # SIP/WebRTC-слой — phoneRuntime.js
 ├── reducers/        # *Rdcr, rootReducer.js, authTimeoutMiddleware.js
 ├── store/           # configureStore.js
 ├── constants/       # redux.js (action types), storage.js (ключи localStorage)
@@ -74,7 +75,7 @@ npm run check    # biome check --write .
 
 ## Архитектура
 
-- Все объекты sip.js и медиа живут в модуле `src/actions/phoneRuntime.js` (singleton):
+- Все объекты sip.js и медиа живут в модуле `src/services/phoneRuntime.js` (singleton):
   `userAgent`, `registerer`, сессии (`incomingSession` / `outgoingSession`), аудиоэлементы,
   `remoteStream`. Доступ — через `getPhoneRuntime` / `setPhoneRuntime` / `resetPhoneRuntime`;
   `phoneRuntime` также реэкспортирует нужные типы sip.js.

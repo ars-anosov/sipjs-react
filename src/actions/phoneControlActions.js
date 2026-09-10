@@ -62,7 +62,7 @@ import {
   transmitSipMessage,
   UserAgent,
   Web,
-} from "./phoneRuntime";
+} from "../services/phoneRuntime";
 import { getApiErrorMessage } from "./utils/kyError";
 
 const getUriHostFromWebRtc = (uriWebRtc = "") => {

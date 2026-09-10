@@ -3,7 +3,7 @@
 
 ## Архитектура состояния
 
-SIP/WebRTC-объекты живут вне Redux — в модуле `phoneRuntime.js`. В store только UI-флаги, заголовки, лог звонков и чат.
+SIP/WebRTC-объекты живут вне Redux — в модуле `src/services/phoneRuntime.js`. В store только UI-флаги, заголовки, лог звонков и чат.
 
 ```mermaid
 flowchart LR

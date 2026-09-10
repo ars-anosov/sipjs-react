@@ -11,7 +11,7 @@ import {
   createChatMessage,
   getPhoneRuntime,
   transmitSipMessage,
-} from "./phoneRuntime";
+} from "../services/phoneRuntime";
 import { getApiErrorMessage } from "./utils/kyError";
 
 const buildInviteSipMessageBody = (room, responseData) => {

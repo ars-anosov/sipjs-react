@@ -272,7 +272,7 @@ function PhoneIco({ phoneControlRdcr }) {
       <Snackbar
         open={toast.open}
         onClose={handleCloseToast}
-        anchorOrigin={{ vertical: "top", horizontal: "left" }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
       >
         <Alert
           onClose={handleCloseToast}
