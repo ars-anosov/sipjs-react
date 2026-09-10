@@ -25,9 +25,8 @@ import {
   PHONE_URI_WEBRTC_KEY,
 } from "../constants/storage";
 import {
+  // Media functions
   cleanupMedia,
-  clearCallsArr,
-  clearChatMessages,
   // Audio elements
   createAudioElements,
   createChatMessage,
@@ -38,31 +37,36 @@ import {
   getPhoneRuntime,
   handleIncomingSipMessage,
   Inviter,
-  loadCallsArr,
-  loadChatMessages,
-  // Call logging
-  logCall,
-  markCallsRead as markCallsReadInStorage,
   // Connection control
   markVoluntaryDisconnect,
   // Codec modifiers
   opusCodecModifier,
+  playIncomingMessageSound,
   Registerer,
   RegistererState,
   resetPhoneRuntime,
   resetPhoneRuntimeSessions,
   // SIP.js types
   SessionState,
-  saveChatMessage,
   setConnectionCtl,
   setLocalAudioEnabled,
   setPhoneRuntime,
-  // Media functions
   setupRemoteMedia,
   transmitSipMessage,
   UserAgent,
   Web,
 } from "../services/phoneRuntime";
+import {
+  clearCallsArr,
+  clearChatMessages,
+  // Call logging
+  loadCallsArr,
+  loadChatMessages,
+  logCall,
+  markCallsRead as markCallsReadInStorage,
+  saveCallsArr,
+  saveChatMessage,
+} from "../services/phoneStorage";
 import { getApiErrorMessage } from "./utils/kyError";
 
 const getUriHostFromWebRtc = (uriWebRtc = "") => {
@@ -99,11 +103,19 @@ const appendChatMessage = (message, dispatch) => {
   });
 };
 
-const CallsArrUpdate = () => (dispatch) => {
+const CallsArrUpdate = () => (dispatch, getState) => {
+  const displayHistory = getState().phoneControlRdcr.displayHistory;
+  let callsArr = loadCallsArr();
+
+  if (displayHistory) {
+    callsArr = callsArr.map((row) => ({ ...row, read: true }));
+    saveCallsArr(callsArr);
+  }
+
   dispatch({
     type: PHONECTL_CALLLOG_UPD,
     payload: {
-      callsArr: loadCallsArr(),
+      callsArr,
     },
   });
 };
@@ -310,9 +322,7 @@ const handleClkRegister = (formData, rdcr) => (dispatch, getState) => {
     onMessage(message) {
       const { chatMessages } = handleIncomingSipMessage(message);
 
-      const incomingMessageSound = new Audio("sounds/sipjs/message.mp3");
-      incomingMessageSound.preload = "auto";
-      incomingMessageSound.play().catch(() => {});
+      playIncomingMessageSound();
 
       dispatch({
         type: PHONECTL_MESSAGE_ADD,
