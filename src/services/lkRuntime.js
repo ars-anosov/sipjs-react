@@ -32,4 +32,4 @@ const getLiveKitRoom = () => {
   return room;
 };
 
-export { getLiveKitRoom, Track, VideoPresets };
+export { getLiveKitRoom, Track };

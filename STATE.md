@@ -3,24 +3,33 @@
 
 ## Архитектура состояния
 
-SIP/WebRTC-объекты живут вне Redux — в модуле `src/services/phoneRuntime.js`. В store только UI-флаги, заголовки, лог звонков и чат.
+SIP/WebRTC-объекты и медиа живут вне Redux — в сервисах `src/services/`. В store только UI-флаги, заголовки, лог звонков и чат.
 
 ```mermaid
 flowchart LR
   UI[Components / Containers]
   ACT[phoneControlActions.js]
   RT[phoneRuntime.js]
+  ST[phoneStorage.js]
   RDCR[phoneControlRdcr]
   SIP[sip.js + WebRTC]
 
   UI -->|dispatch thunks| ACT
-  ACT -->|setPhoneRuntime / media / sessions| RT
+  ACT -->|registerSipUserAgent / placeOutgoingCall / ...| RT
   ACT -->|PHONECTL_*| RDCR
+  RT -->|handlers.* callbacks| ACT
+  RT -->|logCall / load / save| ST
   RT --> SIP
   RDCR -->|props| UI
 ```
 
-`phoneRuntime`: `userAgent`, `registerer`, `sessionOptions`, `incomingSession` / `outgoingSession`, audio elements, `remoteStream`.
+`phoneRuntime` (singleton): `userAgent`, `registerer`, `sessionOptions`, `incomingSession` / `outgoingSession`, audio elements, `remoteStream`. Публичное API — высокоуровневые функции; обратная связь в actions — через колбэки `handlers`.
+
+Смежные сервисы:
+
+- `lkRuntime.js` — LiveKit-комната (`getLiveKitRoom`).
+- `phoneNotifications.js` — Service Worker / Notifications.
+- `phoneStorage.js` — персистенс звонков и чата в `localStorage`.
 
 ## Состояние Redux store (`phoneControlRdcr`)
 
@@ -83,26 +92,31 @@ sequenceDiagram
 
   User->>PhoneReg: Fill registration form and submit
   PhoneReg->>Action: handleClkRegister(formData, rdcr)
-  Action->>Action: Validate form fields
+  Action->>Action: Validate + save uriWebRtc/callerUserNum
+  Action->>Dispatch: PHONECTL_STORE_VALUE / AUTHCTL_STORE_VALUE
   alt Valid
-    Action->>Action: Store uriWebRtc/callerUserNum in localStorage
-    Action->>Dispatch: PHONECTL_STORE_VALUE
-    Action->>UserAgent: new UserAgent(userAgentOptions)
-    Action->>Runtime: setPhoneRuntime(userAgent, audio, sessionOptions)
-    Action->>Registerer: new Registerer(userAgent, registererOptions)
-    Action->>Runtime: setPhoneRuntime(registerer)
+    Action->>Runtime: registerSipUserAgent({ formData, handlers })
+    Runtime->>Runtime: makeURI (throw on invalid)
+    Runtime->>UserAgent: new UserAgent(userAgentOptions)
+    Runtime->>Runtime: setPhoneRuntime(userAgent, audio, sessionOptions)
+    Runtime->>Registerer: new Registerer(userAgent, sessionOptions)
+    Runtime->>Action: handlers.onConnectRequest
     Action->>Dispatch: PHONECTL_CONNECT_REQUEST
-    Action->>UserAgent: start()
-    UserAgent-->>Action: onConnect
-    Action->>Registerer: register()
-    Registerer-->>Action: onAccept
+    Runtime->>UserAgent: start()
+    UserAgent-->>Runtime: onConnect
+    Runtime->>Registerer: register()
+    Registerer-->>Runtime: onAccept
+    Runtime->>Action: handlers.onConnectSuccess
     Action->>Dispatch: PHONECTL_CONNECT_SUCCESS
-    Registerer-->>Action: onReject
+    Registerer-->>Runtime: onReject
+    Runtime->>Action: handlers.onConnectError
     Action->>Dispatch: PHONECTL_CONNECT_ERROR
-    Action->>Action: stopAfterRegistrationFailure()
+    Runtime->>Runtime: stopAfterRegistrationFailure()
+    Runtime->>Action: handlers.onUnregistered
     Action->>Dispatch: PHONECTL_UNREGISTER
-    Action->>Runtime: resetPhoneRuntime()
+    Runtime->>Runtime: resetPhoneRuntime()
   else Invalid
+    Runtime-->>Action: throw
     Action->>Dispatch: PHONECTL_ERROR_ALERT
   end
 ```
@@ -112,35 +126,41 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
   participant UserAgent@{ "type" : "control" }
+  participant Runtime@{ "type" : "collections", "alias": "phoneRuntime.js" }
   participant Action@{ "type" : "collections", "alias": "phoneControlActions.js" }
   participant Registerer@{ "type" : "control" }
   participant Dispatch@{ "type" : "collections", "alias": "phoneControlRdcr.js" }
 
-  UserAgent->>Action: onDisconnect(error)
-  Action->>Action: Check suppressReconnectOnNextDisconnect
+  UserAgent->>Runtime: onDisconnect(error)
+  Runtime->>Runtime: Check suppressReconnectOnNextDisconnect
   alt Not suppressed
+    Runtime->>Action: handlers.onConnectError
     Action->>Dispatch: PHONECTL_CONNECT_ERROR (Disconnected)
     alt error && shouldBeConnected
-      Action->>Action: attemptReconnection(1)
+      Runtime->>Runtime: attemptReconnection(1)
       alt reconnectionAttempt <= reconnectionAttempts
+        Runtime->>Action: handlers.onReconnectTry
         Action->>Dispatch: PHONECTL_RECONNECT_TRY
-        Action->>Action: setTimeout for delay
-        Action->>UserAgent: reconnect()
-        UserAgent-->>Action: reconnect success
-        UserAgent-->>Action: onConnect
-        Action->>Registerer: register()
-        Registerer-->>Action: onAccept
+        Runtime->>Runtime: setTimeout for delay
+        Runtime->>UserAgent: reconnect()
+        UserAgent-->>Runtime: reconnect success
+        UserAgent-->>Runtime: onConnect
+        Runtime->>Registerer: register()
+        Registerer-->>Runtime: onAccept
+        Runtime->>Action: handlers.onConnectSuccess
         Action->>Dispatch: PHONECTL_CONNECT_SUCCESS
-        Registerer-->>Action: onReject
+        Registerer-->>Runtime: onReject
+        Runtime->>Action: handlers.onConnectError
         Action->>Dispatch: PHONECTL_CONNECT_ERROR
       else Attempts exhausted
+        Runtime->>Action: handlers.onConnectError
         Action->>Dispatch: PHONECTL_CONNECT_ERROR (Disconnected)
       end
     end
   else Suppressed
-    Action->>Action: Reset suppressReconnectOnNextDisconnect
+    Runtime->>Runtime: Reset suppressReconnectOnNextDisconnect
   end
-  Note over Action: On reconnect failure, increment attempt and retry
+  Note over Runtime: On reconnect failure, increment attempt and retry
   Note over Registerer: Unregistered while shouldBeConnected also triggers CONNECT_ERROR + attemptReconnection
 ```
 
@@ -149,34 +169,38 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
   participant UserAgent@{ "type" : "control" }
-  participant Action@{ "type" : "collections", "alias": "phoneControlActions.js" }
   participant Runtime@{ "type" : "collections", "alias": "phoneRuntime.js" }
+  participant Action@{ "type" : "collections", "alias": "phoneControlActions.js" }
   participant IncomingSession@{ "type" : "control" }
   participant Dispatch@{ "type" : "collections", "alias": "phoneControlRdcr.js" }
   actor User
   participant PhonePad@{ "type" : "participant", "alias": "PhonePad.jsx" }
 
-  UserAgent->>Action: onInvite(invitation)
-  Action->>Runtime: setPhoneRuntime(incomingSession)
-  Action->>Action: Play incoming ringtone
-  Action->>Action: logCall('ringing', 'in')
+  UserAgent->>Runtime: onInvite(invitation)
+  Runtime->>Runtime: setPhoneRuntime(incomingSession)
+  Runtime->>Runtime: Play incoming ringtone + logCall('ringing', 'in')
+  Runtime->>Action: handlers.onCallLogUpdate
   Action->>Dispatch: CallsArrUpdate() / PHONECTL_CALLLOG_UPD
+  Runtime->>Action: handlers.onIncomeDisplay
   Action->>Dispatch: PHONECTL_INCOME_DISPLAY (calleePhoneNum)
   User->>PhonePad: Click accept call
   PhonePad->>Action: handleClkSubmitIn(rdcr)
   Action->>Dispatch: PHONECTL_INCOME_SUBMIT
-  Action->>Action: Pause incoming ringtone
-  Action->>IncomingSession: accept(sessionOptions)
-  IncomingSession-->>Action: stateChange: Established
-  Action->>Action: logCall('incall', 'in')
+  Action->>Runtime: answerIncomingCall()
+  Runtime->>Runtime: Pause incoming ringtone
+  Runtime->>IncomingSession: accept(sessionOptions)
+  IncomingSession-->>Runtime: stateChange: Established
+  Runtime->>Runtime: logCall('incall', 'in') + setupRemoteMedia()
+  Runtime->>Action: handlers.onCallLogUpdate
   Action->>Dispatch: CallsArrUpdate()
-  Action->>Action: setupRemoteMedia()
-  IncomingSession-->>Action: stateChange: Terminated
-  Action->>Action: logCall('complete', 'in')
+  IncomingSession-->>Runtime: stateChange: Terminated
+  Runtime->>Runtime: logCall('complete', 'in') + cleanupMedia()
+  Runtime->>Action: handlers.onCallLogUpdate
   Action->>Dispatch: CallsArrUpdate()
-  Action->>Action: cleanupMedia()
-  Action->>Action: handleClkReset()
-  Action->>Runtime: resetPhoneRuntimeSessions()
+  Runtime->>Action: handlers.onCallEnded(callData)
+  Action->>Action: dispatch(handleClkReset)
+  Action->>Runtime: resetSipCall(callData)
+  Runtime->>Runtime: resetPhoneRuntimeSessions()
   Action->>Dispatch: PHONECTL_CLK_RESET
 ```
 
@@ -195,27 +219,89 @@ sequenceDiagram
   PhonePad->>Action: handleClkSubmitOut(calleePhoneNum, rdcr)
   Action->>Action: Validate registration and input
   alt Valid
+    Action->>Runtime: placeOutgoingCall(callee, handlers)
+    Runtime->>Runtime: makeURI (throw on invalid)
+    Runtime->>Action: handlers.onOutgoingSubmit
     Action->>Dispatch: PHONECTL_OUTGO_SUBMIT (outgoCallNow: true)
-    Action->>Action: Play outgoing ringtone
-    Action->>Inviter: new Inviter(userAgent, target, sessionOptions)
-    Action->>Runtime: setPhoneRuntime(outgoingSession)
-    Action->>Inviter: invite()
-    Inviter-->>Action: stateChange: Establishing
-    Action->>Action: logCall('ringing', 'out')
+    Runtime->>Runtime: Play outgoing ringtone
+    Runtime->>Inviter: new Inviter(userAgent, target, sessionOptions)
+    Runtime->>Runtime: setPhoneRuntime(outgoingSession)
+    Runtime->>Inviter: invite()
+    Inviter-->>Runtime: stateChange: Establishing
+    Runtime->>Runtime: logCall('ringing', 'out')
+    Runtime->>Action: handlers.onCallLogUpdate
     Action->>Dispatch: CallsArrUpdate()
-    Inviter-->>Action: stateChange: Established
-    Action->>Action: logCall('incall', 'out')
+    Inviter-->>Runtime: stateChange: Established
+    Runtime->>Runtime: logCall('incall', 'out') + Pause ringtone + setupRemoteMedia()
+    Runtime->>Action: handlers.onCallLogUpdate
     Action->>Dispatch: CallsArrUpdate()
-    Action->>Action: Pause outgoing ringtone
-    Action->>Action: setupRemoteMedia()
-    Inviter-->>Action: stateChange: Terminated
-    Action->>Action: logCall('complete', 'out')
+    Inviter-->>Runtime: stateChange: Terminated
+    Runtime->>Runtime: logCall('complete', 'out') + cleanupMedia()
+    Runtime->>Action: handlers.onCallLogUpdate
     Action->>Dispatch: CallsArrUpdate()
-    Action->>Action: cleanupMedia()
-    Action->>Action: handleClkReset()
-    Action->>Runtime: resetPhoneRuntimeSessions()
+    Runtime->>Action: handlers.onCallEnded(callData)
+    Action->>Action: dispatch(handleClkReset)
+    Action->>Runtime: resetSipCall(callData)
+    Runtime->>Runtime: resetPhoneRuntimeSessions()
     Action->>Dispatch: PHONECTL_CLK_RESET
   else Invalid
+    Runtime-->>Action: throw
     Action->>Dispatch: PHONECTL_ERROR_ALERT
   end
+```
+
+## Чат
+
+Исходящее SIP MESSAGE: `handleSendMessage` → `transmitSipMessage` (через активную сессию или `Messager`), статусы `sending` / `delivered` / `error`.
+
+```mermaid
+sequenceDiagram
+  actor User
+  participant PhoneChat@{ "type" : "participant", "alias": "PhoneChat.jsx" }
+  participant Action@{ "type" : "collections", "alias": "phoneControlActions.js" }
+  participant Runtime@{ "type" : "collections", "alias": "phoneRuntime.js" }
+  participant Storage@{ "type" : "collections", "alias": "phoneStorage.js" }
+  participant Messager@{ "type" : "control" }
+  participant Dispatch@{ "type" : "collections", "alias": "phoneControlRdcr.js" }
+
+  User->>PhoneChat: Enter peer + message, send
+  PhoneChat->>Action: handleSendMessage(peer, body, rdcr)
+  Action->>Action: Validate regNow / SIP / peer / body / SIP URI
+  Action->>Runtime: createChatMessage(peer, body, 'out', 'sending')
+  Runtime-->>Action: chatMessage
+  Action->>Storage: saveChatMessage(chatMessage)
+  Action->>Dispatch: PHONECTL_MESSAGE_ADD (sending)
+  Action->>Dispatch: PHONECTL_STORE_VALUE (calleePhoneNum)
+  Action->>Runtime: transmitSipMessage({ chatMessage, uriHost, onStatusChange })
+  Runtime->>Runtime: Active session? else new Messager
+  Runtime->>Messager: message({ requestDelegate })
+  alt onAccept
+    Messager-->>Runtime: onAccept(response)
+    Runtime->>Storage: updateChatMessageStatus('delivered')
+    Runtime->>Action: onStatusChange(chatMessages)
+    Action->>Dispatch: PHONECTL_MESSAGE_UPDATE (delivered)
+  else onReject / error
+    Messager-->>Runtime: onReject / error
+    Runtime->>Storage: updateChatMessageStatus('error')
+    Runtime->>Action: onStatusChange(chatMessages)
+    Action->>Dispatch: PHONECTL_MESSAGE_UPDATE (error)
+  end
+```
+
+Входящее SIP MESSAGE обрабатывается в `userAgent.delegate.onMessage` внутри `registerSipUserAgent`:
+
+```mermaid
+sequenceDiagram
+  participant UserAgent@{ "type" : "control" }
+  participant Runtime@{ "type" : "collections", "alias": "phoneRuntime.js" }
+  participant Storage@{ "type" : "collections", "alias": "phoneStorage.js" }
+  participant Action@{ "type" : "collections", "alias": "phoneControlActions.js" }
+  participant Dispatch@{ "type" : "collections", "alias": "phoneControlRdcr.js" }
+
+  UserAgent->>Runtime: onMessage(message)
+  Runtime->>Runtime: handleIncomingSipMessage (accept, extract peer/body)
+  Runtime->>Storage: saveChatMessage(chatMessage)
+  Runtime->>Runtime: playIncomingMessageSound()
+  Runtime->>Action: handlers.onMessage({ chatMessages })
+  Action->>Dispatch: PHONECTL_MESSAGE_ADD (incoming: true)
 ```

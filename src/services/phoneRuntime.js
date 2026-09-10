@@ -223,8 +223,6 @@ const markVoluntaryDisconnect = (userAgent) => {
   ctl.suppressReconnectOnNextDisconnect = true;
 };
 
-const getConnectionCtl = (userAgent) => connectionCtlByUserAgent.get(userAgent);
-
 const setConnectionCtl = (userAgent, ctl) => {
   connectionCtlByUserAgent.set(userAgent, ctl);
 };
@@ -995,46 +993,15 @@ const setHold = (hold = true) => {
 
 export {
   answerIncomingCall,
-  cleanupMedia,
-  clearRemoteStream,
-  // Audio elements
-  createAudioElements,
   createChatMessage,
-  createRemoteStream,
-  // Session functions
-  endCall,
-  getActiveSession,
-  getConnectionCtl,
-  getPhoneRuntime,
   getUriHostFromWebRtc,
-  handleIncomingSipMessage,
-  Inviter,
   isSipConnected,
   isValidSipTarget,
-  Messager,
-  // Connection control
-  markVoluntaryDisconnect,
-  // Codec modifiers
-  opusCodecModifier,
-  playIncomingMessageSound,
   placeOutgoingCall,
   registerSipUserAgent,
-  Registerer,
-  RegistererState,
-  resetPhoneRuntime,
-  resetPhoneRuntimeSessions,
   resetSipCall,
-  // Re-export SIP.js types for convenience
-  SessionState,
   sendDtmf,
-  setConnectionCtl,
   setHold,
-  setLocalAudioEnabled,
-  setPhoneRuntime,
-  // Media functions
-  setupRemoteMedia,
   transmitSipMessage,
   unregisterSip,
-  UserAgent,
-  Web,
 };
