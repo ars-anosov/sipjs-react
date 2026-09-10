@@ -30,7 +30,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { Room, Track, VideoPresets } from "livekit-client";
+import { getLiveKitRoom, Track } from "../services/lkRuntime";
 import PropTypes from "prop-types";
 import { useEffect, useRef, useState } from "react";
 import { Link as RouterLink, useLocation } from "react-router-dom";
@@ -275,32 +275,7 @@ function LkMeet(props) {
   const [isRoomActive, setIsRoomActive] = useState(false);
   const [room, setRoom] = useState("");
   const [token, setToken] = useState("");
-  const [customRoom] = useState(
-    () =>
-      new Room({
-        adaptiveStream: false,
-        dynacast: false,
-
-        videoCaptureDefaults: {
-          resolution: { width: 1920, height: 1080 },
-        },
-
-        screenShareCaptureDefaults: {
-          resolution: {
-            width: 2560,
-            height: 1440,
-            frameRate: 30,
-          },
-        },
-
-        publishDefaults: {
-          screenShareEncoding: VideoPresets.h1440.encoding,
-          simulcast: false,
-          videoCodec: "vp8",
-          backupCodec: "h264",
-        },
-      }),
-  );
+  const [customRoom] = useState(() => getLiveKitRoom());
   const location = useLocation();
   const theme = useTheme();
   const lkStyles = getLiveKitMuiStyles(theme);
