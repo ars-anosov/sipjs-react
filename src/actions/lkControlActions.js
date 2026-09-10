@@ -9,7 +9,8 @@ import {
 import { LK_URI_TOKEN_KEY } from "../constants/storage";
 import {
   createChatMessage,
-  getPhoneRuntime,
+  getUriHostFromWebRtc,
+  isSipConnected,
   transmitSipMessage,
 } from "../services/phoneRuntime";
 import { getApiErrorMessage } from "./utils/kyError";
@@ -69,21 +70,9 @@ const handleLkTokenSubmit =
 
       // Отправка SIP MESSAGE с приглашением в комнату
       const state = getState();
-      const runtime = getPhoneRuntime();
       const uriWebRtc = state?.phoneControlRdcr?.uriWebRtc || "";
-      const uriHost = (() => {
-        if (!uriWebRtc) {
-          return "";
-        }
-
-        try {
-          return new URL(uriWebRtc).hostname || "";
-        } catch {
-          const match = String(uriWebRtc).match(/^wss?:\/\/([^:/]+)/i);
-          return match?.[1] || "";
-        }
-      })();
-      const canSendSipMessage = Boolean(runtime?.userAgent && uriHost && num);
+      const uriHost = getUriHostFromWebRtc(uriWebRtc);
+      const canSendSipMessage = Boolean(isSipConnected() && uriHost && num);
 
       if (canSendSipMessage) {
         const chatMessage = createChatMessage(
