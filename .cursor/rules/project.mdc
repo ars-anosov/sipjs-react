@@ -1,33 +1,8 @@
 ---
-description: "Контекст репозитория sipjs-react"
+description: "Правила проекта sipjs-react (канон — AGENTS.md)"
 alwaysApply: true
 ---
 
-# sipjs-react
+Канон правил — `AGENTS.md` в корне репозитория. Прочитать его перед правками; здесь ничего не дублировать.
 
-WebRTC-телефон: SPA на sip.js и LiveKit. Канон — `CLAUDE.md`.
-Документация и комментарии — на русском.
-
-- код: `src/`
-- mock: `mock/`
-- сборка: `npm run build` → `dist` (не править вручную)
-
-## Стек
-
-React 19, Vite 8, MUI 9, Redux 5 + thunk, sip.js, livekit-client, ky.
-JavaScript (`.js` / `.jsx`), без TypeScript. Отступ — 2 пробела.
-
-## Команды
-
-```bash
-npm install
-npm run dev      # http://0.0.0.0:3000
-npm run build    # → dist
-npm run serve    # preview, порт 4173
-```
-
-## Правила
-
-- минимальный diff
-- без TS, тестов, CI и новых зависимостей без явного запроса
-- для критичных изменений — риски и шаги проверки
+@AGENTS.md
