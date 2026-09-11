@@ -204,7 +204,9 @@ const handleClkRegister = (formData, rdcr) => (dispatch, getState) => {
       },
     });
   } catch (e) {
-    regAlert(typeof e?.message === "string" ? e.message : "Ошибка регистрации.");
+    regAlert(
+      typeof e?.message === "string" ? e.message : "Ошибка регистрации.",
+    );
   }
 };
 

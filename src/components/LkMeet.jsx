@@ -30,10 +30,10 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { getLiveKitRoom, Track } from "../services/lkRuntime";
 import PropTypes from "prop-types";
 import { useEffect, useRef, useState } from "react";
 import { Link as RouterLink, useLocation } from "react-router-dom";
+import { getLiveKitRoom, Track } from "../services/lkRuntime";
 import "@livekit/components-styles";
 import { useTheme } from "@mui/material/styles";
 import { getLiveKitMuiStyles } from "./LkThemeStyles";

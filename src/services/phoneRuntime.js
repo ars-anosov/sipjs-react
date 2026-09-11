@@ -809,7 +809,13 @@ const answerIncomingCall = () => {
 
 const placeOutgoingCall = (
   calleePhoneNum,
-  { callerUserNum = "", onOutgoingSubmit, onCallLogUpdate, onCallEnded, onInviteError } = {},
+  {
+    callerUserNum = "",
+    onOutgoingSubmit,
+    onCallLogUpdate,
+    onCallEnded,
+    onInviteError,
+  } = {},
 ) => {
   const runtime = getPhoneRuntime();
 
