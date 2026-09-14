@@ -64,16 +64,20 @@ docs/                   # документация и GitHub Pages (ars-anosov.g
 
 `.github/workflows/ci.yml` — push в `main`/`master`: Node.js 24, `npm ci`, `npm run build`.
 
-## Инструменты DSH
+## Инструменты и среда (DSH)
 
-В профиле `web` подключены плагины — опирайся на них, а не изобретай обходные пути.
+В профиле `web` плагины окружения подключены — инструменты доступны сразу, обходные пути не нужны.
+Общие правила машины (WSL ↔ Windows, Playwright MCP, Mermaid, archify, проверка результата) — в
+user-global `~/.dsh/AGENTS.md`; повторяемые процедуры — навыками в `.dsh/skills/`. Здесь только
+специфика этого репозитория:
 
-- **archify** (плагин `@tt-a1i/archify-dsh`, skill `archify`) — архитектурные, sequence, state и data-flow диаграммы как standalone HTML с inline SVG (темы, экспорт PNG/JPEG/WebP/SVG/WebM), на вход текст или Mermaid. В проекте результат — `docs/archify/sipjs-react-architecture.*`; готовые HTML/JSON не править вручную — только перегенерация skill'ом.
-- **dsh-mermaid** — рендерит fenced-блоки с языком `mermaid` в Web-GUI как SVG (тумблер Code/Diagram, fullscreen, экспорт SVG). Отдельного инструмента нет: просто оформляй диаграмму этим блоком; внешний CLI для Mermaid не нужен.
-- **dsh-wsl-browser** — tool `win_open_url`: открывает `http(s)`-URL в браузере Windows (удобно для сервисов WSL, например `http://127.0.0.1:3080`). Только http/https.
-- **mcp-playwright** (MCP-сервер `browser`, `@playwright/mcp`, Chrome на Windows) — живое окно браузера: навигация, снапшот доступности, клики/ввод, консоль, сетевые запросы, скриншоты. Инструменты MCP скрыты ленивым роутером: сначала `mcp__router__search_and_activate` (serverName `browser`), затем доступны `mcp__browser__*` (`browser_navigate`, `browser_click`, `browser_take_screenshot` и т. п.). Профиль Chrome постоянный (логин сохраняется), поэтому второй параллельный запуск с тем же профилем невозможен.
-
-Прочие инструменты окружения WSL (dsh-wsl-kit): `net_doctor`, `path_convert`, `wsl_clipboard`, `win_launch`.
+- **Диаграммы-артефакты** — skill `archify`, результат в `docs/archify/sipjs-react-architecture.*`;
+  готовые HTML/JSON не править вручную, только перегенерация, проверка — навык
+  `archify-visual-check`.
+- **Диаграммы в ответе** — Mermaid-блоком, а не ASCII-артом; образец — `docs/STATE.md`.
+- **Проверка UI** — `npm run dev` (порт 3000), открыть через `win_open_url`
+  (`http://localhost:3000`); границы проверки (SIP, звонки и медиа требуют живого сервера) —
+  навык `ui-verify` (`.dsh/skills/ui-verify`).
 
 ## Правила для агента
 
