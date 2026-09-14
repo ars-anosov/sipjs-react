@@ -299,9 +299,19 @@ function LkMeet(props) {
     lkControlActions.handleChangeStore("displayControl", false);
   };
 
+  const hasLkToken = Boolean(authControlRdcr?.responseData?.lk_token || token);
+
+  // Если AdAuth не выполнен или не содержит lk_token — просто информируем
+  let infoText = "";
+  if (!hasLkToken) {
+    infoText =
+      authControlRdcr?.status === "success"
+        ? "AD не вернул lk_token."
+        : "AD авторизация не выполнена — lk_token недоступен.";
+  }
+
   return (
-    lkControlRdcr.displayControl &&
-    (authControlRdcr?.responseData?.lk_token || token) && (
+    lkControlRdcr.displayControl && (
       <Box sx={{ display: "flex", justifyContent: "center", width: "100%" }}>
         <Paper
           elevation={8}
@@ -323,143 +333,153 @@ function LkMeet(props) {
             }}
           >
             <Typography variant="h6" color="primary">
-              Встреча {room}
+              {room ? `Встреча ${room}` : "LiveKit Встреча"}
             </Typography>
             <IconButton onClick={handleClose}>
               <IconClose color="action" />
             </IconButton>
           </Stack>
 
-          <Grid container direction="column" spacing={2}>
-            {authControlRdcr?.responseData?.sip_username &&
-              authControlRdcr?.responseData?.lk_token && (
-                <Grid
-                  size={{ xs: "auto" }}
-                  sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    gap: 1.5,
-                  }}
-                >
-                  {token ? (
-                    <Button
-                      variant="outlined"
-                      color="error"
-                      size="medium"
-                      disabled={isRoomActive}
-                      component={RouterLink}
-                      to="/"
-                      startIcon={<DeleteOutlinedIcon />}
-                    >
-                      Удалить
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="outlined"
-                      color="primary"
-                      size="medium"
-                      component={RouterLink}
-                      to={`/?lk_room=${authControlRdcr.responseData.sip_username}&lk_token=${authControlRdcr.responseData.lk_token}`}
-                      startIcon={<AddCircleOutlinedIcon />}
-                    >
-                      Создать
-                    </Button>
-                  )}
-
-                  {authControlRdcr.responseData.sip_username === room &&
-                    (!lkControlRdcr.displayLkToken ? (
-                      <Button
-                        type="button"
-                        variant="outlined"
-                        color="primary"
-                        size="medium"
-                        onClick={handleInvite}
-                        startIcon={<GroupAddIcon />}
-                      >
-                        Пригласить
-                      </Button>
-                    ) : (
-                      <LkToken {...props} />
-                    ))}
-                </Grid>
-              )}
-
-            {lkControlRdcr?.responseData?.lk_token && token && (
-              <Grid
-                size={{ xs: 12 }}
-                sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  gap: 1,
-                }}
-              >
-                <Typography>Приглашение для</Typography>
-                <Link
-                  component={RouterLink}
-                  to={`/?lk_room=${authControlRdcr.responseData.sip_username}&lk_token=${lkControlRdcr.responseData.lk_token}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {lkControlRdcr.responseData.lk_num}
-                </Link>
-              </Grid>
-            )}
-
-            {token && (
-              <Grid
-                size={{ xs: 12 }}
-                sx={{ display: "flex", justifyContent: "center" }}
-              >
-                {!isRoomActive ? (
-                  <Box
+          {infoText ? (
+            <Typography
+              variant="body2"
+              color="warning.main"
+              sx={{ px: 1, pb: 1, maxWidth: 280 }}
+            >
+              {infoText}
+            </Typography>
+          ) : (
+            <Grid container direction="column" spacing={2}>
+              {authControlRdcr?.responseData?.sip_username &&
+                authControlRdcr?.responseData?.lk_token && (
+                  <Grid
+                    size={{ xs: "auto" }}
                     sx={{
                       display: "flex",
                       justifyContent: "center",
                       alignItems: "center",
-                      mt: 1,
+                      gap: 1.5,
                     }}
                   >
-                    <Button
-                      type="button"
-                      size="large"
-                      variant="contained"
-                      color="success"
-                      onClick={() => setIsRoomActive(true)}
-                      startIcon={<VideoCallOutlinedIcon />}
-                      sx={{ bgcolor: "success.light", p: 2, borderRadius: 2 }}
-                    >
-                      Подключиться к {room}
-                    </Button>
-                  </Box>
-                ) : (
-                  <>
-                    <GlobalStyles styles={lkStyles} />
-                    <LiveKitRoom
-                      data-lk-theme="default"
-                      token={token}
-                      serverUrl={lkControlRdcr.uriLk}
-                      connect={isRoomActive}
-                      video={false}
-                      audio={false}
-                      room={customRoom}
-                      onDisconnected={() => setIsRoomActive(false)}
-                    >
-                      <VideoGridSection />
-                      <ControlBar
-                        controls={{
-                          screenShare: true,
-                          chat: false,
-                        }}
-                      />
-                      <RoomAudioRenderer />
-                    </LiveKitRoom>
-                  </>
+                    {token ? (
+                      <Button
+                        variant="outlined"
+                        color="error"
+                        size="medium"
+                        disabled={isRoomActive}
+                        component={RouterLink}
+                        to="/"
+                        startIcon={<DeleteOutlinedIcon />}
+                      >
+                        Удалить
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="outlined"
+                        color="primary"
+                        size="medium"
+                        component={RouterLink}
+                        to={`/?lk_room=${authControlRdcr.responseData.sip_username}&lk_token=${authControlRdcr.responseData.lk_token}`}
+                        startIcon={<AddCircleOutlinedIcon />}
+                      >
+                        Создать
+                      </Button>
+                    )}
+
+                    {authControlRdcr.responseData.sip_username === room &&
+                      (!lkControlRdcr.displayLkToken ? (
+                        <Button
+                          type="button"
+                          variant="outlined"
+                          color="primary"
+                          size="medium"
+                          onClick={handleInvite}
+                          startIcon={<GroupAddIcon />}
+                        >
+                          Пригласить
+                        </Button>
+                      ) : (
+                        <LkToken {...props} />
+                      ))}
+                  </Grid>
                 )}
-              </Grid>
-            )}
-          </Grid>
+
+              {lkControlRdcr?.responseData?.lk_token && token && (
+                <Grid
+                  size={{ xs: 12 }}
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    gap: 1,
+                  }}
+                >
+                  <Typography>Приглашение для</Typography>
+                  <Link
+                    component={RouterLink}
+                    to={`/?lk_room=${authControlRdcr.responseData.sip_username}&lk_token=${lkControlRdcr.responseData.lk_token}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {lkControlRdcr.responseData.lk_num}
+                  </Link>
+                </Grid>
+              )}
+
+              {token && (
+                <Grid
+                  size={{ xs: 12 }}
+                  sx={{ display: "flex", justifyContent: "center" }}
+                >
+                  {!isRoomActive ? (
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        mt: 1,
+                      }}
+                    >
+                      <Button
+                        type="button"
+                        size="large"
+                        variant="contained"
+                        color="success"
+                        onClick={() => setIsRoomActive(true)}
+                        startIcon={<VideoCallOutlinedIcon />}
+                        sx={{ bgcolor: "success.light", p: 2, borderRadius: 2 }}
+                      >
+                        Подключиться к {room}
+                      </Button>
+                    </Box>
+                  ) : (
+                    <>
+                      <GlobalStyles styles={lkStyles} />
+                      <LiveKitRoom
+                        data-lk-theme="default"
+                        token={token}
+                        serverUrl={lkControlRdcr.uriLk}
+                        connect={isRoomActive}
+                        video={false}
+                        audio={false}
+                        room={customRoom}
+                        onDisconnected={() => setIsRoomActive(false)}
+                      >
+                        <VideoGridSection />
+                        <ControlBar
+                          controls={{
+                            screenShare: true,
+                            chat: false,
+                          }}
+                        />
+                        <RoomAudioRenderer />
+                      </LiveKitRoom>
+                    </>
+                  )}
+                </Grid>
+              )}
+            </Grid>
+          )}
         </Paper>
       </Box>
     )

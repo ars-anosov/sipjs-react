@@ -42,6 +42,11 @@ const MENU_ITEMS_PHONE = [
 const MENU_ITEMS_AUTH = [
   { key: "displayAd", primary: "AD Авторизация", secondary: "AuthAd.jsx" },
   { key: "displayControl", primary: "AD Кругляш", secondary: "AuthIco.jsx" },
+  {
+    key: "displayAuthPad",
+    primary: "Мост к сервисам",
+    secondary: "AuthPad.jsx",
+  },
 ];
 
 const MENU_ITEMS_LK = [

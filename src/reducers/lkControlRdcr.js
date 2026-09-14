@@ -9,7 +9,7 @@ import { LK_URI_KEY, LK_URI_TOKEN_KEY } from "../constants/storage";
 
 const initialState = {
   displayLkToken: false,
-  displayControl: true,
+  displayControl: false,
   uriLk: localStorage.getItem(LK_URI_KEY)
     ? localStorage.getItem(LK_URI_KEY)
     : "",

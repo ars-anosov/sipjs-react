@@ -10,10 +10,12 @@ import {
 import { AD_URI_AUTH_KEY } from "../constants/storage";
 
 const initialState = {
-  displayAd: false,
-  displayControl: false,
+  displayAd: true,
+  displayAuthPad: false,
+  displayControl: true,
   uriAdAuth: localStorage.getItem(AD_URI_AUTH_KEY) || "",
   status: "idle", // 'idle' | 'loading' | 'success' | 'error'
+  autoReg: false, // тумблер AuthPad: клик on запускает регистрацию SIP данными AD
   responseData: null,
   errComponent: "",
   errText: "",
@@ -26,6 +28,7 @@ export default function authControlRdcr(state = initialState, action) {
         ...state,
         status: "loading",
         displayAd: true,
+        autoReg: false,
         responseData: null,
         errComponent: "",
         errText: "",
@@ -36,6 +39,7 @@ export default function authControlRdcr(state = initialState, action) {
         ...state,
         status: "success",
         displayAd: false,
+        displayAuthPad: true,
         responseData: action.payload.responseData,
         errComponent: "",
         errText: "",
@@ -57,6 +61,8 @@ export default function authControlRdcr(state = initialState, action) {
       return {
         ...state,
         status: "idle",
+        displayAuthPad: false,
+        autoReg: false,
         responseData: null,
         errComponent: "",
         errText: "",

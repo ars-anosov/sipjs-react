@@ -78,6 +78,38 @@ flowchart TD
   class CE error
 ```
 
+## AD-авторизация и авторегистрация SIP (мост `AuthContainer`)
+
+Thunk-и namespace-чистые: `authControlActions` не диспатчит `PHONECTL_`, `phoneControlActions` — `AUTHCTL_`. Оба моста живут в `AuthContainer`. `AuthPad` рендерится по флагу `displayAuthPad` (строка меню; ✕ снимает флаг), который выставляется в `true` на `AUTHCTL_SUBMIT_SUCCESS` и сбрасывается на `AUTHCTL_CLEAR`; при отсутствии AD-данных `AuthPad` информирует текстом. Её тумблер (`authControlRdcr.autoReg`) заблокирован без пары `sip_username`/`sip_secret`, а клик on сразу запускает регистрацию.
+
+```mermaid
+sequenceDiagram
+  actor User
+  participant AuthAd@{ "type" : "participant", "alias": "AuthAd.jsx" }
+  participant AuthPad@{ "type" : "participant", "alias": "AuthPad.jsx" }
+  participant AuthAct@{ "type" : "collections", "alias": "authControlActions.js" }
+  participant AuthCont@{ "type" : "collections", "alias": "AuthContainer.jsx" }
+  participant PhoneAct@{ "type" : "collections", "alias": "phoneControlActions.js" }
+  participant Dispatch@{ "type" : "collections", "alias": "authControlRdcr / phoneControlRdcr" }
+
+  User->>AuthAd: Ввод AD-логина и пароля
+  AuthAd->>AuthAct: handleAdRegister(formData)
+  AuthAct->>Dispatch: AUTHCTL_SUBMIT_REQUEST (autoReg=false, responseData=null)
+  AuthAct->>AuthAct: POST uriAdAuth
+  AuthAct->>Dispatch: AUTHCTL_SUBMIT_SUCCESS (sip_username, sip_secret)
+  AuthCont->>Dispatch: PHONECTL_STORE_VALUE (callerUserNum, regUserPass, displayDir)
+  Note over AuthCont: displayAuthPad=true на success → рендер AuthPad (тумблер off; без AD-данных — текст с информацией)
+  User->>AuthPad: Клик по тумблеру on
+  AuthPad->>AuthCont: onToggleAutoReg(true)
+  AuthCont->>Dispatch: AUTHCTL_STORE_VALUE (autoReg=true)
+  AuthCont->>PhoneAct: handleClkRegister({sip_username, sip_secret, uriWebRtc})
+  PhoneAct->>Dispatch: PHONECTL_CONNECT_REQUEST → SUCCESS/ERROR
+  Dispatch-->>AuthCont: callerUserNum из PhoneReg
+  AuthCont->>Dispatch: AUTHCTL_STORE_VALUE (responseData.sip_username)
+```
+
+Отдельно: `AuthContainer` синхронизирует `phoneControlRdcr.callerUserNum` → `authControlRdcr.responseData.sip_username` (используется `AuthAdInfo` и `LkMeet`), а тумблер «LiveKit Встреча» переключает `lkControlRdcr.displayControl` — показ компоненты `LkMeet` (заблокирован без `lk_token`; если AD не выполнен или нет `lk_token`, `LkMeet` показывает информирующий текст). `autoReg` сбрасывается в `false` на `AUTHCTL_SUBMIT_REQUEST` и `AUTHCTL_CLEAR` — тумблер живёт в рамках одного AD-сеанса.
+
 ## SIP регистрация
 
 ```mermaid
@@ -93,7 +125,8 @@ sequenceDiagram
   User->>PhoneReg: Fill registration form and submit
   PhoneReg->>Action: handleClkRegister(formData, rdcr)
   Action->>Action: Validate + save uriWebRtc/callerUserNum
-  Action->>Dispatch: PHONECTL_STORE_VALUE / AUTHCTL_STORE_VALUE
+  Action->>Dispatch: PHONECTL_STORE_VALUE (callerUserNum, uriWebRtc)
+  Note over Action: sync sip_username в authControlRdcr делает AuthContainer
   alt Valid
     Action->>Runtime: registerSipUserAgent({ formData, handlers })
     Runtime->>Runtime: makeURI (throw on invalid)

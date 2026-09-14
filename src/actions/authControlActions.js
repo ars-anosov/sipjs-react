@@ -5,7 +5,6 @@ import {
   AUTHCTL_SUBMIT_ERROR,
   AUTHCTL_SUBMIT_REQUEST,
   AUTHCTL_SUBMIT_SUCCESS,
-  PHONECTL_STORE_VALUE,
 } from "../constants/redux";
 import {
   AD_AUTH_EXPIRE_TIME_KEY,
@@ -13,8 +12,10 @@ import {
   AD_URI_AUTH_KEY,
 } from "../constants/storage";
 
-import { handleClkRegister } from "./phoneControlActions";
 import { getApiErrorMessage } from "./utils/kyError";
+
+// Namespace-инвариант: thunk-и AUTHCTL_ не трогают PHONECTL_ (и наоборот).
+// Мост «AD-данные → PhoneReg» живёт в контейнере AuthContainer.
 
 function dispatchAdAuthError(dispatch, errText) {
   dispatch({
@@ -25,7 +26,7 @@ function dispatchAdAuthError(dispatch, errText) {
 
 const handleAdRegister =
   (formData = {}) =>
-  async (dispatch, getState) => {
+  async (dispatch) => {
     const login =
       typeof formData.login === "string" ? formData.login.trim() : "";
     const password =
@@ -63,37 +64,8 @@ const handleAdRegister =
         payload: { responseData },
       });
 
-      // Воздействие на компоненту PhoneReg
-      const state = getState();
-
-      dispatch({
-        type: PHONECTL_STORE_VALUE,
-        payload: {
-          storeDataKey: "callerUserNum",
-          storeDataValue: responseData.sip_username,
-        },
-      });
-      dispatch({
-        type: PHONECTL_STORE_VALUE,
-        payload: {
-          storeDataKey: "regUserPass",
-          storeDataValue: responseData.sip_secret,
-        },
-      });
-      dispatch({
-        type: PHONECTL_STORE_VALUE,
-        payload: { storeDataKey: "displayDir", storeDataValue: true },
-      });
-
-      if (!state.phoneControlRdcr.regNow) {
-        const formDataForSip = {
-          callerUserNum: responseData.sip_username,
-          regUserPass: responseData.sip_secret,
-          uriWebRtc: state.phoneControlRdcr.uriWebRtc,
-        };
-        dispatch(handleClkRegister(formDataForSip, state.phoneControlRdcr));
-      }
-      // END OF Воздействие на компоненту PhoneReg
+      // Подстановка sip_username/sip_secret в PhoneReg и автозапуск регистрации —
+      // в AuthContainer (мост AUTHCTL_ → PHONECTL_), управляется тумблером AuthPad.
     } catch (error) {
       const detailMessage = await getApiErrorMessage(error);
       dispatchAdAuthError(dispatch, detailMessage);

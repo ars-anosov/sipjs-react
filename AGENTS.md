@@ -14,8 +14,8 @@ Node.js 24, Vite 8, React 19, MUI 9 + Emotion, Redux 5 (redux-thunk; logger в d
 
 ```
 src/
-├── components/   # UI: PhoneReg, PhonePad, PhoneChat, PhoneHistory, PhoneDir, AuthAd/AuthAdInfo/AuthIco, LkMeet/LkToken/LkThemeStyles, MenuAppBar, PhoneIco
-├── containers/   # Redux-контейнеры: PhoneContainer, LkContainer, MenuAppContainer
+├── components/   # UI: PhoneReg, PhonePad, PhoneChat, PhoneHistory, PhoneDir, AuthAd/AuthAdInfo/AuthIco/AuthPad, LkMeet/LkToken/LkThemeStyles, MenuAppBar, PhoneIco
+├── containers/   # Redux-контейнеры: PhoneContainer, AuthContainer, LkContainer, MenuAppContainer
 ├── actions/      # thunks; utils/kyError.js
 ├── services/     # phoneRuntime, lkRuntime, phoneNotifications, phoneStorage
 ├── reducers/     # phoneControlRdcr, authControlRdcr, lkControlRdcr, authTimeoutMiddleware, rootReducer
@@ -35,13 +35,15 @@ mock/  public/  dist/   # dev-мок, статика, сборка (dist — т�
 - Redux: `phoneControlRdcr`, `authControlRdcr`, `lkControlRdcr`. В store — только UI-флаги,
   заголовки, списки и счётчики; sip.js-объекты/сессии/медиа не хранятся.
 - Actions — thunks (валидация → сервис/HTTP → dispatch). Reducers чистые.
+- Namespace-инвариант: thunks `AUTHCTL_` не диспатчат `PHONECTL_` (и наоборот). Мосты между
+  срезами (`AUTHCTL_` ↔ `PHONECTL_`) — только в контейнере `AuthContainer`.
 - `authTimeoutMiddleware` — раз в 10 с проверяет срок AD-сессии (24 ч).
 - `AuthAd` ожидает JSON: `sip_username`, `sip_secret`, `lk_token`, `ad_login`, `ad_cn`, `ad_title`, `ad_department`.
 
 ## Потоки
 
-- AD: `handleAdRegister` → `POST uriAdAuth` → `AUTHCTL_SUBMIT_SUCCESS` → заполняет SIP-реквизиты и автозапускает `handleClkRegister`.
-- LiveKit: `handleLkTokenSubmit` → `POST uriLkToken` → `LKTOKEN_SUBMIT_SUCCESS` + SIP MESSAGE-приглашение; `LkMeet` читает `lk_room`/`lk_token` из query.
+- AD: `handleAdRegister` → `POST uriAdAuth` → `AUTHCTL_SUBMIT_SUCCESS`. Далее мост `AuthContainer`: подставляет `sip_username`/`sip_secret` в PhoneReg; `AuthPad` видна по флагу меню `displayAuthPad` (✕ снимает флаг), автоматически показывается на `AUTHCTL_SUBMIT_SUCCESS` и скрывается на `AUTHCTL_CLEAR`; при отсутствии AD-данных информирует текстом, её тумблер `autoReg` — клик on сразу запускает `handleClkRegister` (без пары `sip_username`/`sip_secret` тумблер заблокирован); `sip_username` из PhoneReg синхронизируется обратно в `authControlRdcr.responseData`.
+- LiveKit: `handleLkTokenSubmit` → `POST uriLkToken` → `LKTOKEN_SUBMIT_SUCCESS` + SIP MESSAGE-приглашение; `LkMeet` читает `lk_room`/`lk_token` из query. Показ `LkMeet` — флаг `lkControlRdcr.displayControl` (пункт меню «LiveKit Встреча» и тумблер «LiveKit Встреча» в `AuthPad`); если AD не выполнен или нет `lk_token`, `LkMeet` показывает информирующий текст, а тумблер заблокирован.
 - SIP-регистрация/звонки/чат — см. `STATE.md`.
 
 ## Mock API

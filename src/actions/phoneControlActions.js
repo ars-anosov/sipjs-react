@@ -1,6 +1,5 @@
 import ky from "ky";
 import {
-  AUTHCTL_STORE_VALUE,
   PHONECTL_CALLLOG_UPD,
   PHONECTL_CHAT_UNREAD_CLEAR,
   PHONECTL_CLEAR_CHAT,
@@ -97,7 +96,7 @@ const markCallsRead = () => (dispatch) => {
   });
 };
 
-const handleClkRegister = (formData, rdcr) => (dispatch, getState) => {
+const handleClkRegister = (formData, rdcr) => (dispatch) => {
   const regAlert = (errText) => {
     dispatch({
       type: PHONECTL_ERROR_ALERT,
@@ -143,18 +142,8 @@ const handleClkRegister = (formData, rdcr) => (dispatch, getState) => {
       storeDataValue: formData.callerUserNum,
     },
   });
-  // Воздействие на компоненту AuthAd
-  const state = getState();
-  dispatch({
-    type: AUTHCTL_STORE_VALUE,
-    payload: {
-      storeDataKey: "responseData",
-      storeDataValue: {
-        ...(state?.authControlRdcr?.responseData || {}), // Если объекта нет, берем пустой {} и раскрываем его
-        sip_username: formData.callerUserNum,
-      },
-    },
-  });
+  // Синхронизация sip_username в authControlRdcr.responseData — в AuthContainer
+  // (мост PHONECTL_ → AUTHCTL_), см. AuthPad.
 
   clearRegAlert();
 

@@ -1,5 +1,6 @@
 import Container from "@mui/material/Container";
 import Copyright from "./Copyright";
+import AuthContainer from "./containers/AuthContainer.jsx";
 import LkContainer from "./containers/LkContainer.jsx";
 import MenuAppContainer from "./containers/MenuAppContainer";
 import PhoneContainer from "./containers/PhoneContainer.jsx";
@@ -17,6 +18,7 @@ export default function App() {
     >
       <MenuAppContainer />
       <PhoneContainer />
+      <AuthContainer />
       <LkContainer />
       <Copyright showFull={true} />
     </Container>
