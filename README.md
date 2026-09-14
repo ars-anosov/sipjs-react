@@ -1,17 +1,31 @@
 # sipjs-react
-WebRTC телефон на базе библиотеки [sipjs](https://sipjs.com/)
+
+WebRTC-телефон: SIP-клиент на [sip.js](https://sipjs.com/), видеовстречи на [LiveKit](https://livekit.io/) и авторизация через внешний API.
 
 ![phone](img/phone.png)
 
-Готовая сборка в [dist](dist)
+Готовая сборка — в [dist](dist).
+
+## Быстрый старт
+
+Требуется Node.js 24.
 
 ```bash
 npm install
-# npm run dev
-npm run build
+npm run dev     # Vite dev-сервер: http://localhost:3000 (host 0.0.0.0)
+npm run build   # сборка в dist
+npm run serve   # предпросмотр сборки (vite preview, порт 4173)
 ```
 
+Проверки и форматирование — Biome:
 
+```bash
+npm run lint    # линт
+npm run format  # форматирование
+npm run check   # линт + форматирование
+```
+
+В dev-режиме Vite поднимает мок-API.
 
 # Компоненты
 
@@ -27,6 +41,9 @@ npm run build
 ## PhoneIco.jsx
 ![component_PhoneIco.png](img/component_PhoneIco.png)
 
+## PhoneChat.jsx
+Чат по SIP MESSAGE
+
 # Доп. компоненты
 Плюшки для интеграции с внешними сервисами
 
@@ -40,16 +57,25 @@ POST-запрос к серверу авторизации, ожидаемый �
   "ad_login"      : "login",
   "ad_cn"         : "ФИО",
   "ad_title"      : "Должность",
-  "ad_department" : "Отдел",
+  "ad_department" : "Отдел"
 }
 ```
 
 ![component_AuthAd.png](img/component_AuthAd.png)
 
+## AuthPad.jsx
+Тумблеры авторегистрации.
+
+## AuthIco.jsx + AuthAdInfo.jsx
+Индикация данных AD-сессии в интерфейсе.
+
 ## LkMeet.jsx
-Видео встреча через [LiveKit](https://github.com/OpenVidu/openvidu-local-deployment)
+Видеовстреча через [LiveKit](https://github.com/OpenVidu/openvidu-local-deployment)
 
 ![component_LkMeet.png](img/component_LkMeet.png)
+
+## LkToken.jsx
+Форма запроса токена LiveKit (`POST uriLkToken`).
 
 ## PhoneDir.jsx
 GET-запрос к серверу справочнику, ожидаемый ответ:
@@ -58,38 +84,25 @@ GET-запрос к серверу справочнику, ожидаемый о
   { "label": "Москва префикс", "prefix": "1999" },
   { "label": "Спб префикс", "prefix": "1923" },
   { "label": "Пользователь с длинным именем каким-то", "num": "9991", "email": "user@example.com" },
-  { "label": "Пользователь без почты", "num": "9992" },
+  { "label": "Пользователь без почты", "num": "9992" }
 ]
 ```
 
 ![component_PhoneDir.png](img/component_PhoneDir.png)
 
+# Документация
 
+- [docs/STATE.md](docs/STATE.md) — архитектура состояния, SIP-регистрация, звонки, чат (диаграммы Mermaid).
+- [docs/archify/sipjs-react-architecture.html](docs/archify/sipjs-react-architecture.html) — интерактивная диаграмма архитектуры (archify).
 
 # Пакеты
 
-node модули
-```bash
-npm install --save react react-dom react-router-dom
-npm install --save react-redux redux redux-logger redux-thunk
-npm install --save @mui/material @emotion/react @emotion/styled @mui/icons-material
-npm install --save sip.js date-fns ky
-npm install --save-dev vite @vitejs/plugin-react body-parser
-```
+Зависимости — в `package.json`, установка — `npm install`. Обновление мажорных версий:
 
-Перепрыгнуть за мажорные версии
 ```bash
 npx npm-check-updates
 ```
 
-npm скрипты
-```json
-  "scripts": {
-    "dev": "vite --host 0.0.0.0",
-    "build": "vite build",
-    "serve": "vite preview --host 0.0.0.0",
-    "lint": "biome lint .",
-    "format": "biome format --write .",
-    "check": "biome check --write ."
-  }
-```
+# Лицензия
+
+MIT, см. [LICENSE](LICENSE).

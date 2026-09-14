@@ -20,9 +20,10 @@ src/
 ├── services/     # phoneRuntime, lkRuntime, phoneNotifications, phoneStorage
 ├── reducers/     # phoneControlRdcr, authControlRdcr, lkControlRdcr, authTimeoutMiddleware, rootReducer
 ├── store/        # configureStore.js
-├── constants/    # redux.js (action types), storage.js (ключи localStorage)
+├── constants/    # redux.js (action types), storage.js (ключи localStorage), ui.js (HEADER_BACKGROUND, PANEL_HEIGHT)
 └── App.jsx, main.jsx, theme.js, Copyright.jsx
 mock/  public/  dist/   # dev-мок, статика, сборка (dist — только npm run build)
+docs/                   # STATE.md (архитектура состояния) + archify/ (sipjs-react-architecture.architecture.json + .html)
 ```
 
 ## Архитектура
@@ -44,7 +45,7 @@ mock/  public/  dist/   # dev-мок, статика, сборка (dist — т�
 
 - AD: `handleAdRegister` → `POST uriAdAuth` → `AUTHCTL_SUBMIT_SUCCESS`. Далее мост `AuthContainer`: подставляет `sip_username`/`sip_secret` в PhoneReg; `AuthPad` видна по флагу меню `displayAuthPad` (✕ снимает флаг), автоматически показывается на `AUTHCTL_SUBMIT_SUCCESS` и скрывается на `AUTHCTL_CLEAR`; при отсутствии AD-данных информирует текстом, её тумблер `autoReg` — клик on сразу запускает `handleClkRegister` (без пары `sip_username`/`sip_secret` тумблер заблокирован); `sip_username` из PhoneReg синхронизируется обратно в `authControlRdcr.responseData`.
 - LiveKit: `handleLkTokenSubmit` → `POST uriLkToken` → `LKTOKEN_SUBMIT_SUCCESS` + SIP MESSAGE-приглашение; `LkMeet` читает `lk_room`/`lk_token` из query. Показ `LkMeet` — флаг `lkControlRdcr.displayControl` (пункт меню «LiveKit Встреча» и тумблер «LiveKit Встреча» в `AuthPad`); если AD не выполнен или нет `lk_token`, `LkMeet` показывает информирующий текст, а тумблер заблокирован.
-- SIP-регистрация/звонки/чат — см. `STATE.md`.
+- SIP-регистрация/звонки/чат — см. `docs/STATE.md`.
 
 ## Mock API
 
@@ -60,6 +61,17 @@ mock/  public/  dist/   # dev-мок, статика, сборка (dist — т�
 ## CI
 
 `.github/workflows/ci.yml` — push в `main`/`master`: Node.js 24, `npm ci`, `npm run build`.
+
+## Инструменты DSH
+
+В профиле `web` подключены плагины — опирайся на них, а не изобретай обходные пути.
+
+- **archify** (плагин `@tt-a1i/archify-dsh`, skill `archify`) — архитектурные, sequence, state и data-flow диаграммы как standalone HTML с inline SVG (темы, экспорт PNG/JPEG/WebP/SVG/WebM), на вход текст или Mermaid. В проекте результат — `docs/archify/*.architecture.json` + `.html`.
+- **dsh-mermaid** — рендерит fenced-блоки с языком `mermaid` в Web-GUI как SVG (тумблер Code/Diagram, fullscreen, экспорт SVG). Отдельного инструмента нет: просто оформляй диаграмму этим блоком; внешний CLI для Mermaid не нужен.
+- **dsh-wsl-browser** — tool `win_open_url`: открывает `http(s)`-URL в браузере Windows (удобно для сервисов WSL, например `http://127.0.0.1:3080`). Только http/https.
+- **mcp-playwright** (MCP-сервер `browser`, `@playwright/mcp`, Chrome на Windows) — живое окно браузера: навигация, снапшот доступности, клики/ввод, консоль, сетевые запросы, скриншоты. Инструменты MCP скрыты ленивым роутером: сначала `mcp__router__search_and_activate` (serverName `browser`), затем доступны `mcp__browser__*` (`browser_navigate`, `browser_click`, `browser_take_screenshot` и т. п.). Профиль Chrome постоянный (логин сохраняется), поэтому второй параллельный запуск с тем же профилем невозможен.
+
+Прочие инструменты окружения WSL (dsh-wsl-kit): `net_doctor`, `path_convert`, `wsl_clipboard`, `win_launch`.
 
 ## Правила для агента
 

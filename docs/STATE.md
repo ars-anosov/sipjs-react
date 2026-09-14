@@ -78,7 +78,7 @@ flowchart TD
   class CE error
 ```
 
-## AD-авторизация и авторегистрация SIP (мост `AuthContainer`)
+## Мост к сервисам (`AuthContainer`)
 
 Thunk-и namespace-чистые: `authControlActions` не диспатчит `PHONECTL_`, `phoneControlActions` — `AUTHCTL_`. Оба моста живут в `AuthContainer`. `AuthPad` рендерится по флагу `displayAuthPad` (строка меню; ✕ снимает флаг), который выставляется в `true` на `AUTHCTL_SUBMIT_SUCCESS` и сбрасывается на `AUTHCTL_CLEAR`; при отсутствии AD-данных `AuthPad` информирует текстом. Её тумблер (`authControlRdcr.autoReg`) заблокирован без пары `sip_username`/`sip_secret`, а клик on сразу запускает регистрацию.
 
@@ -98,7 +98,7 @@ sequenceDiagram
   AuthAct->>AuthAct: POST uriAdAuth
   AuthAct->>Dispatch: AUTHCTL_SUBMIT_SUCCESS (sip_username, sip_secret)
   AuthCont->>Dispatch: PHONECTL_STORE_VALUE (callerUserNum, regUserPass, displayDir)
-  Note over AuthCont: displayAuthPad=true на success → рендер AuthPad (тумблер off; без AD-данных — текст с информацией)
+  Note over AuthCont: displayAuthPad=true на success → рендер AuthPad (тумблер off, без AD-данных — текст с информацией)
   User->>AuthPad: Клик по тумблеру on
   AuthPad->>AuthCont: onToggleAutoReg(true)
   AuthCont->>Dispatch: AUTHCTL_STORE_VALUE (autoReg=true)

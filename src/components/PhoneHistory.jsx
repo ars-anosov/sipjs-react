@@ -6,6 +6,7 @@ import {
 } from "@mui/icons-material";
 import {
   Box,
+  Divider,
   IconButton,
   Paper,
   Stack,
@@ -21,6 +22,7 @@ import { alpha, keyframes, useTheme } from "@mui/material/styles";
 import { format, isValid, parseISO } from "date-fns";
 import PropTypes from "prop-types";
 import { useEffect, useMemo } from "react";
+import { HEADER_BACKGROUND, PANEL_HEIGHT } from "../constants/ui.js";
 
 const formatCallDate = (dateVal) => {
   if (!dateVal) return "—";
@@ -164,166 +166,185 @@ function PhoneHistory(props) {
         width: "100%",
         mx: "auto",
         mt: 2,
-        p: 1,
+        height: PANEL_HEIGHT,
         borderRadius: 3,
         position: "relative",
+        display: "flex",
+        flexDirection: "column",
+        boxSizing: "border-box",
+        overflow: "hidden",
       }}
     >
+      <IconButton
+        aria-label="Очистить историю"
+        onClick={() => phoneControlActions.handleClearHistory()}
+        sx={{ position: "absolute", top: 4, right: 54, zIndex: 1 }}
+      >
+        <IconDelete color="action" />
+      </IconButton>
+      <IconButton
+        aria-label="Закрыть панель"
+        onClick={handleClose}
+        sx={{ position: "absolute", top: 4, right: 4, zIndex: 1 }}
+      >
+        <IconClose color="action" />
+      </IconButton>
+
       <Stack
         direction="row"
-        sx={{ mb: 1, alignItems: "center", justifyContent: "space-between" }}
-      >
-        <Typography variant="h6" color="primary">
-          SIP Звонки
-        </Typography>
-        <Stack direction="row" spacing={1}>
-          <IconButton
-            onClick={() => phoneControlActions.handleClearHistory()}
-            sx={{ position: "absolute", top: 4, right: 54 }}
-          >
-            <IconDelete color="action" />
-          </IconButton>
-          <IconButton
-            onClick={handleClose}
-            sx={{ position: "absolute", top: 4, right: 4 }}
-          >
-            <IconClose color="action" />
-          </IconButton>
-        </Stack>
-      </Stack>
-
-      <TableContainer
         sx={{
-          height: 452,
-          overflowY: "auto",
-          border: 1,
-          borderColor: "divider",
-          borderRadius: 1,
-          backgroundColor: alpha(theme.palette.background.default, 0.5),
+          minHeight: 48,
+          pl: { xs: 1.5, sm: 2 },
+          pr: 12,
+          py: 0.5,
+          alignItems: "center",
+          bgcolor: HEADER_BACKGROUND,
         }}
       >
-        <Table
-          size="small"
-          aria-label="История звонков"
-          stickyHeader
-          sx={{ tableLayout: "fixed" }}
+        <Box sx={{ minWidth: 0 }}>
+          <Typography variant="h6" color="primary" noWrap>
+            SIP Звонки
+          </Typography>
+        </Box>
+      </Stack>
+
+      <Divider />
+
+      <Box sx={{ p: 1, flex: 1, minHeight: 0, display: "flex" }}>
+        <TableContainer
+          sx={{
+            flex: 1,
+            minWidth: 0,
+            overflowY: "auto",
+            border: 1,
+            borderColor: "divider",
+            borderRadius: 1,
+            backgroundColor: alpha(theme.palette.background.default, 0.5),
+          }}
         >
-          <TableHead>
-            <TableRow>
-              <TableCell sx={{ width: 110, py: 0.5 }}>Время</TableCell>
-              <TableCell sx={{ width: 50, py: 0.5 }}></TableCell>
-              <TableCell sx={{ width: 34, py: 0.5 }}></TableCell>
-              <TableCell sx={{ width: "100%", py: 0.5 }}>Абонент</TableCell>
-            </TableRow>
-          </TableHead>
+          <Table
+            size="small"
+            aria-label="История звонков"
+            stickyHeader
+            sx={{ tableLayout: "fixed" }}
+          >
+            <TableHead>
+              <TableRow>
+                <TableCell sx={{ width: 110, py: 0.5 }}>Время</TableCell>
+                <TableCell sx={{ width: 50, py: 0.5 }}></TableCell>
+                <TableCell sx={{ width: 34, py: 0.5 }}></TableCell>
+                <TableCell sx={{ width: "100%", py: 0.5 }}>Абонент</TableCell>
+              </TableRow>
+            </TableHead>
 
-          <TableBody>
-            {processedCalls.map((row) => (
-              <TableRow
-                key={row.id}
-                onClick={() => handleCallLogClk(row.uri)}
-                sx={{
-                  cursor: "pointer",
-                  backgroundColor: row.rowBgColor,
-                  transition: theme.transitions.create([
-                    "background-color",
-                    "color",
-                  ]),
-                  animation: row.isRinging
-                    ? `${blink} 1s infinite ease-in-out`
-                    : "none",
-                  boxShadow: row.isUnread
-                    ? `inset 0 0 0 1px ${alpha(theme.palette.warning.main, 0.75)}`
-                    : "none",
-                  "& .MuiTableCell-root": {
-                    color: row.rowTextColor,
-                    fontWeight: row.isUnread
-                      ? "bold"
-                      : row.isLost
-                        ? "medium"
-                        : "normal",
-                  },
-                  "&:hover": {
-                    backgroundColor: row.isInCall
-                      ? row.basePalette.dark
-                      : row.isLost && row.isInbound
-                        ? alpha(theme.palette.error.main, 0.15)
-                        : row.isLost && !row.isInbound
-                          ? alpha(
-                              theme.palette.action.disabledBackground ||
-                                "#dddddd",
-                              0.2,
-                            )
-                          : alpha(row.basePalette.light, 0.25),
-                  },
-                }}
-              >
-                <TableCell sx={{ whiteSpace: "nowrap", py: 0.5 }}>
-                  <small>{row.formattedDate}</small>
-                </TableCell>
-
-                <TableCell
+            <TableBody>
+              {processedCalls.map((row) => (
+                <TableRow
+                  key={row.id}
+                  onClick={() => handleCallLogClk(row.uri)}
                   sx={{
-                    whiteSpace: "nowrap",
-                    fontVariantNumeric: "tabular-nums",
-                    py: 0.5,
+                    cursor: "pointer",
+                    backgroundColor: row.rowBgColor,
+                    transition: theme.transitions.create([
+                      "background-color",
+                      "color",
+                    ]),
+                    animation: row.isRinging
+                      ? `${blink} 1s infinite ease-in-out`
+                      : "none",
+                    boxShadow: row.isUnread
+                      ? `inset 0 0 0 1px ${alpha(theme.palette.warning.main, 0.75)}`
+                      : "none",
+                    "& .MuiTableCell-root": {
+                      color: row.rowTextColor,
+                      fontWeight: row.isUnread
+                        ? "bold"
+                        : row.isLost
+                          ? "medium"
+                          : "normal",
+                    },
+                    "&:hover": {
+                      backgroundColor: row.isInCall
+                        ? row.basePalette.dark
+                        : row.isLost && row.isInbound
+                          ? alpha(theme.palette.error.main, 0.15)
+                          : row.isLost && !row.isInbound
+                            ? alpha(
+                                theme.palette.action.disabledBackground ||
+                                  "#dddddd",
+                                0.2,
+                              )
+                            : alpha(row.basePalette.light, 0.25),
+                    },
                   }}
                 >
-                  <small>{row.formattedDuration}</small>
-                </TableCell>
+                  <TableCell sx={{ whiteSpace: "nowrap", py: 0.5 }}>
+                    <small>{row.formattedDate}</small>
+                  </TableCell>
 
-                <TableCell align="right" sx={{ py: 0.25, px: 0.5 }}>
-                  <Box
+                  <TableCell
                     sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "flex-end",
-                      gap: 0.25,
+                      whiteSpace: "nowrap",
+                      fontVariantNumeric: "tabular-nums",
+                      py: 0.5,
                     }}
                   >
-                    {row.isInbound ? (
-                      <IcoIncome
-                        fontSize="small"
-                        sx={{
-                          color: row.isInCall
-                            ? "inherit"
-                            : row.isLost
-                              ? "error.dark"
-                              : "success.main",
-                        }}
-                      />
-                    ) : (
-                      <IcoOutgo
-                        fontSize="small"
-                        sx={{
-                          color: row.isInCall
-                            ? "inherit"
-                            : row.isLost
-                              ? "text.disabled"
-                              : "info.main",
-                        }}
-                      />
-                    )}
-                  </Box>
-                </TableCell>
+                    <small>{row.formattedDuration}</small>
+                  </TableCell>
 
-                <TableCell
-                  sx={{
-                    width: "100%",
-                    pl: 1.5,
-                    py: 0.5,
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {row.uri}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+                  <TableCell align="right" sx={{ py: 0.25, px: 0.5 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "flex-end",
+                        gap: 0.25,
+                      }}
+                    >
+                      {row.isInbound ? (
+                        <IcoIncome
+                          fontSize="small"
+                          sx={{
+                            color: row.isInCall
+                              ? "inherit"
+                              : row.isLost
+                                ? "error.dark"
+                                : "success.main",
+                          }}
+                        />
+                      ) : (
+                        <IcoOutgo
+                          fontSize="small"
+                          sx={{
+                            color: row.isInCall
+                              ? "inherit"
+                              : row.isLost
+                                ? "text.disabled"
+                                : "info.main",
+                          }}
+                        />
+                      )}
+                    </Box>
+                  </TableCell>
+
+                  <TableCell
+                    sx={{
+                      width: "100%",
+                      pl: 1.5,
+                      py: 0.5,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {row.uri}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Box>
     </Paper>
   );
 }

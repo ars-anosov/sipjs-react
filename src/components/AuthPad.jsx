@@ -1,7 +1,16 @@
 import { Close as IconClose } from "@mui/icons-material";
-import { IconButton, Paper, Stack, Switch, Typography } from "@mui/material";
+import {
+  Box,
+  Divider,
+  IconButton,
+  Paper,
+  Stack,
+  Switch,
+  Typography,
+} from "@mui/material";
 import PropTypes from "prop-types";
 import { useEffect } from "react";
+import { HEADER_BACKGROUND } from "../constants/ui.js";
 
 function AuthPad(props) {
   const {
@@ -63,75 +72,93 @@ function AuthPad(props) {
         width: "100%",
         mx: "auto",
         mt: 2,
-        p: 1,
         borderRadius: 3,
         position: "relative",
+        boxSizing: "border-box",
+        overflow: "hidden",
       }}
     >
+      <IconButton
+        aria-label="Закрыть панель"
+        onClick={onClose}
+        sx={{ position: "absolute", top: 4, right: 4, zIndex: 1 }}
+      >
+        <IconClose color="action" />
+      </IconButton>
+
       <Stack
         direction="row"
-        sx={{ mb: 1, alignItems: "center", justifyContent: "space-between" }}
+        sx={{
+          minHeight: 48,
+          pl: { xs: 1.5, sm: 2 },
+          pr: 6,
+          py: 0.5,
+          alignItems: "center",
+          bgcolor: HEADER_BACKGROUND,
+        }}
       >
-        <Typography variant="h6" color="primary">
-          Мост к сервисам
-        </Typography>
-        <Stack direction="row" spacing={1}>
-          <IconButton
-            onClick={onClose}
-            sx={{ position: "absolute", top: 4, right: 4 }}
+        <Box sx={{ minWidth: 0 }}>
+          <Typography variant="h6" color="primary" noWrap>
+            Мост к сервисам
+          </Typography>
+        </Box>
+      </Stack>
+
+      <Divider />
+
+      {/* Тело панели: padding переехал с Paper на тело, чтобы шапка легла вплотную к краям */}
+      <Box sx={{ p: 1 }}>
+        <Stack spacing={1}>
+          <Stack
+            direction="row"
+            spacing={2}
+            sx={{ alignItems: "center", justifyContent: "space-between" }}
           >
-            <IconClose color="action" />
-          </IconButton>
-        </Stack>
-      </Stack>
+            <Typography variant="body1" color="text.primary">
+              {`SIP Регистрация ${sipUsername || "—"}`}
+            </Typography>
+            <Switch
+              checked={autoReg}
+              disabled={!hasSipData}
+              onChange={handleToggleAutoReg}
+              slotProps={{
+                input: { "aria-label": "Автоматическая регистрация SIP" },
+              }}
+            />
+          </Stack>
 
-      <Stack spacing={1}>
-        <Stack
-          direction="row"
-          spacing={2}
-          sx={{ alignItems: "center", justifyContent: "space-between" }}
-        >
-          <Typography variant="body1" color="text.primary">
-            {`SIP Регистрация ${sipUsername || "—"}`}
-          </Typography>
-          <Switch
-            checked={autoReg}
-            disabled={!hasSipData}
-            onChange={handleToggleAutoReg}
-            slotProps={{
-              input: { "aria-label": "Автоматическая регистрация SIP" },
-            }}
-          />
+          <Stack
+            direction="row"
+            spacing={2}
+            sx={{ alignItems: "center", justifyContent: "space-between" }}
+          >
+            <Typography variant="body1" color="text.primary">
+              LiveKit Встреча
+            </Typography>
+            <Switch
+              checked={meetVisible}
+              disabled={!hasLkToken}
+              onChange={handleToggleMeet}
+              slotProps={{
+                input: { "aria-label": "Показ LiveKit Встречи" },
+              }}
+            />
+          </Stack>
         </Stack>
 
-        <Stack
-          direction="row"
-          spacing={2}
-          sx={{ alignItems: "center", justifyContent: "space-between" }}
-        >
-          <Typography variant="body1" color="text.primary">
-            LiveKit Встреча
-          </Typography>
-          <Switch
-            checked={meetVisible}
-            disabled={!hasLkToken}
-            onChange={handleToggleMeet}
-            slotProps={{
-              input: { "aria-label": "Показ LiveKit Встречи" },
-            }}
-          />
-        </Stack>
-      </Stack>
-
-      {infoText && (
-        <Typography
-          variant="caption"
-          color="warning.main"
-          sx={{ display: "block", mt: 1 }}
-        >
-          {infoText}
-        </Typography>
-      )}
+        {infoText && (
+          <>
+            <Divider sx={{ mt: 1 }} />
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ display: "block", mt: 1, textAlign: "center" }}
+            >
+              {infoText}
+            </Typography>
+          </>
+        )}
+      </Box>
     </Paper>
   );
 }
