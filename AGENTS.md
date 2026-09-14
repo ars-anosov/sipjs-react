@@ -23,7 +23,9 @@ src/
 ├── constants/    # redux.js (action types), storage.js (ключи localStorage), ui.js (HEADER_BACKGROUND, PANEL_HEIGHT)
 └── App.jsx, main.jsx, theme.js, Copyright.jsx
 mock/  public/  dist/   # dev-мок, статика, сборка (dist — только npm run build)
-docs/                   # STATE.md (архитектура состояния) + archify/ (sipjs-react-architecture.architecture.json + .html)
+docs/                   # документация и GitHub Pages (ars-anosov.github.io/sipjs-react):
+                        # index.html (лендинг), STATE.md (Mermaid-схемы), archify/ (генерация
+                        # skill'ом archify, исключён из Biome)
 ```
 
 ## Архитектура
@@ -66,7 +68,7 @@ docs/                   # STATE.md (архитектура состояния) +
 
 В профиле `web` подключены плагины — опирайся на них, а не изобретай обходные пути.
 
-- **archify** (плагин `@tt-a1i/archify-dsh`, skill `archify`) — архитектурные, sequence, state и data-flow диаграммы как standalone HTML с inline SVG (темы, экспорт PNG/JPEG/WebP/SVG/WebM), на вход текст или Mermaid. В проекте результат — `docs/archify/*.architecture.json` + `.html`.
+- **archify** (плагин `@tt-a1i/archify-dsh`, skill `archify`) — архитектурные, sequence, state и data-flow диаграммы как standalone HTML с inline SVG (темы, экспорт PNG/JPEG/WebP/SVG/WebM), на вход текст или Mermaid. В проекте результат — `docs/archify/sipjs-react-architecture.*`; готовые HTML/JSON не править вручную — только перегенерация skill'ом.
 - **dsh-mermaid** — рендерит fenced-блоки с языком `mermaid` в Web-GUI как SVG (тумблер Code/Diagram, fullscreen, экспорт SVG). Отдельного инструмента нет: просто оформляй диаграмму этим блоком; внешний CLI для Mermaid не нужен.
 - **dsh-wsl-browser** — tool `win_open_url`: открывает `http(s)`-URL в браузере Windows (удобно для сервисов WSL, например `http://127.0.0.1:3080`). Только http/https.
 - **mcp-playwright** (MCP-сервер `browser`, `@playwright/mcp`, Chrome на Windows) — живое окно браузера: навигация, снапшот доступности, клики/ввод, консоль, сетевые запросы, скриншоты. Инструменты MCP скрыты ленивым роутером: сначала `mcp__router__search_and_activate` (serverName `browser`), затем доступны `mcp__browser__*` (`browser_navigate`, `browser_click`, `browser_take_screenshot` и т. п.). Профиль Chrome постоянный (логин сохраняется), поэтому второй параллельный запуск с тем же профилем невозможен.

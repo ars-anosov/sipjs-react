@@ -92,8 +92,9 @@ GET-запрос к серверу справочнику, ожидаемый о
 
 # Документация
 
-- [docs/STATE.md](docs/STATE.md) — архитектура состояния, SIP-регистрация, звонки, чат (диаграммы Mermaid).
-- [docs/archify/sipjs-react-architecture.html](docs/archify/sipjs-react-architecture.html) — интерактивная диаграмма архитектуры (archify).
+[![Архитектура sipjs-react](docs/archify/sipjs-react-architecture.visual-check.2048x1320.light.png)](https://ars-anosov.github.io/sipjs-react/archify/sipjs-react-architecture.html)
+
+Все документы: <https://ars-anosov.github.io/sipjs-react/>
 
 # Пакеты
 
