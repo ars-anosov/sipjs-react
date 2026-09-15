@@ -74,7 +74,7 @@ function PhoneReg(props) {
     phoneControlActions.handleClkUnregister(phoneControlRdcr);
   };
 
-  const isRegistered = phoneControlRdcr.regNow;
+  const isRegistered = phoneControlRdcr.regState === "ok";
 
   return (
     <Paper
@@ -262,7 +262,7 @@ PhoneReg.propTypes = {
     callerUserNum: PropTypes.string,
     regUserPass: PropTypes.string,
     uriWebRtc: PropTypes.string,
-    regNow: PropTypes.bool,
+    regState: PropTypes.oneOf(["off", "ok", "fail"]),
     errComponent: PropTypes.string,
     errText: PropTypes.string,
   }).isRequired,

@@ -26,6 +26,16 @@ import PhoneDir from "./PhoneDir";
 import PhoneIco from "./PhoneIco";
 import PhonePad from "./PhonePad";
 
+const MENU_ITEMS_AUTH = [
+  { key: "displayAd", primary: "AD Авторизация", secondary: "AuthAd.jsx" },
+  { key: "displayControl", primary: "AD Кругляш", secondary: "AuthIco.jsx" },
+  {
+    key: "displayAuthPad",
+    primary: "Мост к сервисам",
+    secondary: "AuthPad.jsx",
+  },
+];
+
 const MENU_ITEMS_PHONE = [
   { key: "displayReg", primary: "SIP Регистрация", secondary: "PhoneReg.jsx" },
   { key: "displayPad", primary: "SIP Телефон", secondary: "PhonePad.jsx" },
@@ -37,16 +47,6 @@ const MENU_ITEMS_PHONE = [
   { key: "displayChat", primary: "SIP Сообщения", secondary: "PhoneChat.jsx" },
   { key: "displayControl", primary: "SIP Кругляш", secondary: "PhoneIco.jsx" },
   { key: "displayDir", primary: "Тел.Справочник", secondary: "PhoneDir.jsx" },
-];
-
-const MENU_ITEMS_AUTH = [
-  { key: "displayAd", primary: "AD Авторизация", secondary: "AuthAd.jsx" },
-  { key: "displayControl", primary: "AD Кругляш", secondary: "AuthIco.jsx" },
-  {
-    key: "displayAuthPad",
-    primary: "Мост к сервисам",
-    secondary: "AuthPad.jsx",
-  },
 ];
 
 const MENU_ITEMS_LK = [
@@ -158,13 +158,13 @@ function MenuAppBar(props) {
             <Divider />
 
             <List>
-              {MENU_ITEMS_PHONE.map((item) => {
-                const isChecked = !!phoneControlRdcr[item.key];
+              {MENU_ITEMS_AUTH.map((item) => {
+                const isChecked = !!authControlRdcr[item.key];
                 const labelId = `checkbox-list-label-${item.key}`;
                 return (
                   <ListItemButton
                     key={item.key}
-                    onClick={() => toggleDisplayPhone(item.key)}
+                    onClick={() => toggleDisplayAuth(item.key)}
                     sx={{ alignItems: "flex-start" }}
                   >
                     <ListItemIcon>
@@ -189,13 +189,13 @@ function MenuAppBar(props) {
             <Divider />
 
             <List>
-              {MENU_ITEMS_AUTH.map((item) => {
-                const isChecked = !!authControlRdcr[item.key];
+              {MENU_ITEMS_PHONE.map((item) => {
+                const isChecked = !!phoneControlRdcr[item.key];
                 const labelId = `checkbox-list-label-${item.key}`;
                 return (
                   <ListItemButton
                     key={item.key}
-                    onClick={() => toggleDisplayAuth(item.key)}
+                    onClick={() => toggleDisplayPhone(item.key)}
                     sx={{ alignItems: "flex-start" }}
                   >
                     <ListItemIcon>

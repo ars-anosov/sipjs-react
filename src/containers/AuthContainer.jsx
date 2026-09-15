@@ -31,7 +31,10 @@ const AuthContainer = () => {
   );
 
   const { responseData, displayAuthPad } = authControlRdcr;
-  const { callerUserNum, uriWebRtc, regNow, connectStatus } = phoneControlRdcr;
+  const { callerUserNum, uriWebRtc, connectStatus, regState } =
+    phoneControlRdcr;
+
+  const isRegistered = regState === "ok";
 
   const sipUsername = responseData?.sip_username || "";
   const sipSecret = responseData?.sip_secret || "";
@@ -55,11 +58,23 @@ const AuthContainer = () => {
     phoneControlActions.handleChangeStore("displayDir", true);
   }, [sipUsername, sipSecret, phoneControlActions]);
 
-  // Мост AUTHCTL_ → PHONECTL_: клик по тумблеру AuthPad сразу регистрирует PhoneReg
-  const handleToggleAutoReg = (checked) => {
-    authControlActions.handleChangeStore("autoReg", checked);
+  // Мост AUTHCTL_ → PHONECTL_: тумблер AuthPad трёхпозиционный.
+  // off → запуск регистрации (её итог определяет phoneRuntime: ok / fail),
+  // ok → разрегистрация SIP-сессии, fail → возврат в off (разрегистрировать нечего).
+  const handleToggleReg = () => {
+    if (regState === "ok") {
+      phoneControlActions.handleClkUnregister(phoneControlRdcr);
+      return;
+    }
 
-    if (!checked || !sipUsername || !sipSecret || regNow) return;
+    if (regState === "fail") {
+      phoneControlActions.handleChangeStore("regState", "off");
+      return;
+    }
+
+    // Уже идёт попытка подключения — повторный клик не создаёт вторую регистрацию
+    if (isRegistered || connectStatus === "Request") return;
+    if (!sipUsername || !sipSecret) return;
 
     phoneControlActions.handleClkRegister(
       { callerUserNum: sipUsername, regUserPass: sipSecret, uriWebRtc },
@@ -79,14 +94,29 @@ const AuthContainer = () => {
   // Мост PHONECTL_ → AUTHCTL_: AuthAdInfo/LkMeet читают sip_username из authControlRdcr
   useEffect(() => {
     if (!callerUserNum) return;
-    if (!regNow && !connectStatus) return;
+    if (!isRegistered && !connectStatus) return;
     if (responseData?.sip_username === callerUserNum) return;
 
     authControlActions.handleChangeStore("responseData", {
       ...(responseData || {}),
       sip_username: callerUserNum,
     });
-  }, [callerUserNum, regNow, connectStatus, responseData, authControlActions]);
+  }, [
+    callerUserNum,
+    isRegistered,
+    connectStatus,
+    responseData,
+    authControlActions,
+  ]);
+
+  // Мост PHONECTL_ → AUTHCTL_: потеря регистрации (красный тумблер) форсирует
+  // AuthPad, чтобы по нему можно было кликнуть. displayAuthPad в зависимостях
+  // намеренно нет: иначе ✕ не закрыл бы панель, пока regState остаётся 'fail'.
+  useEffect(() => {
+    if (regState !== "fail") return;
+
+    authControlActions.handleChangeStore("displayAuthPad", true);
+  }, [regState, authControlActions]);
 
   // AuthPad показывается по флагу меню; без AD-данных она информирует об этом
   if (!displayAuthPad) return null;
@@ -95,7 +125,8 @@ const AuthContainer = () => {
     <AuthPad
       authControlRdcr={authControlRdcr}
       lkControlRdcr={lkControlRdcr}
-      onToggleAutoReg={handleToggleAutoReg}
+      regState={regState}
+      onToggleReg={handleToggleReg}
       onToggleMeet={handleToggleMeet}
       onClose={handleCloseAuthPad}
     />

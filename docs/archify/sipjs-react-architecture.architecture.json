@@ -52,7 +52,7 @@
           "store",
           "ui"
         ],
-        "note": "AuthContainer — мост AUTHCTL_ ↔ PHONECTL_: реквизиты AD попадают в PhoneReg, авторегистрация — по тумблеру AuthPad."
+        "note": "AuthContainer — мост AUTHCTL_ ↔ PHONECTL_: реквизиты AD попадают в PhoneReg, регистрация — по тумблеру AuthPad (off / ok / fail)."
       },
       {
         "id": "livekit-path",
@@ -489,7 +489,7 @@
       "items": [
         "handleAdRegister → adAuth.loginAd → POST uriAdAuth → AUTHCTL_SUBMIT_SUCCESS",
         "AuthContainer подставляет sip_username/sip_secret в PhoneReg и показывает AuthPad",
-        "тумблер autoReg сразу зовёт handleClkRegister; authTimeoutMiddleware раз в 10 с проверяет AD-сессию (24 ч)"
+        "тумблер AuthPad трёхпозиционный по regState (off / ok / fail); authTimeoutMiddleware раз в 10 с проверяет AD-сессию (24 ч)"
       ]
     },
     {

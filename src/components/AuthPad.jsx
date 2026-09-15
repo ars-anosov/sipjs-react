@@ -16,7 +16,8 @@ function AuthPad(props) {
   const {
     authControlRdcr,
     lkControlRdcr,
-    onToggleAutoReg,
+    regState,
+    onToggleReg,
     onToggleMeet,
     onClose,
   } = props;
@@ -28,7 +29,11 @@ function AuthPad(props) {
     };
   }, []);
 
-  const autoReg = !!authControlRdcr?.autoReg;
+  // Тумблер SIP-регистрации: off — выключен (нейтральный цвет), ok — зелёный
+  // (регистрация прошла), fail — красный (регистрация не прошла)
+  const regOn = regState !== "off";
+  const regColor =
+    regState === "ok" ? "success" : regState === "fail" ? "error" : "primary";
   const sipUsername = authControlRdcr?.responseData?.sip_username || "";
   const sipSecret = authControlRdcr?.responseData?.sip_secret || "";
   const hasSipData = Boolean(sipUsername && sipSecret);
@@ -55,9 +60,10 @@ function AuthPad(props) {
     infoText = `AD не вернул: ${missingFields.join(", ")}.`;
   }
 
-  // Тумблер — не только флаг, но и действие: клик on запускает регистрацию
-  const handleToggleAutoReg = (event) => {
-    onToggleAutoReg(event.target.checked);
+  // Тумблер — не только индикатор, но и действие: из off клик запускает
+  // регистрацию, из цветного состояния — разрегистрацию (решает AuthContainer)
+  const handleToggleReg = () => {
+    onToggleReg();
   };
   // Тумблер показа компоненты LkMeet
   const handleToggleMeet = (event) => {
@@ -118,11 +124,12 @@ function AuthPad(props) {
               {`SIP Регистрация ${sipUsername || "—"}`}
             </Typography>
             <Switch
-              checked={autoReg}
-              disabled={!hasSipData}
-              onChange={handleToggleAutoReg}
+              checked={regOn}
+              color={regColor}
+              disabled={!regOn && !hasSipData}
+              onChange={handleToggleReg}
               slotProps={{
-                input: { "aria-label": "Автоматическая регистрация SIP" },
+                input: { "aria-label": "Тумблер SIP регистрации" },
               }}
             />
           </Stack>
@@ -165,7 +172,6 @@ function AuthPad(props) {
 
 AuthPad.propTypes = {
   authControlRdcr: PropTypes.shape({
-    autoReg: PropTypes.bool,
     status: PropTypes.oneOf(["idle", "loading", "success", "error"]),
     responseData: PropTypes.shape({
       sip_username: PropTypes.string,
@@ -179,7 +185,8 @@ AuthPad.propTypes = {
       lk_token: PropTypes.string,
     }),
   }).isRequired,
-  onToggleAutoReg: PropTypes.func.isRequired,
+  regState: PropTypes.oneOf(["off", "ok", "fail"]).isRequired,
+  onToggleReg: PropTypes.func.isRequired,
   onToggleMeet: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired,
 };

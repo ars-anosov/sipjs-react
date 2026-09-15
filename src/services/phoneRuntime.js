@@ -475,7 +475,6 @@ const registerSipUserAgent = ({ formData, handlers }) => {
 
     if (reconnectionAttempt > reconnectionAttempts) {
       handlers.onConnectError({
-        regNow: false,
         phoneHeader: "Disconnected",
         icoHeader: "Disconnected",
       });
@@ -607,7 +606,6 @@ const registerSipUserAgent = ({ formData, handlers }) => {
         !connectionCtl.suppressReconnectOnNextDisconnect
       ) {
         handlers.onConnectError({
-          regNow: false,
           phoneHeader: "Registration expired",
           icoHeader: "Registration expired",
         });
@@ -640,7 +638,6 @@ const registerSipUserAgent = ({ formData, handlers }) => {
               registrationInFlight = false;
               registrationAccepted = true;
               handlers.onConnectSuccess({
-                regNow: true,
                 phoneHeader: response.message.from.displayName,
                 icoHeader: response.message.from.displayName,
               });
@@ -655,7 +652,6 @@ const registerSipUserAgent = ({ formData, handlers }) => {
               registrationInFlight = false;
               registrationAccepted = false;
               handlers.onConnectError({
-                regNow: false,
                 phoneHeader:
                   response.message.statusCode +
                   " " +
@@ -680,7 +676,6 @@ const registerSipUserAgent = ({ formData, handlers }) => {
           registrationInFlight = false;
           registrationAccepted = false;
           handlers.onConnectError({
-            regNow: false,
             phoneHeader: "Registration error",
             icoHeader: "Registration error",
           });
@@ -715,7 +710,6 @@ const registerSipUserAgent = ({ formData, handlers }) => {
     );
 
     handlers.onConnectError({
-      regNow: false,
       phoneHeader: "Disconnected",
       icoHeader: "Disconnected",
     });
@@ -743,7 +737,6 @@ const registerSipUserAgent = ({ formData, handlers }) => {
       console.error("userAgent.start() failed:", e.message || e);
       connectionCtl.shouldBeConnected = false;
       handlers.onConnectError({
-        regNow: false,
         phoneHeader: "SIP proxy WebSocket problem",
         icoHeader: "SIP proxy WebSocket problem",
       });

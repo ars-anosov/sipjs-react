@@ -69,7 +69,7 @@ POST-запрос к серверу авторизации, ожидаемый �
 ![component_AuthAd.png](img/component_AuthAd.png)
 
 ## AuthPad.jsx
-Панель «Мост к сервисам»: тумблеры SIP-регистрации (`autoReg`) и показа LiveKit-встречи (`lkControlRdcr.displayControl`), кнопка закрытия и текст с недостающими AD-данными.
+Панель «Мост к сервисам»: тумблеры SIP-регистрации (трёхпозиционный по `phoneControlRdcr.regState`: `off` / зелёный `ok` / красный `fail` — клик из `off` регистрирует, из цветного состояния разрегистрирует) и показа LiveKit-встречи (`lkControlRdcr.displayControl`), кнопка закрытия и текст с недостающими AD-данными. При потере регистрации панель показывается автоматически (вместо формы `PhoneReg`), чтобы красный тумблер был доступен для клика.
 
 ## AuthIco.jsx + AuthAdInfo.jsx
 Индикация данных AD-сессии в интерфейсе.
@@ -101,6 +101,9 @@ GET-запрос к серверу справочнику, ожидаемый о
 # Документация
 
 [![Архитектура sipjs-react](docs/archify/sipjs-react-architecture.visual-check.2048x1320.light.png)](https://ars-anosov.github.io/sipjs-react/archify/sipjs-react-architecture.html)
+
+- [Архитектура приложения](https://ars-anosov.github.io/sipjs-react/archify/sipjs-react-architecture.html) — компоненты, слои, мост AD → SIP и ветка LiveKit.
+- [SIP-регистрация](https://ars-anosov.github.io/sipjs-react/archify/sipjs-react-sip-registration.html) — sequence-диаграмма: `regState` (`off`/`ok`/`fail`), отказ, авто-останов и разрегистрация.
 
 Все документы: <https://ars-anosov.github.io/sipjs-react/>
 

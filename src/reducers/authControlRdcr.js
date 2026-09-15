@@ -15,7 +15,6 @@ export const initialState = {
   displayAuthPad: false,
   uriAdAuth: "",
   status: "idle", // 'idle' | 'loading' | 'success' | 'error'
-  autoReg: false, // тумблер AuthPad: клик on запускает регистрацию SIP данными AD
   responseData: null,
   errComponent: "",
   errText: "",
@@ -28,7 +27,6 @@ export default function authControlRdcr(state = initialState, action) {
         ...state,
         status: "loading",
         displayAd: true,
-        autoReg: false,
         responseData: null,
         errComponent: "",
         errText: "",
@@ -62,7 +60,6 @@ export default function authControlRdcr(state = initialState, action) {
         ...state,
         status: "idle",
         displayAuthPad: false,
-        autoReg: false,
         responseData: null,
         errComponent: "",
         errText: "",

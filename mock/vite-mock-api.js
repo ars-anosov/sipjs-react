@@ -43,9 +43,9 @@ export const mockEndpoints = [
     handler(_req, res, { body }) {
       const login = typeof body.login === "string" ? body.login : "";
       sendJson(res, 200, {
-        sip_username: "9993",
+        sip_username: "9994",
         sip_secret: "",
-        lk_token: lkToken("9993", "9993", "1h"),
+        lk_token: lkToken("9994", "9994", "1h"),
         ad_login: login,
         ad_cn: "Mock User",
         ad_title: "Mock Title",

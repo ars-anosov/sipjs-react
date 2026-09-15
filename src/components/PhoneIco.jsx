@@ -86,7 +86,7 @@ function PhoneIco({ phoneControlRdcr }) {
       outgoCallNow,
       incomeDisplay,
       connectStatus,
-      regNow,
+      regState,
     } = phoneControlRdcr;
 
     if (incomeCallNow || outgoCallNow) {
@@ -132,7 +132,7 @@ function PhoneIco({ phoneControlRdcr }) {
         };
     }
 
-    if (regNow) {
+    if (regState === "ok") {
       return {
         Icon: IconPhone,
         bg: "rgba(255, 255, 255, 0.2)",
@@ -211,7 +211,7 @@ PhoneIco.propTypes = {
     outgoCallNow: PropTypes.bool,
     incomeDisplay: PropTypes.bool,
     connectStatus: PropTypes.string,
-    regNow: PropTypes.bool,
+    regState: PropTypes.oneOf(["off", "ok", "fail"]),
     callerName: PropTypes.string,
     callerNumber: PropTypes.string,
     calleePhoneNum: PropTypes.string,

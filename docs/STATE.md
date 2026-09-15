@@ -60,9 +60,9 @@ flowchart TD
   CU[PHONECTL_CHAT_UNREAD_CLEAR]
   CC[PHONECTL_CLEAR_CHAT]
 
-  Init -->|connectStatus=Request, phoneHeader, icoHeader| CR
-  CR -->|connectStatus=Success, regNow, displayReg=false, displayPad=true, displayHistory/Chat=false| CS
-  CR -->|connectStatus=Error, regNow=false, phoneHeader, icoHeader| CE
+  Init -->|connectStatus=Request, regState=off, phoneHeader, icoHeader| CR
+  CR -->|connectStatus=Success, regState=ok, displayReg=false, displayPad=true, displayHistory/Chat=false| CS
+  CR -->|connectStatus=Error, regState=fail, phoneHeader, icoHeader| CE
   CS -->|outgoCallNow из payload, callHoldNow=false, phoneHeader, icoHeader| OS
   CS -->|incomeDisplay=true, calleePhoneNum, phoneHeader, icoHeader| ID
   ID -->|incomeDisplay=false, incomeCallNow=true, callHoldNow=false, phoneHeader, icoHeader| IS
@@ -80,8 +80,8 @@ flowchart TD
   EA -->|clear / call end| RS
   IS -->|hangup / Terminated| RS
   OS -->|hangup / Terminated| RS
-  RS -->|reset call UI flags, connectStatus пустой, keep regNow| CS
-  UN -->|connectStatus пустой, regNow=false, заголовки «Не зарегистрирован», displayReg=true, displayPad/History/Chat=false, счётчики unread=0, флаги звонка=false, calleePhoneNum/errText пустые| Init
+  RS -->|reset call UI flags, connectStatus пустой, regState сохраняется| CS
+  UN -->|connectStatus пустой, regState сохраняется (красный тумблер AuthPad), заголовки «Не зарегистрирован», displayReg=false при payload.registrationLost (потеря регистрации, PhoneReg не форсируем) и true при явной разрегистрации, displayPad/History/Chat=false, счётчики unread=0, флаги звонка=false, calleePhoneNum/errText пустые| Init
 
   classDef initial fill:#e3f2fd,stroke:#1565c0,stroke-width:1px
   classDef success fill:#e8f5e8,stroke:#4caf50,stroke-width:1px
@@ -94,7 +94,7 @@ flowchart TD
 
 ## Мост к сервисам (`AuthContainer`)
 
-Thunk-и namespace-чистые: `authControlActions` не диспатчит `PHONECTL_`, `phoneControlActions` — `AUTHCTL_`. Оба моста `AUTHCTL_` ↔ `PHONECTL_` живут в `AuthContainer`; чужой срез thunk-и не читают через `getState()`, а получают нужные значения аргументом (`uriWebRtc` в `handleLkTokenSubmit`, `rdcr` в `handleClkRegister`/`handleSendMessage`). Остальные контейнеры только раздают срезы пропсами — `LkContainer` → `phoneControlRdcr` для формы приглашения `LkToken`. `AuthPad` рендерится по флагу `displayAuthPad` (строка меню; ✕ снимает флаг), который выставляется в `true` на `AUTHCTL_SUBMIT_SUCCESS` и сбрасывается на `AUTHCTL_CLEAR`; при отсутствии AD-данных `AuthPad` информирует текстом. Её тумблер (`authControlRdcr.autoReg`) заблокирован без пары `sip_username`/`sip_secret`, а клик on сразу запускает регистрацию.
+Thunk-и namespace-чистые: `authControlActions` не диспатчит `PHONECTL_`, `phoneControlActions` — `AUTHCTL_`. Оба моста `AUTHCTL_` ↔ `PHONECTL_` живут в `AuthContainer`; чужой срез thunk-и не читают через `getState()`, а получают нужные значения аргументом (`uriWebRtc` в `handleLkTokenSubmit`, `rdcr` в `handleClkRegister`/`handleSendMessage`). Остальные контейнеры только раздают срезы пропсами — `LkContainer` → `phoneControlRdcr` для формы приглашения `LkToken`. `AuthPad` рендерится по флагу `displayAuthPad` (строка меню; ✕ снимает флаг), который выставляется в `true` на `AUTHCTL_SUBMIT_SUCCESS` и сбрасывается на `AUTHCTL_CLEAR`; при отсутствии AD-данных `AuthPad` информирует текстом. Её тумблер трёхпозиционный и отражает `phoneControlRdcr.regState` (`off` / `ok` — зелёный / `fail` — красный): выключенный тумблер заблокирован без пары `sip_username`/`sip_secret`, клик из `off` запускает регистрацию, из `ok` — разрегистрацию, из `fail` — возвращает в `off`. Потеря регистрации (`regState` → `fail`) дополнительно форсирует `displayAuthPad` — форма `PhoneReg` при этом не появляется, а красный тумблер AuthPad остаётся кликабельным (✕ панель всё равно закрывает: `displayAuthPad` намеренно не в зависимостях эффекта).
 
 ```mermaid
 sequenceDiagram
@@ -112,7 +112,7 @@ sequenceDiagram
   alt Валидация не прошла или HTTP-ошибка
     AuthAct->>Dispatch: AUTHCTL_SUBMIT_ERROR (errText)
   else Успех
-    AuthAct->>Dispatch: AUTHCTL_SUBMIT_REQUEST (autoReg=false, responseData=null)
+    AuthAct->>Dispatch: AUTHCTL_SUBMIT_REQUEST (responseData=null)
     AuthAct->>AdAuth: loginAd({ login, password, uriAdAuth })
     AdAuth->>AdAuth: POST uriAdAuth, сохранить адрес и AD-сессию
     AdAuth-->>AuthAct: responseData
@@ -120,17 +120,20 @@ sequenceDiagram
   end
   AuthCont->>Dispatch: PHONECTL_STORE_VALUE (callerUserNum, regUserPass, displayDir)
   Note over AuthCont: displayAuthPad=true на success → рендер AuthPad (тумблер off, без AD-данных — текст с информацией)
-  User->>AuthPad: Клик по тумблеру on
-  AuthPad->>AuthCont: onToggleAutoReg(true)
-  AuthCont->>Dispatch: AUTHCTL_STORE_VALUE (autoReg=true)
+  User->>AuthPad: Клик по тумблеру (off)
+  AuthPad->>AuthCont: onToggleReg()
   AuthCont->>PhoneAct: handleClkRegister({sip_username, sip_secret, uriWebRtc}, phoneControlRdcr)
-  PhoneAct->>Dispatch: PHONECTL_CONNECT_REQUEST → SUCCESS/ERROR
+  PhoneAct->>Dispatch: PHONECTL_CONNECT_REQUEST (regState=off) → SUCCESS (regState=ok) / ERROR (regState=fail)
   Dispatch-->>AuthCont: callerUserNum из PhoneReg
-  Note over AuthCont: sync только при callerUserNum и (regNow или connectStatus)
+  Note over AuthCont: sync только при callerUserNum и (regState=ok или connectStatus)
   AuthCont->>Dispatch: AUTHCTL_STORE_VALUE (responseData.sip_username)
+  User->>AuthPad: Клик по цветному тумблеру (ok)
+  AuthPad->>AuthCont: onToggleReg()
+  AuthCont->>PhoneAct: handleClkUnregister(phoneControlRdcr)
+  PhoneAct->>Dispatch: PHONECTL_UNREGISTER + PHONECTL_STORE_VALUE (regState=off)
 ```
 
-Отдельно: `AuthContainer` синхронизирует `phoneControlRdcr.callerUserNum` → `authControlRdcr.responseData.sip_username` (используется `AuthAdInfo` и `LkMeet`), а тумблер «LiveKit Встреча» переключает `lkControlRdcr.displayControl` — показ компоненты `LkMeet` (заблокирован без `lk_token`; если AD не выполнен или нет `lk_token`, `LkMeet` показывает информирующий текст). `autoReg` сбрасывается в `false` на `AUTHCTL_SUBMIT_REQUEST` и `AUTHCTL_CLEAR` — тумблер живёт в рамках одного AD-сеанса.
+Отдельно: `AuthContainer` синхронизирует `phoneControlRdcr.callerUserNum` → `authControlRdcr.responseData.sip_username` (используется `AuthAdInfo` и `LkMeet`), а тумблер «LiveKit Встреча» переключает `lkControlRdcr.displayControl` — показ компоненты `LkMeet` (заблокирован без `lk_token`; если AD не выполнен или нет `lk_token`, `LkMeet` показывает информирующий текст). Клик по красному тумблеру (`fail`) разрегистрировать нечего — `AuthContainer` возвращает `regState` в `off` через `phoneControlActions.handleChangeStore`. `regState` живёт в `phoneControlRdcr`: `off` на `PHONECTL_CONNECT_REQUEST`, `ok` на `PHONECTL_CONNECT_SUCCESS`, `fail` на `PHONECTL_CONNECT_ERROR`; `PHONECTL_UNREGISTER` его не трогает (иначе красный гас бы через 3 с вместе с авто-остановом `UserAgent` после неуспешной регистрации), а явная разрегистрация (`handleClkUnregister`) сбрасывает в `off` отдельным `PHONECTL_STORE_VALUE`. Тот же переход в `fail` форсирует `displayAuthPad` (мост `PHONECTL_` → `AUTHCTL_`): при потере регистрации показывается AuthPad с красным тумблером, а не `PhoneReg`; `displayReg=false` для этого случая выставляет редьюсер по `payload.registrationLost`, который подставляет только авто-путь `phoneRuntime` (`onUnregistered` в `handleClkRegister`). `regState` — единственный флаг регистрации в срезе: булев `regNow` удалён, все проверки «зарегистрирован» — `regState === "ok"` (`isRegistered` в `phoneControlActions`, `isRegistered` в `AuthContainer`).
 
 ## SIP регистрация
 
@@ -159,19 +162,20 @@ sequenceDiagram
     Runtime->>Runtime: setPhoneRuntime(userAgent, audio, sessionOptions)
     Runtime->>Registerer: new Registerer(userAgent, sessionOptions)
     Runtime->>Action: handlers.onConnectRequest
-    Action->>Dispatch: PHONECTL_CONNECT_REQUEST
+    Action->>Dispatch: PHONECTL_CONNECT_REQUEST (regState=off)
     Runtime->>UserAgent: start()
     UserAgent-->>Runtime: onConnect
     Runtime->>Registerer: register()
     Registerer-->>Runtime: onAccept
     Runtime->>Action: handlers.onConnectSuccess
-    Action->>Dispatch: PHONECTL_CONNECT_SUCCESS
+    Action->>Dispatch: PHONECTL_CONNECT_SUCCESS (regState=ok, зелёный тумблер AuthPad)
     Registerer-->>Runtime: onReject / start().catch
     Runtime->>Action: handlers.onConnectError
-    Action->>Dispatch: PHONECTL_CONNECT_ERROR
+    Action->>Dispatch: PHONECTL_CONNECT_ERROR (regState=fail, красный тумблер AuthPad)
     Runtime->>Runtime: через 3 с: stopAfterRegistrationFailure()
     Runtime->>Action: handlers.onUnregistered
-    Action->>Dispatch: PHONECTL_UNREGISTER
+    Action->>Dispatch: PHONECTL_UNREGISTER (payload.registrationLost=true)
+    Note over Dispatch: UNREGISTER не трогает regState и не форсирует PhoneReg (displayReg=false); AuthContainer по regState=fail показывает AuthPad с красным тумблером
     Runtime->>Runtime: resetPhoneRuntime()
   end
   Note over Action: makeURI внутри registerSipUserAgent бросает исключение → catch → PHONECTL_ERROR_ALERT
@@ -191,12 +195,13 @@ sequenceDiagram
   Runtime->>Runtime: Check suppressReconnectOnNextDisconnect
   alt Not suppressed
     Runtime->>Action: handlers.onConnectError
-    Action->>Dispatch: PHONECTL_CONNECT_ERROR (Disconnected)
+    Action->>Dispatch: PHONECTL_CONNECT_ERROR (Disconnected, regState=fail)
     alt error && shouldBeConnected
       Runtime->>Runtime: attemptReconnection(1)
       alt reconnectionAttempt <= reconnectionAttempts
         Runtime->>Action: handlers.onReconnectTry
         Action->>Dispatch: PHONECTL_RECONNECT_TRY
+        Note over Dispatch: RECONNECT_TRY не трогает regState — красный держится до успеха или клика
         Runtime->>Runtime: setTimeout for delay
         Runtime->>UserAgent: reconnect()
         UserAgent-->>Runtime: reconnect success
@@ -204,13 +209,13 @@ sequenceDiagram
         Runtime->>Registerer: register()
         Registerer-->>Runtime: onAccept
         Runtime->>Action: handlers.onConnectSuccess
-        Action->>Dispatch: PHONECTL_CONNECT_SUCCESS
+        Action->>Dispatch: PHONECTL_CONNECT_SUCCESS (regState=ok)
         Registerer-->>Runtime: onReject
         Runtime->>Action: handlers.onConnectError
-        Action->>Dispatch: PHONECTL_CONNECT_ERROR
+        Action->>Dispatch: PHONECTL_CONNECT_ERROR (regState=fail)
       else Attempts exhausted
         Runtime->>Action: handlers.onConnectError
-        Action->>Dispatch: PHONECTL_CONNECT_ERROR (Disconnected)
+        Action->>Dispatch: PHONECTL_CONNECT_ERROR (Disconnected, regState=fail)
       end
     end
   else Suppressed
@@ -326,7 +331,7 @@ sequenceDiagram
 
   User->>PhoneChat: Enter peer + message, send
   PhoneChat->>Action: handleSendMessage(peer, body, rdcr)
-  Action->>Action: Validate regNow / SIP / peer / body / SIP URI
+  Action->>Action: Validate regState=ok / SIP / peer / body / SIP URI
   Action->>Runtime: createChatMessage(peer, body, 'out', 'sending')
   Runtime-->>Action: chatMessage
   Action->>Storage: saveChatMessage(chatMessage)
@@ -377,7 +382,7 @@ sequenceDiagram
 - `MessagesArrUpdate` → `PHONECTL_MESSAGES_LOAD` из `loadChatMessages()`.
 - `CallsArrUpdate` → `PHONECTL_CALLLOG_UPD` из `loadCallsArr()`; при открытой истории помечает звонки прочитанными (единственный `getState()` в actions — по своему срезу).
 - `markCallsRead` → `PHONECTL_CALLLOG_UPD` с результатом `markCallsRead()` из storage.
-- `handleClkUnregister(rdcr)` → `unregisterSip()` → `PHONECTL_UNREGISTER`; без SIP-подключения или регистрации — `PHONECTL_ERROR_ALERT`.
+- `handleClkUnregister(rdcr)` → `unregisterSip()` → `PHONECTL_UNREGISTER` + `PHONECTL_STORE_VALUE (regState=off)`; без SIP-подключения или регистрации — `PHONECTL_ERROR_ALERT`.
 - `handleClkDtmf(tone, rdcr, options)` → `sendDtmf`; ошибки — `PHONECTL_ERROR_ALERT` (`errComponent: PhonePad`).
 - `handleClkHold(rdcr, hold)` → `setHold` → `PHONECTL_STORE_VALUE (callHoldNow)`.
 - `handleChangeStore` → `PHONECTL_STORE_VALUE` для произвольного поля среза.

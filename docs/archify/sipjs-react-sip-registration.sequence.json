@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "sipjs-react: SIP-регистрация",
+    "quality_profile": "showcase",
+    "column_fit": "spread",
+    "viewBox": [1980, 1030],
+    "legend": {
+      "mode": "auto",
+      "entries": {
+        "emphasis": { "label": "ключевой шаг" },
+        "dashed": { "label": "по таймеру" },
+        "return": { "label": "ответ" }
+      }
+    },
+    "views": [
+      {
+        "id": "start-registration",
+        "label": "Регистрация из off",
+        "focus": ["user", "authpad", "authcont", "actions", "runtime"],
+        "note": "Клик из off запускает handleClkRegister с реквизитами AD."
+      },
+      {
+        "id": "reject-and-red",
+        "label": "Отказ → красный",
+        "focus": ["registerer", "runtime", "actions", "rdcr", "authcont", "authpad"],
+        "note": "Отказ даёт regState=fail; PhoneReg не форсируется, показывается AuthPad."
+      },
+      {
+        "id": "unregister",
+        "label": "Разрегистрация из ok",
+        "focus": ["user", "authpad", "authcont", "actions", "rdcr"],
+        "note": "Клик по зелёному тумблеру разрегистрирует сессию и возвращает regState в off."
+      }
+    ]
+  },
+  "participants": [
+    { "id": "user", "type": "external", "label": "Пользователь", "sublabel": "клик по тумблеру" },
+    { "id": "authpad", "type": "frontend", "label": "AuthPad.jsx", "sublabel": "тумблер regState" },
+    { "id": "authcont", "type": "frontend", "label": "AuthContainer.jsx", "sublabel": "мост AUTHCTL_ ↔ PHONECTL_" },
+    { "id": "actions", "type": "backend", "label": "phoneControlActions.js", "sublabel": "thunk регистрации" },
+    { "id": "runtime", "type": "backend", "label": "phoneRuntime.js", "sublabel": "singleton sip.js" },
+    { "id": "registerer", "type": "external", "label": "Registerer (sip.js)", "sublabel": "REGISTER к SBC" },
+    { "id": "rdcr", "type": "database", "label": "phoneControlRdcr", "sublabel": "regState, displayReg" }
+  ],
+  "segments": [
+    { "from": 150, "to": 395, "label": "Регистрация из off" },
+    { "from": 400, "to": 500, "label": "Успех" },
+    { "from": 505, "to": 775, "label": "Отказ и возврат" },
+    { "from": 780, "to": 945, "label": "Разрегистрация" }
+  ],
+  "messages": [
+    { "from": "user", "to": "authpad", "y": 176, "label": "клик из off", "variant": "emphasis" },
+    { "from": "authpad", "to": "authcont", "y": 214, "label": "onToggleReg()", "variant": "default" },
+    { "from": "authcont", "to": "actions", "y": 252, "label": "handleClkRegister(реквизиты AD)", "variant": "default" },
+    { "from": "actions", "to": "rdcr", "y": 290, "label": "CONNECT_REQUEST (regState=off)", "variant": "default" },
+    { "from": "actions", "to": "runtime", "y": 328, "label": "registerSipUserAgent(formData)", "variant": "default" },
+    { "from": "runtime", "to": "registerer", "y": 366, "label": "start() + register()", "variant": "default" },
+    { "from": "registerer", "to": "runtime", "y": 404, "label": "200 OK", "variant": "return" },
+    { "from": "runtime", "to": "actions", "y": 442, "label": "onConnectSuccess", "variant": "default" },
+    { "from": "actions", "to": "rdcr", "y": 480, "label": "CONNECT_SUCCESS (regState=ok)", "variant": "emphasis" },
+    { "from": "registerer", "to": "runtime", "y": 528, "label": "401 / 403 / таймаут", "variant": "return" },
+    { "from": "runtime", "to": "actions", "y": 566, "label": "onConnectError", "variant": "default" },
+    { "from": "actions", "to": "rdcr", "y": 604, "label": "CONNECT_ERROR (regState=fail)", "variant": "emphasis" },
+    { "from": "runtime", "to": "actions", "y": 642, "label": "через 3 с: onUnregistered", "variant": "dashed" },
+    { "from": "actions", "to": "rdcr", "y": 680, "label": "UNREGISTER (displayReg=false)", "variant": "dashed" },
+    { "from": "authcont", "to": "authpad", "y": 718, "label": "displayAuthPad=true", "variant": "dashed" },
+    { "from": "user", "to": "authpad", "y": 756, "label": "клик по красному → regState=off", "variant": "emphasis" },
+    { "from": "user", "to": "authpad", "y": 804, "label": "клик по зелёному", "variant": "emphasis" },
+    { "from": "authpad", "to": "authcont", "y": 842, "label": "onToggleReg()", "variant": "default" },
+    { "from": "authcont", "to": "actions", "y": 880, "label": "handleClkUnregister(phoneControlRdcr)", "variant": "default" },
+    { "from": "actions", "to": "rdcr", "y": 918, "label": "UNREGISTER + STORE_VALUE (off)", "variant": "default" }
+  ],
+  "activations": [
+    { "participant": "authpad", "from": 170, "to": 226, "type": "frontend" },
+    { "participant": "authcont", "from": 208, "to": 298, "type": "frontend" },
+    { "participant": "actions", "from": 246, "to": 490, "type": "backend" },
+    { "participant": "runtime", "from": 322, "to": 448, "type": "backend" },
+    { "participant": "registerer", "from": 360, "to": 410, "type": "external" },
+    { "participant": "runtime", "from": 528, "to": 652, "type": "backend" },
+    { "participant": "actions", "from": 560, "to": 690, "type": "backend" },
+    { "participant": "authpad", "from": 750, "to": 762, "type": "frontend" },
+    { "participant": "authpad", "from": 798, "to": 850, "type": "frontend" },
+    { "participant": "authcont", "from": 836, "to": 890, "type": "frontend" },
+    { "participant": "actions", "from": 874, "to": 930, "type": "backend" }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Тумблер — состояние и действие",
+      "items": [
+        "regState: off / ok (зелёный) / fail (красный)",
+        "off → handleClkRegister, ok → handleClkUnregister",
+        "fail → сброс в off; без пары AD-реквизитов тумблер выключен"
+      ]
+    },
+    {
+      "dot": "orange",
+      "title": "Красный переживает авто-стоп",
+      "items": [
+        "runtime через 3 с сам гасит UserAgent после отказа",
+        "UNREGISTER не трогает regState — красный не гаснет",
+        "явная разрегистрация сбрасывает regState в off"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Потеря регистрации → AuthPad",
+      "items": [
+        "onUnregistered шлёт UNREGISTER с payload.registrationLost",
+        "displayReg=false — форма PhoneReg не форсируется",
+        "мост PHONECTL_ → AUTHCTL_ по regState=fail: displayAuthPad"
+      ]
+    }
+  ]
+}

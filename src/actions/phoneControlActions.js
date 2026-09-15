@@ -49,6 +49,9 @@ import {
 } from "../services/phoneStorage";
 import { getApiErrorMessage } from "./utils/kyError";
 
+// Регистрация активна: единственный источник истины — phoneControlRdcr.regState
+const isRegistered = (rdcr) => rdcr.regState === "ok";
+
 const MessagesArrUpdate = () => (dispatch) => {
   dispatch({
     type: PHONECTL_MESSAGES_LOAD,
@@ -161,15 +164,15 @@ const handleClkRegister = (formData, rdcr) => (dispatch) => {
             type: PHONECTL_CONNECT_REQUEST,
             payload: { phoneHeader, icoHeader },
           }),
-        onConnectSuccess: ({ regNow, phoneHeader, icoHeader }) =>
+        onConnectSuccess: ({ phoneHeader, icoHeader }) =>
           dispatch({
             type: PHONECTL_CONNECT_SUCCESS,
-            payload: { regNow, phoneHeader, icoHeader },
+            payload: { phoneHeader, icoHeader },
           }),
-        onConnectError: ({ regNow, phoneHeader, icoHeader }) =>
+        onConnectError: ({ phoneHeader, icoHeader }) =>
           dispatch({
             type: PHONECTL_CONNECT_ERROR,
-            payload: { regNow, phoneHeader, icoHeader },
+            payload: { phoneHeader, icoHeader },
           }),
         onReconnectTry: ({ phoneHeader, icoHeader }) =>
           dispatch({
@@ -188,7 +191,13 @@ const handleClkRegister = (formData, rdcr) => (dispatch) => {
           }),
         onCallLogUpdate: () => dispatch(CallsArrUpdate()),
         onCallEnded: (callData) => dispatch(handleClkReset(callData, rdcr)),
-        onUnregistered: () => dispatch({ type: PHONECTL_UNREGISTER }),
+        // Потеря/неудача регистрации: PhoneReg не форсируем — мост
+        // PHONECTL_ → AUTHCTL_ в AuthContainer покажет AuthPad с красным тумблером
+        onUnregistered: () =>
+          dispatch({
+            type: PHONECTL_UNREGISTER,
+            payload: { registrationLost: true },
+          }),
         onRegisterStarted: () => clearRegAlert(),
       },
     });
@@ -224,13 +233,18 @@ const handleClkUnregister = (rdcr) => (dispatch) => {
     regAlert("Нет подключения к SIP.");
     return;
   }
-  if (!rdcr.regNow) {
+  if (!isRegistered(rdcr)) {
     regAlert("Нет активной регистрации.");
     return;
   }
 
   unregisterSip().then(() => {
     dispatch({ type: PHONECTL_UNREGISTER });
+    // Явная разрегистрация возвращает тумблер AuthPad в 'off'
+    dispatch({
+      type: PHONECTL_STORE_VALUE,
+      payload: { storeDataKey: "regState", storeDataValue: "off" },
+    });
     clearRegAlert();
   });
 };
@@ -275,7 +289,7 @@ const handleClkSubmitOut = (calleePhoneNum, rdcr) => {
         ? calleePhoneNum.trim()
         : String(calleePhoneNum ?? "").trim();
 
-    if (!rdcr.regNow) {
+    if (!isRegistered(rdcr)) {
       padAlert("Нет регистрации. Сначала зарегистрируйтесь.");
       return;
     }
@@ -469,7 +483,7 @@ const handleSendMessage = (peerPhoneNum, messageBody, rdcr) => (dispatch) => {
       ? messageBody.trim()
       : String(messageBody ?? "").trim();
 
-  if (!rdcr.regNow) {
+  if (!isRegistered(rdcr)) {
     chatAlert("Нет регистрации. Сначала зарегистрируйтесь.");
     return;
   }

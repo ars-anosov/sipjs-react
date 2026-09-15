@@ -187,7 +187,7 @@ function PhonePad(props) {
     );
   };
 
-  const isRegistered = phoneControlRdcr.regNow;
+  const isRegistered = phoneControlRdcr.regState === "ok";
   const regButtonColor = isRegistered ? "success" : "error";
 
   const callActionSx = {

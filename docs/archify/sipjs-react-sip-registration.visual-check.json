@@ -5,9 +5,9 @@
   "status": "pass",
   "visualReview": "pending",
   "artifact": {
-    "path": "\\\\wsl.localhost\\Ubuntu\\home\\ars\\_git\\sipjs-react\\docs\\archify\\sipjs-react-architecture.html",
-    "sha256": "31a5dd07084333e1e65a5ea2c599bf55f5ac8f55c05bc724813d291cd07d0dd7",
-    "bytes": 652986
+    "path": "\\\\wsl.localhost\\Ubuntu\\home\\ars\\_git\\sipjs-react\\docs\\archify\\sipjs-react-sip-registration.html",
+    "sha256": "9c6aa0b3eb82c7aca9c733495a8079deac2844acf14fe77517734e56450f74b9",
+    "bytes": 648158
   },
   "state": {
     "detail": "read",
@@ -89,7 +89,7 @@
         "overflowY": false,
         "ok": true,
         "resolvedTheme": "light",
-        "file": "sipjs-react-architecture.visual-check.1440x900.light.png"
+        "file": "sipjs-react-sip-registration.visual-check.1440x900.light.png"
       },
       {
         "width": 1440,
@@ -103,7 +103,7 @@
         "overflowY": false,
         "ok": true,
         "resolvedTheme": "dark",
-        "file": "sipjs-react-architecture.visual-check.1440x900.dark.png"
+        "file": "sipjs-react-sip-registration.visual-check.1440x900.dark.png"
       },
       {
         "width": 2048,
@@ -117,7 +117,7 @@
         "overflowY": false,
         "ok": true,
         "resolvedTheme": "light",
-        "file": "sipjs-react-architecture.visual-check.2048x1320.light.png"
+        "file": "sipjs-react-sip-registration.visual-check.2048x1320.light.png"
       },
       {
         "width": 2048,
@@ -131,13 +131,13 @@
         "overflowY": false,
         "ok": true,
         "resolvedTheme": "dark",
-        "file": "sipjs-react-architecture.visual-check.2048x1320.dark.png"
+        "file": "sipjs-react-sip-registration.visual-check.2048x1320.dark.png"
       }
     ],
-    "contactSheet": "sipjs-react-architecture.visual-check.html"
+    "contactSheet": "sipjs-react-sip-registration.visual-check.html"
   },
   "sidecars": {
-    "receipt": "sipjs-react-architecture.visual-check.json",
-    "contactSheet": "sipjs-react-architecture.visual-check.html"
+    "receipt": "sipjs-react-sip-registration.visual-check.json",
+    "contactSheet": "sipjs-react-sip-registration.visual-check.html"
   }
 }

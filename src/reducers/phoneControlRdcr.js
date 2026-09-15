@@ -45,8 +45,11 @@ export const initialState = {
   addPrefix: false,
   calleePrefix: "1999",
   // PhoneIco + PhonePad
-  regNow: false,
   connectStatus: "",
+  // Единственный источник истины о регистрации (тумблер AuthPad, PhoneIco,
+  // PhonePad, PhoneReg, PhoneChat): 'off' — не зарегистрирован,
+  // 'ok' — успешная регистрация (зелёный), 'fail' — неуспешная (красный)
+  regState: "off",
   phoneHeader: "Не зарегистрирован",
   icoHeader: "Не зарегистрирован",
   incomeDisplay: false,
@@ -70,6 +73,8 @@ export default function phoneControlRdcr(state = initialState, action) {
       return {
         ...state,
         connectStatus: "Request",
+        // Новая попытка регистрации сбрасывает предыдущий неуспех
+        regState: "off",
         phoneHeader: action.payload.phoneHeader,
         icoHeader: action.payload.icoHeader,
       };
@@ -78,7 +83,7 @@ export default function phoneControlRdcr(state = initialState, action) {
       return {
         ...state,
         connectStatus: "Success",
-        regNow: action.payload.regNow,
+        regState: "ok",
         displayReg: false,
         displayPad: true,
         displayHistory: false,
@@ -91,19 +96,28 @@ export default function phoneControlRdcr(state = initialState, action) {
       return {
         ...state,
         connectStatus: "Error",
-        regNow: action.payload.regNow,
+        regState: "fail",
         phoneHeader: action.payload.phoneHeader,
         icoHeader: action.payload.icoHeader,
       };
 
-    case PHONECTL_UNREGISTER:
+    case PHONECTL_UNREGISTER: {
+      // regState намеренно не трогаем: этот action приходит и от авто-останова
+      // UserAgent после неуспешной регистрации — красный тумблер AuthPad должен
+      // пережить его. Явная разрегистрация сбрасывает regState в 'off'
+      // отдельным PHONECTL_STORE_VALUE (phoneControlActions.handleClkUnregister).
+      //
+      // При потере регистрации (payload от phoneRuntime) форму PhoneReg не
+      // форсируем: мост PHONECTL_ → AUTHCTL_ в AuthContainer покажет AuthPad,
+      // где красный тумблер кликабелен.
+      const registrationLost = Boolean(action.payload?.registrationLost);
+
       return {
         ...state,
         connectStatus: "",
-        regNow: false,
         phoneHeader: "Не зарегистрирован",
         icoHeader: "Не зарегистрирован",
-        displayReg: true,
+        displayReg: !registrationLost,
         displayPad: false,
         displayHistory: false,
         displayChat: false,
@@ -117,6 +131,7 @@ export default function phoneControlRdcr(state = initialState, action) {
         errComponent: "",
         errText: "",
       };
+    }
 
     case PHONECTL_RECONNECT_TRY:
       return {

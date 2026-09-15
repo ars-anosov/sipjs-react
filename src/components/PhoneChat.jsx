@@ -323,7 +323,7 @@ function PhoneChat(props) {
             <Button
               type="submit"
               color="success"
-              disabled={!phoneControlRdcr.regNow}
+              disabled={phoneControlRdcr.regState !== "ok"}
               sx={{
                 width: 52,
                 height: 52,
