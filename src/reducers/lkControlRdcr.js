@@ -5,13 +5,14 @@ import {
   LKTOKEN_SUBMIT_REQUEST,
   LKTOKEN_SUBMIT_SUCCESS,
 } from "../constants/redux";
-import { getStoredLkTokenUri, getStoredLkUri } from "../services/lkToken";
 
-const initialState = {
+// Только UI-дефолты: сохранённый конфиг (uriLk, uriLkToken) подставляет сид стора —
+// store/preloadedState.js → preloadedState в configureStore.
+export const initialState = {
   displayLkToken: false,
   displayControl: false,
-  uriLk: getStoredLkUri(),
-  uriLkToken: getStoredLkTokenUri(),
+  uriLk: "",
+  uriLkToken: "",
   status: "idle",
   message: "",
   responseData: null,
@@ -47,7 +48,12 @@ export default function lkTokenRdcr(state = initialState, action) {
       };
 
     case LKTOKEN_CLEAR:
-      return initialState;
+      // Сохранённый конфиг не теряем: сбрасываем только результат запроса.
+      return {
+        ...initialState,
+        uriLk: state.uriLk,
+        uriLkToken: state.uriLkToken,
+      };
 
     case LK_STORE_VALUE:
       return {

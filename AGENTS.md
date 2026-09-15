@@ -19,7 +19,7 @@ src/
 ├── actions/      # thunks; utils/kyError.js
 ├── services/     # adAuth, phoneRuntime, lkRuntime, lkToken, phoneDirectory, phoneNotifications, phoneStorage
 ├── reducers/     # phoneControlRdcr, authControlRdcr, lkControlRdcr, authTimeoutMiddleware, rootReducer
-├── store/        # configureStore.js
+├── store/        # configureStore.js, preloadedState.js (сид из сервисов)
 ├── constants/    # redux.js (action types), storage.js (ключи localStorage), ui.js (HEADER_BACKGROUND, PANEL_HEIGHT)
 └── App.jsx, main.jsx, theme.js, Copyright.jsx
 mock/  public/  dist/   # dev-мок, статика, сборка (dist — только npm run build)
@@ -37,16 +37,23 @@ docs/                   # документация и GitHub Pages (ars-anosov.g
   `phoneStorage` (настройки телефона, звонки и чат в localStorage).
 - Весь `localStorage` и весь HTTP (`ky`) — только в `services/`; ключи — в
   `constants/storage.js`. Actions вызывают доменный API сервиса и преобразуют ошибки
-  через `actions/utils/kyError.js`; reducers берут начальные значения геттерами сервиса.
+  через `actions/utils/kyError.js`. Сервисы со стором сводит только слой стора:
+  `store/preloadedState.js` собирает сид (`uriAdAuth`, `uriLk`/`uriLkToken`, настройки
+  телефона) и отдаёт его в `configureStore`, который передаёт срезы в `createStore` как
+  `preloadedState`; там же инжектятся зависимости `authTimeoutMiddleware` (проверка срока
+  и сброс AD-сессии). Reducers и middleware сервисов не импортируют и остаются чистыми.
 - Компоненты не импортируют `sip.js`/`livekit-client` и не работают с runtime напрямую — только
   пропсы + `*Actions` и узкий доменный API сервиса. Исключения: `PhoneIco` → `phoneNotifications`,
   `LkMeet` → `lkRuntime` и компоненты `@livekit/components-react`, `AuthAd` → `adAuth`.
 - Redux: `phoneControlRdcr`, `authControlRdcr`, `lkControlRdcr`. В store — только UI-флаги,
-  заголовки, списки и счётчики; sip.js-объекты/сессии/медиа не хранятся.
+  заголовки, списки и счётчики; sip.js-объекты/сессии/медиа не хранятся. `initialState`
+  редьюсеров экспортируется и остаётся чистым: из него `store/preloadedState.js` собирает
+  срез для `preloadedState`.
 - Actions — thunks (валидация → сервис/HTTP → dispatch). Reducers чистые.
 - Namespace-инвариант: thunks `AUTHCTL_` не диспатчат `PHONECTL_` (и наоборот). Мосты между
   срезами (`AUTHCTL_` ↔ `PHONECTL_`) — только в контейнере `AuthContainer`.
-- `authTimeoutMiddleware` — раз в 10 с проверяет срок AD-сессии (24 ч).
+- `authTimeoutMiddleware` (зависимости инжектит `configureStore`) — раз в 10 с проверяет
+  срок AD-сессии (24 ч).
 - `AuthAd` ожидает JSON: `sip_username`, `sip_secret`, `lk_token`, `ad_login`, `ad_cn`, `ad_title`, `ad_department`.
 
 ## Потоки

@@ -18,15 +18,6 @@ import {
   PHONECTL_UNREGISTER,
 } from "../constants/redux";
 
-import {
-  getStoredCallerUserNum,
-  getStoredUriWebRtc,
-  getStoredUseIce,
-} from "../services/phoneStorage";
-
-const parseUriWebRtcValue = (uriWebRtc = "") =>
-  typeof uriWebRtc === "string" ? uriWebRtc.trim() : "";
-
 const getUnreadMissedCallsCount = (callsArr = []) =>
   (callsArr || []).filter((row) => {
     const flow = String(row?.flow || "").toLowerCase();
@@ -34,7 +25,9 @@ const getUnreadMissedCallsCount = (callsArr = []) =>
     return row?.read === false && flow.includes("in") && state.includes("lost");
   }).length;
 
-const initialState = {
+// Только UI-дефолты: сохранённые настройки (uriWebRtc, callerUserNum, useIce)
+// подставляет сид стора — store/preloadedState.js → preloadedState в configureStore.
+export const initialState = {
   // --- UI ---
   // MenuAppBar
   displayReg: false,
@@ -44,10 +37,10 @@ const initialState = {
   displayHistory: false,
   displayChat: false,
   // PhoneReg form fields
-  uriWebRtc: parseUriWebRtcValue(getStoredUriWebRtc()),
-  callerUserNum: getStoredCallerUserNum(),
+  uriWebRtc: "",
+  callerUserNum: "",
   regUserPass: "",
-  useIce: getStoredUseIce(),
+  useIce: true,
   calleePhoneNum: "",
   addPrefix: false,
   calleePrefix: "1999",

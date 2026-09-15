@@ -9,7 +9,8 @@ const AD_SESSION_TTL_MS = 24 * 60 * 60 * 1000;
 const AD_REQUEST_TIMEOUT_MS = 5000;
 
 // AD-сессия и адрес сервиса авторизации живут только здесь: actions вызывают
-// доменный API, reducers и middleware — геттеры, компоненты — getStoredAdLogin.
+// доменный API, configureStore и store/preloadedState.js — геттеры, компоненты —
+// getStoredAdLogin.
 
 function getStoredAdAuthUri() {
   return localStorage.getItem(AD_URI_AUTH_KEY) || "";
