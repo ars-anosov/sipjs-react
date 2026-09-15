@@ -17,7 +17,7 @@ src/
 ├── components/   # UI: PhoneReg, PhonePad, PhoneChat, PhoneHistory, PhoneDir, AuthAd/AuthAdInfo/AuthIco/AuthPad, LkMeet/LkToken/LkThemeStyles, MenuAppBar, PhoneIco
 ├── containers/   # Redux-контейнеры: PhoneContainer, AuthContainer, LkContainer, MenuAppContainer
 ├── actions/      # thunks; utils/kyError.js
-├── services/     # phoneRuntime, lkRuntime, phoneNotifications, phoneStorage
+├── services/     # adAuth, phoneRuntime, lkRuntime, lkToken, phoneDirectory, phoneNotifications, phoneStorage
 ├── reducers/     # phoneControlRdcr, authControlRdcr, lkControlRdcr, authTimeoutMiddleware, rootReducer
 ├── store/        # configureStore.js
 ├── constants/    # redux.js (action types), storage.js (ключи localStorage), ui.js (HEADER_BACKGROUND, PANEL_HEIGHT)
@@ -32,9 +32,15 @@ docs/                   # документация и GitHub Pages (ars-anosov.g
 
 - Сервисы (`services/`) не зависят от Redux; общаются с actions через колбэки:
   `phoneRuntime` (sip.js + SIP-медиа, singleton), `lkRuntime` (LiveKit-комната, singleton),
-  `phoneNotifications` (Service Worker/Notification), `phoneStorage` (localStorage).
-- Компоненты не импортируют `sip.js` и не работают с SIP-runtime — только пропсы + `*Actions`.
-  Исключения: `PhoneIco` → `phoneNotifications`, `LkMeet` → `lkRuntime`.
+  `adAuth` (AD-вход, AD-сессия и её срок), `lkToken` (конфиг LiveKit и запрос токена),
+  `phoneDirectory` (HTTP телефонного справочника), `phoneNotifications` (Service Worker/Notification),
+  `phoneStorage` (настройки телефона, звонки и чат в localStorage).
+- Весь `localStorage` и весь HTTP (`ky`) — только в `services/`; ключи — в
+  `constants/storage.js`. Actions вызывают доменный API сервиса и преобразуют ошибки
+  через `actions/utils/kyError.js`; reducers берут начальные значения геттерами сервиса.
+- Компоненты не импортируют `sip.js`/`livekit-client` и не работают с runtime напрямую — только
+  пропсы + `*Actions` и узкий доменный API сервиса. Исключения: `PhoneIco` → `phoneNotifications`,
+  `LkMeet` → `lkRuntime` и компоненты `@livekit/components-react`, `AuthAd` → `adAuth`.
 - Redux: `phoneControlRdcr`, `authControlRdcr`, `lkControlRdcr`. В store — только UI-флаги,
   заголовки, списки и счётчики; sip.js-объекты/сессии/медиа не хранятся.
 - Actions — thunks (валидация → сервис/HTTP → dispatch). Reducers чистые.
@@ -57,7 +63,7 @@ docs/                   # документация и GitHub Pages (ars-anosov.g
 
 - React: функциональные компоненты, `PropTypes`; презентация — `components/`, связка со store — `containers/` (`useSelector`, `bindActionCreators` + `useMemo`). UI — только MUI.
 - Redux: action types — `constants/redux.js` (префиксы `PHONECTL_`, `AUTHCTL_`, `LKTOKEN_`/`LK_`).
-- Прочее: ключи `localStorage` — `constants/storage.js`; HTTP — `ky`, ошибки — `actions/utils/kyError.js`; Vite `base: './'` сохранять.
+- Прочее: ключи `localStorage` — `constants/storage.js`; HTTP (`ky`) и `localStorage` — только в `services/`; ошибки — `actions/utils/kyError.js`; Vite `base: './'` сохранять.
 - Формат: Biome — 2 пробела, только `Space` (без `Tab`), двойные кавычки; с автоформатом не спорить.
 
 ## CI

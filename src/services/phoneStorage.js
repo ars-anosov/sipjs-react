@@ -3,7 +3,34 @@ import {
   CALLS_STORAGE_KEY,
   CHAT_MAX_MESSAGES,
   CHAT_STORAGE_KEY,
+  PHONE_CALLER_USER_NUM_KEY,
+  PHONE_URI_WEBRTC_KEY,
+  PHONE_USE_ICE_KEY,
 } from "../constants/storage";
+
+// ============================================================
+// Phone Settings Persistence
+// ============================================================
+
+const getStoredUriWebRtc = () =>
+  localStorage.getItem(PHONE_URI_WEBRTC_KEY) || "";
+
+const storeUriWebRtc = (uriWebRtc) => {
+  localStorage.setItem(PHONE_URI_WEBRTC_KEY, uriWebRtc);
+};
+
+const getStoredCallerUserNum = () =>
+  localStorage.getItem(PHONE_CALLER_USER_NUM_KEY) || "";
+
+const storeCallerUserNum = (callerUserNum) => {
+  localStorage.setItem(PHONE_CALLER_USER_NUM_KEY, callerUserNum);
+};
+
+// Ключа нет — ICE включён по умолчанию (как было в initialState).
+const getStoredUseIce = () => {
+  const raw = localStorage.getItem(PHONE_USE_ICE_KEY);
+  return raw === null ? true : raw === "true";
+};
 
 // ============================================================
 // Call Log Persistence
@@ -179,11 +206,16 @@ export {
   clearCallsArr,
   clearChatMessages,
   getChatMessageStatus,
+  getStoredCallerUserNum,
+  getStoredUriWebRtc,
+  getStoredUseIce,
   loadCallsArr,
   loadChatMessages,
   logCall,
   markCallsRead,
   saveCallsArr,
   saveChatMessage,
+  storeCallerUserNum,
+  storeUriWebRtc,
   updateChatMessageStatus,
 };

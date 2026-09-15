@@ -1,4 +1,3 @@
-import ky from "ky";
 import {
   PHONECTL_CALLLOG_UPD,
   PHONECTL_CHAT_UNREAD_CLEAR,
@@ -19,10 +18,9 @@ import {
   PHONECTL_UNREGISTER,
 } from "../constants/redux";
 import {
-  PHONE_CALLER_USER_NUM_KEY,
-  PHONE_URI_DIR_KEY,
-  PHONE_URI_WEBRTC_KEY,
-} from "../constants/storage";
+  fetchPhoneDir,
+  getStoredPhoneDirUri,
+} from "../services/phoneDirectory";
 import {
   answerIncomingCall,
   createChatMessage,
@@ -46,6 +44,8 @@ import {
   markCallsRead as markCallsReadInStorage,
   saveCallsArr,
   saveChatMessage,
+  storeCallerUserNum,
+  storeUriWebRtc,
 } from "../services/phoneStorage";
 import { getApiErrorMessage } from "./utils/kyError";
 
@@ -129,8 +129,8 @@ const handleClkRegister = (formData, rdcr) => (dispatch) => {
     regAlert("Заполните все поля.");
     return;
   }
-  localStorage.setItem(PHONE_URI_WEBRTC_KEY, normalizedUriWebRtc);
-  localStorage.setItem(PHONE_CALLER_USER_NUM_KEY, formData.callerUserNum);
+  storeUriWebRtc(normalizedUriWebRtc);
+  storeCallerUserNum(formData.callerUserNum);
   dispatch({
     type: PHONECTL_STORE_VALUE,
     payload: { storeDataKey: "uriWebRtc", storeDataValue: normalizedUriWebRtc },
@@ -514,15 +514,15 @@ const handleSendMessage = (peerPhoneNum, messageBody, rdcr) => (dispatch) => {
 };
 
 const getPhoneDir = () => async () => {
-  const url = localStorage.getItem(PHONE_URI_DIR_KEY);
+  const url = getStoredPhoneDirUri();
 
   if (!url) {
-    console.warn("No phone directory URI found in localStorage.");
+    console.warn("Адрес телефонного справочника не задан.");
     return [];
   }
 
   try {
-    return await ky.get(url).json();
+    return await fetchPhoneDir(url);
   } catch (error) {
     const detailMessage = await getApiErrorMessage(
       error,

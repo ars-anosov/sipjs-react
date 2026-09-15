@@ -8,12 +8,18 @@
   </head>
   <body>
     <script type="text/javascript">
-      localStorage.setItem('uriWebRtc', 'wss://sbc.pecom.ru:9443')
-      localStorage.setItem('useIce', 'true')
-      localStorage.setItem('uriAdAuth', 'http://localhost:3000/user/ad')
-      localStorage.setItem('uriLkToken', 'http://localhost:3000/user/lk')
-      localStorage.setItem('uriLk', 'https://192-168-0-142.openvidu-local.dev:7443/')
-      localStorage.setItem('uriPhoneDir', 'http://localhost:3000/user/phonedir')
+      // Dev-дефолты: заполняем только отсутствующие ключи, чтобы не затирать значения пользователя
+      const devDefaults = {
+        uriWebRtc: 'wss://sbc.pecom.ru:9443',
+        useIce: 'true',
+        uriAdAuth: 'http://localhost:3000/user/ad',
+        uriLkToken: 'http://localhost:3000/user/lk',
+        uriLk: 'https://192-168-0-142.openvidu-local.dev:7443/',
+        uriPhoneDir: 'http://localhost:3000/user/phonedir',
+      };
+      for (const [key, value] of Object.entries(devDefaults)) {
+        if (!localStorage.getItem(key)) localStorage.setItem(key, value);
+      }
     </script>
     <div id="root"></div>
     <script type="module" src="src/main.jsx"></script>

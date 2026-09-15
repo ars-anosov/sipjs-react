@@ -1,4 +1,3 @@
-import ky from "ky";
 import {
   AUTHCTL_CLEAR,
   AUTHCTL_STORE_VALUE,
@@ -6,12 +5,7 @@ import {
   AUTHCTL_SUBMIT_REQUEST,
   AUTHCTL_SUBMIT_SUCCESS,
 } from "../constants/redux";
-import {
-  AD_AUTH_EXPIRE_TIME_KEY,
-  AD_LOGIN_KEY,
-  AD_URI_AUTH_KEY,
-} from "../constants/storage";
-
+import * as adAuth from "../services/adAuth";
 import { getApiErrorMessage } from "./utils/kyError";
 
 // Namespace-инвариант: thunk-и AUTHCTL_ не трогают PHONECTL_ (и наоборот).
@@ -43,21 +37,12 @@ const handleAdRegister =
       dispatchAdAuthError(dispatch, "Не задан uriAdAuth.");
       return;
     }
-    localStorage.setItem(AD_URI_AUTH_KEY, uriAdAuth);
 
     dispatch({ type: AUTHCTL_SUBMIT_REQUEST });
 
     try {
-      const responseData = await ky
-        .post(uriAdAuth, {
-          json: { login, password },
-          timeout: 5000,
-        })
-        .json();
-
-      localStorage.setItem(AD_LOGIN_KEY, login);
-      const expireTime = Date.now() + 24 * 60 * 60 * 1000;
-      localStorage.setItem(AD_AUTH_EXPIRE_TIME_KEY, expireTime);
+      // Сервис сам сохраняет адрес AD и AD-сессию.
+      const responseData = await adAuth.loginAd({ login, password, uriAdAuth });
 
       dispatch({
         type: AUTHCTL_SUBMIT_SUCCESS,
@@ -73,7 +58,7 @@ const handleAdRegister =
   };
 
 const handleAdAuthClear = () => (dispatch) => {
-  localStorage.removeItem(AD_AUTH_EXPIRE_TIME_KEY);
+  adAuth.clearAdAuthSession();
   dispatch({ type: AUTHCTL_CLEAR });
 };
 

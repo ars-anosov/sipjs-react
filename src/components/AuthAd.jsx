@@ -23,14 +23,12 @@ import {
 } from "@mui/material";
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
-import { AD_LOGIN_KEY } from "../constants/storage";
+import { getStoredAdLogin } from "../services/adAuth";
 
 function AdAuth(props) {
   const { authControlRdcr, authControlActions } = props;
 
-  const [login, setLogin] = useState(
-    () => localStorage.getItem(AD_LOGIN_KEY) || "",
-  );
+  const [login, setLogin] = useState(() => getStoredAdLogin());
   const [password, setPassword] = useState("");
   const [uriAdAuth, setUriAdAuth] = useState("");
   const [showPassword, setShowPassword] = useState(false);

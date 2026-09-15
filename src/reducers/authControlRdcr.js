@@ -7,13 +7,13 @@ import {
   AUTHCTL_SUBMIT_SUCCESS,
 } from "../constants/redux";
 
-import { AD_URI_AUTH_KEY } from "../constants/storage";
+import { getStoredAdAuthUri } from "../services/adAuth";
 
 const initialState = {
   displayAd: true,
   displayAuthPad: false,
   displayControl: true,
-  uriAdAuth: localStorage.getItem(AD_URI_AUTH_KEY) || "",
+  uriAdAuth: getStoredAdAuthUri(),
   status: "idle", // 'idle' | 'loading' | 'success' | 'error'
   autoReg: false, // тумблер AuthPad: клик on запускает регистрацию SIP данными AD
   responseData: null,

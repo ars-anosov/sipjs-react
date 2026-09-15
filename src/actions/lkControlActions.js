@@ -1,4 +1,3 @@
-import ky from "ky";
 import {
   LK_STORE_VALUE,
   LKTOKEN_CLEAR,
@@ -6,7 +5,7 @@ import {
   LKTOKEN_SUBMIT_REQUEST,
   LKTOKEN_SUBMIT_SUCCESS,
 } from "../constants/redux";
-import { LK_URI_TOKEN_KEY } from "../constants/storage";
+import { requestLkToken, storeLkTokenUri } from "../services/lkToken";
 import {
   createChatMessage,
   getUriHostFromWebRtc,
@@ -51,14 +50,12 @@ const handleLkTokenSubmit =
       });
       return;
     }
-    localStorage.setItem(LK_URI_TOKEN_KEY, formData.uriLkToken);
+    storeLkTokenUri(formData.uriLkToken);
 
     dispatch({ type: LKTOKEN_SUBMIT_REQUEST });
 
     try {
-      const responseData = await ky
-        .post(uriLkToken, { json: { num, room } })
-        .json();
+      const responseData = await requestLkToken({ num, room, uriLkToken });
 
       dispatch({
         type: LKTOKEN_SUBMIT_SUCCESS,

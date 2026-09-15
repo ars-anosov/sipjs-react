@@ -19,10 +19,10 @@ import {
 } from "../constants/redux";
 
 import {
-  PHONE_CALLER_USER_NUM_KEY,
-  PHONE_URI_WEBRTC_KEY,
-  PHONE_USE_ICE_KEY,
-} from "../constants/storage";
+  getStoredCallerUserNum,
+  getStoredUriWebRtc,
+  getStoredUseIce,
+} from "../services/phoneStorage";
 
 const parseUriWebRtcValue = (uriWebRtc = "") =>
   typeof uriWebRtc === "string" ? uriWebRtc.trim() : "";
@@ -44,15 +44,10 @@ const initialState = {
   displayHistory: false,
   displayChat: false,
   // PhoneReg form fields
-  uriWebRtc: parseUriWebRtcValue(localStorage.getItem(PHONE_URI_WEBRTC_KEY)),
-  callerUserNum: localStorage.getItem(PHONE_CALLER_USER_NUM_KEY)
-    ? localStorage.getItem(PHONE_CALLER_USER_NUM_KEY)
-    : "",
+  uriWebRtc: parseUriWebRtcValue(getStoredUriWebRtc()),
+  callerUserNum: getStoredCallerUserNum(),
   regUserPass: "",
-  useIce:
-    localStorage.getItem(PHONE_USE_ICE_KEY) === null
-      ? true
-      : localStorage.getItem(PHONE_USE_ICE_KEY) === "true",
+  useIce: getStoredUseIce(),
   calleePhoneNum: "",
   addPrefix: false,
   calleePrefix: "1999",
