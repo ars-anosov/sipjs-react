@@ -27,13 +27,17 @@ const buildInviteSipMessageBody = (room, responseData) => {
   return `room=${room}`;
 };
 
+// uriWebRtc — данные чужого среза (phoneControlRdcr): thunk не читает стор напрямую,
+// мост между срезами делает контейнер и передаёт значение аргументом.
 const handleLkTokenSubmit =
   (formData = {}) =>
-  async (dispatch, getState) => {
+  async (dispatch) => {
     const num = typeof formData.num === "string" ? formData.num.trim() : "";
     const room = typeof formData.room === "string" ? formData.room.trim() : "";
     const uriLkToken =
       typeof formData.uriLkToken === "string" ? formData.uriLkToken.trim() : "";
+    const uriWebRtc =
+      typeof formData.uriWebRtc === "string" ? formData.uriWebRtc.trim() : "";
 
     if (!num || !room) {
       dispatch({
@@ -66,8 +70,6 @@ const handleLkTokenSubmit =
       });
 
       // Отправка SIP MESSAGE с приглашением в комнату
-      const state = getState();
-      const uriWebRtc = state?.phoneControlRdcr?.uriWebRtc || "";
       const uriHost = getUriHostFromWebRtc(uriWebRtc);
       const canSendSipMessage = Boolean(isSipConnected() && uriHost && num);
 

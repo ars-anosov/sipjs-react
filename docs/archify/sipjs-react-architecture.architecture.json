@@ -6,42 +6,75 @@
     "quality_profile": "showcase",
     "repository": {
       "url": "https://github.com/ars-anosov/sipjs-react.git",
-      "revision": "bf406352e7c121dee6952bd1ded22c622e342801"
+      "revision": "62147564ac4dfa48c43dbbce220f92837b1ea192"
     },
     "legend": {
       "mode": "auto",
       "entries": {
-        "frontend": { "label": "UI и контейнеры" },
-        "backend": { "label": "actions и services" },
-        "database": { "label": "Состояние и хранилища" },
-        "security": { "label": "Внешняя AD-авторизация" },
-        "external": { "label": "Внешние системы и SDK" }
+        "frontend": {
+          "label": "UI и контейнеры"
+        },
+        "backend": {
+          "label": "actions и services"
+        },
+        "database": {
+          "label": "Состояние и хранилища"
+        },
+        "security": {
+          "label": "Внешняя AD-авторизация"
+        },
+        "external": {
+          "label": "Внешние системы и SDK"
+        }
       }
     },
     "views": [
       {
         "id": "main-flow",
         "label": "Основной поток данных",
-        "focus": ["users", "ui", "containers", "actions", "runtime", "sbc"],
-        "note": "Ввод оператора проходит слои React → Redux → phoneRuntime и уходит на SIP SBC по WSS."
+        "focus": [
+          "users",
+          "ui",
+          "containers",
+          "actions",
+          "runtime",
+          "sbc"
+        ],
+        "note": "События UI проходят контейнеры и thunk-и, SIP-операции уходят в phoneRuntime и на SIP SBC по WSS."
       },
       {
         "id": "ad-bridge",
         "label": "Мост AD → SIP",
-        "focus": ["ad", "actions", "containers", "store", "ui"],
+        "focus": [
+          "ad",
+          "actions",
+          "containers",
+          "store",
+          "ui"
+        ],
         "note": "AuthContainer — мост AUTHCTL_ ↔ PHONECTL_: реквизиты AD попадают в PhoneReg, авторегистрация — по тумблеру AuthPad."
       },
       {
         "id": "livekit-path",
         "label": "Ветка LiveKit",
-        "focus": ["actions", "ui", "lkRuntime", "livekit"],
-        "note": "handleLkTokenSubmit берёт lk_token, дальше LkMeet через lkRuntime подключается к комнате LiveKit."
+        "focus": [
+          "actions",
+          "ui",
+          "lkRuntime",
+          "livekit"
+        ],
+        "note": "handleLkTokenSubmit берёт lk_token, LkMeet через lkRuntime подключается к комнате LiveKit."
       },
       {
         "id": "state-and-storage",
         "label": "Состояние и хранилища",
-        "focus": ["store", "storage", "actions", "runtime"],
-        "note": "Redux хранит только UI-состояние, звонки и чат персистятся в localStorage через phoneStorage."
+        "focus": [
+          "store",
+          "storage",
+          "actions",
+          "runtime"
+        ],
+        "note": "Слой store собирает сид из сервисов, Redux хранит UI-состояние, звонки и чат персистятся в localStorage."
       }
     ]
   },
@@ -51,8 +84,14 @@
       "type": "external",
       "label": "Пользователь",
       "sublabel": "браузер Chrome / Edge",
-      "pos": [30, 236],
-      "size": [140, 66]
+      "pos": [
+        30,
+        212
+      ],
+      "size": [
+        150,
+        72
+      ]
     },
     {
       "id": "ui",
@@ -60,12 +99,27 @@
       "label": "Компоненты React",
       "sublabel": "PhonePad · AuthPad · LkMeet",
       "tag": "MUI 9",
-      "pos": [262, 236],
-      "size": [180, 66],
+      "pos": [
+        250,
+        212
+      ],
+      "size": [
+        185,
+        72
+      ],
       "sources": [
-        { "path": "src/components/PhonePad.jsx", "label": "телефон" },
-        { "path": "src/components/AuthPad.jsx", "label": "мост к сервисам" },
-        { "path": "src/components/LkMeet.jsx", "label": "LiveKit-встреча" }
+        {
+          "path": "src/components/PhonePad.jsx",
+          "label": "телефон"
+        },
+        {
+          "path": "src/components/AuthPad.jsx",
+          "label": "мост к сервисам"
+        },
+        {
+          "path": "src/components/LkMeet.jsx",
+          "label": "LiveKit-встреча"
+        }
       ]
     },
     {
@@ -74,11 +128,24 @@
       "label": "Контейнеры",
       "sublabel": "useSelector · bindActionCreators",
       "tag": "react-redux",
-      "pos": [540, 236],
-      "size": [190, 66],
+      "pos": [
+        505,
+        212
+      ],
+      "size": [
+        195,
+        72
+      ],
       "sources": [
-        { "path": "src/containers/AuthContainer.jsx", "line": 43, "label": "мост AUTHCTL_ → PHONECTL_" },
-        { "path": "src/containers/PhoneContainer.jsx", "line": 16 }
+        {
+          "path": "src/containers/AuthContainer.jsx",
+          "line": 58,
+          "label": "мост AUTHCTL_ → PHONECTL_"
+        },
+        {
+          "path": "src/containers/PhoneContainer.jsx",
+          "line": 16
+        }
       ]
     },
     {
@@ -87,11 +154,25 @@
       "label": "Thunk-actions",
       "sublabel": "phoneControl · authControl · lkControl",
       "tag": "redux-thunk + ky",
-      "pos": [820, 236],
-      "size": [200, 66],
+      "pos": [
+        770,
+        212
+      ],
+      "size": [
+        200,
+        72
+      ],
       "sources": [
-        { "path": "src/actions/authControlActions.js", "line": 52, "label": "POST uriAdAuth" },
-        { "path": "src/actions/phoneControlActions.js", "line": 525, "label": "GET Тел.Справочник" }
+        {
+          "path": "src/actions/authControlActions.js",
+          "line": 45,
+          "label": "POST uriAdAuth"
+        },
+        {
+          "path": "src/actions/phoneControlActions.js",
+          "line": 442,
+          "label": "SIP MESSAGE"
+        }
       ]
     },
     {
@@ -100,48 +181,84 @@
       "label": "phoneRuntime",
       "sublabel": "sip.js UserAgent и сессии",
       "tag": "singleton",
-      "pos": [1120, 236],
-      "size": [190, 66],
+      "pos": [
+        1040,
+        212
+      ],
+      "size": [
+        190,
+        72
+      ],
       "sources": [
-        { "path": "src/services/phoneRuntime.js", "line": 1000, "label": "публичный API" }
+        {
+          "path": "src/services/phoneRuntime.js",
+          "line": 1000,
+          "label": "публичный API"
+        }
+      ]
+    },
+    {
+      "id": "sbc",
+      "type": "external",
+      "label": "SIP SBC",
+      "sublabel": "sbc.pecom.ru:9443",
+      "tag": "WSS",
+      "pos": [
+        1300,
+        212
+      ],
+      "size": [
+        155,
+        72
       ]
     },
     {
       "id": "store",
       "type": "database",
       "label": "Redux store",
-      "sublabel": "UI-флаги · списки · счётчики",
+      "sublabel": "UI-флаги · настройки · чат",
       "tag": "redux",
-      "pos": [262, 72],
-      "size": [190, 66],
+      "pos": [
+        420,
+        56
+      ],
+      "size": [
+        195,
+        72
+      ],
       "sources": [
-        { "path": "src/store/configureStore.js", "label": "thunk + logger" },
-        { "path": "src/reducers/phoneControlRdcr.js", "line": 36, "label": "initialState" }
-      ]
-    },
-    {
-      "id": "lkRuntime",
-      "type": "backend",
-      "label": "lkRuntime",
-      "sublabel": "комната и треки",
-      "tag": "singleton",
-      "pos": [262, 414],
-      "size": [180, 66],
-      "sources": [
-        { "path": "src/services/lkRuntime.js", "line": 5, "label": "getLiveKitRoom" }
+        {
+          "path": "src/store/preloadedState.js",
+          "line": 19,
+          "label": "сид из сервисов"
+        },
+        {
+          "path": "src/store/configureStore.js",
+          "line": 12,
+          "label": "thunk + logger"
+        }
       ]
     },
     {
       "id": "storage",
       "type": "database",
       "label": "localStorage",
-      "sublabel": "звонки · чат · сессия AD",
-      "tag": "phoneStorage",
-      "pos": [1080, 414],
-      "size": [180, 66],
+      "sublabel": "настройки · звонки · чат · AD",
+      "tag": "services/*",
+      "pos": [
+        1040,
+        56
+      ],
+      "size": [
+        195,
+        72
+      ],
       "sources": [
-        { "path": "src/services/phoneStorage.js", "label": "персистенс" },
-        { "path": "src/reducers/authTimeoutMiddleware.js", "label": "TTL сессии AD 24 ч" }
+        {
+          "path": "src/services/phoneStorage.js",
+          "line": 15,
+          "label": "настройки телефона"
+        }
       ]
     },
     {
@@ -150,17 +267,65 @@
       "label": "AD-авторизация",
       "sublabel": "sip_username · sip_secret · lk_token",
       "tag": "ky · HTTP",
-      "pos": [820, 568],
-      "size": [200, 66]
+      "pos": [
+        1120,
+        388
+      ],
+      "size": [
+        200,
+        72
+      ],
+      "sources": [
+        {
+          "path": "src/services/adAuth.js",
+          "line": 48,
+          "label": "loginAd"
+        }
+      ]
     },
     {
-      "id": "sbc",
+      "id": "dir",
       "type": "external",
-      "label": "SIP SBC",
-      "sublabel": "sbc.pecom.ru:9443",
-      "tag": "WSS",
-      "pos": [1400, 236],
-      "size": [150, 66]
+      "label": "Тел. справочник",
+      "sublabel": "GET /user/phonedir",
+      "tag": "ky · HTTP",
+      "pos": [
+        840,
+        388
+      ],
+      "size": [
+        190,
+        72
+      ],
+      "sources": [
+        {
+          "path": "src/services/phoneDirectory.js",
+          "line": 11,
+          "label": "fetchPhoneDir"
+        }
+      ]
+    },
+    {
+      "id": "lkRuntime",
+      "type": "backend",
+      "label": "lkRuntime",
+      "sublabel": "комната и треки",
+      "tag": "singleton",
+      "pos": [
+        230,
+        388
+      ],
+      "size": [
+        190,
+        72
+      ],
+      "sources": [
+        {
+          "path": "src/services/lkRuntime.js",
+          "line": 5,
+          "label": "getLiveKitRoom"
+        }
+      ]
     },
     {
       "id": "livekit",
@@ -168,8 +333,14 @@
       "label": "LiveKit SFU",
       "sublabel": "комната · треки",
       "tag": "WebRTC · WSS",
-      "pos": [262, 568],
-      "size": [150, 66]
+      "pos": [
+        540,
+        388
+      ],
+      "size": [
+        155,
+        72
+      ]
     }
   ],
   "boundaries": [
@@ -189,44 +360,145 @@
     }
   ],
   "connections": [
-    { "id": "users-to-ui", "from": "users", "to": "ui", "label": "ввод и клики", "variant": "emphasis" },
-    { "id": "ui-to-containers", "from": "ui", "to": "containers", "label": "события UI" },
-    { "id": "containers-to-actions", "from": "containers", "to": "actions", "label": "вызов action" },
-    { "id": "actions-to-runtime", "from": "actions", "to": "runtime", "label": "SIP-операции" },
-    { "id": "runtime-to-sbc", "from": "runtime", "to": "sbc", "label": "SIP over WSS", "variant": "emphasis" },
-    { "id": "actions-to-store", "from": "actions", "to": "store", "label": "PHONECTL_* · AUTHCTL_*", "fromSide": "top", "toSide": "right" },
-    { "id": "store-to-ui", "from": "store", "to": "ui", "label": "props (useSelector)", "fromSide": "bottom", "toSide": "top" },
-    { "id": "actions-to-ad", "from": "actions", "to": "ad", "label": "POST uriAdAuth", "variant": "security", "labelDy": 60 },
-    { "id": "ui-to-lkruntime", "from": "ui", "to": "lkRuntime", "label": "getLiveKitRoom", "labelDy": 40 },
-    { "id": "lkruntime-to-livekit", "from": "lkRuntime", "to": "livekit", "label": "комната по WSS", "fromSide": "bottom", "toSide": "top" },
-    { "id": "runtime-to-storage", "from": "runtime", "to": "storage", "label": "logCall · save", "fromSide": "bottom", "toSide": "top" }
+    {
+      "id": "users-to-ui",
+      "from": "users",
+      "to": "ui",
+      "label": "ввод и клики",
+      "variant": "emphasis",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "ui-to-containers",
+      "from": "ui",
+      "to": "containers",
+      "label": "события UI",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "containers-to-actions",
+      "from": "containers",
+      "to": "actions",
+      "label": "вызов action",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "actions-to-runtime",
+      "from": "actions",
+      "to": "runtime",
+      "label": "SIP-операции",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "runtime-to-sbc",
+      "from": "runtime",
+      "to": "sbc",
+      "label": "SIP over WSS",
+      "variant": "emphasis",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "actions-to-store",
+      "from": "actions",
+      "to": "store",
+      "label": "PHONECTL_* · AUTHCTL_* · LK_*",
+      "fromSide": "top",
+      "toSide": "bottom"
+    },
+    {
+      "id": "store-to-ui",
+      "from": "store",
+      "to": "ui",
+      "label": "состояние → пропсы",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "storage-to-store",
+      "from": "storage",
+      "to": "store",
+      "label": "сид preloadedState",
+      "fromSide": "left",
+      "toSide": "right"
+    },
+    {
+      "id": "runtime-to-storage",
+      "from": "runtime",
+      "to": "storage",
+      "label": "logCall · saveChatMessage",
+      "fromSide": "top",
+      "toSide": "bottom"
+    },
+    {
+      "id": "actions-to-ad",
+      "from": "actions",
+      "to": "ad",
+      "label": "POST uriAdAuth",
+      "variant": "security",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "actions-to-dir",
+      "from": "actions",
+      "to": "dir",
+      "label": "GET /user/phonedir",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelAt": [
+        935,
+        358
+      ]
+    },
+    {
+      "id": "ui-to-lkruntime",
+      "from": "ui",
+      "to": "lkRuntime",
+      "label": "getLiveKitRoom",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "lkruntime-to-livekit",
+      "from": "lkRuntime",
+      "to": "livekit",
+      "label": "комната по WSS",
+      "fromSide": "right",
+      "toSide": "left"
+    }
   ],
   "cards": [
     {
       "dot": "cyan",
       "title": "Слои приложения",
       "items": [
-        "components/ — презентация на MUI: sip.js и LiveKit не импортируются",
-        "containers/ — useSelector + bindActionCreators; мост AUTHCTL_ ↔ PHONECTL_",
-        "actions/ и services/ — thunk-валидация, phoneRuntime, lkRuntime, phoneStorage"
+        "components/ — презентация на MUI: sip.js и livekit-client здесь не импортируются",
+        "containers/ — useSelector + bindActionCreators; мосты AUTHCTL_ ↔ PHONECTL_ только в AuthContainer",
+        "actions/ — thunk: валидация → сервис → dispatch; чужой срез не читается через getState()",
+        "services/ — phoneRuntime, lkRuntime, adAuth, lkToken, phoneDirectory, phoneStorage, phoneNotifications"
       ]
     },
     {
       "dot": "emerald",
       "title": "Мост к сервисам",
       "items": [
-        "handleAdRegister → POST uriAdAuth → AUTHCTL_SUBMIT_SUCCESS (sip_username, sip_secret, lk_token)",
-        "AuthContainer подставляет пару SIP в PhoneReg и показывает AuthPad",
-        "autoReg сразу зовёт handleClkRegister; authTimeoutMiddleware раз в 10 с проверяет AD-сессию (24 ч)"
+        "handleAdRegister → adAuth.loginAd → POST uriAdAuth → AUTHCTL_SUBMIT_SUCCESS",
+        "AuthContainer подставляет sip_username/sip_secret в PhoneReg и показывает AuthPad",
+        "тумблер autoReg сразу зовёт handleClkRegister; authTimeoutMiddleware раз в 10 с проверяет AD-сессию (24 ч)"
       ]
     },
     {
       "dot": "violet",
-      "title": "Состояние, хранилища и уведомления",
+      "title": "Состояние и хранилища",
       "items": [
-        "Redux — только UI-флаги, списки и счётчики; sip.js-объекты не сериализуются",
-        "localStorage — uriWebRtc, звонки, чат и сессия AD (TTL 24 ч)",
-        "phoneNotifications — Service Worker и системные уведомления, dev-мок /user/*"
+        "слой store/ — preloadedState.js собирает сид из сервисов, configureStore передаёт срезы и инжектит middleware",
+        "Redux — UI-флаги, заголовки, настройки (uriWebRtc, callerUserNum, useIce), звонки и чат",
+        "localStorage — настройки, звонки, чат и сессия AD; HTTP (ky) и localStorage только в services/"
       ]
     }
   ]

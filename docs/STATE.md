@@ -1,9 +1,9 @@
 # phone
-Готовая сборка в [dist](dist).
+Сборка — `npm run build` в `dist/` (каталог в git не хранится).
 
 ## Архитектура состояния
 
-SIP/WebRTC-объекты и медиа живут вне Redux — в сервисах `src/services/`. В store только UI-флаги, заголовки, лог звонков и чат.
+SIP/WebRTC-объекты и медиа живут вне Redux — в сервисах `src/services/`. В store — UI-флаги, заголовки, лог звонков, чат, а также настройки подключения (`uriWebRtc`, `callerUserNum`, `useIce`, `addPrefix`, `calleePrefix`) и введённый SIP-пароль `regUserPass`.
 
 ```mermaid
 flowchart LR
@@ -18,18 +18,24 @@ flowchart LR
   ACT -->|registerSipUserAgent / placeOutgoingCall / ...| RT
   ACT -->|PHONECTL_*| RDCR
   RT -->|handlers.* callbacks| ACT
-  RT -->|logCall / load / save| ST
+  RT -->|logCall / saveChatMessage / updateChatMessageStatus / getChatMessageStatus| ST
+  ACT -->|loadCallsArr / loadChatMessages / markCallsRead| ST
   RT --> SIP
   RDCR -->|props| UI
 ```
 
-`phoneRuntime` (singleton): `userAgent`, `registerer`, `sessionOptions`, `incomingSession` / `outgoingSession`, audio elements, `remoteStream`. Публичное API — высокоуровневые функции; обратная связь в actions — через колбэки `handlers`.
+Слой `src/store/` — единственное место, где стор сходится с сервисами: `preloadedState.js` через геттеры сервисов собирает сид (`uriWebRtc`, `callerUserNum`, `useIce`, `uriAdAuth`, `uriLk`, `uriLkToken`) и полные срезы из `initialState` редьюсеров, `configureStore.js` передаёт их в `createStore` как `preloadedState` (thunk + `authTimeoutMiddleware`, в dev ещё `redux-logger`) и инжектит зависимости middleware. `rootReducer.js` — `combineReducers` трёх срезов. Reducers и middleware сервисов не импортируют.
+
+`phoneRuntime` (singleton): `userAgent`, `registerer`, `sessionOptions`, `incomingSession` / `outgoingSession`, audio elements, `remoteStream`. Публичное API — функции сценариев (`registerSipUserAgent`, `placeOutgoingCall`, `answerIncomingCall`, `transmitSipMessage`, `resetSipCall`) и утилиты (`getUriHostFromWebRtc`, `isSipConnected`, `isValidSipTarget`, `sendDtmf`, `setHold`, `createChatMessage`); обратная связь в actions — через колбэки `handlers`.
 
 Смежные сервисы:
 
-- `lkRuntime.js` — LiveKit-комната (`getLiveKitRoom`).
+- `lkRuntime.js` — LiveKit-комната (singleton, `getLiveKitRoom`).
+- `adAuth.js` — AD-вход (`loginAd`), адрес сервиса и срок AD-сессии в `localStorage`.
+- `lkToken.js` — конфиг LiveKit и запрос токена (`requestLkToken`).
+- `phoneDirectory.js` — HTTP телефонного справочника.
 - `phoneNotifications.js` — Service Worker / Notifications.
-- `phoneStorage.js` — персистенс звонков и чата в `localStorage`.
+- `phoneStorage.js` — настройки подключения, звонки и чат в `localStorage`.
 
 ## Состояние Redux store (`phoneControlRdcr`)
 
@@ -49,16 +55,24 @@ flowchart TD
   SV[PHONECTL_STORE_VALUE]
   EA[PHONECTL_ERROR_ALERT]
   MA[PHONECTL_MESSAGE_ADD]
+  MU[PHONECTL_MESSAGE_UPDATE]
+  ML[PHONECTL_MESSAGES_LOAD]
+  CU[PHONECTL_CHAT_UNREAD_CLEAR]
+  CC[PHONECTL_CLEAR_CHAT]
 
   Init -->|connectStatus=Request, phoneHeader, icoHeader| CR
   CR -->|connectStatus=Success, regNow, displayReg=false, displayPad=true, displayHistory/Chat=false| CS
   CR -->|connectStatus=Error, regNow=false, phoneHeader, icoHeader| CE
-  CS -->|outgoCallNow=true, phoneHeader, icoHeader| OS
+  CS -->|outgoCallNow из payload, callHoldNow=false, phoneHeader, icoHeader| OS
   CS -->|incomeDisplay=true, calleePhoneNum, phoneHeader, icoHeader| ID
-  ID -->|incomeDisplay=false, incomeCallNow=true| IS
-  CS -->|callsArr, callUnread| CL
+  ID -->|incomeDisplay=false, incomeCallNow=true, callHoldNow=false, phoneHeader, icoHeader| IS
+  CS -->|callsArr, callUnread=0 при displayHistory| CL
   CS -->|arbitrary field, e.g. displayHistory/Chat, callHoldNow| SV
-  CS -->|chatMessages, chatUnread| MA
+  CS -->|chatMessages, chatUnread+1 при incoming и !displayChat| MA
+  CS -->|chatMessages, смена статуса доставки| MU
+  CS -->|chatMessages из localStorage| ML
+  CS -->|chatUnread=0| CU
+  CS -->|chatMessages пустой, chatUnread=0| CC
   CE -->|connectStatus=Reconnect| RC
   RC -->|register onAccept| CS
   RC -->|attempts exhausted / reject| CE
@@ -66,8 +80,8 @@ flowchart TD
   EA -->|clear / call end| RS
   IS -->|hangup / Terminated| RS
   OS -->|hangup / Terminated| RS
-  RS -->|reset call UI flags, keep regNow| CS
-  UN -->|displayReg=true, displayPad=false, clear call/chat unread| Init
+  RS -->|reset call UI flags, connectStatus пустой, keep regNow| CS
+  UN -->|connectStatus пустой, regNow=false, заголовки «Не зарегистрирован», displayReg=true, displayPad/History/Chat=false, счётчики unread=0, флаги звонка=false, calleePhoneNum/errText пустые| Init
 
   classDef initial fill:#e3f2fd,stroke:#1565c0,stroke-width:1px
   classDef success fill:#e8f5e8,stroke:#4caf50,stroke-width:1px
@@ -80,7 +94,7 @@ flowchart TD
 
 ## Мост к сервисам (`AuthContainer`)
 
-Thunk-и namespace-чистые: `authControlActions` не диспатчит `PHONECTL_`, `phoneControlActions` — `AUTHCTL_`. Оба моста живут в `AuthContainer`. `AuthPad` рендерится по флагу `displayAuthPad` (строка меню; ✕ снимает флаг), который выставляется в `true` на `AUTHCTL_SUBMIT_SUCCESS` и сбрасывается на `AUTHCTL_CLEAR`; при отсутствии AD-данных `AuthPad` информирует текстом. Её тумблер (`authControlRdcr.autoReg`) заблокирован без пары `sip_username`/`sip_secret`, а клик on сразу запускает регистрацию.
+Thunk-и namespace-чистые: `authControlActions` не диспатчит `PHONECTL_`, `phoneControlActions` — `AUTHCTL_`. Оба моста `AUTHCTL_` ↔ `PHONECTL_` живут в `AuthContainer`; чужой срез thunk-и не читают через `getState()`, а получают нужные значения аргументом (`uriWebRtc` в `handleLkTokenSubmit`, `rdcr` в `handleClkRegister`/`handleSendMessage`). Остальные контейнеры только раздают срезы пропсами — `LkContainer` → `phoneControlRdcr` для формы приглашения `LkToken`. `AuthPad` рендерится по флагу `displayAuthPad` (строка меню; ✕ снимает флаг), который выставляется в `true` на `AUTHCTL_SUBMIT_SUCCESS` и сбрасывается на `AUTHCTL_CLEAR`; при отсутствии AD-данных `AuthPad` информирует текстом. Её тумблер (`authControlRdcr.autoReg`) заблокирован без пары `sip_username`/`sip_secret`, а клик on сразу запускает регистрацию.
 
 ```mermaid
 sequenceDiagram
@@ -88,23 +102,31 @@ sequenceDiagram
   participant AuthAd@{ "type" : "participant", "alias": "AuthAd.jsx" }
   participant AuthPad@{ "type" : "participant", "alias": "AuthPad.jsx" }
   participant AuthAct@{ "type" : "collections", "alias": "authControlActions.js" }
+  participant AdAuth@{ "type" : "collections", "alias": "adAuth.js" }
   participant AuthCont@{ "type" : "collections", "alias": "AuthContainer.jsx" }
   participant PhoneAct@{ "type" : "collections", "alias": "phoneControlActions.js" }
   participant Dispatch@{ "type" : "collections", "alias": "authControlRdcr / phoneControlRdcr" }
 
   User->>AuthAd: Ввод AD-логина и пароля
   AuthAd->>AuthAct: handleAdRegister(formData)
-  AuthAct->>Dispatch: AUTHCTL_SUBMIT_REQUEST (autoReg=false, responseData=null)
-  AuthAct->>AuthAct: POST uriAdAuth
-  AuthAct->>Dispatch: AUTHCTL_SUBMIT_SUCCESS (sip_username, sip_secret)
+  alt Валидация не прошла или HTTP-ошибка
+    AuthAct->>Dispatch: AUTHCTL_SUBMIT_ERROR (errText)
+  else Успех
+    AuthAct->>Dispatch: AUTHCTL_SUBMIT_REQUEST (autoReg=false, responseData=null)
+    AuthAct->>AdAuth: loginAd({ login, password, uriAdAuth })
+    AdAuth->>AdAuth: POST uriAdAuth, сохранить адрес и AD-сессию
+    AdAuth-->>AuthAct: responseData
+    AuthAct->>Dispatch: AUTHCTL_SUBMIT_SUCCESS (responseData)
+  end
   AuthCont->>Dispatch: PHONECTL_STORE_VALUE (callerUserNum, regUserPass, displayDir)
   Note over AuthCont: displayAuthPad=true на success → рендер AuthPad (тумблер off, без AD-данных — текст с информацией)
   User->>AuthPad: Клик по тумблеру on
   AuthPad->>AuthCont: onToggleAutoReg(true)
   AuthCont->>Dispatch: AUTHCTL_STORE_VALUE (autoReg=true)
-  AuthCont->>PhoneAct: handleClkRegister({sip_username, sip_secret, uriWebRtc})
+  AuthCont->>PhoneAct: handleClkRegister({sip_username, sip_secret, uriWebRtc}, phoneControlRdcr)
   PhoneAct->>Dispatch: PHONECTL_CONNECT_REQUEST → SUCCESS/ERROR
   Dispatch-->>AuthCont: callerUserNum из PhoneReg
+  Note over AuthCont: sync только при callerUserNum и (regNow или connectStatus)
   AuthCont->>Dispatch: AUTHCTL_STORE_VALUE (responseData.sip_username)
 ```
 
@@ -124,10 +146,13 @@ sequenceDiagram
 
   User->>PhoneReg: Fill registration form and submit
   PhoneReg->>Action: handleClkRegister(formData, rdcr)
-  Action->>Action: Validate + save uriWebRtc/callerUserNum
-  Action->>Dispatch: PHONECTL_STORE_VALUE (callerUserNum, uriWebRtc)
-  Note over Action: sync sip_username в authControlRdcr делает AuthContainer
-  alt Valid
+  alt Поля не заполнены
+    Action->>Dispatch: PHONECTL_ERROR_ALERT
+  else Valid
+    Action->>Action: save uriWebRtc и callerUserNum в phoneStorage
+    Action->>Dispatch: PHONECTL_STORE_VALUE (uriWebRtc)
+    Action->>Dispatch: PHONECTL_STORE_VALUE (callerUserNum)
+    Note over Action: sync sip_username в authControlRdcr делает AuthContainer
     Action->>Runtime: registerSipUserAgent({ formData, handlers })
     Runtime->>Runtime: makeURI (throw on invalid)
     Runtime->>UserAgent: new UserAgent(userAgentOptions)
@@ -141,17 +166,15 @@ sequenceDiagram
     Registerer-->>Runtime: onAccept
     Runtime->>Action: handlers.onConnectSuccess
     Action->>Dispatch: PHONECTL_CONNECT_SUCCESS
-    Registerer-->>Runtime: onReject
+    Registerer-->>Runtime: onReject / start().catch
     Runtime->>Action: handlers.onConnectError
     Action->>Dispatch: PHONECTL_CONNECT_ERROR
-    Runtime->>Runtime: stopAfterRegistrationFailure()
+    Runtime->>Runtime: через 3 с: stopAfterRegistrationFailure()
     Runtime->>Action: handlers.onUnregistered
     Action->>Dispatch: PHONECTL_UNREGISTER
     Runtime->>Runtime: resetPhoneRuntime()
-  else Invalid
-    Runtime-->>Action: throw
-    Action->>Dispatch: PHONECTL_ERROR_ALERT
   end
+  Note over Action: makeURI внутри registerSipUserAgent бросает исключение → catch → PHONECTL_ERROR_ALERT
 ```
 
 ## Восстановление сетевого обрыва / перерегистрация
@@ -223,13 +246,15 @@ sequenceDiagram
   Runtime->>Runtime: Pause incoming ringtone
   Runtime->>IncomingSession: accept(sessionOptions)
   IncomingSession-->>Runtime: stateChange: Established
-  Runtime->>Runtime: logCall('incall', 'in') + setupRemoteMedia()
+  Runtime->>Runtime: logCall('incall', 'in')
   Runtime->>Action: handlers.onCallLogUpdate
   Action->>Dispatch: CallsArrUpdate()
+  Runtime->>Runtime: setupRemoteMedia()
   IncomingSession-->>Runtime: stateChange: Terminated
-  Runtime->>Runtime: logCall('complete', 'in') + cleanupMedia()
+  Runtime->>Runtime: logCall('complete', 'in')
   Runtime->>Action: handlers.onCallLogUpdate
   Action->>Dispatch: CallsArrUpdate()
+  Runtime->>Runtime: cleanupMedia()
   Runtime->>Action: handlers.onCallEnded(callData)
   Action->>Action: dispatch(handleClkReset)
   Action->>Runtime: resetSipCall(callData)
@@ -265,13 +290,15 @@ sequenceDiagram
     Runtime->>Action: handlers.onCallLogUpdate
     Action->>Dispatch: CallsArrUpdate()
     Inviter-->>Runtime: stateChange: Established
-    Runtime->>Runtime: logCall('incall', 'out') + Pause ringtone + setupRemoteMedia()
+    Runtime->>Runtime: logCall('incall', 'out')
     Runtime->>Action: handlers.onCallLogUpdate
     Action->>Dispatch: CallsArrUpdate()
+    Runtime->>Runtime: Pause ringtone + setupRemoteMedia()
     Inviter-->>Runtime: stateChange: Terminated
-    Runtime->>Runtime: logCall('complete', 'out') + cleanupMedia()
+    Runtime->>Runtime: logCall('complete', 'out')
     Runtime->>Action: handlers.onCallLogUpdate
     Action->>Dispatch: CallsArrUpdate()
+    Runtime->>Runtime: cleanupMedia()
     Runtime->>Action: handlers.onCallEnded(callData)
     Action->>Action: dispatch(handleClkReset)
     Action->>Runtime: resetSipCall(callData)
@@ -303,7 +330,7 @@ sequenceDiagram
   Action->>Runtime: createChatMessage(peer, body, 'out', 'sending')
   Runtime-->>Action: chatMessage
   Action->>Storage: saveChatMessage(chatMessage)
-  Action->>Dispatch: PHONECTL_MESSAGE_ADD (sending)
+  Action->>Dispatch: PHONECTL_MESSAGE_ADD ({ chatMessages, incoming: false }), статус — в самом сообщении
   Action->>Dispatch: PHONECTL_STORE_VALUE (calleePhoneNum)
   Action->>Runtime: transmitSipMessage({ chatMessage, uriHost, onStatusChange })
   Runtime->>Runtime: Active session? else new Messager
@@ -318,8 +345,12 @@ sequenceDiagram
     Runtime->>Storage: updateChatMessageStatus('error')
     Runtime->>Action: onStatusChange(chatMessages)
     Action->>Dispatch: PHONECTL_MESSAGE_UPDATE (error)
+  else Запрос прошёл без колбэка
+    Runtime->>Storage: getChatMessageStatus(id) === 'sending' → updateChatMessageStatus('delivered', 200, 'OK')
   end
 ```
+
+Загрузка и счётчики чата: `MessagesArrUpdate` → `PHONECTL_MESSAGES_LOAD` (из `localStorage`), `handleChatUnreadClear` → `PHONECTL_CHAT_UNREAD_CLEAR`, `handleClearChat` → `PHONECTL_CLEAR_CHAT`.
 
 Входящее SIP MESSAGE обрабатывается в `userAgent.delegate.onMessage` внутри `registerSipUserAgent`:
 
@@ -338,3 +369,22 @@ sequenceDiagram
   Runtime->>Action: handlers.onMessage({ chatMessages })
   Action->>Dispatch: PHONECTL_MESSAGE_ADD (incoming: true)
 ```
+
+## Остальные thunk-и
+
+`phoneControlActions.js`:
+
+- `MessagesArrUpdate` → `PHONECTL_MESSAGES_LOAD` из `loadChatMessages()`.
+- `CallsArrUpdate` → `PHONECTL_CALLLOG_UPD` из `loadCallsArr()`; при открытой истории помечает звонки прочитанными (единственный `getState()` в actions — по своему срезу).
+- `markCallsRead` → `PHONECTL_CALLLOG_UPD` с результатом `markCallsRead()` из storage.
+- `handleClkUnregister(rdcr)` → `unregisterSip()` → `PHONECTL_UNREGISTER`; без SIP-подключения или регистрации — `PHONECTL_ERROR_ALERT`.
+- `handleClkDtmf(tone, rdcr, options)` → `sendDtmf`; ошибки — `PHONECTL_ERROR_ALERT` (`errComponent: PhonePad`).
+- `handleClkHold(rdcr, hold)` → `setHold` → `PHONECTL_STORE_VALUE (callHoldNow)`.
+- `handleChangeStore` → `PHONECTL_STORE_VALUE` для произвольного поля среза.
+- `handleChatUnreadClear` → `PHONECTL_CHAT_UNREAD_CLEAR`.
+- `handleClearChat` → `clearChatMessages()` + `PHONECTL_CLEAR_CHAT`.
+- `handleClearHistory` → `clearCallsArr()` + `PHONECTL_STORE_VALUE (callsArr=[])`.
+- `getPhoneDir` → `fetchPhoneDir(getStoredPhoneDirUri())`; ошибки преобразует `actions/utils/kyError.js`.
+
+`authControlActions.js`: `handleAdRegister` (AD-вход), `handleAdAuthClear` (`AUTHCTL_CLEAR` + сброс AD-сессии), `handleChangeStore` (`AUTHCTL_STORE_VALUE`).
+`lkControlActions.js`: `handleLkTokenSubmit` (токен + SIP MESSAGE-приглашение), `handleLkTokenClear` (`LKTOKEN_CLEAR` + сброс только результата запроса), `handleChangeStore` (`LK_STORE_VALUE`).

@@ -1,10 +1,10 @@
 # sipjs-react
 
-WebRTC-телефон: SIP-клиент на [sip.js](https://sipjs.com/), видеовстречи на [LiveKit](https://livekit.io/) и авторизация через внешний API.
+WebRTC-телефон: SIP-клиент на [sip.js](https://sipjs.com/), видеовстречи на [LiveKit](https://livekit.io/) и авторизация через Active Directory (внешний AD-API).
 
 ![phone](img/phone.png)
 
-Готовая сборка — в [dist](dist).
+Сборка — `npm run build` в `dist/` (каталог в git не хранится).
 
 ## Быстрый старт
 
@@ -14,20 +14,25 @@ WebRTC-телефон: SIP-клиент на [sip.js](https://sipjs.com/), ви�
 npm install
 npm run dev     # Vite dev-сервер: http://localhost:3000 (host 0.0.0.0)
 npm run build   # сборка в dist
-npm run serve   # предпросмотр сборки (vite preview, порт 4173)
+npm run serve   # предпросмотр сборки: http://localhost:4173 (vite preview, host 0.0.0.0)
 ```
 
-Проверки и форматирование — Biome:
+Проверки и форматирование — Biome (`format` и `check` пишут правки в файлы):
 
 ```bash
-npm run lint    # линт
-npm run format  # форматирование
-npm run check   # линт + форматирование
+npm run lint    # только проверка
+npm run format  # форматирование с записью
+npm run check   # линт + форматирование с записью
 ```
 
 В dev-режиме Vite поднимает мок-API.
 
 # Компоненты
+
+Презентационные компоненты (`src/components/`) получают данные и `*Actions` пропсами; со стором их связывают контейнеры (`src/containers/`): `PhoneContainer`, `AuthContainer`, `LkContainer`, `MenuAppContainer`.
+
+## MenuAppBar.jsx
+Меню приложения: пункты «SIP …» (`phoneControlRdcr`), «AD …» (`authControlRdcr`), «LiveKit Встреча» (`lkControlRdcr`).
 
 ## PhoneReg.jsx
 ![component_PhoneReg.png](img/component_PhoneReg.png)
@@ -64,18 +69,21 @@ POST-запрос к серверу авторизации, ожидаемый �
 ![component_AuthAd.png](img/component_AuthAd.png)
 
 ## AuthPad.jsx
-Тумблеры авторегистрации.
+Панель «Мост к сервисам»: тумблеры SIP-регистрации (`autoReg`) и показа LiveKit-встречи (`lkControlRdcr.displayControl`), кнопка закрытия и текст с недостающими AD-данными.
 
 ## AuthIco.jsx + AuthAdInfo.jsx
 Индикация данных AD-сессии в интерфейсе.
 
 ## LkMeet.jsx
-Видеовстреча через [LiveKit](https://github.com/OpenVidu/openvidu-local-deployment)
+Видеовстреча на [LiveKit](https://livekit.io/) (локальный деплой — [openvidu-local-deployment](https://github.com/OpenVidu/openvidu-local-deployment)); комната из query `lk_room`/`lk_token`.
 
 ![component_LkMeet.png](img/component_LkMeet.png)
 
 ## LkToken.jsx
-Форма запроса токена LiveKit (`POST uriLkToken`).
+Форма приглашения внутри `LkMeet`: поле «Вн. номер», `room`/`uriLkToken` берутся из стора. `POST uriLkToken` выполняет thunk `handleLkTokenSubmit`.
+
+## LkThemeStyles.js
+Стили LiveKit-компонентов под тему MUI.
 
 ## PhoneDir.jsx
 GET-запрос к серверу справочнику, ожидаемый ответ:

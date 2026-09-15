@@ -26,7 +26,14 @@ function LkToken(props) {
   const handleSubmit = (event) => {
     event.preventDefault();
     if (!num.trim()) return;
-    lkControlActions.handleLkTokenSubmit({ num, room, uriLkToken });
+    // uriWebRtc — из чужого среза phoneControlRdcr: мост делает контейнер (LkContainer),
+    // thunk получает значение аргументом и не читает стор.
+    lkControlActions.handleLkTokenSubmit({
+      num,
+      room,
+      uriLkToken,
+      uriWebRtc: phoneControlRdcr?.uriWebRtc || "",
+    });
   };
 
   const handleClose = () => {
