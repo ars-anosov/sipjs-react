@@ -1,49 +1,108 @@
 ---
 name: ui-verify
-description: Проверить UI-правку sipjs-react в настоящем браузере — поднять dev-сервер на порту 3000, открыть телефон через Windows-браузер и подтвердить поведение в Playwright MCP (снапшот, клик, консоль). Учитывает границу проверки — SIP-регистрация, звонки и медиа требуют живого сервера и разрешений микрофона и камеры, мок их не заменяет.
+description: Проверить UI-правку sipjs-react в настоящем браузере — поднять dev-сервер, открыть телефон в Linux-Chromium внутри WSL через .dsh/bin/browser (Playwright CLI) и подтвердить поведение снапшотом, кликом, консолью и скриншотом. Использовать, когда менялись компоненты, вёрстка, тема или связка со Redux и нужен факт, а не догадка.
 whenToUse: Правка в src/components, src/containers, src/reducers, theme.js или mock/ — перед ответом пользователю.
 ---
 
-# Проверка UI-правки sipjs-react
+# Проверка UI-правки в браузере
 
-Общий порядок — dev-сервер, `win_open_url`, активация Playwright MCP, требование фактов в отчёте —
-в user-global `~/.dsh/AGENTS.md`. Ниже только специфика этого репозитория.
+Проверка = dev-сервер + Linux-Chromium в WSL: снапшот, клик, консоль, скриншот. Браузер
+хостовой Windows для этого не используется — человек смотрит телефон сам через `win_open_url`.
 
-## Что поднимать
+## Окружение
+
+Запускать браузер только обёрткой `.dsh/bin/browser` (Playwright CLI, headless): она уводит
+`HOME` и `XDG_CACHE_HOME` в `.playwright/cache`, иначе песочница DSH не даёт Chrome создать
+профиль, а демон CLI падает на `mkdir ~/.cache/ms-playwright/daemon`. Настройки — в
+`.playwright/cli.config.json` (chromium, viewport 1280×800, `console.level: warning`, вывод в
+`.playwright/cache/output`), браузеры — в общем кэше `~/.cache/ms-playwright` (только чтение).
+Вызывать `playwright-cli` напрямую не нужно.
+
+Если браузер падает с `error while loading shared libraries`, не хватает системных библиотек
+Chromium:
+
+```bash
+sudo apt-get install -y libnss3 libnspr4 libxcomposite1 libxdamage1 \
+  libxfixes3 libxrandr2 libxrender1 libasound2t64
+```
+
+Если браузера нет: `npm i -g @playwright/cli@latest && playwright-cli install-browser chrome-for-testing`.
+
+## Шаги
+
+1. Поднять dev-сервер (managed background job, порт 3000 из `vite.config.js`) и дождаться ответа:
 
 ```bash
 npm run dev
 curl -sf -o /dev/null http://localhost:3000/ && echo ready
 ```
 
-Порт 3000, `host: 0.0.0.0`, `watch.usePolling: true` — в WSL правки подхватываются без
-перезапуска сервера. Открыть `http://localhost:3000` через `win_open_url`, дальше работать в
-`mcp__browser__*` (сначала `mcp__router__search_and_activate`, serverName `browser`).
+Если порт 3000 занят (например, dev-сервером соседнего проекта), Vite молча возьмёт 3001:
+свериться с URL в выводе `npm run dev` и дальше проверять фактический порт.
 
-## Что реально проверяется локально
+2. Открыть телефон человеку — инструментом `win_open_url` на `http://localhost:3000`.
 
-- Mock API — Vite-плагин `mock/vite-mock-api.js` (`apply: "serve"`, только dev): `POST /user/ad`,
-  `POST /user/lk`, `GET /user/phonedir`. AD-мок отдаёт `sip_username: 9993` и **пустой
-  `sip_secret`**, `lk_token` подписан dev-ключом.
-- Поэтому без живого SIP-сервера проверяются: рендер и валидация формы `PhoneReg`, тумблеры и
-  тексты `AuthPad`, пункты меню и переходы HashRouter, флаги Redux, обработка ошибок `ky`
-  (`actions/utils/kyError.js`), показ `LkMeet` с текстом «AD не выполнен / нет `lk_token`».
-- SIP-регистрация, звонки, медиа и конференция LiveKit требуют доступного сервера (`uriWebRtc` —
-  wss, `uriLk`/`uriLkToken`) и разрешений микрофона и камеры в Chrome. Мок их не заменяет: если
-  сервера нет, проверить UI-уровень и прямо написать, что сам звонок не проверялся.
+3. **Весь сценарий проверки выполнять одной командой в одном вызове `bash`.** Демон CLI живёт
+   только внутри вызова: между вызовами сессия теряется и следующая команда ответит
+   `Browser 'default' is not open`. Шаги соединяются в одну цепочку:
 
-## Что смотреть
+```bash
+.dsh/bin/browser open http://localhost:3000
+.dsh/bin/browser click e21
+.dsh/bin/browser console warning
+.dsh/bin/browser screenshot
+.dsh/bin/browser close
+```
 
-- Адреса сервисов лежат в `localStorage` (`src/constants/storage.js`: `uriAdAuth`, `uriWebRtc`,
-  `uriPhoneDir`, `uriLk`, `uriLkToken`) — для сквозной проверки подставить их в UI, сброс сессии
-  очищает значения.
-- `LkMeet` берёт `lk_room`/`lk_token` из query маршрута (HashRouter, вид `#/?lk_room=...`).
-- Dev-сборка включает `redux-logger`: по логу действий проверяются порядок dispatch и
-  namespace-инвариант (`AUTHCTL_` не диспатчит `PHONECTL_`, мосты — только в `AuthContainer`).
-- Service Worker и Notifications (`phoneNotifications`) в браузере требуют разрешения на
-  уведомления: отказ или отсутствие поддержки даёт информационный текст, а не падение.
+Режим только headless: `--headed` падает с «Looks like you launched a headed browser without
+having a XServer running» (у песочницы приватный `/tmp`, X-сокет недоступен).
 
-## Уборка
+4. Экономить контекст — снапшот не читать целиком:
 
-Закрыть окно Chrome (профиль Playwright постоянный — иначе следующая сессия браузер не запустит) и
-остановить job dev-сервера.
+```bash
+.dsh/bin/browser snapshot --depth=4          # частичное дерево
+.dsh/bin/browser find "Отправить"            # точечный поиск с контекстом
+.dsh/bin/browser console error               # только ошибки
+.dsh/bin/browser requests                    # сеть, затем request <index>
+.dsh/bin/browser localstorage-list
+```
+
+5. Смотреть именно то, что затронуто правкой:
+
+- AD-вход: мок `POST /user/ad` отдаёт `sip_username: 9994` и **пустой `sip_secret`**, `lk_token`
+  подписан dev-ключом; проверяются рендер и валидация `PhoneReg`, тумблер и тексты `AuthPad`,
+  флаг `displayAuthPad`, переходы HashRouter.
+- Тумблер `AuthPad` трёхпозиционный по `phoneControlRdcr.regState` (`off` / `ok` — зелёный /
+  `fail` — красный); при потере регистрации показывается AuthPad с красным тумблером, а не
+  `PhoneReg`.
+- `LkMeet` берёт `lk_room`/`lk_token` из query маршрута (HashRouter, вид `#/?lk_room=...`); без
+  AD/`lk_token` показывает информирующий текст, тумблер заблокирован.
+- Адреса сервисов — в `localStorage` (`constants/storage.js`: `uriAdAuth`, `uriWebRtc`,
+  `uriPhoneDir`, `uriLk`, `uriLkToken`) — для сквозной проверки подставить их через
+  `localstorage-set`, а для чистого состояния удалить ключи и перезагрузить страницу.
+- dev-сборка включает `redux-logger`: по логу действий проверяются порядок dispatch и
+  namespace-инвариант (`AUTHCTL_` не диспатчит `PHONECTL_`, мост — только в `AuthContainer`).
+- меню `MenuAppBar` — модальный `Drawer`: пока он открыт, остальное приложение уходит в
+  `aria-hidden`, поэтому `snapshot`, `find` и роль-локаторы его не видят — закрывать `Escape`,
+  прежде чем искать что-то вне меню.
+- SIP-регистрация, звонки, медиа и конференция LiveKit требуют живого сервера (`uriWebRtc` —
+  wss, `uriLk`/`uriLkToken`) и разрешений микрофона и камеры. Мок их не заменяет: если сервера
+  нет, проверить UI-уровень и прямо написать, что сам звонок не проверялся.
+- Service Worker и Notifications (`phoneNotifications`) требуют разрешения на уведомления:
+  отказ или отсутствие поддержки даёт информационный текст, а не падение.
+
+6. Отчёт: URL, шаги воспроизведения, что наблюдалось, ошибки консоли и сети. Для визуальной
+   правки — скриншот из `.playwright/cache/output/` (показать через `read_image`) плюс ссылка
+   для человека через `win_open_url`.
+
+7. Убрать за собой: `.dsh/bin/browser close` и остановить job dev-сервера.
+
+## Признаки проблемы
+
+- ошибки в `console error` (в том числе React warnings о ключах и PropTypes);
+- 4xx/5xx в `.dsh/bin/browser requests` — сверить с mock-роутами `mock/vite-mock-api.js`;
+- снапшот доступности не содержит ожидаемого элемента или содержит лишний;
+- `snapshot` не содержит формы или панели, хотя они видны на скриншоте — открыт drawer меню
+  (`aria-hidden`), закрыть `Escape`;
+- `Browser 'default' is not open` — шаги разнесены по разным вызовам, а не собраны в один;
+- сервер поднялся, но страница пустая — проверить, что dev-job действительно жив, а не упал.
