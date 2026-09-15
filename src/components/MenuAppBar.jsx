@@ -59,14 +59,7 @@ const MENU_ITEMS_LK = [
 ];
 
 function MenuAppBar(props) {
-  const {
-    phoneControlRdcr,
-    phoneControlActions,
-    authControlRdcr,
-    authControlActions,
-    lkControlRdcr,
-    lkControlActions,
-  } = props;
+  const { phoneControlRdcr, phoneControlActions, authControlRdcr, authControlActions, lkControlRdcr, lkControlActions } = props;
 
   useEffect(() => {
     if (import.meta.env.DEV) console.log("MenuAppBar MOUNT");
@@ -80,11 +73,7 @@ function MenuAppBar(props) {
 
   const rawToolbarHeight = theme?.mixins?.toolbar?.maxHeight;
   const toolbarHeight =
-    typeof rawToolbarHeight === "number"
-      ? rawToolbarHeight
-      : rawToolbarHeight
-        ? parseInt(String(rawToolbarHeight).replace("px", ""), 10)
-        : 64;
+    typeof rawToolbarHeight === "number" ? rawToolbarHeight : rawToolbarHeight ? parseInt(String(rawToolbarHeight).replace("px", ""), 10) : 64;
 
   const [anchorEl_phoneControl, setAnchorEl_phoneControl] = useState(null);
   const [anchorEl_adControl, setAnchorEl_adControl] = useState(null);
@@ -107,14 +96,7 @@ function MenuAppBar(props) {
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
         <Toolbar>
-          <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            sx={{ mr: 2 }}
-            onClick={handleOpenMenu}
-          >
+          <IconButton size="large" edge="start" color="inherit" aria-label="menu" sx={{ mr: 2 }} onClick={handleOpenMenu}>
             <MenuIcon />
           </IconButton>
 
@@ -129,29 +111,12 @@ function MenuAppBar(props) {
               },
             }}
           >
-            <Stack
-              direction="row"
-              spacing={2}
-              sx={{ p: 1, height: toolbarHeight }}
-            >
-              <Box
-                component="img"
-                src="img/Vite.png"
-                sx={{ height: "100%", width: "auto" }}
-                alt="Vite"
-              />
-              <Box
-                component="img"
-                src="img/React.png"
-                sx={{ height: "100%", width: "auto" }}
-                alt="React"
-              />
+            <Stack direction="row" spacing={2} sx={{ p: 1, height: toolbarHeight }}>
+              <Box component="img" src="img/Vite.png" sx={{ height: "100%", width: "auto" }} alt="Vite" />
+              <Box component="img" src="img/React.png" sx={{ height: "100%", width: "auto" }} alt="React" />
               <Box sx={{ flexGrow: 1 }} />
               <IconButton onClick={handleCloseMenu}>
-                <ChevronLeftIcon
-                  color="primary"
-                  sx={{ height: "100%", width: "auto" }}
-                />
+                <ChevronLeftIcon color="primary" sx={{ height: "100%", width: "auto" }} />
               </IconButton>
             </Stack>
 
@@ -162,25 +127,11 @@ function MenuAppBar(props) {
                 const isChecked = !!authControlRdcr[item.key];
                 const labelId = `checkbox-list-label-${item.key}`;
                 return (
-                  <ListItemButton
-                    key={item.key}
-                    onClick={() => toggleDisplayAuth(item.key)}
-                    sx={{ alignItems: "flex-start" }}
-                  >
+                  <ListItemButton key={item.key} onClick={() => toggleDisplayAuth(item.key)} sx={{ alignItems: "flex-start" }}>
                     <ListItemIcon>
-                      <Checkbox
-                        edge="start"
-                        checked={isChecked}
-                        tabIndex={-1}
-                        disableRipple
-                        slotProps={{ input: { "aria-labelledby": labelId } }}
-                      />
+                      <Checkbox edge="start" checked={isChecked} tabIndex={-1} disableRipple slotProps={{ input: { "aria-labelledby": labelId } }} />
                     </ListItemIcon>
-                    <ListItemText
-                      id={labelId}
-                      primary={item.primary}
-                      secondary={item.secondary}
-                    />
+                    <ListItemText id={labelId} primary={item.primary} secondary={item.secondary} />
                   </ListItemButton>
                 );
               })}
@@ -193,25 +144,11 @@ function MenuAppBar(props) {
                 const isChecked = !!phoneControlRdcr[item.key];
                 const labelId = `checkbox-list-label-${item.key}`;
                 return (
-                  <ListItemButton
-                    key={item.key}
-                    onClick={() => toggleDisplayPhone(item.key)}
-                    sx={{ alignItems: "flex-start" }}
-                  >
+                  <ListItemButton key={item.key} onClick={() => toggleDisplayPhone(item.key)} sx={{ alignItems: "flex-start" }}>
                     <ListItemIcon>
-                      <Checkbox
-                        edge="start"
-                        checked={isChecked}
-                        tabIndex={-1}
-                        disableRipple
-                        slotProps={{ input: { "aria-labelledby": labelId } }}
-                      />
+                      <Checkbox edge="start" checked={isChecked} tabIndex={-1} disableRipple slotProps={{ input: { "aria-labelledby": labelId } }} />
                     </ListItemIcon>
-                    <ListItemText
-                      id={labelId}
-                      primary={item.primary}
-                      secondary={item.secondary}
-                    />
+                    <ListItemText id={labelId} primary={item.primary} secondary={item.secondary} />
                   </ListItemButton>
                 );
               })}
@@ -224,25 +161,11 @@ function MenuAppBar(props) {
                 const isChecked = !!lkControlRdcr[item.key];
                 const labelId = `checkbox-list-label-${item.key}`;
                 return (
-                  <ListItemButton
-                    key={item.key}
-                    onClick={() => toggleDisplayLk(item.key)}
-                    sx={{ alignItems: "flex-start" }}
-                  >
+                  <ListItemButton key={item.key} onClick={() => toggleDisplayLk(item.key)} sx={{ alignItems: "flex-start" }}>
                     <ListItemIcon>
-                      <Checkbox
-                        edge="start"
-                        checked={isChecked}
-                        tabIndex={-1}
-                        disableRipple
-                        slotProps={{ input: { "aria-labelledby": labelId } }}
-                      />
+                      <Checkbox edge="start" checked={isChecked} tabIndex={-1} disableRipple slotProps={{ input: { "aria-labelledby": labelId } }} />
                     </ListItemIcon>
-                    <ListItemText
-                      id={labelId}
-                      primary={item.primary}
-                      secondary={item.secondary}
-                    />
+                    <ListItemText id={labelId} primary={item.primary} secondary={item.secondary} />
                   </ListItemButton>
                 );
               })}
@@ -264,22 +187,12 @@ function MenuAppBar(props) {
             WebRTC
           </Typography>
 
-          {phoneControlRdcr.displayDir && (
-            <PhoneDir
-              phoneControlRdcr={phoneControlRdcr}
-              phoneControlActions={phoneControlActions}
-            />
-          )}
+          {phoneControlRdcr.displayDir && <PhoneDir phoneControlRdcr={phoneControlRdcr} phoneControlActions={phoneControlActions} />}
 
           <Box sx={{ flexGrow: 1 }} />
 
           {phoneControlRdcr.displayControl && (
-            <Stack
-              direction="row"
-              spacing={1}
-              sx={{ cursor: "pointer", alignItems: "center" }}
-              onClick={(e) => setAnchorEl_phoneControl(e.currentTarget)}
-            >
+            <Stack direction="row" spacing={1} sx={{ cursor: "pointer", alignItems: "center" }} onClick={(e) => setAnchorEl_phoneControl(e.currentTarget)}>
               <Typography variant="caption" sx={{ pl: 1 }}>
                 {phoneControlRdcr.icoHeader}
               </Typography>
@@ -288,12 +201,7 @@ function MenuAppBar(props) {
           )}
 
           {authControlRdcr.displayControl && (
-            <Stack
-              direction="row"
-              spacing={1}
-              sx={{ cursor: "pointer", alignItems: "center" }}
-              onClick={(e) => setAnchorEl_adControl(e.currentTarget)}
-            >
+            <Stack direction="row" spacing={1} sx={{ cursor: "pointer", alignItems: "center" }} onClick={(e) => setAnchorEl_adControl(e.currentTarget)}>
               <Typography variant="caption" sx={{ pl: 1 }}>
                 {authControlRdcr?.responseData?.ad_login}
               </Typography>
@@ -312,15 +220,9 @@ function MenuAppBar(props) {
         transformOrigin={{ vertical: "top", horizontal: "center" }}
       >
         <Box sx={{ p: 1 }}>
-          <Typography variant="body2">
-            {phoneControlRdcr.uriWebRtc || ""}
-          </Typography>
+          <Typography variant="body2">{phoneControlRdcr.uriWebRtc || ""}</Typography>
           <Divider />
-          <PhonePad
-            phoneControlRdcr={phoneControlRdcr}
-            phoneControlActions={phoneControlActions}
-            showInput={false}
-          />
+          <PhonePad phoneControlRdcr={phoneControlRdcr} phoneControlActions={phoneControlActions} showInput={false} />
         </Box>
       </Popover>
 
@@ -335,11 +237,7 @@ function MenuAppBar(props) {
         <Box sx={{ p: 1 }}>
           <Typography variant="body2">{authControlRdcr.uriAdAuth}</Typography>
           <Divider />
-          <AuthAdInfo
-            authControlRdcr={authControlRdcr}
-            authControlActions={authControlActions}
-            showFull={false}
-          />
+          <AuthAdInfo authControlRdcr={authControlRdcr} authControlActions={authControlActions} showFull={false} />
         </Box>
       </Popover>
     </Box>

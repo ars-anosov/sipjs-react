@@ -1,23 +1,5 @@
-import {
-  ArrowBack as IcoIncome,
-  Close as IconClose,
-  Delete as IconDelete,
-  ArrowForward as IcoOutgo,
-} from "@mui/icons-material";
-import {
-  Box,
-  Divider,
-  IconButton,
-  Paper,
-  Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Typography,
-} from "@mui/material";
+import { ArrowBack as IcoIncome, Close as IconClose, Delete as IconDelete, ArrowForward as IcoOutgo } from "@mui/icons-material";
+import { Box, Divider, IconButton, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import { alpha, keyframes, useTheme } from "@mui/material/styles";
 import { format, isValid, parseISO } from "date-fns";
 import PropTypes from "prop-types";
@@ -105,9 +87,7 @@ function PhoneHistory(props) {
       const isInbound = flow.includes("in");
       const isUnread = row.read === false;
 
-      const basePalette = isInbound
-        ? theme.palette.success
-        : theme.palette.info;
+      const basePalette = isInbound ? theme.palette.success : theme.palette.info;
 
       let rowBgColor = "transparent";
       let rowTextColor = basePalette.main;
@@ -125,10 +105,7 @@ function PhoneHistory(props) {
         rowTextColor = theme.palette.error.dark;
       } else if (isLost && !isInbound) {
         // 3. Исходящий НЕОТВЕЧЕННЫЙ (Серая строка)
-        rowBgColor = alpha(
-          theme.palette.action.disabledBackground || "#dddddd",
-          0.02,
-        );
+        rowBgColor = alpha(theme.palette.action.disabledBackground || "#dddddd", 0.02);
         rowTextColor = theme.palette.text.disabled;
       } else if (isRinging) {
         // 4. Идет вызов/мигание
@@ -182,11 +159,7 @@ function PhoneHistory(props) {
       >
         <IconDelete color="action" />
       </IconButton>
-      <IconButton
-        aria-label="Закрыть панель"
-        onClick={handleClose}
-        sx={{ position: "absolute", top: 4, right: 4, zIndex: 1 }}
-      >
+      <IconButton aria-label="Закрыть панель" onClick={handleClose} sx={{ position: "absolute", top: 4, right: 4, zIndex: 1 }}>
         <IconClose color="action" />
       </IconButton>
 
@@ -222,12 +195,7 @@ function PhoneHistory(props) {
             backgroundColor: alpha(theme.palette.background.default, 0.5),
           }}
         >
-          <Table
-            size="small"
-            aria-label="История звонков"
-            stickyHeader
-            sx={{ tableLayout: "fixed" }}
-          >
+          <Table size="small" aria-label="История звонков" stickyHeader sx={{ tableLayout: "fixed" }}>
             <TableHead>
               <TableRow>
                 <TableCell sx={{ width: 110, py: 0.5 }}>Время</TableCell>
@@ -245,23 +213,12 @@ function PhoneHistory(props) {
                   sx={{
                     cursor: "pointer",
                     backgroundColor: row.rowBgColor,
-                    transition: theme.transitions.create([
-                      "background-color",
-                      "color",
-                    ]),
-                    animation: row.isRinging
-                      ? `${blink} 1s infinite ease-in-out`
-                      : "none",
-                    boxShadow: row.isUnread
-                      ? `inset 0 0 0 1px ${alpha(theme.palette.warning.main, 0.75)}`
-                      : "none",
+                    transition: theme.transitions.create(["background-color", "color"]),
+                    animation: row.isRinging ? `${blink} 1s infinite ease-in-out` : "none",
+                    boxShadow: row.isUnread ? `inset 0 0 0 1px ${alpha(theme.palette.warning.main, 0.75)}` : "none",
                     "& .MuiTableCell-root": {
                       color: row.rowTextColor,
-                      fontWeight: row.isUnread
-                        ? "bold"
-                        : row.isLost
-                          ? "medium"
-                          : "normal",
+                      fontWeight: row.isUnread ? "bold" : row.isLost ? "medium" : "normal",
                     },
                     "&:hover": {
                       backgroundColor: row.isInCall
@@ -269,11 +226,7 @@ function PhoneHistory(props) {
                         : row.isLost && row.isInbound
                           ? alpha(theme.palette.error.main, 0.15)
                           : row.isLost && !row.isInbound
-                            ? alpha(
-                                theme.palette.action.disabledBackground ||
-                                  "#dddddd",
-                                0.2,
-                              )
+                            ? alpha(theme.palette.action.disabledBackground || "#dddddd", 0.2)
                             : alpha(row.basePalette.light, 0.25),
                     },
                   }}
@@ -305,22 +258,14 @@ function PhoneHistory(props) {
                         <IcoIncome
                           fontSize="small"
                           sx={{
-                            color: row.isInCall
-                              ? "inherit"
-                              : row.isLost
-                                ? "error.dark"
-                                : "success.main",
+                            color: row.isInCall ? "inherit" : row.isLost ? "error.dark" : "success.main",
                           }}
                         />
                       ) : (
                         <IcoOutgo
                           fontSize="small"
                           sx={{
-                            color: row.isInCall
-                              ? "inherit"
-                              : row.isLost
-                                ? "text.disabled"
-                                : "info.main",
+                            color: row.isInCall ? "inherit" : row.isLost ? "text.disabled" : "info.main",
                           }}
                         />
                       )}

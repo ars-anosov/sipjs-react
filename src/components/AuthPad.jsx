@@ -1,26 +1,11 @@
 import { Close as IconClose } from "@mui/icons-material";
-import {
-  Box,
-  Divider,
-  IconButton,
-  Paper,
-  Stack,
-  Switch,
-  Typography,
-} from "@mui/material";
+import { Box, Divider, IconButton, Paper, Stack, Switch, Typography } from "@mui/material";
 import PropTypes from "prop-types";
 import { useEffect } from "react";
 import { HEADER_BACKGROUND } from "../constants/ui.js";
 
 function AuthPad(props) {
-  const {
-    authControlRdcr,
-    lkControlRdcr,
-    regState,
-    onToggleReg,
-    onToggleMeet,
-    onClose,
-  } = props;
+  const { authControlRdcr, lkControlRdcr, regState, onToggleReg, onToggleMeet, onClose } = props;
 
   useEffect(() => {
     if (import.meta.env.DEV) console.log("AuthPad MOUNT");
@@ -32,17 +17,13 @@ function AuthPad(props) {
   // Тумблер SIP-регистрации: off — выключен (нейтральный цвет), ok — зелёный
   // (регистрация прошла), fail — красный (регистрация не прошла)
   const regOn = regState !== "off";
-  const regColor =
-    regState === "ok" ? "success" : regState === "fail" ? "error" : "primary";
+  const regColor = regState === "ok" ? "success" : regState === "fail" ? "error" : "primary";
   const sipUsername = authControlRdcr?.responseData?.sip_username || "";
   const sipSecret = authControlRdcr?.responseData?.sip_secret || "";
   const hasSipData = Boolean(sipUsername && sipSecret);
 
   // lk_token приходит либо из AD-ответа, либо из формы LkToken
-  const lkToken =
-    authControlRdcr?.responseData?.lk_token ||
-    lkControlRdcr?.responseData?.lk_token ||
-    "";
+  const lkToken = authControlRdcr?.responseData?.lk_token || lkControlRdcr?.responseData?.lk_token || "";
   const hasLkToken = Boolean(lkToken);
   const meetVisible = !!lkControlRdcr?.displayControl;
 
@@ -54,8 +35,7 @@ function AuthPad(props) {
 
   let infoText = "";
   if (authControlRdcr?.status !== "success") {
-    infoText =
-      "AD авторизация не выполнена — sip_username / sip_secret / lk_token недоступны.";
+    infoText = "AD авторизация не выполнена — sip_username / sip_secret / lk_token недоступны.";
   } else if (missingFields.length > 0) {
     infoText = `AD не вернул: ${missingFields.join(", ")}.`;
   }
@@ -84,11 +64,7 @@ function AuthPad(props) {
         overflow: "hidden",
       }}
     >
-      <IconButton
-        aria-label="Закрыть панель"
-        onClick={onClose}
-        sx={{ position: "absolute", top: 4, right: 4, zIndex: 1 }}
-      >
+      <IconButton aria-label="Закрыть панель" onClick={onClose} sx={{ position: "absolute", top: 4, right: 4, zIndex: 1 }}>
         <IconClose color="action" />
       </IconButton>
 
@@ -115,11 +91,7 @@ function AuthPad(props) {
       {/* Тело панели: padding переехал с Paper на тело, чтобы шапка легла вплотную к краям */}
       <Box sx={{ p: 1 }}>
         <Stack spacing={1}>
-          <Stack
-            direction="row"
-            spacing={2}
-            sx={{ alignItems: "center", justifyContent: "space-between" }}
-          >
+          <Stack direction="row" spacing={2} sx={{ alignItems: "center", justifyContent: "space-between" }}>
             <Typography variant="body1" color="text.primary">
               {`SIP Регистрация ${sipUsername || "—"}`}
             </Typography>
@@ -134,11 +106,7 @@ function AuthPad(props) {
             />
           </Stack>
 
-          <Stack
-            direction="row"
-            spacing={2}
-            sx={{ alignItems: "center", justifyContent: "space-between" }}
-          >
+          <Stack direction="row" spacing={2} sx={{ alignItems: "center", justifyContent: "space-between" }}>
             <Typography variant="body1" color="text.primary">
               LiveKit Встреча
             </Typography>
@@ -156,11 +124,7 @@ function AuthPad(props) {
         {infoText && (
           <>
             <Divider sx={{ mt: 1 }} />
-            <Typography
-              variant="caption"
-              color="text.secondary"
-              sx={{ display: "block", mt: 1, textAlign: "center" }}
-            >
+            <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 1, textAlign: "center" }}>
               {infoText}
             </Typography>
           </>

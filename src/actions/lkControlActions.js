@@ -1,26 +1,13 @@
-import {
-  LK_STORE_VALUE,
-  LKTOKEN_CLEAR,
-  LKTOKEN_SUBMIT_ERROR,
-  LKTOKEN_SUBMIT_REQUEST,
-  LKTOKEN_SUBMIT_SUCCESS,
-} from "../constants/redux";
+import { LK_STORE_VALUE, LKTOKEN_CLEAR, LKTOKEN_SUBMIT_ERROR, LKTOKEN_SUBMIT_REQUEST, LKTOKEN_SUBMIT_SUCCESS } from "../constants/redux";
 import { requestLkToken, storeLkTokenUri } from "../services/lkToken";
-import {
-  createChatMessage,
-  getUriHostFromWebRtc,
-  isSipConnected,
-  transmitSipMessage,
-} from "../services/phoneRuntime";
+import { createChatMessage, getUriHostFromWebRtc, isSipConnected, transmitSipMessage } from "../services/phoneRuntime";
 import { getApiErrorMessage } from "./utils/kyError";
 
 const buildInviteSipMessageBody = (room, responseData) => {
   if (responseData && typeof responseData === "object") {
     const lines = [`Приглашение на встречу`];
     lines.push("");
-    lines.push(
-      `<a href="/?lk_room=${room}&lk_token=${responseData.lk_token}">${room}</a>`,
-    );
+    lines.push(`<a href="/?lk_room=${room}&lk_token=${responseData.lk_token}">${room}</a>`);
     return lines.join("\n");
   }
 
@@ -34,10 +21,8 @@ const handleLkTokenSubmit =
   async (dispatch) => {
     const num = typeof formData.num === "string" ? formData.num.trim() : "";
     const room = typeof formData.room === "string" ? formData.room.trim() : "";
-    const uriLkToken =
-      typeof formData.uriLkToken === "string" ? formData.uriLkToken.trim() : "";
-    const uriWebRtc =
-      typeof formData.uriWebRtc === "string" ? formData.uriWebRtc.trim() : "";
+    const uriLkToken = typeof formData.uriLkToken === "string" ? formData.uriLkToken.trim() : "";
+    const uriWebRtc = typeof formData.uriWebRtc === "string" ? formData.uriWebRtc.trim() : "";
 
     if (!num || !room) {
       dispatch({
@@ -74,12 +59,7 @@ const handleLkTokenSubmit =
       const canSendSipMessage = Boolean(isSipConnected() && uriHost && num);
 
       if (canSendSipMessage) {
-        const chatMessage = createChatMessage(
-          num,
-          buildInviteSipMessageBody(room, responseData),
-          "out",
-          "sending",
-        );
+        const chatMessage = createChatMessage(num, buildInviteSipMessageBody(room, responseData), "out", "sending");
 
         try {
           await transmitSipMessage({ chatMessage, uriHost });

@@ -5,23 +5,10 @@ import {
   PhoneInTalk as IconPhoneInTalk,
   SettingsPhone as IconSettingsPhone,
 } from "@mui/icons-material";
-import {
-  Alert,
-  AlertTitle,
-  Badge,
-  IconButton,
-  keyframes,
-  Snackbar,
-  useTheme,
-} from "@mui/material";
+import { Alert, AlertTitle, Badge, IconButton, keyframes, Snackbar, useTheme } from "@mui/material";
 import PropTypes from "prop-types";
 import { useEffect, useMemo, useState } from "react";
-import {
-  closeIncomingCallNotification,
-  disposePhoneNotifications,
-  initPhoneNotifications,
-  showIncomingCallNotification,
-} from "../services/phoneNotifications";
+import { closeIncomingCallNotification, disposePhoneNotifications, initPhoneNotifications, showIncomingCallNotification } from "../services/phoneNotifications";
 
 const pulse = keyframes`
   0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); transform: scale(1); }
@@ -65,29 +52,18 @@ function PhoneIco({ phoneControlRdcr }) {
 
   // 2. Отслеживание входящего звонка и показ/скрытие уведомлений
   useEffect(() => {
-    const calleePhoneNum =
-      phoneControlRdcr?.calleePhoneNum || phoneControlRdcr?.callerNumber;
+    const calleePhoneNum = phoneControlRdcr?.calleePhoneNum || phoneControlRdcr?.callerNumber;
 
     if (phoneControlRdcr?.incomeDisplay) {
       showIncomingCallNotification(calleePhoneNum);
     } else {
       closeIncomingCallNotification();
     }
-  }, [
-    phoneControlRdcr?.incomeDisplay,
-    phoneControlRdcr?.calleePhoneNum,
-    phoneControlRdcr?.callerNumber,
-  ]);
+  }, [phoneControlRdcr?.incomeDisplay, phoneControlRdcr?.calleePhoneNum, phoneControlRdcr?.callerNumber]);
 
   // Кэшируем вычисления стилей и иконки
   const cfg = useMemo(() => {
-    const {
-      incomeCallNow,
-      outgoCallNow,
-      incomeDisplay,
-      connectStatus,
-      regState,
-    } = phoneControlRdcr;
+    const { incomeCallNow, outgoCallNow, incomeDisplay, connectStatus, regState } = phoneControlRdcr;
 
     if (incomeCallNow || outgoCallNow) {
       return {
@@ -150,18 +126,11 @@ function PhoneIco({ phoneControlRdcr }) {
   }, [phoneControlRdcr, theme]);
 
   const { Icon, bg, color, pulse: isSwelling } = cfg;
-  const totalUnread =
-    Number(phoneControlRdcr?.callUnread || 0) +
-    Number(phoneControlRdcr?.chatUnread || 0);
+  const totalUnread = Number(phoneControlRdcr?.callUnread || 0) + Number(phoneControlRdcr?.chatUnread || 0);
 
   return (
     <>
-      <Badge
-        badgeContent={totalUnread}
-        color="error"
-        overlap="circular"
-        invisible={!totalUnread}
-      >
+      <Badge badgeContent={totalUnread} color="error" overlap="circular" invisible={!totalUnread}>
         <IconButton
           size="small"
           sx={{
@@ -187,16 +156,8 @@ function PhoneIco({ phoneControlRdcr }) {
         </IconButton>
       </Badge>
 
-      <Snackbar
-        open={toast.open}
-        onClose={handleCloseToast}
-        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-      >
-        <Alert
-          onClose={handleCloseToast}
-          severity={toast.severity}
-          sx={{ width: "100%" }}
-        >
+      <Snackbar open={toast.open} onClose={handleCloseToast} anchorOrigin={{ vertical: "bottom", horizontal: "left" }}>
+        <Alert onClose={handleCloseToast} severity={toast.severity} sx={{ width: "100%" }}>
           <AlertTitle sx={{ fontWeight: "bold" }}>{toast.title}</AlertTitle>
           {toast.message}
         </Alert>

@@ -1,19 +1,6 @@
-import {
-  Inviter,
-  Messager,
-  Registerer,
-  RegistererState,
-  SessionState,
-  UserAgent,
-  Web,
-} from "sip.js";
+import { Inviter, Messager, Registerer, RegistererState, SessionState, UserAgent, Web } from "sip.js";
 
-import {
-  getChatMessageStatus,
-  logCall,
-  saveChatMessage,
-  updateChatMessageStatus,
-} from "./phoneStorage";
+import { getChatMessageStatus, logCall, saveChatMessage, updateChatMessageStatus } from "./phoneStorage";
 
 const createPhoneRuntime = () => ({
   userAgentOptions: null,
@@ -61,13 +48,11 @@ const clearRemoteStream = (remoteStream) => {
 
 const setupRemoteMedia = (session, mediaElement, remoteStream) => {
   clearRemoteStream(remoteStream);
-  session.sessionDescriptionHandler.peerConnection
-    .getReceivers()
-    .forEach((receiver) => {
-      if (receiver.track) {
-        remoteStream.addTrack(receiver.track);
-      }
-    });
+  session.sessionDescriptionHandler.peerConnection.getReceivers().forEach((receiver) => {
+    if (receiver.track) {
+      remoteStream.addTrack(receiver.track);
+    }
+  });
   mediaElement.srcObject = remoteStream;
   mediaElement.play();
 };
@@ -118,19 +103,15 @@ const getActiveSession = () => {
   const runtime = getPhoneRuntime();
   const sessions = [runtime.incomingSession, runtime.outgoingSession];
 
-  return sessions.find(
-    (session) => session && session.state === SessionState.Established,
-  );
+  return sessions.find((session) => session && session.state === SessionState.Established);
 };
 
 const setLocalAudioEnabled = (session, enabled) => {
-  session.sessionDescriptionHandler?.peerConnection
-    ?.getSenders()
-    .forEach((sender) => {
-      if (sender.track && sender.track.kind === "audio") {
-        sender.track.enabled = enabled;
-      }
-    });
+  session.sessionDescriptionHandler?.peerConnection?.getSenders().forEach((sender) => {
+    if (sender.track && sender.track.kind === "audio") {
+      sender.track.enabled = enabled;
+    }
+  });
 };
 
 // ============================================================
@@ -262,8 +243,7 @@ const handleIncomingSipMessage = (message) => {
   message.accept();
 
   const peer = peerFromSipUri(message.request.from.uri);
-  const body =
-    typeof message.request.body === "string" ? message.request.body : "";
+  const body = typeof message.request.body === "string" ? message.request.body : "";
   const chatMessage = createChatMessage(peer, body, "in");
   const chatMessages = saveChatMessage(chatMessage);
 
@@ -284,29 +264,16 @@ const transmitSipMessage = ({ chatMessage, uriHost, onStatusChange }) => {
   }
 
   const setDeliveryStatus = (status, statusCode, statusText) => {
-    const chatMessages = updateChatMessageStatus(
-      chatMessage.id,
-      status,
-      statusCode,
-      statusText,
-    );
+    const chatMessages = updateChatMessageStatus(chatMessage.id, status, statusCode, statusText);
     onStatusChange?.(chatMessages);
   };
 
   const requestDelegate = {
     onAccept(response) {
-      setDeliveryStatus(
-        "delivered",
-        response.message.statusCode,
-        response.message.reasonPhrase,
-      );
+      setDeliveryStatus("delivered", response.message.statusCode, response.message.reasonPhrase);
     },
     onReject(response) {
-      setDeliveryStatus(
-        "error",
-        response.message.statusCode,
-        response.message.reasonPhrase,
-      );
+      setDeliveryStatus("error", response.message.statusCode, response.message.reasonPhrase);
     },
   };
 
@@ -335,10 +302,7 @@ const transmitSipMessage = ({ chatMessage, uriHost, onStatusChange }) => {
     .catch((error) => {
       console.log("MESSAGE send ERROR !", error);
       if (getChatMessageStatus(chatMessage.id) === "sending") {
-        const msg =
-          error && typeof error.message === "string"
-            ? error.message
-            : String(error);
+        const msg = error && typeof error.message === "string" ? error.message : String(error);
         setDeliveryStatus("error", null, msg);
       }
     });
@@ -363,8 +327,7 @@ const getUriHostFromWebRtc = (uriWebRtc = "") => {
 
 const isSipConnected = () => Boolean(getPhoneRuntime().userAgent);
 
-const isValidSipTarget = (peer, uriHost) =>
-  Boolean(UserAgent.makeURI(`sip:${peer}@${uriHost}`));
+const isValidSipTarget = (peer, uriHost) => Boolean(UserAgent.makeURI(`sip:${peer}@${uriHost}`));
 
 // ------------------------------------------------------------
 // Регистрация: UserAgent + Registerer + делегаты + реконнект
@@ -411,15 +374,14 @@ const registerSipUserAgent = ({ formData, handlers }) => {
   if (!useIce) {
     // 1. Ставим 1 мс. SIP.js мгновенно завершит ожидание и сформирует INVITE.
     sessionOptions.sessionDescriptionHandlerOptions.iceGatheringTimeout = 1;
-    sessionOptions.sessionDescriptionHandlerOptions.peerConnectionConfiguration =
-      {
-        // 2. Используем стандартную политику
-        iceTransportPolicy: "all",
-        // 3. Вырезаем STUN/TURN, чтобы браузер не тратил время на внешние запросы
-        iceServers: [],
-        // 4. Ограничиваем пул кандидатов до нуля, блокируя сбор на уровне WebRTC
-        iceCandidatePoolSize: 0,
-      };
+    sessionOptions.sessionDescriptionHandlerOptions.peerConnectionConfiguration = {
+      // 2. Используем стандартную политику
+      iceTransportPolicy: "all",
+      // 3. Вырезаем STUN/TURN, чтобы браузер не тратил время на внешние запросы
+      iceServers: [],
+      // 4. Ограничиваем пул кандидатов до нуля, блокируя сбор на уровне WebRTC
+      iceCandidatePoolSize: 0,
+    };
   }
 
   const { audioLocalIn, audioLocalOut, audioRemote } = createAudioElements();
@@ -510,10 +472,7 @@ const registerSipUserAgent = ({ formData, handlers }) => {
               attemptingReconnection = false;
             })
             .catch((error) => {
-              console.error(
-                "userAgent.reconnect() failed:",
-                error.message || error,
-              );
+              console.error("userAgent.reconnect() failed:", error.message || error);
               attemptingReconnection = false;
               attemptReconnection(++reconnectionAttempt);
             });
@@ -573,10 +532,7 @@ const registerSipUserAgent = ({ formData, handlers }) => {
       handlers.onCallLogUpdate();
       handlers.onIncomeDisplay({
         calleePhoneNum:
-          incomingSession.remoteIdentity.uri.raw.user +
-          (incomingSession.remoteIdentity.displayName
-            ? ` "${incomingSession.remoteIdentity.displayName}"`
-            : ""),
+          incomingSession.remoteIdentity.uri.raw.user + (incomingSession.remoteIdentity.displayName ? ` "${incomingSession.remoteIdentity.displayName}"` : ""),
       });
     },
 
@@ -601,10 +557,7 @@ const registerSipUserAgent = ({ formData, handlers }) => {
       registrationAccepted = false;
       registrationInFlight = false;
 
-      if (
-        connectionCtl.shouldBeConnected &&
-        !connectionCtl.suppressReconnectOnNextDisconnect
-      ) {
+      if (connectionCtl.shouldBeConnected && !connectionCtl.suppressReconnectOnNextDisconnect) {
         handlers.onConnectError({
           phoneHeader: "Registration expired",
           icoHeader: "Registration expired",
@@ -615,11 +568,7 @@ const registerSipUserAgent = ({ formData, handlers }) => {
   });
 
   userAgent.delegate.onConnect = () => {
-    if (
-      !connectionCtl.shouldBeConnected ||
-      registrationAccepted ||
-      registrationInFlight
-    ) {
+    if (!connectionCtl.shouldBeConnected || registrationAccepted || registrationInFlight) {
       return;
     }
 
@@ -643,23 +592,12 @@ const registerSipUserAgent = ({ formData, handlers }) => {
               });
             },
             onReject(response) {
-              console.error(
-                "SIP Registration rejected:",
-                response.message.statusCode +
-                  " " +
-                  response.message.reasonPhrase,
-              );
+              console.error("SIP Registration rejected:", `${response.message.statusCode} ${response.message.reasonPhrase}`);
               registrationInFlight = false;
               registrationAccepted = false;
               handlers.onConnectError({
-                phoneHeader:
-                  response.message.statusCode +
-                  " " +
-                  response.message.reasonPhrase,
-                icoHeader:
-                  response.message.statusCode +
-                  " " +
-                  response.message.reasonPhrase,
+                phoneHeader: `${response.message.statusCode} ${response.message.reasonPhrase}`,
+                icoHeader: `${response.message.statusCode} ${response.message.reasonPhrase}`,
               });
               // Принудительно отключаю, чтобы сбросить старые атрибуты user/secret
               setTimeout(() => {
@@ -704,10 +642,7 @@ const registerSipUserAgent = ({ formData, handlers }) => {
     registrationInFlight = false;
     attemptingReconnection = false;
 
-    console.error(
-      "WebSocket disconnected:",
-      error ? error.message : "unknown reason",
-    );
+    console.error("WebSocket disconnected:", error ? error.message : "unknown reason");
 
     handlers.onConnectError({
       phoneHeader: "Disconnected",
@@ -800,16 +735,7 @@ const answerIncomingCall = () => {
 // Исходящий вызов
 // ------------------------------------------------------------
 
-const placeOutgoingCall = (
-  calleePhoneNum,
-  {
-    callerUserNum = "",
-    onOutgoingSubmit,
-    onCallLogUpdate,
-    onCallEnded,
-    onInviteError,
-  } = {},
-) => {
+const placeOutgoingCall = (calleePhoneNum, { callerUserNum = "", onOutgoingSubmit, onCallLogUpdate, onCallEnded, onInviteError } = {}) => {
   const runtime = getPhoneRuntime();
 
   const server = runtime.userAgentOptions?.transportOptions?.server || "";
@@ -824,11 +750,7 @@ const placeOutgoingCall = (
 
   runtime.audioLocalOut.play();
 
-  const outgoingSession = new Inviter(
-    runtime.userAgent,
-    target,
-    runtime.sessionOptions,
-  );
+  const outgoingSession = new Inviter(runtime.userAgent, target, runtime.sessionOptions);
   setPhoneRuntime({
     outgoingSession,
   });
@@ -850,20 +772,12 @@ const placeOutgoingCall = (
         logCall(outgoingSession, "incall", "out");
         onCallLogUpdate?.();
         runtime.audioLocalOut.pause();
-        setupRemoteMedia(
-          outgoingSession,
-          runtime.audioRemote,
-          runtime.remoteStream,
-        );
+        setupRemoteMedia(outgoingSession, runtime.audioRemote, runtime.remoteStream);
         break;
       case SessionState.Terminated: {
         logCall(outgoingSession, "complete", "out");
         onCallLogUpdate?.();
-        cleanupMedia(
-          runtime.audioRemote,
-          runtime.audioLocalIn,
-          runtime.audioLocalOut,
-        );
+        cleanupMedia(runtime.audioRemote, runtime.audioLocalIn, runtime.audioLocalOut);
         onCallEnded?.({
           outgoingSession,
           incomingSession: false,
@@ -884,9 +798,7 @@ const placeOutgoingCall = (
     })
     .catch((error) => {
       // ПРОВЕРКА: Если сессия закрыта нами, не считаем это ошибкой
-      const isTerminated =
-        outgoingSession.state === SessionState.Terminating ||
-        outgoingSession.state === SessionState.Terminated;
+      const isTerminated = outgoingSession.state === SessionState.Terminating || outgoingSession.state === SessionState.Terminated;
       if (isTerminated) {
         console.log("Игнорируем ошибку в состоянии Terminating/Terminated");
         return;
@@ -894,10 +806,7 @@ const placeOutgoingCall = (
 
       // В противном случае — это реальная проблема (сеть, сервер и т.д.)
       console.log("inviter INVITE send ERROR !", error);
-      const msg =
-        error && typeof error.message === "string"
-          ? error.message
-          : String(error);
+      const msg = error && typeof error.message === "string" ? error.message : String(error);
       onInviteError?.(msg);
       onCallEnded?.({
         outgoingSession,
@@ -913,10 +822,7 @@ const placeOutgoingCall = (
 
 const resetSipCall = (callData = {}) => {
   const runtime = getPhoneRuntime();
-  const {
-    outgoingSession = runtime.outgoingSession,
-    incomingSession = runtime.incomingSession,
-  } = callData;
+  const { outgoingSession = runtime.outgoingSession, incomingSession = runtime.incomingSession } = callData;
 
   if (outgoingSession) endCall(outgoingSession);
   if (incomingSession) endCall(incomingSession);
@@ -936,10 +842,7 @@ const sendDtmf = (tone, options = {}) => {
   }
 
   if (options.useSessionDescriptionHandler) {
-    const sent = session.sessionDescriptionHandler?.sendDtmf(
-      tone,
-      options.dtmfOptions,
-    );
+    const sent = session.sessionDescriptionHandler?.sendDtmf(tone, options.dtmfOptions);
     if (!sent) {
       return Promise.reject(new Error("Не удалось отправить DTMF."));
     }
@@ -971,9 +874,7 @@ const setHold = (hold = true) => {
     return Promise.reject(new Error("Нет активного звонка для HOLD."));
   }
 
-  const sessionDescriptionHandlerModifiers = hold
-    ? [opusCodecModifier, Web.holdModifier]
-    : [opusCodecModifier];
+  const sessionDescriptionHandlerModifiers = hold ? [opusCodecModifier, Web.holdModifier] : [opusCodecModifier];
 
   return session
     .invite({ sessionDescriptionHandlerModifiers })
@@ -982,11 +883,7 @@ const setHold = (hold = true) => {
     })
     .catch((error) => {
       console.log("hold re-INVITE send ERROR !", error);
-      throw new Error(
-        hold
-          ? "Не удалось поставить звонок на HOLD."
-          : "Не удалось снять звонок с HOLD.",
-      );
+      throw new Error(hold ? "Не удалось поставить звонок на HOLD." : "Не удалось снять звонок с HOLD.");
     });
 };
 

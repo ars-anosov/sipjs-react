@@ -2,15 +2,7 @@ import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 // Импортируем современные иконки Outlined
 import PersonAddOutlinedIcon from "@mui/icons-material/PersonAddOutlined";
 
-import {
-  Alert,
-  Box,
-  CircularProgress,
-  Collapse,
-  IconButton,
-  InputBase,
-  Stack,
-} from "@mui/material";
+import { Alert, Box, CircularProgress, Collapse, IconButton, InputBase, Stack } from "@mui/material";
 import PropTypes from "prop-types";
 import { useState } from "react";
 
@@ -19,9 +11,7 @@ function LkToken(props) {
 
   const [num, setNum] = useState("");
   const [room, _setRoom] = useState(phoneControlRdcr?.callerUserNum || "");
-  const [uriLkToken, _setUriLkToken] = useState(
-    lkControlRdcr?.uriLkToken || "",
-  );
+  const [uriLkToken, _setUriLkToken] = useState(lkControlRdcr?.uriLkToken || "");
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -103,11 +93,7 @@ function LkToken(props) {
             "&:hover": { backgroundColor: "action.hover" },
           }}
         >
-          {isLoading ? (
-            <CircularProgress size={16} color="inherit" />
-          ) : (
-            <PersonAddOutlinedIcon fontSize="small" />
-          )}
+          {isLoading ? <CircularProgress size={16} color="inherit" /> : <PersonAddOutlinedIcon fontSize="small" />}
         </IconButton>
 
         {/* Разделитель или скрытые поля (не влияют на верстку) */}
@@ -133,9 +119,7 @@ function LkToken(props) {
         </IconButton>
       </Stack>
 
-      <Collapse
-        in={!!lkControlRdcr.message && lkControlRdcr.status === "error"}
-      >
+      <Collapse in={!!lkControlRdcr.message && lkControlRdcr.status === "error"}>
         <Alert
           severity="error"
           variant="standard"

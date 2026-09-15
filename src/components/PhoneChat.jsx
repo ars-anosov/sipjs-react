@@ -1,22 +1,5 @@
-import {
-  Backspace as IconBackspace,
-  Close as IconClose,
-  Delete as IconDelete,
-  Send as IconSend,
-} from "@mui/icons-material";
-import {
-  Alert,
-  Box,
-  Button,
-  Collapse,
-  Divider,
-  IconButton,
-  InputAdornment,
-  Paper,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Backspace as IconBackspace, Close as IconClose, Delete as IconDelete, Send as IconSend } from "@mui/icons-material";
+import { Alert, Box, Button, Collapse, Divider, IconButton, InputAdornment, Paper, Stack, TextField, Typography } from "@mui/material";
 import { alpha, useTheme } from "@mui/material/styles";
 import { format } from "date-fns";
 import PropTypes from "prop-types";
@@ -31,9 +14,7 @@ function PhoneChat(props) {
   const messagesEndRef = useRef(null);
 
   const formatPhoneDigits = (value) => (value || "").replace(/\D/g, "");
-  const [peerTxt, setPeerTxt] = useState(
-    formatPhoneDigits(phoneControlRdcr.calleePhoneNum),
-  );
+  const [peerTxt, setPeerTxt] = useState(formatPhoneDigits(phoneControlRdcr.calleePhoneNum));
   const [messageTxt, setMessageTxt] = useState("");
 
   useEffect(() => {
@@ -44,18 +25,13 @@ function PhoneChat(props) {
     return () => {
       if (import.meta.env.DEV) console.log("PhoneChat UNMOUNT");
     };
-  }, [
-    phoneControlActions.MessagesArrUpdate,
-    phoneControlActions.handleChatUnreadClear,
-  ]);
+  }, [phoneControlActions.MessagesArrUpdate, phoneControlActions.handleChatUnreadClear]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
 
-  const visibleMessages = peerTxt.trim()
-    ? phoneControlRdcr.chatMessages.filter((msg) => msg.peer === peerTxt.trim())
-    : phoneControlRdcr.chatMessages;
+  const visibleMessages = peerTxt.trim() ? phoneControlRdcr.chatMessages.filter((msg) => msg.peer === peerTxt.trim()) : phoneControlRdcr.chatMessages;
 
   const handleClose = () => {
     phoneControlActions.handleChangeStore("displayChat", false);
@@ -65,11 +41,7 @@ function PhoneChat(props) {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    phoneControlActions.handleSendMessage(
-      peerTxt,
-      messageTxt,
-      phoneControlRdcr,
-    );
+    phoneControlActions.handleSendMessage(peerTxt, messageTxt, phoneControlRdcr);
     setMessageTxt("");
   };
 
@@ -77,19 +49,14 @@ function PhoneChat(props) {
     setPeerTxt(formatPhoneDigits(peer));
   };
 
-  const title =
-    phoneControlRdcr.chatUnread > 0
-      ? `SIP Сообщения (${phoneControlRdcr.chatUnread})`
-      : "SIP Сообщения";
+  const title = phoneControlRdcr.chatUnread > 0 ? `SIP Сообщения (${phoneControlRdcr.chatUnread})` : "SIP Сообщения";
 
   const formatDeliveryStatus = (msg) => {
     if (msg.direction !== "out" || !msg.status) return null;
 
     if (msg.status === "sending") return "отправка...";
     if (msg.statusCode) {
-      return msg.statusText
-        ? `${msg.statusCode} ${msg.statusText}`
-        : String(msg.statusCode);
+      return msg.statusText ? `${msg.statusCode} ${msg.statusText}` : String(msg.statusCode);
     }
     if (msg.status === "delivered") return "доставлено";
     if (msg.status === "error") return msg.statusText || "ошибка";
@@ -152,18 +119,10 @@ function PhoneChat(props) {
         overflow: "hidden",
       }}
     >
-      <IconButton
-        aria-label="Очистить сообщения"
-        onClick={phoneControlActions.handleClearChat}
-        sx={{ position: "absolute", top: 4, right: 54, zIndex: 1 }}
-      >
+      <IconButton aria-label="Очистить сообщения" onClick={phoneControlActions.handleClearChat} sx={{ position: "absolute", top: 4, right: 54, zIndex: 1 }}>
         <IconDelete color="action" />
       </IconButton>
-      <IconButton
-        aria-label="Закрыть панель"
-        onClick={handleClose}
-        sx={{ position: "absolute", top: 4, right: 4, zIndex: 1 }}
-      >
+      <IconButton aria-label="Закрыть панель" onClick={handleClose} sx={{ position: "absolute", top: 4, right: 4, zIndex: 1 }}>
         <IconClose color="action" />
       </IconButton>
 
@@ -243,9 +202,7 @@ function PhoneChat(props) {
               ? visibleMessages.map((msg) => {
                   const isOutbound = msg.direction === "out";
                   const deliveryStatus = formatDeliveryStatus(msg);
-                  const bubbleColor = isOutbound
-                    ? alpha(theme.palette.info.main, 0.05)
-                    : alpha(theme.palette.success.main, 0.05);
+                  const bubbleColor = isOutbound ? alpha(theme.palette.info.main, 0.05) : alpha(theme.palette.success.main, 0.05);
 
                   return (
                     <Box
@@ -259,11 +216,7 @@ function PhoneChat(props) {
                       }}
                       onClick={() => handlePeerSelect(msg.peer)}
                     >
-                      <Stack
-                        direction="row"
-                        spacing={1}
-                        sx={{ mb: 0.5, justifyContent: "space-between" }}
-                      >
+                      <Stack direction="row" spacing={1} sx={{ mb: 0.5, justifyContent: "space-between" }}>
                         <Typography variant="caption" color="text.secondary">
                           {isOutbound ? `Вы → ${msg.peer}` : msg.peer}
                         </Typography>
@@ -271,10 +224,7 @@ function PhoneChat(props) {
                           {format(new Date(msg.time), "HH:mm:ss")}
                         </Typography>
                       </Stack>
-                      <Typography
-                        variant="body2"
-                        sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
-                      >
+                      <Typography variant="body2" sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
                         {renderMessageBody(msg.body)}
                       </Typography>
                       {deliveryStatus && (
@@ -285,8 +235,7 @@ function PhoneChat(props) {
                             mt: 0.5,
                             textAlign: "right",
                             color: deliveryStatusColor(msg),
-                            fontStyle:
-                              msg.status === "sending" ? "italic" : "normal",
+                            fontStyle: msg.status === "sending" ? "italic" : "normal",
                           }}
                         >
                           {deliveryStatus}
@@ -299,11 +248,7 @@ function PhoneChat(props) {
             <div ref={messagesEndRef} />
           </Box>
 
-          <Stack
-            direction="row"
-            spacing={1}
-            sx={{ alignItems: "flex-end", flexShrink: 0 }}
-          >
+          <Stack direction="row" spacing={1} sx={{ alignItems: "flex-end", flexShrink: 0 }}>
             <TextField
               fullWidth
               label="Сообщение"
@@ -335,12 +280,7 @@ function PhoneChat(props) {
           </Stack>
         </Box>
 
-        <Collapse
-          in={
-            phoneControlRdcr.errComponent === "PhoneChat" &&
-            phoneControlRdcr.errText
-          }
-        >
+        <Collapse in={phoneControlRdcr.errComponent === "PhoneChat" && phoneControlRdcr.errText}>
           <Alert severity="error" sx={{ mt: 2 }}>
             {phoneControlRdcr.errText}
           </Alert>

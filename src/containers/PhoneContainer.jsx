@@ -19,21 +19,13 @@ const PhoneContainer = () => {
   const phoneControlRdcr = useSelector((state) => state.phoneControlRdcr);
   const authControlRdcr = useSelector((state) => state.authControlRdcr);
 
-  const phoneControlActions = useMemo(
-    () => bindActionCreators(phoneActions, dispatch),
-    [dispatch],
-  );
-  const authControlActions = useMemo(
-    () => bindActionCreators(authActions, dispatch),
-    [dispatch],
-  );
+  const phoneControlActions = useMemo(() => bindActionCreators(phoneActions, dispatch), [dispatch]);
+  const authControlActions = useMemo(() => bindActionCreators(authActions, dispatch), [dispatch]);
 
   const { displayAd } = authControlRdcr;
-  const { displayReg, displayPad, displayHistory, displayChat, errComponent } =
-    phoneControlRdcr;
+  const { displayReg, displayPad, displayHistory, displayChat, errComponent } = phoneControlRdcr;
 
-  const isOverlayActive =
-    displayAd || displayReg || errComponent === "PhoneReg";
+  const isOverlayActive = displayAd || displayReg || errComponent === "PhoneReg";
 
   // Стили для оверлеев вынесены из тела рендера для производительности
   const centerOverlayStyle = {
@@ -60,20 +52,14 @@ const PhoneContainer = () => {
       {/* Центрирование AuthAd */}
       {displayAd && (
         <Box sx={centerOverlayStyle}>
-          <AuthAd
-            authControlRdcr={authControlRdcr}
-            authControlActions={authControlActions}
-          />
+          <AuthAd authControlRdcr={authControlRdcr} authControlActions={authControlActions} />
         </Box>
       )}
 
       {/* Центрирование PhoneReg */}
       {(displayReg || errComponent === "PhoneReg") && (
         <Box sx={centerOverlayStyle}>
-          <PhoneReg
-            phoneControlRdcr={phoneControlRdcr}
-            phoneControlActions={phoneControlActions}
-          />
+          <PhoneReg phoneControlRdcr={phoneControlRdcr} phoneControlActions={phoneControlActions} />
         </Box>
       )}
 
@@ -89,31 +75,21 @@ const PhoneContainer = () => {
         {/* Телефон */}
         {(displayPad || errComponent === "PhonePad") && (
           <Grid size={{ xs: 12, md: "auto" }}>
-            <PhonePad
-              phoneControlRdcr={phoneControlRdcr}
-              phoneControlActions={phoneControlActions}
-              showInput
-            />
+            <PhonePad phoneControlRdcr={phoneControlRdcr} phoneControlActions={phoneControlActions} showInput />
           </Grid>
         )}
 
         {/* История */}
         {(displayHistory || errComponent === "PhoneHistory") && (
           <Grid size={{ xs: 12, md: "auto" }}>
-            <PhoneHistory
-              phoneControlRdcr={phoneControlRdcr}
-              phoneControlActions={phoneControlActions}
-            />
+            <PhoneHistory phoneControlRdcr={phoneControlRdcr} phoneControlActions={phoneControlActions} />
           </Grid>
         )}
 
         {/* Чат */}
         {(displayChat || errComponent === "PhoneChat") && (
           <Grid size={{ xs: 12, md: "auto" }}>
-            <PhoneChat
-              phoneControlRdcr={phoneControlRdcr}
-              phoneControlActions={phoneControlActions}
-            />
+            <PhoneChat phoneControlRdcr={phoneControlRdcr} phoneControlActions={phoneControlActions} />
           </Grid>
         )}
       </Grid>

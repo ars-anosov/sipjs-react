@@ -53,8 +53,7 @@ function PhonePad(props) {
   if (import.meta.env.DEV) console.log("PhonePad hook");
 
   const { phoneControlRdcr, phoneControlActions, showInput } = props;
-  const callNow =
-    phoneControlRdcr.incomeCallNow || phoneControlRdcr.outgoCallNow;
+  const callNow = phoneControlRdcr.incomeCallNow || phoneControlRdcr.outgoCallNow;
   const callStartRef = useRef(null);
 
   useEffect(() => {
@@ -78,9 +77,7 @@ function PhonePad(props) {
     }
 
     const intervalId = window.setInterval(() => {
-      const elapsedSeconds = Math.floor(
-        (Date.now() - callStartRef.current) / 1000,
-      );
+      const elapsedSeconds = Math.floor((Date.now() - callStartRef.current) / 1000);
       setCallDuration(elapsedSeconds);
     }, 1000);
 
@@ -136,9 +133,7 @@ function PhonePad(props) {
       phoneControlActions.handleClkSubmitIn(phoneControlRdcr);
     } else {
       phoneControlActions.handleClkSubmitOut(
-        phoneControlRdcr.addPrefix
-          ? phoneControlRdcr.calleePrefix + phoneControlRdcr.calleePhoneNum
-          : phoneControlRdcr.calleePhoneNum,
+        phoneControlRdcr.addPrefix ? phoneControlRdcr.calleePrefix + phoneControlRdcr.calleePhoneNum : phoneControlRdcr.calleePhoneNum,
         phoneControlRdcr,
       );
     }
@@ -151,10 +146,7 @@ function PhonePad(props) {
     phoneControlActions.handleClkReset(callData, phoneControlRdcr);
   };
   const handleHold = () => {
-    phoneControlActions.handleClkHold(
-      phoneControlRdcr,
-      !phoneControlRdcr.callHoldNow,
-    );
+    phoneControlActions.handleClkHold(phoneControlRdcr, !phoneControlRdcr.callHoldNow);
   };
 
   const toggleHistory = () => {
@@ -167,24 +159,15 @@ function PhonePad(props) {
   };
 
   const toggleChat = () => {
-    phoneControlActions.handleChangeStore(
-      "displayChat",
-      !phoneControlRdcr.displayChat,
-    );
+    phoneControlActions.handleChangeStore("displayChat", !phoneControlRdcr.displayChat);
   };
 
   const togglePrefix = () => {
-    phoneControlActions.handleChangeStore(
-      "addPrefix",
-      !phoneControlRdcr.addPrefix,
-    );
+    phoneControlActions.handleChangeStore("addPrefix", !phoneControlRdcr.addPrefix);
   };
 
   const toggleReg = () => {
-    phoneControlActions.handleChangeStore(
-      "displayReg",
-      !phoneControlRdcr.displayReg,
-    );
+    phoneControlActions.handleChangeStore("displayReg", !phoneControlRdcr.displayReg);
   };
 
   const isRegistered = phoneControlRdcr.regState === "ok";
@@ -196,8 +179,7 @@ function PhonePad(props) {
     borderRadius: "50%",
     p: 0,
     boxShadow: 6,
-    transition:
-      "transform 120ms ease, box-shadow 120ms ease, filter 120ms ease",
+    transition: "transform 120ms ease, box-shadow 120ms ease, filter 120ms ease",
     "&:hover": {
       transform: "translateY(-1px) scale(1.03)",
       boxShadow: 10,
@@ -243,18 +225,10 @@ function PhonePad(props) {
     >
       {showInput && (
         <>
-          <IconButton
-            aria-label="Закрыть панель"
-            onClick={handleClose}
-            sx={{ position: "absolute", top: 4, right: 4, zIndex: 1 }}
-          >
+          <IconButton aria-label="Закрыть панель" onClick={handleClose} sx={{ position: "absolute", top: 4, right: 4, zIndex: 1 }}>
             <IconClose color="action" />
           </IconButton>
-          <IconButton
-            aria-label="О системных уведомлениях"
-            onClick={handleCloseInfo}
-            sx={{ position: "absolute", top: 4, right: 54, zIndex: 1 }}
-          >
+          <IconButton aria-label="О системных уведомлениях" onClick={handleCloseInfo} sx={{ position: "absolute", top: 4, right: 54, zIndex: 1 }}>
             <IconInfoOutlined color="action" />
           </IconButton>
 
@@ -281,22 +255,16 @@ function PhonePad(props) {
       )}
 
       {!showInput && !phoneControlRdcr.displayPad && (
-        <Stack
-          direction="row"
-          sx={{ alignItems: "center", justifyContent: "flex-end" }}
-        >
+        <Stack direction="row" sx={{ alignItems: "center", justifyContent: "flex-end" }}>
           <IconButton onClick={handleShowPad}>
             <IconInstallMobile color="action" />
           </IconButton>
         </Stack>
       )}
 
-      <Box
-        sx={{ p: showInput ? 1 : 0, flex: 1, minHeight: 0, overflowY: "auto" }}
-      >
+      <Box sx={{ p: showInput ? 1 : 0, flex: 1, minHeight: 0, overflowY: "auto" }}>
         <Typography variant="body2" color="primary" sx={{ mb: 2 }}>
-          {callNow && formatDuration(callDuration)}{" "}
-          {phoneControlRdcr.phoneHeader}
+          {callNow && formatDuration(callDuration)} {phoneControlRdcr.phoneHeader}
         </Typography>
 
         <Box component="form" onSubmit={handleSubmit} onReset={handleReset}>
@@ -337,16 +305,9 @@ function PhonePad(props) {
             </Stack>
           )}
 
-          <Grid
-            container
-            spacing={2}
-            sx={{ mb: 2, justifyContent: "center", alignItems: "center" }}
-          >
+          <Grid container spacing={2} sx={{ mb: 2, justifyContent: "center", alignItems: "center" }}>
             {/* Кнопка Вызов / Ответить */}
-            <Grid
-              size={callNow ? 4 : 6}
-              sx={{ display: "flex", justifyContent: "center" }}
-            >
+            <Grid size={callNow ? 4 : 6} sx={{ display: "flex", justifyContent: "center" }}>
               {phoneControlRdcr.incomeDisplay ? (
                 <Button
                   type="submit"
@@ -378,11 +339,7 @@ function PhonePad(props) {
                   type="submit"
                   variant="contained"
                   color="success"
-                  disabled={
-                    !isRegistered ||
-                    phoneControlRdcr.outgoCallNow ||
-                    phoneControlRdcr.incomeCallNow
-                  }
+                  disabled={!isRegistered || phoneControlRdcr.outgoCallNow || phoneControlRdcr.incomeCallNow}
                   sx={callActionSx}
                 >
                   <IconPhone />
@@ -393,38 +350,17 @@ function PhonePad(props) {
             {/* Кнопка Удержания (Hold / Resume) */}
             {callNow && (
               <Grid size={4} sx={{ display: "flex", justifyContent: "center" }}>
-                <Tooltip
-                  title={phoneControlRdcr.callHoldNow ? "Resume" : "Hold"}
-                >
-                  <Button
-                    type="button"
-                    variant="contained"
-                    color={phoneControlRdcr.callHoldNow ? "success" : "info"}
-                    onClick={handleHold}
-                    sx={callActionSx}
-                  >
-                    {phoneControlRdcr.callHoldNow ? (
-                      <IconResume />
-                    ) : (
-                      <IconHold />
-                    )}
+                <Tooltip title={phoneControlRdcr.callHoldNow ? "Resume" : "Hold"}>
+                  <Button type="button" variant="contained" color={phoneControlRdcr.callHoldNow ? "success" : "info"} onClick={handleHold} sx={callActionSx}>
+                    {phoneControlRdcr.callHoldNow ? <IconResume /> : <IconHold />}
                   </Button>
                 </Tooltip>
               </Grid>
             )}
 
             {/* Кнопка Сброс */}
-            <Grid
-              size={callNow ? 4 : 6}
-              sx={{ display: "flex", justifyContent: "center" }}
-            >
-              <Button
-                type="reset"
-                variant="contained"
-                color="error"
-                disabled={!isRegistered}
-                sx={callActionSx}
-              >
+            <Grid size={callNow ? 4 : 6} sx={{ display: "flex", justifyContent: "center" }}>
+              <Button type="reset" variant="contained" color="error" disabled={!isRegistered} sx={callActionSx}>
                 <IconHangup />
               </Button>
             </Grid>
@@ -449,16 +385,10 @@ function PhonePad(props) {
                       color: "text.primary",
                     }}
                   >
-                    <Typography
-                      variant="body1"
-                      sx={{ lineHeight: 1, fontWeight: "bold" }}
-                    >
+                    <Typography variant="body1" sx={{ lineHeight: 1, fontWeight: "bold" }}>
                       {num}
                     </Typography>
-                    <Typography
-                      variant="caption"
-                      sx={{ fontSize: "0.7rem", color: "text.secondary" }}
-                    >
+                    <Typography variant="caption" sx={{ fontSize: "0.7rem", color: "text.secondary" }}>
                       {letters}
                     </Typography>
                   </Button>
@@ -476,11 +406,7 @@ function PhonePad(props) {
               alignItems: "center",
             }}
           >
-            <Tooltip
-              title={
-                isRegistered ? "Разрегистрироваться" : "Зарегистрироваться"
-              }
-            >
+            <Tooltip title={isRegistered ? "Разрегистрироваться" : "Зарегистрироваться"}>
               <IconButton color={regButtonColor} onClick={toggleReg}>
                 {isRegistered ? <IconOnline /> : <IconOffline />}
               </IconButton>
@@ -489,10 +415,7 @@ function PhonePad(props) {
             <Stack direction="row" spacing={1}>
               {showInput && (
                 <Tooltip title="Префикс">
-                  <IconButton
-                    color={phoneControlRdcr.addPrefix ? "primary" : "default"}
-                    onClick={togglePrefix}
-                  >
+                  <IconButton color={phoneControlRdcr.addPrefix ? "primary" : "default"} onClick={togglePrefix}>
                     <IconDialpad />
                   </IconButton>
                 </Tooltip>
@@ -501,18 +424,10 @@ function PhonePad(props) {
                 badgeContent={phoneControlRdcr.callUnread}
                 color="error"
                 overlap="circular"
-                invisible={
-                  !phoneControlRdcr.callUnread ||
-                  phoneControlRdcr.displayHistory
-                }
+                invisible={!phoneControlRdcr.callUnread || phoneControlRdcr.displayHistory}
               >
                 <Tooltip title="История">
-                  <IconButton
-                    color={
-                      phoneControlRdcr.displayHistory ? "primary" : "default"
-                    }
-                    onClick={toggleHistory}
-                  >
+                  <IconButton color={phoneControlRdcr.displayHistory ? "primary" : "default"} onClick={toggleHistory}>
                     <IconPhoneHistory />
                   </IconButton>
                 </Tooltip>
@@ -521,15 +436,10 @@ function PhonePad(props) {
                 badgeContent={phoneControlRdcr.chatUnread}
                 color="error"
                 overlap="circular"
-                invisible={
-                  !phoneControlRdcr.chatUnread || phoneControlRdcr.displayChat
-                }
+                invisible={!phoneControlRdcr.chatUnread || phoneControlRdcr.displayChat}
               >
                 <Tooltip title="Сообщения">
-                  <IconButton
-                    color={phoneControlRdcr.displayChat ? "primary" : "default"}
-                    onClick={toggleChat}
-                  >
+                  <IconButton color={phoneControlRdcr.displayChat ? "primary" : "default"} onClick={toggleChat}>
                     <IconChatOutlined />
                   </IconButton>
                 </Tooltip>
@@ -538,28 +448,15 @@ function PhonePad(props) {
           </Stack>
         </Box>
 
-        <Collapse
-          in={
-            phoneControlRdcr.errComponent === "PhonePad" &&
-            phoneControlRdcr.errText
-          }
-        >
+        <Collapse in={phoneControlRdcr.errComponent === "PhonePad" && phoneControlRdcr.errText}>
           <Alert severity="error" sx={{ mt: 2 }}>
             {phoneControlRdcr.errText}
           </Alert>
         </Collapse>
       </Box>
 
-      <Snackbar
-        open={info.open}
-        onClose={handleCloseInfo}
-        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-      >
-        <Alert
-          onClose={handleCloseInfo}
-          severity="info"
-          sx={{ ...kbdStyles, width: "100%" }}
-        >
+      <Snackbar open={info.open} onClose={handleCloseInfo} anchorOrigin={{ vertical: "bottom", horizontal: "left" }}>
+        <Alert onClose={handleCloseInfo} severity="info" sx={{ ...kbdStyles, width: "100%" }}>
           <AlertTitle>Если нет системных уведомлений.</AlertTitle>
           Проверьте настройки вашей Windows:
           <ol>
@@ -567,12 +464,10 @@ function PhonePad(props) {
               <strong>Режим «Не беспокоить» (Фокусировка внимания)</strong>:
               <ul>
                 <li>
-                  Windows 11: Нажмите <kbd>Win + N</kbd>. Убедитесь, что значок{" "}
-                  <kbd>колокольчика/полумесяца</kbd> отключен.
+                  Windows 11: Нажмите <kbd>Win + N</kbd>. Убедитесь, что значок <kbd>колокольчика/полумесяца</kbd> отключен.
                 </li>
                 <li>
-                  Windows 10: Нажмите <kbd>Win + A</kbd>. Убедитесь, что плитка{" "}
-                  <kbd>«Фокусировка внимания»</kbd> отключена.
+                  Windows 10: Нажмите <kbd>Win + A</kbd>. Убедитесь, что плитка <kbd>«Фокусировка внимания»</kbd> отключена.
                 </li>
               </ul>
             </li>
@@ -583,8 +478,7 @@ function PhonePad(props) {
                   Нажмите <kbd>Win + I</kbd> → Система → Уведомления.
                 </li>
                 <li>
-                  Найдите в списке ваш браузер (Chrome / Edge) и убедитесь, что
-                  переключатель для него находится в положении <kbd>«Вкл»</kbd>.
+                  Найдите в списке ваш браузер (Chrome / Edge) и убедитесь, что переключатель для него находится в положении <kbd>«Вкл»</kbd>.
                 </li>
               </ul>
             </li>
@@ -594,9 +488,7 @@ function PhonePad(props) {
                 <li>Windows 11: нажмите на стрелочку рядом с браузером</li>
                 <li>Windows 10: нажмите прямо на название вашего браузера</li>
                 <li>
-                  проверьте, стоит ли галочка на пункте{" "}
-                  <kbd>«Показывать баннеры уведомлений»</kbd>, иначе пуши будут
-                  падать в историю скрытно.
+                  проверьте, стоит ли галочка на пункте <kbd>«Показывать баннеры уведомлений»</kbd>, иначе пуши будут падать в историю скрытно.
                 </li>
               </ul>
             </li>

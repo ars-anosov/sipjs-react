@@ -7,8 +7,7 @@ import * as phoneActions from "../actions/phoneControlActions.js";
 import AuthPad from "../components/AuthPad.jsx";
 
 // Ключ пары SIP-реквизитов: защищает от повторных dispatch на каждый ререндер
-const buildSipKey = (sipUsername, sipSecret) =>
-  `${sipUsername}\u0000${sipSecret}`;
+const buildSipKey = (sipUsername, sipSecret) => `${sipUsername}\u0000${sipSecret}`;
 
 const AuthContainer = () => {
   const dispatch = useDispatch();
@@ -17,22 +16,12 @@ const AuthContainer = () => {
   const authControlRdcr = useSelector((state) => state.authControlRdcr);
   const lkControlRdcr = useSelector((state) => state.lkControlRdcr);
 
-  const phoneControlActions = useMemo(
-    () => bindActionCreators(phoneActions, dispatch),
-    [dispatch],
-  );
-  const authControlActions = useMemo(
-    () => bindActionCreators(authActions, dispatch),
-    [dispatch],
-  );
-  const lkControlActions = useMemo(
-    () => bindActionCreators(lkActions, dispatch),
-    [dispatch],
-  );
+  const phoneControlActions = useMemo(() => bindActionCreators(phoneActions, dispatch), [dispatch]);
+  const authControlActions = useMemo(() => bindActionCreators(authActions, dispatch), [dispatch]);
+  const lkControlActions = useMemo(() => bindActionCreators(lkActions, dispatch), [dispatch]);
 
   const { responseData, displayAuthPad } = authControlRdcr;
-  const { callerUserNum, uriWebRtc, connectStatus, regState } =
-    phoneControlRdcr;
+  const { callerUserNum, uriWebRtc, connectStatus, regState } = phoneControlRdcr;
 
   const isRegistered = regState === "ok";
 
@@ -76,10 +65,7 @@ const AuthContainer = () => {
     if (isRegistered || connectStatus === "Request") return;
     if (!sipUsername || !sipSecret) return;
 
-    phoneControlActions.handleClkRegister(
-      { callerUserNum: sipUsername, regUserPass: sipSecret, uriWebRtc },
-      phoneControlRdcr,
-    );
+    phoneControlActions.handleClkRegister({ callerUserNum: sipUsername, regUserPass: sipSecret, uriWebRtc }, phoneControlRdcr);
   };
 
   // Мост AUTHCTL_ → LK_: тумблер AuthPad просто показывает/скрывает LkMeet
@@ -101,13 +87,7 @@ const AuthContainer = () => {
       ...(responseData || {}),
       sip_username: callerUserNum,
     });
-  }, [
-    callerUserNum,
-    isRegistered,
-    connectStatus,
-    responseData,
-    authControlActions,
-  ]);
+  }, [callerUserNum, isRegistered, connectStatus, responseData, authControlActions]);
 
   // Мост PHONECTL_ → AUTHCTL_: потеря регистрации (красный тумблер) форсирует
   // AuthPad, чтобы по нему можно было кликнуть. displayAuthPad в зависимостях

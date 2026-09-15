@@ -17,10 +17,7 @@ import {
   PHONECTL_STORE_VALUE,
   PHONECTL_UNREGISTER,
 } from "../constants/redux";
-import {
-  fetchPhoneDir,
-  getStoredPhoneDirUri,
-} from "../services/phoneDirectory";
+import { fetchPhoneDir, getStoredPhoneDirUri } from "../services/phoneDirectory";
 import {
   answerIncomingCall,
   createChatMessage,
@@ -120,15 +117,10 @@ const handleClkRegister = (formData, rdcr) => (dispatch) => {
     });
   };
 
-  const normalizedUriWebRtc =
-    typeof formData.uriWebRtc === "string" ? formData.uriWebRtc.trim() : "";
+  const normalizedUriWebRtc = typeof formData.uriWebRtc === "string" ? formData.uriWebRtc.trim() : "";
 
   // Checks
-  if (
-    !normalizedUriWebRtc ||
-    !formData.callerUserNum ||
-    !formData.regUserPass
-  ) {
+  if (!normalizedUriWebRtc || !formData.callerUserNum || !formData.regUserPass) {
     regAlert("Заполните все поля.");
     return;
   }
@@ -202,9 +194,7 @@ const handleClkRegister = (formData, rdcr) => (dispatch) => {
       },
     });
   } catch (e) {
-    regAlert(
-      typeof e?.message === "string" ? e.message : "Ошибка регистрации.",
-    );
+    regAlert(typeof e?.message === "string" ? e.message : "Ошибка регистрации.");
   }
 };
 
@@ -284,10 +274,7 @@ const handleClkSubmitOut = (calleePhoneNum, rdcr) => {
       });
     };
 
-    const callee =
-      typeof calleePhoneNum === "string"
-        ? calleePhoneNum.trim()
-        : String(calleePhoneNum ?? "").trim();
+    const callee = typeof calleePhoneNum === "string" ? calleePhoneNum.trim() : String(calleePhoneNum ?? "").trim();
 
     if (!isRegistered(rdcr)) {
       padAlert("Нет регистрации. Сначала зарегистрируйтесь.");
@@ -371,8 +358,7 @@ const handleClkDtmf =
       });
     };
 
-    const dtmf =
-      typeof tone === "string" ? tone.trim() : String(tone ?? "").trim();
+    const dtmf = typeof tone === "string" ? tone.trim() : String(tone ?? "").trim();
     if (!/^[0-9A-D#*,]$/.test(dtmf)) {
       padAlert("Некорректный DTMF сигнал.");
       return;
@@ -381,11 +367,7 @@ const handleClkDtmf =
     sendDtmf(dtmf, options)
       .then(() => clearPadAlert())
       .catch((error) => {
-        padAlert(
-          error && typeof error.message === "string"
-            ? error.message
-            : "Не удалось отправить DTMF.",
-        );
+        padAlert(error && typeof error.message === "string" ? error.message : "Не удалось отправить DTMF.");
       });
   };
 
@@ -421,11 +403,7 @@ const handleClkHold =
         clearPadAlert();
       })
       .catch((error) => {
-        padAlert(
-          error && typeof error.message === "string"
-            ? error.message
-            : "Ошибка HOLD.",
-        );
+        padAlert(error && typeof error.message === "string" ? error.message : "Ошибка HOLD.");
       });
   };
 
@@ -474,14 +452,8 @@ const handleSendMessage = (peerPhoneNum, messageBody, rdcr) => (dispatch) => {
     });
   };
 
-  const peer =
-    typeof peerPhoneNum === "string"
-      ? peerPhoneNum.trim()
-      : String(peerPhoneNum ?? "").trim();
-  const body =
-    typeof messageBody === "string"
-      ? messageBody.trim()
-      : String(messageBody ?? "").trim();
+  const peer = typeof peerPhoneNum === "string" ? peerPhoneNum.trim() : String(peerPhoneNum ?? "").trim();
+  const body = typeof messageBody === "string" ? messageBody.trim() : String(messageBody ?? "").trim();
 
   if (!isRegistered(rdcr)) {
     chatAlert("Нет регистрации. Сначала зарегистрируйтесь.");
@@ -538,10 +510,7 @@ const getPhoneDir = () => async () => {
   try {
     return await fetchPhoneDir(url);
   } catch (error) {
-    const detailMessage = await getApiErrorMessage(
-      error,
-      "Ошибка загрузки телефонного справочника.",
-    );
+    const detailMessage = await getApiErrorMessage(error, "Ошибка загрузки телефонного справочника.");
 
     console.error("Error fetching phone directory:", detailMessage);
     throw new Error(detailMessage);

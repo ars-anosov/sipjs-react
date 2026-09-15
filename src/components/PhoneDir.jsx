@@ -1,17 +1,7 @@
 import DialpadIcon from "@mui/icons-material/Dialpad";
 import MailIcon from "@mui/icons-material/Mail";
 import PhoneIcon from "@mui/icons-material/Phone";
-import {
-  Alert,
-  Autocomplete,
-  Box,
-  createFilterOptions,
-  IconButton,
-  Snackbar,
-  TextField,
-  Tooltip,
-  Typography,
-} from "@mui/material";
+import { Alert, Autocomplete, Box, createFilterOptions, IconButton, Snackbar, TextField, Tooltip, Typography } from "@mui/material";
 import PropTypes from "prop-types";
 import { useEffect, useRef, useState } from "react";
 
@@ -155,32 +145,19 @@ function PhoneDir(props) {
                 >
                   {option.label}
                 </Typography>
-                <Typography
-                  component="span"
-                  variant="caption"
-                  sx={{ color: "text.secondary" }}
-                >
+                <Typography component="span" variant="caption" sx={{ color: "text.secondary" }}>
                   {targetValue} {option.email}
                 </Typography>
               </Box>
 
-              <Box
-                sx={{ display: "flex", gap: 0.5, flexShrink: 0 }}
-                onClick={(e) => e.stopPropagation()}
-              >
+              <Box sx={{ display: "flex", gap: 0.5, flexShrink: 0 }} onClick={(e) => e.stopPropagation()}>
                 {option.num && (
                   <Tooltip title="В телефон" arrow>
                     <IconButton
                       color="primary"
                       onClick={() => {
-                        phoneControlActions.handleChangeStore(
-                          "calleePhoneNum",
-                          option.num,
-                        );
-                        phoneControlActions.handleChangeStore(
-                          "displayPad",
-                          true,
-                        );
+                        phoneControlActions.handleChangeStore("calleePhoneNum", option.num);
+                        phoneControlActions.handleChangeStore("displayPad", true);
                       }}
                     >
                       <PhoneIcon fontSize="small" />
@@ -193,18 +170,9 @@ function PhoneDir(props) {
                     <IconButton
                       color="primary"
                       onClick={() => {
-                        phoneControlActions.handleChangeStore(
-                          "calleePrefix",
-                          option.prefix,
-                        );
-                        phoneControlActions.handleChangeStore(
-                          "addPrefix",
-                          true,
-                        );
-                        phoneControlActions.handleChangeStore(
-                          "displayPad",
-                          true,
-                        );
+                        phoneControlActions.handleChangeStore("calleePrefix", option.prefix);
+                        phoneControlActions.handleChangeStore("addPrefix", true);
+                        phoneControlActions.handleChangeStore("displayPad", true);
                       }}
                     >
                       <DialpadIcon fontSize="small" />
@@ -263,18 +231,8 @@ function PhoneDir(props) {
         )}
       />
 
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={1000}
-        onClose={handleCloseSnackbar}
-        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-      >
-        <Alert
-          onClose={handleCloseSnackbar}
-          severity={snackbar.severity}
-          variant="filled"
-          sx={{ width: "100%" }}
-        >
+      <Snackbar open={snackbar.open} autoHideDuration={1000} onClose={handleCloseSnackbar} anchorOrigin={{ vertical: "bottom", horizontal: "left" }}>
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} variant="filled" sx={{ width: "100%" }}>
           {snackbar.message}
         </Alert>
       </Snackbar>

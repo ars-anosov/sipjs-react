@@ -8,19 +8,7 @@ import {
   Visibility,
   VisibilityOff,
 } from "@mui/icons-material";
-import {
-  Alert,
-  Avatar,
-  Box,
-  Button,
-  Collapse,
-  IconButton,
-  InputAdornment,
-  Paper,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Alert, Avatar, Box, Button, Collapse, IconButton, InputAdornment, Paper, Stack, TextField, Typography } from "@mui/material";
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import { getStoredAdLogin } from "../services/adAuth";
@@ -60,12 +48,7 @@ function AdAuth(props) {
     authControlActions.handleChangeStore("displayAd", false);
   };
 
-  const isSubmitDisabled =
-    isLoading ||
-    isSuccess ||
-    !login.trim() ||
-    !password.trim() ||
-    (import.meta.env.DEV && !uriAdAuth.trim());
+  const isSubmitDisabled = isLoading || isSuccess || !login.trim() || !password.trim() || (import.meta.env.DEV && !uriAdAuth.trim());
 
   return (
     <Paper
@@ -86,11 +69,7 @@ function AdAuth(props) {
       }}
     >
       {/* Кнопка закрытия формы сверху справа */}
-      <IconButton
-        onClick={handleClose}
-        disabled={isLoading}
-        sx={{ position: "absolute", top: 4, right: 4 }}
-      >
+      <IconButton onClick={handleClose} disabled={isLoading} sx={{ position: "absolute", top: 4, right: 4 }}>
         <IconClose color="action" />
       </IconButton>
 
@@ -116,14 +95,8 @@ function AdAuth(props) {
           AD Авторизация
         </Typography>
 
-        <Typography
-          variant="body2"
-          color="text.secondary"
-          sx={{ textAlign: "center" }}
-        >
-          {isSuccess
-            ? responseData.ad_cn
-            : "Введите учетные данные Active Directory"}
+        <Typography variant="body2" color="text.secondary" sx={{ textAlign: "center" }}>
+          {isSuccess ? responseData.ad_cn : "Введите учетные данные Active Directory"}
         </Typography>
       </Stack>
 

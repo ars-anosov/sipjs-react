@@ -12,15 +12,13 @@ import {
 // Phone Settings Persistence
 // ============================================================
 
-const getStoredUriWebRtc = () =>
-  localStorage.getItem(PHONE_URI_WEBRTC_KEY) || "";
+const getStoredUriWebRtc = () => localStorage.getItem(PHONE_URI_WEBRTC_KEY) || "";
 
 const storeUriWebRtc = (uriWebRtc) => {
   localStorage.setItem(PHONE_URI_WEBRTC_KEY, uriWebRtc);
 };
 
-const getStoredCallerUserNum = () =>
-  localStorage.getItem(PHONE_CALLER_USER_NUM_KEY) || "";
+const getStoredCallerUserNum = () => localStorage.getItem(PHONE_CALLER_USER_NUM_KEY) || "";
 
 const storeCallerUserNum = (callerUserNum) => {
   localStorage.setItem(PHONE_CALLER_USER_NUM_KEY, callerUserNum);
@@ -58,16 +56,10 @@ const logCall = (session, callState, direction) => {
   const log = {
     id: session.id,
     clid: session.displayName,
-    uri:
-      session.remoteIdentity.uri.raw.user +
-      (session.remoteIdentity.displayName
-        ? ` "${session.remoteIdentity.displayName}"`
-        : ""),
+    uri: session.remoteIdentity.uri.raw.user + (session.remoteIdentity.displayName ? ` "${session.remoteIdentity.displayName}"` : ""),
     time: Date.now(),
   };
-  const calllog = normalizeCallLog(
-    JSON.parse(localStorage.getItem(CALLS_STORAGE_KEY)),
-  );
+  const calllog = normalizeCallLog(JSON.parse(localStorage.getItem(CALLS_STORAGE_KEY)));
 
   if (!Object.hasOwn(calllog, session.id)) {
     calllog[log.id] = {
@@ -102,9 +94,7 @@ const logCall = (session, callState, direction) => {
 };
 
 const loadCallsArr = () => {
-  const calllog = normalizeCallLog(
-    JSON.parse(localStorage.getItem(CALLS_STORAGE_KEY)),
-  );
+  const calllog = normalizeCallLog(JSON.parse(localStorage.getItem(CALLS_STORAGE_KEY)));
   const rows = Object.values(calllog);
 
   // Удаляю первую строчку лога (самую старую)
@@ -118,9 +108,7 @@ const loadCallsArr = () => {
 };
 
 const markCallsRead = () => {
-  const calllog = normalizeCallLog(
-    JSON.parse(localStorage.getItem(CALLS_STORAGE_KEY)),
-  );
+  const calllog = normalizeCallLog(JSON.parse(localStorage.getItem(CALLS_STORAGE_KEY)));
   const rows = Object.values(calllog);
 
   if (rows.length > 0) {

@@ -160,9 +160,7 @@ export default function phoneControlRdcr(state = initialState, action) {
       return {
         ...state,
         callsArr: action.payload.callsArr || [],
-        callUnread: state.displayHistory
-          ? 0
-          : getUnreadMissedCallsCount(action.payload.callsArr),
+        callUnread: state.displayHistory ? 0 : getUnreadMissedCallsCount(action.payload.callsArr),
       };
 
     case PHONECTL_INCOME_DISPLAY:
@@ -211,10 +209,7 @@ export default function phoneControlRdcr(state = initialState, action) {
       return {
         ...state,
         chatMessages: action.payload.chatMessages,
-        chatUnread:
-          state.displayChat || !action.payload.incoming
-            ? state.chatUnread
-            : state.chatUnread + 1,
+        chatUnread: state.displayChat || !action.payload.incoming ? state.chatUnread : state.chatUnread + 1,
       };
 
     case PHONECTL_MESSAGE_UPDATE:

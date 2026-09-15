@@ -1,13 +1,4 @@
-import {
-  AudioTrack,
-  ControlBar,
-  LiveKitRoom,
-  ParticipantContext,
-  ParticipantName,
-  RoomAudioRenderer,
-  useTracks,
-  VideoTrack,
-} from "@livekit/components-react";
+import { AudioTrack, ControlBar, LiveKitRoom, ParticipantContext, ParticipantName, RoomAudioRenderer, useTracks, VideoTrack } from "@livekit/components-react";
 import {
   AddCircleOutlined as AddCircleOutlinedIcon,
   DeleteOutlined as DeleteOutlinedIcon,
@@ -19,17 +10,7 @@ import {
   Mic as IconMicOn,
   VideoCallOutlined as VideoCallOutlinedIcon,
 } from "@mui/icons-material";
-import {
-  Box,
-  Button,
-  GlobalStyles,
-  Grid,
-  IconButton,
-  Link,
-  Paper,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { Box, Button, GlobalStyles, Grid, IconButton, Link, Paper, Stack, Typography } from "@mui/material";
 import PropTypes from "prop-types";
 import { useEffect, useRef, useState } from "react";
 import { Link as RouterLink, useLocation } from "react-router-dom";
@@ -48,11 +29,7 @@ function MicrophoneStatusIcon({ trackRef }) {
 
   if (isMuted) {
     // Используем CSS-переменную ошибки v9 и более утонченный размер
-    return (
-      <IconMicOff
-        sx={{ fontSize: 13, color: "var(--mui-palette-error-main)" }}
-      />
-    );
+    return <IconMicOff sx={{ fontSize: 13, color: "var(--mui-palette-error-main)" }} />;
   }
 
   return (
@@ -61,9 +38,7 @@ function MicrophoneStatusIcon({ trackRef }) {
         fontSize: 13,
         // Используем CSS-переменную успеха v9
         color: isSpeaking ? "var(--mui-palette-success-main)" : "#ffffff",
-        animation: isSpeaking
-          ? "lkPulse 1.4s infinite cubic-bezier(0.4, 0, 0.2, 1)"
-          : "none",
+        animation: isSpeaking ? "lkPulse 1.4s infinite cubic-bezier(0.4, 0, 0.2, 1)" : "none",
         "@keyframes lkPulse": {
           "0%": { transform: "scale(1)" },
           "50%": { transform: "scale(1.18)" },
@@ -85,8 +60,7 @@ function ParticipantTileBox({ track }) {
       setIsFullscreen(document.fullscreenElement === containerRef.current);
     };
     document.addEventListener("fullscreenchange", handleFsChange);
-    return () =>
-      document.removeEventListener("fullscreenchange", handleFsChange);
+    return () => document.removeEventListener("fullscreenchange", handleFsChange);
   }, []);
 
   const toggleFullscreen = async () => {
@@ -103,10 +77,7 @@ function ParticipantTileBox({ track }) {
   };
 
   return (
-    <Grid
-      size={isScreenShare ? { xs: 12 } : { xs: 12, md: "auto" }}
-      sx={{ border: "none", boxShadow: "none", overflow: "visible" }}
-    >
+    <Grid size={isScreenShare ? { xs: 12 } : { xs: 12, md: "auto" }} sx={{ border: "none", boxShadow: "none", overflow: "visible" }}>
       <Box
         ref={containerRef}
         sx={{
@@ -134,9 +105,7 @@ function ParticipantTileBox({ track }) {
           // СОВРЕМЕННАЯ ИНДИКАЦИЯ ГОЛОСА:
           transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
           border: "1px solid",
-          borderColor: isSpeaking
-            ? "rgba(74, 222, 128, 0.4)"
-            : "rgba(255, 255, 255, 0.08)",
+          borderColor: isSpeaking ? "rgba(74, 222, 128, 0.4)" : "rgba(255, 255, 255, 0.08)",
 
           // Динамическое неоновое свечение (Glow effect) вокруг карточки говорящего
           boxShadow: isFullscreen
@@ -148,9 +117,7 @@ function ParticipantTileBox({ track }) {
           "&:hover": {
             // Мягкий интерактивный подъем карточки при наведении, если нет полноэкранного режима
             transform: isFullscreen ? "none" : "translateY(-2px)",
-            borderColor: isSpeaking
-              ? "rgba(74, 222, 128, 0.6)"
-              : "rgba(255, 255, 255, 0.2)",
+            borderColor: isSpeaking ? "rgba(74, 222, 128, 0.6)" : "rgba(255, 255, 255, 0.2)",
           },
         }}
       >
@@ -194,13 +161,9 @@ function ParticipantTileBox({ track }) {
 
               // Эволюция цвета при разговоре через CSS-переменные v9
               transition: "all 0.25s ease",
-              backgroundColor: isSpeaking
-                ? "rgba(34, 197, 94, 0.2)"
-                : "rgba(15, 23, 42, 0.6)",
+              backgroundColor: isSpeaking ? "rgba(34, 197, 94, 0.2)" : "rgba(15, 23, 42, 0.6)",
               border: "1px solid",
-              borderColor: isSpeaking
-                ? "rgba(74, 222, 128, 0.4)"
-                : "rgba(255, 255, 255, 0.1)",
+              borderColor: isSpeaking ? "rgba(74, 222, 128, 0.4)" : "rgba(255, 255, 255, 0.1)",
             }}
           >
             <MicrophoneStatusIcon trackRef={track} />
@@ -237,11 +200,7 @@ function ParticipantTileBox({ track }) {
               },
             }}
           >
-            {isFullscreen ? (
-              <IconFullscreenExit sx={{ fontSize: 18 }} />
-            ) : (
-              <IconFullscreen sx={{ fontSize: 18 }} />
-            )}
+            {isFullscreen ? <IconFullscreenExit sx={{ fontSize: 18 }} /> : <IconFullscreen sx={{ fontSize: 18 }} />}
           </IconButton>
         </ParticipantContext.Provider>
       </Box>
@@ -257,11 +216,7 @@ function VideoGridSection() {
 
   return (
     // Увеличенное расстояние между карточками (spacing={3}) добавляет интерфейсу "воздуха"
-    <Grid
-      container
-      spacing={3}
-      sx={{ justifyContent: "center", width: "100%", p: 2 }}
-    >
+    <Grid container spacing={3} sx={{ justifyContent: "center", width: "100%", p: 2 }}>
       {tracks.map((track, uniqueKey) => (
         // biome-ignore lint/suspicious/noArrayIndexKey: <объяснение>
         <ParticipantTileBox key={uniqueKey} track={track} />
@@ -304,10 +259,7 @@ function LkMeet(props) {
   // Если AdAuth не выполнен или не содержит lk_token — просто информируем
   let infoText = "";
   if (!hasLkToken) {
-    infoText =
-      authControlRdcr?.status === "success"
-        ? "AD не вернул lk_token."
-        : "AD авторизация не выполнена — lk_token недоступен.";
+    infoText = authControlRdcr?.status === "success" ? "AD не вернул lk_token." : "AD авторизация не выполнена — lk_token недоступен.";
   }
 
   return (
@@ -341,68 +293,56 @@ function LkMeet(props) {
           </Stack>
 
           {infoText ? (
-            <Typography
-              variant="body2"
-              color="warning.main"
-              sx={{ px: 1, pb: 1, maxWidth: 280 }}
-            >
+            <Typography variant="body2" color="warning.main" sx={{ px: 1, pb: 1, maxWidth: 280 }}>
               {infoText}
             </Typography>
           ) : (
             <Grid container direction="column" spacing={2}>
-              {authControlRdcr?.responseData?.sip_username &&
-                authControlRdcr?.responseData?.lk_token && (
-                  <Grid
-                    size={{ xs: "auto" }}
-                    sx={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      gap: 1.5,
-                    }}
-                  >
-                    {token ? (
-                      <Button
-                        variant="outlined"
-                        color="error"
-                        size="medium"
-                        disabled={isRoomActive}
-                        component={RouterLink}
-                        to="/"
-                        startIcon={<DeleteOutlinedIcon />}
-                      >
-                        Удалить
+              {authControlRdcr?.responseData?.sip_username && authControlRdcr?.responseData?.lk_token && (
+                <Grid
+                  size={{ xs: "auto" }}
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    gap: 1.5,
+                  }}
+                >
+                  {token ? (
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      size="medium"
+                      disabled={isRoomActive}
+                      component={RouterLink}
+                      to="/"
+                      startIcon={<DeleteOutlinedIcon />}
+                    >
+                      Удалить
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      size="medium"
+                      component={RouterLink}
+                      to={`/?lk_room=${authControlRdcr.responseData.sip_username}&lk_token=${authControlRdcr.responseData.lk_token}`}
+                      startIcon={<AddCircleOutlinedIcon />}
+                    >
+                      Создать
+                    </Button>
+                  )}
+
+                  {authControlRdcr.responseData.sip_username === room &&
+                    (!lkControlRdcr.displayLkToken ? (
+                      <Button type="button" variant="outlined" color="primary" size="medium" onClick={handleInvite} startIcon={<GroupAddIcon />}>
+                        Пригласить
                       </Button>
                     ) : (
-                      <Button
-                        variant="outlined"
-                        color="primary"
-                        size="medium"
-                        component={RouterLink}
-                        to={`/?lk_room=${authControlRdcr.responseData.sip_username}&lk_token=${authControlRdcr.responseData.lk_token}`}
-                        startIcon={<AddCircleOutlinedIcon />}
-                      >
-                        Создать
-                      </Button>
-                    )}
-
-                    {authControlRdcr.responseData.sip_username === room &&
-                      (!lkControlRdcr.displayLkToken ? (
-                        <Button
-                          type="button"
-                          variant="outlined"
-                          color="primary"
-                          size="medium"
-                          onClick={handleInvite}
-                          startIcon={<GroupAddIcon />}
-                        >
-                          Пригласить
-                        </Button>
-                      ) : (
-                        <LkToken {...props} />
-                      ))}
-                  </Grid>
-                )}
+                      <LkToken {...props} />
+                    ))}
+                </Grid>
+              )}
 
               {lkControlRdcr?.responseData?.lk_token && token && (
                 <Grid
@@ -427,10 +367,7 @@ function LkMeet(props) {
               )}
 
               {token && (
-                <Grid
-                  size={{ xs: 12 }}
-                  sx={{ display: "flex", justifyContent: "center" }}
-                >
+                <Grid size={{ xs: 12 }} sx={{ display: "flex", justifyContent: "center" }}>
                   {!isRoomActive ? (
                     <Box
                       sx={{

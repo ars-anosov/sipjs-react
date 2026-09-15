@@ -1,26 +1,5 @@
-import {
-  DialerSip,
-  Dns,
-  Close as IconClose,
-  Login as IconLogin,
-  Logout as IconLogout,
-  Lock,
-  Visibility,
-  VisibilityOff,
-} from "@mui/icons-material";
-import {
-  Alert,
-  Avatar,
-  Box,
-  Button,
-  Collapse,
-  IconButton,
-  InputAdornment,
-  Paper,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { DialerSip, Dns, Close as IconClose, Login as IconLogin, Logout as IconLogout, Lock, Visibility, VisibilityOff } from "@mui/icons-material";
+import { Alert, Avatar, Box, Button, Collapse, IconButton, InputAdornment, Paper, Stack, TextField, Typography } from "@mui/material";
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 
@@ -34,9 +13,7 @@ function PhoneReg(props) {
     };
   }, []);
 
-  const [callerUserNum, setCallerUserNum] = useState(
-    phoneControlRdcr.callerUserNum,
-  );
+  const [callerUserNum, setCallerUserNum] = useState(phoneControlRdcr.callerUserNum);
   const [regUserPass, setRegUserPass] = useState(phoneControlRdcr.regUserPass);
   const [uriWebRtc, setUriWebRtc] = useState(phoneControlRdcr.uriWebRtc);
   const [showPassword, setShowPassword] = useState(false);
@@ -46,11 +23,7 @@ function PhoneReg(props) {
     setCallerUserNum(phoneControlRdcr.callerUserNum || "");
     setRegUserPass(phoneControlRdcr.regUserPass || "");
     setUriWebRtc(phoneControlRdcr.uriWebRtc || "");
-  }, [
-    phoneControlRdcr.callerUserNum,
-    phoneControlRdcr.regUserPass,
-    phoneControlRdcr.uriWebRtc,
-  ]);
+  }, [phoneControlRdcr.callerUserNum, phoneControlRdcr.regUserPass, phoneControlRdcr.uriWebRtc]);
 
   const handleClose = () => {
     phoneControlActions.handleChangeStore("displayReg", false);
@@ -62,12 +35,8 @@ function PhoneReg(props) {
 
   const handleRegister = (event) => {
     event.preventDefault();
-    if (!callerUserNum.trim() || !regUserPass.trim() || !uriWebRtc.trim())
-      return;
-    phoneControlActions.handleClkRegister(
-      { callerUserNum, regUserPass, uriWebRtc },
-      phoneControlRdcr,
-    );
+    if (!callerUserNum.trim() || !regUserPass.trim() || !uriWebRtc.trim()) return;
+    phoneControlActions.handleClkRegister({ callerUserNum, regUserPass, uriWebRtc }, phoneControlRdcr);
   };
 
   const handleUnregister = () => {
@@ -95,10 +64,7 @@ function PhoneReg(props) {
       }}
     >
       {/* Кнопка закрытия сверху справа */}
-      <IconButton
-        onClick={handleClose}
-        sx={{ position: "absolute", top: 4, right: 4 }}
-      >
+      <IconButton onClick={handleClose} sx={{ position: "absolute", top: 4, right: 4 }}>
         <IconClose color="action" />
       </IconButton>
 
@@ -243,12 +209,7 @@ function PhoneReg(props) {
       </Box>
 
       {/* Ошибки компонента */}
-      <Collapse
-        in={
-          phoneControlRdcr.errComponent === "PhoneReg" &&
-          !!phoneControlRdcr.errText
-        }
-      >
+      <Collapse in={phoneControlRdcr.errComponent === "PhoneReg" && !!phoneControlRdcr.errText}>
         <Alert severity="error" sx={{ mt: 3, borderRadius: 2 }}>
           {phoneControlRdcr.errText}
         </Alert>

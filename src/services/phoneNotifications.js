@@ -15,16 +15,14 @@ const registerServiceWorker = () => {
     .register("sw.js")
     .then((reg) => {
       swRegistration = reg;
-      if (import.meta.env.DEV)
-        console.log("Service Worker успешно зарегистрирован");
+      if (import.meta.env.DEV) console.log("Service Worker успешно зарегистрирован");
     })
     .catch((err) => {
       console.error(err);
       emitToast({
         severity: "error",
         title: "Ошибка Service Worker",
-        message:
-          "Не удалось запустить фоновый модуль. Попробуйте обновить страницу.",
+        message: "Не удалось запустить фоновый модуль. Попробуйте обновить страницу.",
       });
     });
 };
@@ -51,8 +49,7 @@ const initPhoneNotifications = ({ onToast } = {}) => {
     emitToast({
       severity: "error",
       title: "Уведомления не поддерживаются",
-      message:
-        "Ваш браузер не поддерживает Service Worker или Notifications API.",
+      message: "Ваш браузер не поддерживает Service Worker или Notifications API.",
     });
     return;
   }
@@ -61,8 +58,7 @@ const initPhoneNotifications = ({ onToast } = {}) => {
     emitToast({
       severity: "warning",
       title: "Уведомления заблокированы",
-      message:
-        "Нажмите на значок в начале адресной строки и разрешите «Уведомления».",
+      message: "Нажмите на значок в начале адресной строки и разрешите «Уведомления».",
     });
     // Воркер всё равно регистрируем, чтобы он был готов, если пользователь вернет права
     registerServiceWorker();
@@ -73,8 +69,7 @@ const initPhoneNotifications = ({ onToast } = {}) => {
         emitToast({
           severity: "warning",
           title: "Уведомления отклонены",
-          message:
-            "Вы запретили уведомления. Звонки не будут отображаться в фоне.",
+          message: "Вы запретили уведомления. Звонки не будут отображаться в фоне.",
         });
       }
       // Независимо от выбора (разрешил или запретил) регистрируем воркер
@@ -106,8 +101,7 @@ const showIncomingCallNotification = (calleePhoneNum) => {
 
 const closeIncomingCallNotification = () => {
   // Используем .active, чтобы гарантировать отправку, пока идет claim()
-  const activeWorker =
-    swRegistration?.active || navigator.serviceWorker?.controller;
+  const activeWorker = swRegistration?.active || navigator.serviceWorker?.controller;
 
   if (activeWorker) {
     activeWorker.postMessage({
@@ -117,9 +111,4 @@ const closeIncomingCallNotification = () => {
   }
 };
 
-export {
-  closeIncomingCallNotification,
-  disposePhoneNotifications,
-  initPhoneNotifications,
-  showIncomingCallNotification,
-};
+export { closeIncomingCallNotification, disposePhoneNotifications, initPhoneNotifications, showIncomingCallNotification };

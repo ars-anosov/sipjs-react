@@ -1,7 +1,3 @@
 {
-  "recommendations": [
-    "ms-vscode-remote.remote-containers",
-    "bierner.markdown-preview-github-styles",
-    "bierner.markdown-mermaid"
-  ]
+  "recommendations": ["ms-vscode-remote.remote-containers", "bierner.markdown-preview-github-styles", "bierner.markdown-mermaid"]
 }

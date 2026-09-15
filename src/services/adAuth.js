@@ -1,9 +1,5 @@
 import ky from "ky";
-import {
-  AD_AUTH_EXPIRE_TIME_KEY,
-  AD_LOGIN_KEY,
-  AD_URI_AUTH_KEY,
-} from "../constants/storage";
+import { AD_AUTH_EXPIRE_TIME_KEY, AD_LOGIN_KEY, AD_URI_AUTH_KEY } from "../constants/storage";
 
 const AD_SESSION_TTL_MS = 24 * 60 * 60 * 1000;
 const AD_REQUEST_TIMEOUT_MS = 5000;
@@ -26,10 +22,7 @@ function storeAdAuthUri(uriAdAuth) {
 
 function persistAdAuthSession({ login }) {
   localStorage.setItem(AD_LOGIN_KEY, login);
-  localStorage.setItem(
-    AD_AUTH_EXPIRE_TIME_KEY,
-    String(Date.now() + AD_SESSION_TTL_MS),
-  );
+  localStorage.setItem(AD_AUTH_EXPIRE_TIME_KEY, String(Date.now() + AD_SESSION_TTL_MS));
 }
 
 function clearAdAuthSession() {
@@ -60,10 +53,4 @@ async function loginAd({ login, password, uriAdAuth }) {
   return responseData;
 }
 
-export {
-  clearAdAuthSession,
-  getStoredAdAuthUri,
-  getStoredAdLogin,
-  isAdAuthSessionExpired,
-  loginAd,
-};
+export { clearAdAuthSession, getStoredAdAuthUri, getStoredAdLogin, isAdAuthSessionExpired, loginAd };

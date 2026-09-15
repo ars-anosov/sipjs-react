@@ -56,24 +56,22 @@ export const getLiveKitMuiStyles = (theme) => ({
     "--lk-border-color": "transparent !important",
     "--lk-border-radius": `${theme.shape.borderRadius}px`,
 
-    "& .lk-grid-layout, & .lk-carousel, & .lk-grid-layout *, & .lk-carousel *":
-      {
-        border: "none !important",
-        boxShadow: "none !important",
-        outline: "none !important",
-      },
+    "& .lk-grid-layout, & .lk-carousel, & .lk-grid-layout *, & .lk-carousel *": {
+      border: "none !important",
+      boxShadow: "none !important",
+      outline: "none !important",
+    },
 
-    "& .lk-video-container, & .lk-participant-tile, & .lk-focus-layout, & video":
-      {
-        borderRadius: "inherit",
-        overflow: "hidden",
-        border: "none !important",
-        boxShadow: "none !important",
-        outline: "none !important",
-        backgroundClip: "padding-box",
-        WebkitMaskImage: "radial-gradient(circle, white 100%, black 100%)",
-        maskImage: "radial-gradient(circle, white 100%, black 100%)",
-      },
+    "& .lk-video-container, & .lk-participant-tile, & .lk-focus-layout, & video": {
+      borderRadius: "inherit",
+      overflow: "hidden",
+      border: "none !important",
+      boxShadow: "none !important",
+      outline: "none !important",
+      backgroundClip: "padding-box",
+      WebkitMaskImage: "radial-gradient(circle, white 100%, black 100%)",
+      maskImage: "radial-gradient(circle, white 100%, black 100%)",
+    },
 
     // Светлые выпадающие меню и поповеры
     "--lk-dropdown-bg": theme.palette.background.paper,

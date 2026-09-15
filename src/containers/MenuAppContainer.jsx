@@ -9,18 +9,9 @@ import MenuAppBar from "../components/MenuAppBar.jsx";
 const MenuAppContainer = () => {
   const dispatch = useDispatch();
 
-  const phoneControlActions = useMemo(
-    () => bindActionCreators(phoneActions, dispatch),
-    [dispatch],
-  );
-  const authControlActions = useMemo(
-    () => bindActionCreators(authActions, dispatch),
-    [dispatch],
-  );
-  const lkControlActions = useMemo(
-    () => bindActionCreators(lkActions, dispatch),
-    [dispatch],
-  );
+  const phoneControlActions = useMemo(() => bindActionCreators(phoneActions, dispatch), [dispatch]);
+  const authControlActions = useMemo(() => bindActionCreators(authActions, dispatch), [dispatch]);
+  const lkControlActions = useMemo(() => bindActionCreators(lkActions, dispatch), [dispatch]);
 
   const phoneControlRdcr = useSelector((state) => state.phoneControlRdcr);
   const authControlRdcr = useSelector((state) => state.authControlRdcr);

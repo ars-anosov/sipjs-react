@@ -1,10 +1,4 @@
-import {
-  LK_STORE_VALUE,
-  LKTOKEN_CLEAR,
-  LKTOKEN_SUBMIT_ERROR,
-  LKTOKEN_SUBMIT_REQUEST,
-  LKTOKEN_SUBMIT_SUCCESS,
-} from "../constants/redux";
+import { LK_STORE_VALUE, LKTOKEN_CLEAR, LKTOKEN_SUBMIT_ERROR, LKTOKEN_SUBMIT_REQUEST, LKTOKEN_SUBMIT_SUCCESS } from "../constants/redux";
 
 // Только UI-дефолты: сохранённый конфиг (uriLk, uriLkToken) подставляет сид стора —
 // store/preloadedState.js → preloadedState в configureStore.
