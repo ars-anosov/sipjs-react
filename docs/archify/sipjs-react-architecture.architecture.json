@@ -6,7 +6,7 @@
     "quality_profile": "showcase",
     "repository": {
       "url": "https://github.com/ars-anosov/sipjs-react.git",
-      "revision": "62147564ac4dfa48c43dbbce220f92837b1ea192"
+      "revision": "1a4a57e7af8985e33f9ca8b168cf3469d8d2e381"
     },
     "legend": {
       "mode": "auto",
@@ -139,7 +139,7 @@
       "sources": [
         {
           "path": "src/containers/AuthContainer.jsx",
-          "line": 58,
+          "line": 56,
           "label": "мост AUTHCTL_ → PHONECTL_"
         },
         {
@@ -170,7 +170,7 @@
         },
         {
           "path": "src/actions/phoneControlActions.js",
-          "line": 442,
+          "line": 456,
           "label": "SIP MESSAGE"
         }
       ]
@@ -192,7 +192,7 @@
       "sources": [
         {
           "path": "src/services/phoneRuntime.js",
-          "line": 1000,
+          "line": 993,
           "label": "публичный API"
         }
       ]

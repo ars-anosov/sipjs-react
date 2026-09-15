@@ -26,28 +26,35 @@ sudo apt-get install -y libnss3 libnspr4 libxcomposite1 libxdamage1 \
   libxfixes3 libxrandr2 libxrender1 libasound2t64
 ```
 
+Если `sudo` недоступен, обёртка подхватывает библиотеки из
+`.playwright/cache/deps/root/usr/lib/x86_64-linux-gnu` (каталог наполняется вручную, например
+распаковкой `.deb`; `LD_LIBRARY_PATH` выставляет `.dsh/bin/browser`).
+
 Если браузера нет: `npm i -g @playwright/cli@latest && playwright-cli install-browser chrome-for-testing`.
 
 ## Шаги
 
-1. Поднять dev-сервер (managed background job, порт 3000 из `vite.config.js`) и дождаться ответа:
+1. Поднять dev-сервер (managed background job, порт из `vite.config.js`) и дождаться в выводе
+`npm run dev` строки с фактическим адресом:
 
 ```bash
 npm run dev
-curl -sf -o /dev/null http://localhost:3000/ && echo ready
+curl -sf -o /dev/null http://localhost:<порт>/ && echo ready
 ```
 
-Если порт 3000 занят (например, dev-сервером соседнего проекта), Vite молча возьмёт 3001:
-свериться с URL в выводе `npm run dev` и дальше проверять фактический порт.
+Порт 3000 может быть занят чужим dev-сервером: Vite молча берёт следующий свободный (3001, 3002, …),
+поэтому проверять готовность и ходить браузером нужно по фактическому порту из вывода `npm run dev`
+— `curl` по «своему» адресу мимо порта подтвердит готовность чужого приложения.
 
-2. Открыть телефон человеку — инструментом `win_open_url` на `http://localhost:3000`.
+2. Открыть телефон человеку — инструментом `win_open_url` на фактический URL из вывода
+   (`http://localhost:<порт>`).
 
 3. **Весь сценарий проверки выполнять одной командой в одном вызове `bash`.** Демон CLI живёт
    только внутри вызова: между вызовами сессия теряется и следующая команда ответит
    `Browser 'default' is not open`. Шаги соединяются в одну цепочку:
 
 ```bash
-.dsh/bin/browser open http://localhost:3000
+.dsh/bin/browser open http://localhost:<порт>
 .dsh/bin/browser click e21
 .dsh/bin/browser console warning
 .dsh/bin/browser screenshot
@@ -61,7 +68,7 @@ having a XServer running» (у песочницы приватный `/tmp`, X-�
 
 ```bash
 .dsh/bin/browser snapshot --depth=4          # частичное дерево
-.dsh/bin/browser find "Отправить"            # точечный поиск с контекстом
+.dsh/bin/browser find "Подключить телефон"   # точечный поиск с контекстом
 .dsh/bin/browser console error               # только ошибки
 .dsh/bin/browser requests                    # сеть, затем request <index>
 .dsh/bin/browser localstorage-list
@@ -79,7 +86,8 @@ having a XServer running» (у песочницы приватный `/tmp`, X-�
   AD/`lk_token` показывает информирующий текст, тумблер заблокирован.
 - Адреса сервисов — в `localStorage` (`constants/storage.js`: `uriAdAuth`, `uriWebRtc`,
   `uriPhoneDir`, `uriLk`, `uriLkToken`) — для сквозной проверки подставить их через
-  `localstorage-set`, а для чистого состояния удалить ключи и перезагрузить страницу.
+  `localstorage-set`; чтобы вернуть dev-дефолты, удалить ключи и перезагрузить страницу (корневой
+  `index.html` досеивает только отсутствующие ключи).
 - dev-сборка включает `redux-logger`: по логу действий проверяются порядок dispatch и
   namespace-инвариант (`AUTHCTL_` не диспатчит `PHONECTL_`, мост — только в `AuthContainer`).
 - меню `MenuAppBar` — модальный `Drawer`: пока он открыт, остальное приложение уходит в

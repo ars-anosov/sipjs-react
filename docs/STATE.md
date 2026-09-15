@@ -26,7 +26,7 @@ flowchart LR
 
 Слой `src/store/` — единственное место, где стор сходится с сервисами: `preloadedState.js` через геттеры сервисов собирает сид (`uriWebRtc`, `callerUserNum`, `useIce`, `uriAdAuth`, `uriLk`, `uriLkToken`) и полные срезы из `initialState` редьюсеров, `configureStore.js` передаёт их в `createStore` как `preloadedState` (thunk + `authTimeoutMiddleware`, в dev ещё `redux-logger`) и инжектит зависимости middleware. `rootReducer.js` — `combineReducers` трёх срезов. Reducers и middleware сервисов не импортируют.
 
-`phoneRuntime` (singleton): `userAgent`, `registerer`, `sessionOptions`, `incomingSession` / `outgoingSession`, audio elements, `remoteStream`. Публичное API — функции сценариев (`registerSipUserAgent`, `placeOutgoingCall`, `answerIncomingCall`, `transmitSipMessage`, `resetSipCall`) и утилиты (`getUriHostFromWebRtc`, `isSipConnected`, `isValidSipTarget`, `sendDtmf`, `setHold`, `createChatMessage`); обратная связь в actions — через колбэки `handlers`.
+`phoneRuntime` (singleton): `userAgent`, `registerer`, `sessionOptions`, `incomingSession` / `outgoingSession`, audio elements, `remoteStream`. Публичное API — функции сценариев (`registerSipUserAgent`, `placeOutgoingCall`, `answerIncomingCall`, `transmitSipMessage`, `resetSipCall`, `unregisterSip`) и утилиты (`getUriHostFromWebRtc`, `isSipConnected`, `isValidSipTarget`, `sendDtmf`, `setHold`, `createChatMessage`); обратная связь в actions — через колбэки `handlers`.
 
 Смежные сервисы:
 
@@ -81,7 +81,7 @@ flowchart TD
   IS -->|hangup / Terminated| RS
   OS -->|hangup / Terminated| RS
   RS -->|reset call UI flags, connectStatus пустой, regState сохраняется| CS
-  UN -->|connectStatus пустой, regState сохраняется (красный тумблер AuthPad), заголовки «Не зарегистрирован», displayReg=false при payload.registrationLost (потеря регистрации, PhoneReg не форсируем) и true при явной разрегистрации, displayPad/History/Chat=false, счётчики unread=0, флаги звонка=false, calleePhoneNum/errText пустые| Init
+  UN -->|connectStatus пустой, regState сохраняется (красный тумблер AuthPad), заголовки «Не зарегистрирован», displayReg=false при payload.registrationLost (потеря регистрации, PhoneReg не форсируем) и true при явной разрегистрации, displayPad/History/Chat=false, счётчики unread=0, флаги звонка=false, calleePhoneNum/errComponent/errText пустые| Init
 
   classDef initial fill:#e3f2fd,stroke:#1565c0,stroke-width:1px
   classDef success fill:#e8f5e8,stroke:#4caf50,stroke-width:1px
@@ -119,10 +119,10 @@ sequenceDiagram
     AuthAct->>Dispatch: AUTHCTL_SUBMIT_SUCCESS (responseData)
   end
   AuthCont->>Dispatch: PHONECTL_STORE_VALUE (callerUserNum, regUserPass, displayDir)
-  Note over AuthCont: displayAuthPad=true на success → рендер AuthPad (тумблер off, без AD-данных — текст с информацией)
+  Note over AuthCont: displayAuthPad=true на success → рендер AuthPad (тумблер off; при неполном AD-ответе — текст с недостающими полями)
   User->>AuthPad: Клик по тумблеру (off)
   AuthPad->>AuthCont: onToggleReg()
-  AuthCont->>PhoneAct: handleClkRegister({sip_username, sip_secret, uriWebRtc}, phoneControlRdcr)
+  AuthCont->>PhoneAct: handleClkRegister({callerUserNum: sip_username, regUserPass: sip_secret, uriWebRtc}, phoneControlRdcr)
   PhoneAct->>Dispatch: PHONECTL_CONNECT_REQUEST (regState=off) → SUCCESS (regState=ok) / ERROR (regState=fail)
   Dispatch-->>AuthCont: callerUserNum из PhoneReg
   Note over AuthCont: sync только при callerUserNum и (regState=ok или connectStatus)

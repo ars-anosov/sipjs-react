@@ -24,7 +24,7 @@ src/
 └── App.jsx, main.jsx, theme.js, Copyright.jsx
 mock/  public/  dist/   # dev-мок, статика, сборка (dist — только npm run build)
 docs/                   # документация и GitHub Pages (ars-anosov.github.io/sipjs-react):
-                        # index.html, STATE.md (Mermaid-схемы), archify/ (исключён из Biome)
+                        # index.html, STATE.md (Mermaid-схемы), archify/ (исключён из Biome), .nojekyll
 ```
 
 ## Архитектура
@@ -60,9 +60,9 @@ docs/                   # документация и GitHub Pages (ars-anosov.g
 
 Общие правила машины (WSL ↔ Windows, Mermaid, archify, проверка результата) — в user-global `~/.dsh/AGENTS.md`; повторяемые процедуры — навыками в `.dsh/skills/`. Здесь только специфика репозитория:
 
-- **Диаграммы-артефакты** — skill `archify`, результат в `docs/archify/` (`sipjs-react-architecture.*`, `sipjs-react-sip-registration.*`); готовые HTML/JSON не править вручную, только перегенерация, проверка — навык `archify-visual-check`.
+- **Диаграммы-артефакты** — skill `archify`, результат в `docs/archify/` (`sipjs-react-architecture.*`, `sipjs-react-sip-registration.*`); готовые HTML/JSON не править вручную, только перегенерация, проверка — навык `archify-visual-check`. В git остаются лишь `*.visual-check.2048x1320.light.png` (превью для README) и receipt `*.visual-check.json`, остальные скриншоты и contact sheet — временные (перечислены в `.gitignore`).
 - **Диаграммы в ответе** — Mermaid-блоком, а не ASCII-артом; образец — `docs/STATE.md`.
-- **Проверка UI** — `npm run dev` (порт 3000): человеку открывать `win_open_url` (`http://localhost:3000`), агенту — Linux-Chromium в WSL обёрткой `.dsh/bin/browser` (Playwright CLI, только headless). Настройки — `.playwright/cli.config.json` (chromium, viewport 1280×800, вывод в `.playwright/cache/output`), рантайм — в игнорируемом `.playwright/cache/`; обёртка уводит `HOME`/`XDG_CACHE_HOME` внутрь проекта, иначе песочница DSH не даёт Chrome записать профиль. Весь сценарий — одной цепочкой команд в одном вызове `bash` (демон CLI не переживает вызов). Порядок и границы проверки (SIP, звонки и медиа требуют живого сервера) — навык `ui-verify`.
+- **Проверка UI** — `npm run dev` (порт 3000 из `vite.config.js`; если занят, Vite возьмёт следующий — дальше использовать фактический порт из вывода): человеку открывать `win_open_url` по этому порту, агенту — Linux-Chromium в WSL обёрткой `.dsh/bin/browser` (Playwright CLI, только headless). Настройки — `.playwright/cli.config.json` (chromium, viewport 1280×800, вывод в `.playwright/cache/output`), рантайм — в игнорируемом `.playwright/cache/`; обёртка уводит `HOME`/`XDG_CACHE_HOME` внутрь проекта, иначе песочница DSH не даёт Chrome записать профиль. Весь сценарий — одной цепочкой команд в одном вызове `bash` (демон CLI не переживает вызов). Порядок и границы проверки (SIP, звонки и медиа требуют живого сервера) — навык `ui-verify`.
 
 ## Правила для агента
 
