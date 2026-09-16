@@ -1,67 +1,32 @@
-import { Box, Grid } from "@mui/material";
+import { Grid } from "@mui/material";
 import { useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { bindActionCreators } from "redux";
-import * as authActions from "../actions/authControlActions.js";
 // Actions
 import * as phoneActions from "../actions/phoneControlActions.js";
 
 // Components
-import AuthAd from "../components/AuthAd.jsx";
 import PhoneChat from "../components/PhoneChat.jsx";
 import PhoneHistory from "../components/PhoneHistory.jsx";
 import PhonePad from "../components/PhonePad.jsx";
 import PhoneReg from "../components/PhoneReg.jsx";
 
+// Контейнер среза телефона: форма входа PhoneReg и рабочие блоки PhonePad/PhoneHistory/PhoneChat.
+// AD-вход (AuthAd) относится к authControlRdcr — его рендерит AuthContainer, чужой срез здесь не читается.
 const PhoneContainer = () => {
   const dispatch = useDispatch();
 
   const phoneControlRdcr = useSelector((state) => state.phoneControlRdcr);
-  const authControlRdcr = useSelector((state) => state.authControlRdcr);
 
   const phoneControlActions = useMemo(() => bindActionCreators(phoneActions, dispatch), [dispatch]);
-  const authControlActions = useMemo(() => bindActionCreators(authActions, dispatch), [dispatch]);
 
-  const { displayAd } = authControlRdcr;
   const { displayReg, displayPad, displayHistory, displayChat, errComponent } = phoneControlRdcr;
 
-  const isOverlayActive = displayAd || displayReg || errComponent === "PhoneReg";
-
-  // Стили для оверлеев вынесены из тела рендера для производительности
-  const centerOverlayStyle = {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    zIndex: 10,
-    width: "auto",
-    pointerEvents: "auto",
-  };
-
+  // Форма входа — модальный Dialog (портал), в потоке документа она места не занимает,
+  // поэтому телефон под ней не сдвигается
   return (
-    <Box
-      sx={{
-        position: "relative",
-        width: "100%",
-        minHeight: isOverlayActive ? "400px" : "auto",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      {/* Центрирование AuthAd */}
-      {displayAd && (
-        <Box sx={centerOverlayStyle}>
-          <AuthAd authControlRdcr={authControlRdcr} authControlActions={authControlActions} />
-        </Box>
-      )}
-
-      {/* Центрирование PhoneReg */}
-      {(displayReg || errComponent === "PhoneReg") && (
-        <Box sx={centerOverlayStyle}>
-          <PhoneReg phoneControlRdcr={phoneControlRdcr} phoneControlActions={phoneControlActions} />
-        </Box>
-      )}
+    <>
+      {(displayReg || errComponent === "PhoneReg") && <PhoneReg phoneControlRdcr={phoneControlRdcr} phoneControlActions={phoneControlActions} />}
 
       <Grid
         container
@@ -93,7 +58,7 @@ const PhoneContainer = () => {
           </Grid>
         )}
       </Grid>
-    </Box>
+    </>
   );
 };
 

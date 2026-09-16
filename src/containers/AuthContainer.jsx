@@ -4,6 +4,7 @@ import { bindActionCreators } from "redux";
 import * as authActions from "../actions/authControlActions.js";
 import * as lkActions from "../actions/lkControlActions.js";
 import * as phoneActions from "../actions/phoneControlActions.js";
+import AuthAd from "../components/AuthAd.jsx";
 import AuthPad from "../components/AuthPad.jsx";
 
 // Ключ пары SIP-реквизитов: защищает от повторных dispatch на каждый ререндер
@@ -20,7 +21,7 @@ const AuthContainer = () => {
   const authControlActions = useMemo(() => bindActionCreators(authActions, dispatch), [dispatch]);
   const lkControlActions = useMemo(() => bindActionCreators(lkActions, dispatch), [dispatch]);
 
-  const { responseData, displayAuthPad } = authControlRdcr;
+  const { responseData, displayAd, displayAuthPad, errComponent: authErrComponent } = authControlRdcr;
   const { callerUserNum, uriWebRtc, connectStatus, regState } = phoneControlRdcr;
 
   const isRegistered = regState === "ok";
@@ -98,18 +99,24 @@ const AuthContainer = () => {
     authControlActions.handleChangeStore("displayAuthPad", true);
   }, [regState, authControlActions]);
 
-  // AuthPad показывается по флагу меню; без AD-данных она информирует об этом
-  if (!displayAuthPad) return null;
-
+  // Оба блока AD-домена: форма входа (displayAd) и мост к сервисам (displayAuthPad);
+  // без AD-данных AuthPad информирует текстом, поэтому рендерится всегда по флагу меню.
+  // Форма — модальный Dialog (портал), в потоке документа она места не занимает
   return (
-    <AuthPad
-      authControlRdcr={authControlRdcr}
-      lkControlRdcr={lkControlRdcr}
-      regState={regState}
-      onToggleReg={handleToggleReg}
-      onToggleMeet={handleToggleMeet}
-      onClose={handleCloseAuthPad}
-    />
+    <>
+      {(displayAd || authErrComponent === "AuthAd") && <AuthAd authControlRdcr={authControlRdcr} authControlActions={authControlActions} />}
+
+      {displayAuthPad && (
+        <AuthPad
+          authControlRdcr={authControlRdcr}
+          lkControlRdcr={lkControlRdcr}
+          regState={regState}
+          onToggleReg={handleToggleReg}
+          onToggleMeet={handleToggleMeet}
+          onClose={handleCloseAuthPad}
+        />
+      )}
+    </>
   );
 };
 
