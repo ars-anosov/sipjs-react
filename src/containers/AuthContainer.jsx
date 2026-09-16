@@ -5,6 +5,7 @@ import * as authActions from "../actions/authControlActions.js";
 import * as lkActions from "../actions/lkControlActions.js";
 import * as phoneActions from "../actions/phoneControlActions.js";
 import AuthAd from "../components/AuthAd.jsx";
+import AuthLinks from "../components/AuthLinks.jsx";
 import AuthPad from "../components/AuthPad.jsx";
 
 // Ключ пары SIP-реквизитов: защищает от повторных dispatch на каждый ререндер
@@ -21,7 +22,7 @@ const AuthContainer = () => {
   const authControlActions = useMemo(() => bindActionCreators(authActions, dispatch), [dispatch]);
   const lkControlActions = useMemo(() => bindActionCreators(lkActions, dispatch), [dispatch]);
 
-  const { responseData, displayAd, displayAuthPad, errComponent: authErrComponent } = authControlRdcr;
+  const { responseData, displayAd, displayAuthPad, status: authStatus, errComponent: authErrComponent } = authControlRdcr;
   const { callerUserNum, uriWebRtc, connectStatus, regState } = phoneControlRdcr;
 
   const isRegistered = regState === "ok";
@@ -78,6 +79,16 @@ const AuthContainer = () => {
     authControlActions.handleChangeStore("displayAuthPad", false);
   };
 
+  // Стартовый экран: ссылки открывают формы своего среза (переходов между срезами нет —
+  // каждый вызов пишет только в свой)
+  const handleOpenReg = () => {
+    phoneControlActions.handleChangeStore("displayReg", true);
+  };
+
+  const handleOpenAd = () => {
+    authControlActions.handleChangeStore("displayAd", true);
+  };
+
   // Мост PHONECTL_ → AUTHCTL_: AuthAdInfo/LkMeet читают sip_username из authControlRdcr
   useEffect(() => {
     if (!callerUserNum) return;
@@ -99,11 +110,16 @@ const AuthContainer = () => {
     authControlActions.handleChangeStore("displayAuthPad", true);
   }, [regState, authControlActions]);
 
-  // Оба блока AD-домена: форма входа (displayAd) и мост к сервисам (displayAuthPad);
-  // без AD-данных AuthPad информирует текстом, поэтому рендерится всегда по флагу меню.
+  // Стартовый экран — ссылки на обе формы, пока ни одна авторизация не прошла.
+  // Дальше: успех AD → мост AuthPad, успешная SIP-регистрация → телефон PhonePad
+  const showAuthLinks = authStatus !== "success" && regState !== "ok";
+
+  // Оба блока AD-домена: форма входа (displayAd) и мост к сервисам (displayAuthPad).
   // Форма — модальный Dialog (портал), в потоке документа она места не занимает
   return (
     <>
+      {showAuthLinks && <AuthLinks onOpenReg={handleOpenReg} onOpenAd={handleOpenAd} />}
+
       {(displayAd || authErrComponent === "AuthAd") && <AuthAd authControlRdcr={authControlRdcr} authControlActions={authControlActions} />}
 
       {displayAuthPad && (

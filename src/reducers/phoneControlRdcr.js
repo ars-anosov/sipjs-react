@@ -30,8 +30,8 @@ const getUnreadMissedCallsCount = (callsArr = []) =>
 export const initialState = {
   // --- UI ---
   // MenuAppBar
-  displayReg: true,
   displayControl: true,
+  displayReg: false,
   displayPad: false,
   displayDir: false,
   displayHistory: false,
