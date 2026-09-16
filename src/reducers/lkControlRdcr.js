@@ -3,8 +3,8 @@ import { LK_STORE_VALUE, LKTOKEN_CLEAR, LKTOKEN_SUBMIT_ERROR, LKTOKEN_SUBMIT_REQ
 // Только UI-дефолты: сохранённый конфиг (uriLk, uriLkToken) подставляет сид стора —
 // store/preloadedState.js → preloadedState в configureStore.
 export const initialState = {
-  displayLkToken: false,
   displayControl: false,
+  displayLkToken: false,
   uriLk: "",
   uriLkToken: "",
   status: "idle",

@@ -10,8 +10,8 @@ import {
 // Только UI-дефолты: сохранённые значения (uriAdAuth) подставляет сид стора —
 // store/preloadedState.js → preloadedState в configureStore.
 export const initialState = {
-  displayAd: false,
   displayControl: false,
+  displayAd: false,
   displayAuthPad: false,
   uriAdAuth: "",
   status: "idle", // 'idle' | 'loading' | 'success' | 'error'

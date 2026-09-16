@@ -31,7 +31,7 @@ export const initialState = {
   // --- UI ---
   // MenuAppBar
   displayControl: true,
-  displayReg: false,
+  displayReg: true,
   displayPad: false,
   displayDir: false,
   displayHistory: false,
