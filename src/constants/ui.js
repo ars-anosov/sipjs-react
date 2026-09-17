@@ -1,3 +1,2 @@
-export const HEADER_BACKGROUND = "grey.100";
-
+// Высота панелей, которые показываются как отдельное окно поверх страницы.
 export const PANEL_HEIGHT = 528;

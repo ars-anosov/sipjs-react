@@ -5,17 +5,21 @@ import {
   PhoneInTalk as IconPhoneInTalk,
   SettingsPhone as IconSettingsPhone,
 } from "@mui/icons-material";
-import { Alert, AlertTitle, Badge, IconButton, keyframes, Snackbar, useTheme } from "@mui/material";
+import { Alert, AlertTitle, alpha, Badge, IconButton, keyframes, Snackbar, Tooltip, useTheme } from "@mui/material";
 import PropTypes from "prop-types";
 import { useEffect, useMemo, useState } from "react";
 import { closeIncomingCallNotification, disposePhoneNotifications, initPhoneNotifications, showIncomingCallNotification } from "../services/phoneNotifications";
 
+// Пульс берёт цвет из --status-pulse, который задаёт сам индикатор: на белой шапке
+// прежнее белое свечение было не видно.
 const pulse = keyframes`
-  0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4); transform: scale(1); }
-  70% { box-shadow: 0 0 0 8px rgba(255, 255, 255, 0); transform: scale(1.08); }
-  100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); transform: scale(1); }
+  0% { box-shadow: 0 0 0 0 var(--status-pulse); transform: scale(1); }
+  70% { box-shadow: 0 0 0 8px rgba(0, 0, 0, 0); transform: scale(1.04); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 0, 0, 0); transform: scale(1); }
 `;
 
+// Индикатор состояния SIP: цвет иконки и подложки задаёт статус,
+// подпись дублирует его в tooltip и aria-label.
 function PhoneIco({ phoneControlRdcr }) {
   const theme = useTheme();
 
@@ -68,18 +72,18 @@ function PhoneIco({ phoneControlRdcr }) {
     if (incomeCallNow || outgoCallNow) {
       return {
         Icon: IconPhoneInTalk,
-        bg: theme.palette.success.main,
-        color: "#fff",
+        color: theme.palette.success.main,
         pulse: false,
+        label: "SIP: разговор идёт",
       };
     }
 
     if (incomeDisplay) {
       return {
         Icon: IconPhoneInTalk,
-        bg: theme.palette.success.main,
-        color: "#fff",
+        color: theme.palette.success.main,
         pulse: true,
+        label: "SIP: входящий вызов",
       };
     }
 
@@ -87,73 +91,81 @@ function PhoneIco({ phoneControlRdcr }) {
       case "Error":
         return {
           Icon: IconPhoneDisabled,
-          bg: theme.palette.error.dark,
-          color: "#fff",
+          color: theme.palette.error.main,
           pulse: false,
+          label: "SIP: нет соединения",
         };
       case "Reconnect":
       case "Request":
         return {
           Icon: IconSettingsPhone,
-          bg: theme.palette.warning.main,
-          color: "rgba(0,0,0,0.87)",
-          pulse: false,
+          color: theme.palette.warning.dark,
+          pulse: true,
+          label: "SIP: подключение к серверу",
         };
       case "Success":
         return {
           Icon: IconPhone,
-          bg: "rgba(255, 255, 255, 0.2)",
-          color: "#fff",
+          color: theme.palette.success.main,
           pulse: false,
+          label: "SIP: соединение установлено",
         };
     }
 
     if (regState === "ok") {
       return {
         Icon: IconPhone,
-        bg: "rgba(255, 255, 255, 0.2)",
-        color: "#fff",
+        color: theme.palette.success.main,
         pulse: false,
+        label: "SIP: зарегистрирован",
       };
     }
 
     return {
       Icon: IconDialerSip,
-      bg: "rgba(0, 0, 0, 0.2)",
-      color: "rgba(0, 0, 0, 0.4)",
+      color: theme.palette.text.secondary,
       pulse: false,
+      label: "SIP: не зарегистрирован",
     };
   }, [phoneControlRdcr, theme]);
 
-  const { Icon, bg, color, pulse: isSwelling } = cfg;
+  const { Icon, color, pulse: isSwelling, label } = cfg;
   const totalUnread = Number(phoneControlRdcr?.callUnread || 0) + Number(phoneControlRdcr?.chatUnread || 0);
 
   return (
     <>
-      <Badge badgeContent={totalUnread} color="error" overlap="circular" invisible={!totalUnread}>
-        <IconButton
-          size="small"
-          sx={{
-            ml: 1,
-            width: 46,
-            height: 46,
-            backgroundColor: bg,
-            color: color,
-            border: "1px solid rgba(255,255,255,0.3)",
-            animation: isSwelling ? `${pulse} 1.5s infinite` : "none",
-            transition: "all 0.2s ease-in-out",
-            "&:hover": {
-              backgroundColor: bg,
-              filter: "brightness(1.1)",
-              transform: "translateY(-1px)",
-            },
-            "& .MuiSvgIcon-root": {
-              fontSize: "1.6rem",
-            },
-          }}
-        >
-          <Icon />
-        </IconButton>
+      {/* Отступ до подписи держит Badge: IconButton внутри него — уже второй
+          элемент стека, и его собственный ml складывался с margin от Stack
+          spacing (16px вместо 8px, как у AuthIco). */}
+      <Badge badgeContent={totalUnread} color="error" overlap="circular" invisible={!totalUnread} sx={{ ml: 1 }}>
+        <Tooltip title={label}>
+          <IconButton
+            size="small"
+            aria-label={label}
+            sx={{
+              width: 42,
+              height: 42,
+              "--status-pulse": alpha(color, 0.45),
+              color,
+              backgroundColor: alpha(color, 0.12),
+              border: `1px solid ${alpha(color, 0.28)}`,
+              animation: isSwelling ? `${pulse} 1.4s ease-out infinite` : "none",
+              transition: theme.transitions.create(["background-color", "border-color", "transform"], {
+                duration: theme.transitions.duration.short,
+              }),
+              "&:hover": {
+                backgroundColor: alpha(color, 0.2),
+                borderColor: alpha(color, 0.45),
+                transform: "translateY(-1px)",
+              },
+              "& .MuiSvgIcon-root": {
+                fontSize: "1.35rem",
+              },
+            }}
+          >
+            <Icon />
+          </IconButton>
+        </Tooltip>
       </Badge>
 
       <Snackbar open={toast.open} onClose={handleCloseToast} anchorOrigin={{ vertical: "bottom", horizontal: "left" }}>

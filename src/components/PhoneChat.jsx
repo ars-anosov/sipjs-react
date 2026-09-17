@@ -4,7 +4,8 @@ import { alpha, useTheme } from "@mui/material/styles";
 import { format } from "date-fns";
 import PropTypes from "prop-types";
 import { useEffect, useRef, useState } from "react";
-import { HEADER_BACKGROUND, PANEL_HEIGHT } from "../constants/ui.js";
+import { PANEL_HEIGHT } from "../constants/ui.js";
+import { HEADER_BACKGROUND, PAPER_BACKGROUND } from "../theme.js";
 
 function PhoneChat(props) {
   if (import.meta.env.DEV) console.log("PhoneChat hook");
@@ -111,6 +112,7 @@ function PhoneChat(props) {
         mx: "auto",
         mt: 2,
         height: PANEL_HEIGHT,
+        bgcolor: PAPER_BACKGROUND,
         borderRadius: 3,
         position: "relative",
         display: "flex",

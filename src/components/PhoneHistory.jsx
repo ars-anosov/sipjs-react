@@ -4,7 +4,8 @@ import { alpha, keyframes, useTheme } from "@mui/material/styles";
 import { format, isValid, parseISO } from "date-fns";
 import PropTypes from "prop-types";
 import { useEffect, useMemo } from "react";
-import { HEADER_BACKGROUND, PANEL_HEIGHT } from "../constants/ui.js";
+import { PANEL_HEIGHT } from "../constants/ui.js";
+import { HEADER_BACKGROUND, PAPER_BACKGROUND } from "../theme.js";
 
 const formatCallDate = (dateVal) => {
   if (!dateVal) return "—";
@@ -144,6 +145,7 @@ function PhoneHistory(props) {
         mx: "auto",
         mt: 2,
         height: PANEL_HEIGHT,
+        bgcolor: PAPER_BACKGROUND,
         borderRadius: 3,
         position: "relative",
         display: "flex",

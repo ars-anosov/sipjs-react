@@ -34,7 +34,8 @@ import {
 } from "@mui/material";
 import PropTypes from "prop-types";
 import { useEffect, useRef, useState } from "react";
-import { HEADER_BACKGROUND, PANEL_HEIGHT } from "../constants/ui.js";
+import { PANEL_HEIGHT } from "../constants/ui.js";
+import { HEADER_BACKGROUND } from "../theme.js";
 
 const kbdStyles = {
   "& kbd": {

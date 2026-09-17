@@ -25,8 +25,8 @@ export default function App() {
       }}
     >
       <MenuAppContainer />
-      <PhoneContainer />
       <AuthContainer />
+      <PhoneContainer />
       <LkContainer />
       <Box sx={{ mt: "auto" }}>
         <Copyright showFull={true} />

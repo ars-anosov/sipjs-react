@@ -100,13 +100,14 @@ function PhoneDir(props) {
             },
           },
           clearIndicator: {
-            sx: { color: "#ffffff !important" },
+            // Цвет контролов — из темы: шапка теперь светлая (белый AppBar),
+            // прежние белые подписи и рамки на ней не читались.
+            sx: { color: "text.secondary" },
           },
         }}
         sx={{
           width: 200,
           mx: 2,
-          "& .MuiIconButton-root": { color: "#ffffff" },
         }}
         renderOption={(propsOption, option) => {
           const { key, ...optionProps } = propsOption;
@@ -218,13 +219,13 @@ function PhoneDir(props) {
             {...params}
             label="Поиск"
             sx={{
-              "& .MuiInputLabel-root": { color: "#ffffff" },
-              "& .MuiInputLabel-root.Mui-focused": { color: "#ffffff" },
-              "& .MuiInputBase-input": { color: "#ffffff" },
+              "& .MuiInputLabel-root": { color: "text.secondary" },
+              "& .MuiInputLabel-root.Mui-focused": { color: "primary.main" },
+              "& .MuiInputBase-input": { color: "text.primary" },
               "& .MuiOutlinedInput-root": {
-                "& fieldset": { borderColor: "#ffffff" },
-                "&:hover fieldset": { borderColor: "#ffffff !important" },
-                "&.Mui-focused fieldset": { borderColor: "#ffffff" },
+                "& fieldset": { borderColor: "divider" },
+                "&:hover fieldset": { borderColor: "text.secondary" },
+                "&.Mui-focused fieldset": { borderColor: "primary.main" },
               },
             }}
           />

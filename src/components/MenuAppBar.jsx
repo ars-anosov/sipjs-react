@@ -9,17 +9,17 @@ import {
   IconButton,
   List,
   ListItemButton,
-  ListItemIcon,
   ListItemText,
+  ListSubheader,
   Popover,
   Stack,
   Toolbar,
   Typography,
 } from "@mui/material";
-import { useTheme } from "@mui/material/styles";
 import PropTypes from "prop-types";
 import { useEffect, useState } from "react";
 import Copyright from "../Copyright";
+import { HEADER_BACKGROUND } from "../theme.js";
 import AuthAdInfo from "./AuthAdInfo";
 import AuthIco from "./AuthIco";
 import PhoneDir from "./PhoneDir";
@@ -27,36 +27,38 @@ import PhoneIco from "./PhoneIco";
 import PhonePad from "./PhonePad";
 
 const MENU_ITEMS_AUTH = [
-  { key: "displayAd", primary: "AD Авторизация", secondary: "AuthAd.jsx" },
   { key: "displayControl", primary: "AD Кругляш", secondary: "AuthIco.jsx" },
-  {
-    key: "displayAuthPad",
-    primary: "Мост к сервисам",
-    secondary: "AuthPad.jsx",
-  },
+  { key: "displayAd", primary: "AD Авторизация", secondary: "AuthAd.jsx" },
+  { key: "displayAuthPad", primary: "Мост к сервисам", secondary: "AuthPad.jsx" },
 ];
 
 const MENU_ITEMS_PHONE = [
+  { key: "displayControl", primary: "SIP Кругляш", secondary: "PhoneIco.jsx" },
   { key: "displayReg", primary: "SIP Регистрация", secondary: "PhoneReg.jsx" },
   { key: "displayPad", primary: "SIP Телефон", secondary: "PhonePad.jsx" },
-  {
-    key: "displayHistory",
-    primary: "SIP Звонки",
-    secondary: "PhoneHistory.jsx",
-  },
+  { key: "displayHistory", primary: "SIP Звонки", secondary: "PhoneHistory.jsx" },
   { key: "displayChat", primary: "SIP Сообщения", secondary: "PhoneChat.jsx" },
-  { key: "displayControl", primary: "SIP Кругляш", secondary: "PhoneIco.jsx" },
   { key: "displayDir", primary: "Тел.Справочник", secondary: "PhoneDir.jsx" },
 ];
 
 const MENU_ITEMS_LK = [
   // { key: 'displayLkToken', primary: 'LiveKit Приглашение', secondary: 'LkToken.jsx' },
-  {
-    key: "displayControl",
-    primary: "LiveKit Встреча",
-    secondary: "LkMeet.jsx",
-  },
+  { key: "displayControl", primary: "LiveKit Встреча", secondary: "LkMeet.jsx" },
 ];
+
+// Отступы строки меню. Горизонталь равна padding подзаголовков List, чтобы
+// названия пунктов и заголовки секций стояли на одной вертикали.
+// Радиус, вертикальные поля строки и цвет берутся из theme.MuiListItemButton.
+const MENU_ROW_SX = { px: 1.5, py: 0.75, my: 0.25 };
+
+const LIST_SUBHEADER_PROPS = {
+  component: "div",
+  disableSticky: true,
+  sx: { px: 1.5 },
+};
+
+// Кликабельная группа «подпись + индикатор статуса» в шапке.
+const STATUS_STACK_SX = { cursor: "pointer", alignItems: "center" };
 
 function MenuAppBar(props) {
   const { phoneControlRdcr, phoneControlActions, authControlRdcr, authControlActions, lkControlRdcr, lkControlActions } = props;
@@ -68,12 +70,6 @@ function MenuAppBar(props) {
       if (import.meta.env.DEV) console.log("MenuAppBar UNMOUNT");
     };
   }, []);
-
-  const theme = useTheme();
-
-  const rawToolbarHeight = theme?.mixins?.toolbar?.maxHeight;
-  const toolbarHeight =
-    typeof rawToolbarHeight === "number" ? rawToolbarHeight : rawToolbarHeight ? parseInt(String(rawToolbarHeight).replace("px", ""), 10) : 64;
 
   const [anchorEl_phoneControl, setAnchorEl_phoneControl] = useState(null);
   const [anchorEl_adControl, setAnchorEl_adControl] = useState(null);
@@ -95,7 +91,7 @@ function MenuAppBar(props) {
   return (
     // Без flexGrow: корень App — flex-колонка, и выросшая обёртка уводила бы футер вниз
     <Box>
-      <AppBar position="static">
+      <AppBar position="static" color="inherit" elevation={0}>
         <Toolbar>
           <IconButton size="large" edge="start" color="inherit" aria-label="menu" sx={{ mr: 2 }} onClick={handleOpenMenu}>
             <MenuIcon />
@@ -112,69 +108,97 @@ function MenuAppBar(props) {
               },
             }}
           >
-            <Stack direction="row" spacing={2} sx={{ p: 1, height: toolbarHeight }}>
-              <Box component="img" src="img/Vite.png" sx={{ height: "100%", width: "auto" }} alt="Vite" />
-              <Box component="img" src="img/React.png" sx={{ height: "100%", width: "auto" }} alt="React" />
+            <Stack
+              direction="row"
+              spacing={0.5}
+              sx={{
+                px: 1.5,
+                py: 1.5,
+                alignItems: "center",
+                bgcolor: HEADER_BACKGROUND,
+                borderBottom: "1px solid",
+                borderColor: "divider",
+              }}
+            >
+              <Stack direction="row" spacing={0.5} sx={{ alignItems: "center" }}>
+                <Box component="img" src="img/Vite.png" sx={{ height: 18, width: "auto" }} alt="Vite" />
+                <Box component="img" src="img/React.png" sx={{ height: 18, width: "auto" }} alt="React" />
+              </Stack>
+              {/* Две распорки, а не ml:"auto": у Stack со spacing селектор
+                  `& > :not(style) + :not(style)` задаёт margin-left и перебивает auto. */}
               <Box sx={{ flexGrow: 1 }} />
-              <IconButton onClick={handleCloseMenu}>
-                <ChevronLeftIcon color="primary" sx={{ height: "100%", width: "auto" }} />
+              <Typography variant="subtitle1" color="primary" noWrap>
+                Компоненты
+              </Typography>
+              <Box sx={{ flexGrow: 1 }} />
+              <IconButton size="small" onClick={handleCloseMenu} sx={{ color: "text.secondary" }}>
+                <ChevronLeftIcon />
               </IconButton>
             </Stack>
 
-            <Divider />
+            <Box sx={{ flex: 1, overflowY: "auto", py: 1 }}>
+              <List disablePadding sx={{ px: 1 }} subheader={<ListSubheader {...LIST_SUBHEADER_PROPS}>Компоненты AD</ListSubheader>}>
+                {MENU_ITEMS_AUTH.map((item) => {
+                  const isChecked = !!authControlRdcr[item.key];
+                  const labelId = `checkbox-list-label-${item.key}`;
+                  return (
+                    <ListItemButton key={item.key} onClick={() => toggleDisplayAuth(item.key)} sx={MENU_ROW_SX}>
+                      <ListItemText
+                        id={labelId}
+                        primary={item.primary}
+                        secondary={item.secondary}
+                        slotProps={{ primary: { noWrap: true }, secondary: { noWrap: true } }}
+                      />
+                      <Checkbox edge="end" size="small" checked={isChecked} tabIndex={-1} disableRipple slotProps={{ input: { "aria-labelledby": labelId } }} />
+                    </ListItemButton>
+                  );
+                })}
+              </List>
 
-            <List>
-              {MENU_ITEMS_AUTH.map((item) => {
-                const isChecked = !!authControlRdcr[item.key];
-                const labelId = `checkbox-list-label-${item.key}`;
-                return (
-                  <ListItemButton key={item.key} onClick={() => toggleDisplayAuth(item.key)} sx={{ alignItems: "flex-start" }}>
-                    <ListItemIcon>
-                      <Checkbox edge="start" checked={isChecked} tabIndex={-1} disableRipple slotProps={{ input: { "aria-labelledby": labelId } }} />
-                    </ListItemIcon>
-                    <ListItemText id={labelId} primary={item.primary} secondary={item.secondary} />
-                  </ListItemButton>
-                );
-              })}
-            </List>
+              <Divider sx={{ my: 1.5 }} />
 
-            <Divider />
+              <List disablePadding sx={{ px: 1 }} subheader={<ListSubheader {...LIST_SUBHEADER_PROPS}>Компоненты SIP</ListSubheader>}>
+                {MENU_ITEMS_PHONE.map((item) => {
+                  const isChecked = !!phoneControlRdcr[item.key];
+                  const labelId = `checkbox-list-label-${item.key}`;
+                  return (
+                    <ListItemButton key={item.key} onClick={() => toggleDisplayPhone(item.key)} sx={MENU_ROW_SX}>
+                      <ListItemText
+                        id={labelId}
+                        primary={item.primary}
+                        secondary={item.secondary}
+                        slotProps={{ primary: { noWrap: true }, secondary: { noWrap: true } }}
+                      />
+                      <Checkbox edge="end" size="small" checked={isChecked} tabIndex={-1} disableRipple slotProps={{ input: { "aria-labelledby": labelId } }} />
+                    </ListItemButton>
+                  );
+                })}
+              </List>
 
-            <List>
-              {MENU_ITEMS_PHONE.map((item) => {
-                const isChecked = !!phoneControlRdcr[item.key];
-                const labelId = `checkbox-list-label-${item.key}`;
-                return (
-                  <ListItemButton key={item.key} onClick={() => toggleDisplayPhone(item.key)} sx={{ alignItems: "flex-start" }}>
-                    <ListItemIcon>
-                      <Checkbox edge="start" checked={isChecked} tabIndex={-1} disableRipple slotProps={{ input: { "aria-labelledby": labelId } }} />
-                    </ListItemIcon>
-                    <ListItemText id={labelId} primary={item.primary} secondary={item.secondary} />
-                  </ListItemButton>
-                );
-              })}
-            </List>
+              <Divider sx={{ my: 1.5 }} />
 
-            <Divider />
-
-            <List>
-              {MENU_ITEMS_LK.map((item) => {
-                const isChecked = !!lkControlRdcr[item.key];
-                const labelId = `checkbox-list-label-${item.key}`;
-                return (
-                  <ListItemButton key={item.key} onClick={() => toggleDisplayLk(item.key)} sx={{ alignItems: "flex-start" }}>
-                    <ListItemIcon>
-                      <Checkbox edge="start" checked={isChecked} tabIndex={-1} disableRipple slotProps={{ input: { "aria-labelledby": labelId } }} />
-                    </ListItemIcon>
-                    <ListItemText id={labelId} primary={item.primary} secondary={item.secondary} />
-                  </ListItemButton>
-                );
-              })}
-            </List>
+              <List disablePadding sx={{ px: 1 }} subheader={<ListSubheader {...LIST_SUBHEADER_PROPS}>Компоненты LiveKit</ListSubheader>}>
+                {MENU_ITEMS_LK.map((item) => {
+                  const isChecked = !!lkControlRdcr[item.key];
+                  const labelId = `checkbox-list-label-${item.key}`;
+                  return (
+                    <ListItemButton key={item.key} onClick={() => toggleDisplayLk(item.key)} sx={MENU_ROW_SX}>
+                      <ListItemText
+                        id={labelId}
+                        primary={item.primary}
+                        secondary={item.secondary}
+                        slotProps={{ primary: { noWrap: true }, secondary: { noWrap: true } }}
+                      />
+                      <Checkbox edge="end" size="small" checked={isChecked} tabIndex={-1} disableRipple slotProps={{ input: { "aria-labelledby": labelId } }} />
+                    </ListItemButton>
+                  );
+                })}
+              </List>
+            </Box>
 
             <Box
               sx={{
-                mt: "auto", // Выталкивает блок в самый низ контейнера
+                mt: "auto",
                 p: 2,
                 textAlign: "center",
               }}
@@ -193,7 +217,7 @@ function MenuAppBar(props) {
           <Box sx={{ flexGrow: 1 }} />
 
           {phoneControlRdcr.displayControl && (
-            <Stack direction="row" spacing={1} sx={{ cursor: "pointer", alignItems: "center" }} onClick={(e) => setAnchorEl_phoneControl(e.currentTarget)}>
+            <Stack direction="row" spacing={1} sx={STATUS_STACK_SX} onClick={(e) => setAnchorEl_phoneControl(e.currentTarget)}>
               <Typography variant="caption" sx={{ pl: 1 }}>
                 {phoneControlRdcr.icoHeader}
               </Typography>
@@ -202,7 +226,7 @@ function MenuAppBar(props) {
           )}
 
           {authControlRdcr.displayControl && (
-            <Stack direction="row" spacing={1} sx={{ cursor: "pointer", alignItems: "center" }} onClick={(e) => setAnchorEl_adControl(e.currentTarget)}>
+            <Stack direction="row" spacing={1} sx={STATUS_STACK_SX} onClick={(e) => setAnchorEl_adControl(e.currentTarget)}>
               <Typography variant="caption" sx={{ pl: 1 }}>
                 {authControlRdcr?.responseData?.ad_login}
               </Typography>
