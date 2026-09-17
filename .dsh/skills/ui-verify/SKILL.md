@@ -18,6 +18,13 @@ whenToUse: Правка в src/components, src/containers, src/reducers, theme.j
 `.playwright/cache/output`), браузеры — в общем кэше `~/.cache/ms-playwright` (только чтение).
 Вызывать `playwright-cli` напрямую не нужно.
 
+`open`, `snapshot`, `screenshot` и `console` складывают в `.playwright/cache/output/` файлы с
+авто-именами (`page-<ISO>.yml|png`, `console-<ISO>.log`) и сами их не удаляют — за день проверок
+там набираются сотни файлов. Отключить это настройкой нельзя: `outputMode: "stdout"` в
+`cli.config.json` не мешает `open`/`snapshot` писать `page-*.yml`, поэтому работают только
+ретеншн обёртки (авто-имена старше суток) и уборка из шага 7. Два одновременных прогона внутри
+проекта делят сессию `default` — разводить их переменной `PLAYWRIGHT_CLI_SESSION=<имя>`.
+
 Если браузер падает с `error while loading shared libraries`, не хватает системных библиотек
 Chromium:
 
@@ -67,12 +74,17 @@ having a XServer running» (у песочницы приватный `/tmp`, X-�
 4. Экономить контекст — снапшот не читать целиком:
 
 ```bash
-.dsh/bin/browser snapshot --depth=4          # частичное дерево
-.dsh/bin/browser find "Подключить телефон"   # точечный поиск с контекстом
-.dsh/bin/browser console error               # только ошибки
-.dsh/bin/browser requests                    # сеть, затем request <index>
+.dsh/bin/browser snapshot --depth=4                # частичное дерево
+.dsh/bin/browser find "Телефон не зарегистрирован" # поиск по текстовым узлам снапшота
+.dsh/bin/browser eval "() => [...document.querySelectorAll('button')].map((b) => b.textContent.trim()).filter(Boolean)"
+.dsh/bin/browser console error                     # только ошибки
+.dsh/bin/browser requests                          # сеть, затем request <index>
 .dsh/bin/browser localstorage-list
 ```
+
+`find` ищет **текстовые узлы** снапшота, а не accessible names: подпись кнопки в снапшоте
+(`button "Подключить телефон"`) он не находит (`No matches found`), хотя текст есть в DOM —
+для имён и состояний элементов использовать `eval`.
 
 5. Смотреть именно то, что затронуто правкой:
 
@@ -103,7 +115,13 @@ having a XServer running» (у песочницы приватный `/tmp`, X-�
    правки — скриншот из `.playwright/cache/output/` (показать через `read_image`) плюс ссылка
    для человека через `win_open_url`.
 
-7. Убрать за собой: `.dsh/bin/browser close` и остановить job dev-сервера.
+7. Убрать за собой: `.dsh/bin/browser close`, остановить job dev-сервера и удалить из
+   `.playwright/cache/output/` авто-имена текущего прогона (`page-*.yml`, `page-*.png`,
+   `console-*.log`) — обёртка чистит только то, что старше суток. Скриншот для отчёта снимать
+   сразу с именем и путём от корня репозитория:
+   `.dsh/bin/browser screenshot --filename=.playwright/cache/output/ui-check-<тема>.png` — тогда
+   его удалять не нужно. Голое имя без каталога CLI кладёт в текущий каталог, и файл всплывает
+   в `git status` как untracked.
 
 ## Признаки проблемы
 

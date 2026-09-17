@@ -8,7 +8,25 @@ WebRTC-телефон: SIP (sip.js), видеовстречи LiveKit, AD-авт
 
 Node.js 24, Vite 8, React 19, MUI 9 + Emotion, Redux 5 (redux-thunk; logger в dev), react-router-dom 7 (HashRouter), sip.js, livekit-client + `@livekit/components-react`, ky, date-fns. JavaScript (без TS). Формат — Biome.
 
-`npm run dev | build | serve | lint | format | check`. Тестов нет.
+```bash
+npm install
+npm run dev      # dev-сервер, http://localhost:3000 (порт 3000 из vite.config.js)
+npm run build    # сборка в dist
+npm run serve    # предпросмотр собранного dist, порт из вывода (по умолчанию 4173)
+npm run lint     # biome lint .
+npm run format   # biome format --write .
+npm run check    # biome check --write .
+```
+
+Тестов нет.
+
+## Инструменты и среда (DSH)
+
+Общие правила машины (WSL ↔ Windows, Mermaid, archify, проверка результата) — в user-global `~/.dsh/AGENTS.md`; повторяемые процедуры — навыками в `.dsh/skills/`. Здесь только специфика репозитория:
+
+- **Диаграммы-артефакты** — skill `archify`, результат в `docs/archify/` (`sipjs-react-architecture.*`, `sipjs-react-sip-registration.*`); готовые HTML/JSON не править вручную, только перегенерация, проверка — навык `archify-visual-check`. В git остаются лишь `*.visual-check.2048x1320.light.png` (превью для README) и receipt `*.visual-check.json`, остальные скриншоты и contact sheet — временные (перечислены в `.gitignore`).
+- **Диаграммы в ответе** — Mermaid-блоком, а не ASCII-артом; образец — `docs/STATE.md`.
+- **Проверка UI** — `npm run dev` (порт 3000 из `vite.config.js`; если занят, Vite возьмёт следующий — дальше использовать фактический порт из вывода): человеку открывать `win_open_url` по этому порту, агенту — Linux-Chromium в WSL обёрткой `.dsh/bin/browser` (Playwright CLI, только headless). Настройки — `.playwright/cli.config.json` (chromium, viewport 1280×800, уровень `warning`, вывод в `.playwright/cache/output`). Файлы с авто-именами (`page-*`, `console-*`) там копятся: обёртка удаляет их старше суток, свежие за прогон убирает шаг 7 навыка `ui-verify`; рантайм демона — в игнорируемом `.playwright/cache/`. Обёртка уводит `HOME`/`XDG_CACHE_HOME` внутрь проекта, иначе песочница DSH не даёт Chrome записать профиль. Весь сценарий — одной цепочкой команд в одном вызове `bash` (демон CLI не переживает вызов). Порядок и границы проверки (SIP, звонки и медиа требуют живого сервера) — навык `ui-verify`.
 
 ## Структура
 
@@ -22,9 +40,27 @@ src/
 ├── store/        # configureStore.js, preloadedState.js (сид из сервисов)
 ├── constants/    # redux.js (action types), storage.js (ключи и лимиты localStorage), ui.js
 └── App.jsx, main.jsx, theme.js, Copyright.jsx
-mock/  public/  dist/   # dev-мок, статика, сборка (dist — только npm run build)
-docs/                   # документация и GitHub Pages (ars-anosov.github.io/sipjs-react):
-                        # index.html, STATE.md (Mermaid-схемы), archify/ (исключён из Biome), .nojekyll
+mock/             # mock API для dev (vite plugin, apply: "serve")
+public/           # статика: img/, sounds/, sw.js
+img/              # скриншоты компонентов для README
+docs/             # документация и GitHub Pages (ars-anosov.github.io/sipjs-react):
+                  # index.html (лендинг), STATE.md (Mermaid-схемы), archify/ (генерация skill'ом
+                  # archify, исключён из Biome), .nojekyll
+dist/             # результат npm run build — вручную не править
+.github/          # CI (workflows/ci.yml: npm ci + build) и адаптер copilot-instructions.md
+.dsh/             # навыки агента (skills/ui-verify) и обёртка bin/browser
+.playwright/      # конфиг Playwright CLI (cli.config.json); cache/ — рантайм и вывод проверок
+                  # (авто-имена page-*/console-* чистят обёртка и навык ui-verify), в git не хранится
+.devcontainer/    # devcontainer: образ javascript-node 24, forwardPorts 3000 и 4173
+.vscode/          # редактор: Biome-форматтер и formatOnSave, рекомендации расширений
+.zed/             # Zed: Biome как LSP и форматтер для JS/JSON, исключения node_modules и dist
+.cursor/          # адаптер правил для Cursor (rules/project.mdc)
+.codex/           # адаптер правил для Codex (codex.md)
+.editorconfig     # LF, финальный перевод строки, 2 пробела (в Markdown пробелы не обрезаются)
+jsconfig.json     # настройки JS-проекта для редактора: ES2022, JSX react-jsx, Bundler
+biome.json        # линтер и форматтер; includes исключает dist, node_modules, docs/archify
+README.md         # описание проекта и быстрый старт (Node.js 24), скриншоты — в img/
+LICENSE           # MIT
 ```
 
 ## Архитектура
@@ -51,18 +87,11 @@ docs/                   # документация и GitHub Pages (ars-anosov.g
 - Redux: action types — `constants/redux.js` (префиксы `PHONECTL_`, `AUTHCTL_`, `LKTOKEN_`/`LK_`).
 - Прочее: ключи `localStorage` — `constants/storage.js`; HTTP (`ky`) и `localStorage` — только в `services/`; ошибки — `actions/utils/kyError.js`; Vite `base: './'` сохранять.
 - Формат: Biome — 2 пробела, только `Space` (без `Tab`), двойные кавычки; с автоформатом не спорить.
+- Внешние библиотеки (sip.js, LiveKit): перед использованием незнакомого метода сверяться с официальной документацией, а в ответе давать ссылку на раздел документации этого метода; API по памяти не выдумывать.
 
 ## CI
 
 `.github/workflows/ci.yml` — push в `main`/`master`: Node.js 24, `npm ci`, `npm run build`.
-
-## Инструменты и среда (DSH)
-
-Общие правила машины (WSL ↔ Windows, Mermaid, archify, проверка результата) — в user-global `~/.dsh/AGENTS.md`; повторяемые процедуры — навыками в `.dsh/skills/`. Здесь только специфика репозитория:
-
-- **Диаграммы-артефакты** — skill `archify`, результат в `docs/archify/` (`sipjs-react-architecture.*`, `sipjs-react-sip-registration.*`); готовые HTML/JSON не править вручную, только перегенерация, проверка — навык `archify-visual-check`. В git остаются лишь `*.visual-check.2048x1320.light.png` (превью для README) и receipt `*.visual-check.json`, остальные скриншоты и contact sheet — временные (перечислены в `.gitignore`).
-- **Диаграммы в ответе** — Mermaid-блоком, а не ASCII-артом; образец — `docs/STATE.md`.
-- **Проверка UI** — `npm run dev` (порт 3000 из `vite.config.js`; если занят, Vite возьмёт следующий — дальше использовать фактический порт из вывода): человеку открывать `win_open_url` по этому порту, агенту — Linux-Chromium в WSL обёрткой `.dsh/bin/browser` (Playwright CLI, только headless). Настройки — `.playwright/cli.config.json` (chromium, viewport 1280×800, вывод в `.playwright/cache/output`), рантайм — в игнорируемом `.playwright/cache/`; обёртка уводит `HOME`/`XDG_CACHE_HOME` внутрь проекта, иначе песочница DSH не даёт Chrome записать профиль. Весь сценарий — одной цепочкой команд в одном вызове `bash` (демон CLI не переживает вызов). Порядок и границы проверки (SIP, звонки и медиа требуют живого сервера) — навык `ui-verify`.
 
 ## Правила для агента
 
@@ -72,4 +101,6 @@ docs/                   # документация и GitHub Pages (ars-anosov.g
 4. Без TS/тестов/CI/новых зависимостей/инфраструктуры без явного запроса.
 5. Не редактировать `dist` вручную — только `npm run build`.
 6. Русский язык в документации, комментариях и ответах.
-7. При смене соглашений править этот файл; адаптеры не дублируют правила.
+7. Формат — по Biome: 2 пробела, только пробелы, без табов, двойные кавычки; с автоформатом не спорить.
+8. Для каждого использованного метода внешних библиотек давать ссылку на официальную документацию этого метода; не выдумывать API по памяти, а сверяться с источником.
+9. При смене соглашений править этот файл; адаптеры не дублируют правила.
