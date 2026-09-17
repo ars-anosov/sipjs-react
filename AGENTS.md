@@ -22,11 +22,10 @@ npm run check    # biome check --write .
 
 ## Инструменты и среда (DSH)
 
-Общие правила машины (WSL ↔ Windows, Mermaid, archify, проверка результата) — в user-global `~/.dsh/AGENTS.md`; повторяемые процедуры — навыками в `.dsh/skills/`. Здесь только специфика репозитория:
+Общие правила машины (WSL ↔ Windows, Mermaid — образец `docs/STATE.md`, archify, проверка результата) — в user-global `~/.dsh/AGENTS.md`; повторяемые процедуры — навыками в `.dsh/skills/`. Здесь только специфика репозитория:
 
-- **Диаграммы-артефакты** — skill `archify`, результат в `docs/archify/` (`sipjs-react-architecture.*`, `sipjs-react-sip-registration.*`); готовые HTML/JSON не править вручную, только перегенерация, проверка — навык `archify-visual-check`. В git остаются лишь `*.visual-check.2048x1320.light.png` (превью для README) и receipt `*.visual-check.json`, остальные скриншоты и contact sheet — временные (перечислены в `.gitignore`).
-- **Диаграммы в ответе** — Mermaid-блоком, а не ASCII-артом; образец — `docs/STATE.md`.
-- **Проверка UI** — `npm run dev` (порт 3000 из `vite.config.js`; если занят, Vite возьмёт следующий — дальше использовать фактический порт из вывода): человеку открывать `win_open_url` по этому порту, агенту — Linux-Chromium в WSL обёрткой `.dsh/bin/browser` (Playwright CLI, только headless). Настройки — `.playwright/cli.config.json` (chromium, viewport 1280×800, уровень `warning`, вывод в `.playwright/cache/output`). Файлы с авто-именами (`page-*`, `console-*`) там копятся: обёртка удаляет их старше суток, свежие за прогон убирает шаг 7 навыка `ui-verify`; рантайм демона — в игнорируемом `.playwright/cache/`. Обёртка уводит `HOME`/`XDG_CACHE_HOME` внутрь проекта, иначе песочница DSH не даёт Chrome записать профиль. Весь сценарий — одной цепочкой команд в одном вызове `bash` (демон CLI не переживает вызов). Порядок и границы проверки (SIP, звонки и медиа требуют живого сервера) — навык `ui-verify`.
+- **Диаграммы-артефакты** — skill `archify`, результат в `docs/archify/` (`sipjs-react-architecture.*`, `sipjs-react-sip-registration.*`); проверка — навык `archify-visual-check`. В git остаются лишь `*.visual-check.2048x1320.light.png` (превью для README) и receipt `*.visual-check.json`, остальные скриншоты и contact sheet — временные (перечислены в `.gitignore`).
+- **Проверка UI** — `npm run dev` (порт 3000 из `vite.config.js`; если занят, Vite возьмёт следующий — брать фактический из вывода), человеку — `win_open_url` по этому порту, агенту — обёртка `.dsh/bin/browser`; настройки — `.playwright/cli.config.json`, рантайм и вывод — в игнорируемом `.playwright/cache/`, авто-имена `page-*`/`console-*` чистят обёртка (старше суток) и шаг 7 навыка `ui-verify`. Порядок и границы проверки (SIP, звонки и медиа требуют живого сервера) — навык `ui-verify`.
 
 ## Структура
 

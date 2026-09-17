@@ -6,7 +6,7 @@
     "quality_profile": "showcase",
     "repository": {
       "url": "https://github.com/ars-anosov/sipjs-react.git",
-      "revision": "1a4a57e7af8985e33f9ca8b168cf3469d8d2e381"
+      "revision": "8d453dceb0cea81775ffbc2189b6a858b2866d38"
     },
     "legend": {
       "mode": "auto",
@@ -52,7 +52,7 @@
           "store",
           "ui"
         ],
-        "note": "AuthContainer — мост AUTHCTL_ ↔ PHONECTL_: реквизиты AD попадают в PhoneReg, регистрация — по тумблеру AuthPad (off / ok / fail)."
+        "note": "AuthLinks открывает обе формы входа; AuthContainer — мост AUTHCTL_ ↔ PHONECTL_, тумблер AuthPad отражает regState (off / ok / fail)."
       },
       {
         "id": "livekit-path",
@@ -97,7 +97,7 @@
       "id": "ui",
       "type": "frontend",
       "label": "Компоненты React",
-      "sublabel": "PhonePad · AuthPad · LkMeet",
+      "sublabel": "AuthLinks · PhoneReg · LkMeet",
       "tag": "MUI 9",
       "pos": [
         250,
@@ -109,16 +109,19 @@
       ],
       "sources": [
         {
+          "path": "src/components/AuthLinks.jsx",
+          "line": 17,
+          "label": "стартовый экран"
+        },
+        {
           "path": "src/components/PhonePad.jsx",
+          "line": 52,
           "label": "телефон"
         },
         {
-          "path": "src/components/AuthPad.jsx",
-          "label": "мост к сервисам"
-        },
-        {
           "path": "src/components/LkMeet.jsx",
-          "label": "LiveKit-встреча"
+          "line": 228,
+          "label": "встреча"
         }
       ]
     },
@@ -139,12 +142,13 @@
       "sources": [
         {
           "path": "src/containers/AuthContainer.jsx",
-          "line": 56,
-          "label": "мост AUTHCTL_ → PHONECTL_"
+          "line": 70,
+          "label": "мост AUTHCTL_ ↔ PHONECTL_"
         },
         {
           "path": "src/containers/PhoneContainer.jsx",
-          "line": 16
+          "line": 16,
+          "label": "домен phoneControlRdcr"
         }
       ]
     },
@@ -165,12 +169,17 @@
       "sources": [
         {
           "path": "src/actions/authControlActions.js",
-          "line": 45,
-          "label": "POST uriAdAuth"
+          "line": 15,
+          "label": "handleAdRegister"
         },
         {
           "path": "src/actions/phoneControlActions.js",
-          "line": 456,
+          "line": 99,
+          "label": "handleClkRegister"
+        },
+        {
+          "path": "src/actions/phoneControlActions.js",
+          "line": 434,
           "label": "SIP MESSAGE"
         }
       ]
@@ -192,8 +201,8 @@
       "sources": [
         {
           "path": "src/services/phoneRuntime.js",
-          "line": 993,
-          "label": "публичный API"
+          "line": 336,
+          "label": "registerSipUserAgent"
         }
       ]
     },
@@ -229,12 +238,12 @@
       "sources": [
         {
           "path": "src/store/preloadedState.js",
-          "line": 19,
+          "line": 14,
           "label": "сид из сервисов"
         },
         {
           "path": "src/store/configureStore.js",
-          "line": 12,
+          "line": 21,
           "label": "thunk + logger"
         }
       ]
@@ -278,8 +287,8 @@
       "sources": [
         {
           "path": "src/services/adAuth.js",
-          "line": 48,
-          "label": "loginAd"
+          "line": 41,
+          "label": "loginAd → POST uriAdAuth"
         }
       ]
     },
@@ -438,7 +447,7 @@
       "id": "actions-to-ad",
       "from": "actions",
       "to": "ad",
-      "label": "POST uriAdAuth",
+      "label": "POST uriAdAuth · adAuth.js",
       "variant": "security",
       "fromSide": "bottom",
       "toSide": "top"
@@ -480,25 +489,25 @@
         "components/ — презентация на MUI: sip.js и livekit-client здесь не импортируются",
         "containers/ — useSelector + bindActionCreators; мосты AUTHCTL_ ↔ PHONECTL_ только в AuthContainer",
         "actions/ — thunk: валидация → сервис → dispatch; чужой срез не читается через getState()",
-        "services/ — phoneRuntime, lkRuntime, adAuth, lkToken, phoneDirectory, phoneStorage, phoneNotifications"
+        "services/ + store/ — сервисы, сид preloadedState и инъекция middleware в configureStore"
       ]
     },
     {
       "dot": "emerald",
-      "title": "Мост к сервисам",
+      "title": "Стартовый экран и владение рендером",
       "items": [
-        "handleAdRegister → adAuth.loginAd → POST uriAdAuth → AUTHCTL_SUBMIT_SUCCESS",
-        "AuthContainer подставляет sip_username/sip_secret в PhoneReg и показывает AuthPad",
-        "тумблер AuthPad трёхпозиционный по regState (off / ok / fail); authTimeoutMiddleware раз в 10 с проверяет AD-сессию (24 ч)"
+        "на старте displayReg=true: модальная форма SIP открыта поверх блока AuthLinks",
+        "AuthLinks виден, пока status ≠ success и regState ≠ ok; ссылки открывают формы AD и SIP",
+        "владение по срезу: AuthContainer — AuthLinks/AuthAd/AuthPad, PhoneContainer — PhoneReg/PhonePad/PhoneHistory/PhoneChat"
       ]
     },
     {
       "dot": "violet",
-      "title": "Состояние и хранилища",
+      "title": "Мост AD → SIP и состояние",
       "items": [
-        "слой store/ — preloadedState.js собирает сид из сервисов, configureStore передаёт срезы и инжектит middleware",
-        "Redux — UI-флаги, заголовки, настройки (uriWebRtc, callerUserNum, useIce), звонки и чат",
-        "localStorage — настройки, звонки, чат и сессия AD; HTTP (ky) и localStorage только в services/"
+        "handleAdRegister → adAuth.loginAd → POST uriAdAuth → AUTHCTL_SUBMIT_SUCCESS",
+        "тумблер AuthPad трёхпозиционный по regState (off / ok / fail)",
+        "authTimeoutMiddleware раз в 10 с проверяет AD-сессию (24 ч); ky и localStorage только в services/"
       ]
     }
   ]

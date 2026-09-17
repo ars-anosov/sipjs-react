@@ -4840,7 +4840,7 @@
       </div>
     </div>
 
-    <script id="archify-guided-views-data" type="application/json">[{"id":"start-registration","label":"Регистрация из off","focus":["user","authpad","authcont","actions","runtime"],"note":"Клик из off запускает handleClkRegister с реквизитами AD."},{"id":"reject-and-red","label":"Отказ → красный","focus":["registerer","runtime","actions","rdcr","authcont","authpad"],"note":"Отказ даёт regState=fail; PhoneReg не форсируется, показывается AuthPad."},{"id":"unregister","label":"Разрегистрация из ok","focus":["user","authpad","authcont","actions","rdcr"],"note":"Клик по зелёному тумблеру разрегистрирует сессию и возвращает regState в off."}]</script>
+    <script id="archify-guided-views-data" type="application/json">[{"id":"start-registration","label":"Регистрация из off","focus":["user","authpad","authcont","actions","runtime"],"note":"Форма PhoneReg открыта на старте (displayReg=true); тумблер AuthPad из off запускает handleClkRegister с реквизитами AD."},{"id":"reject-and-red","label":"Отказ → красный","focus":["registerer","runtime","actions","rdcr","authcont","authpad"],"note":"Отказ даёт regState=fail; PhoneReg не форсируется, показывается AuthPad."},{"id":"unregister","label":"Разрегистрация из ok","focus":["user","authpad","authcont","actions","rdcr"],"note":"Клик по зелёному тумблеру разрегистрирует сессию и возвращает regState в off."}]</script>
 
     <div class="guided-views no-print" id="guided-views" hidden aria-label="Guided diagram views">
       <button id="guided-view-prev" type="button" aria-label="Previous guided view" title="Previous guided view ([)">&#8592;</button>
@@ -4909,13 +4909,13 @@
         <rect width="100%" height="100%" fill="url(#grid)" />
 
         <!-- Time Segments -->
-        <rect data-graph-role="structural-frame" data-composition-frame-kind="segment" data-composition-frame-id="0" x="48" y="150" width="1884" height="245" rx="10" class="c-lane" stroke-width="1"/>
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="segment" data-composition-frame-id="0" x="48" y="150" width="1884" height="185" rx="10" class="c-lane" stroke-width="1"/>
 
-        <rect data-graph-role="structural-frame" data-composition-frame-kind="segment" data-composition-frame-id="1" x="48" y="400" width="1884" height="100" rx="10" class="c-lane" stroke-width="1"/>
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="segment" data-composition-frame-id="1" x="48" y="340" width="1884" height="205" rx="10" class="c-lane" stroke-width="1"/>
 
-        <rect data-graph-role="structural-frame" data-composition-frame-kind="segment" data-composition-frame-id="2" x="48" y="505" width="1884" height="270" rx="10" class="c-lane" stroke-width="1"/>
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="segment" data-composition-frame-id="2" x="48" y="550" width="1884" height="240" rx="10" class="c-lane" stroke-width="1"/>
 
-        <rect data-graph-role="structural-frame" data-composition-frame-kind="segment" data-composition-frame-id="3" x="48" y="780" width="1884" height="165" rx="10" class="c-lane" stroke-width="1"/>
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="segment" data-composition-frame-id="3" x="48" y="795" width="1884" height="140" rx="10" class="c-lane" stroke-width="1"/>
 
         <!-- Lifelines -->
         <path d="M 157 142 L 157 965" class="a-default" stroke-width="0.8" stroke-dasharray="3,7"/>
@@ -4927,28 +4927,30 @@
         <path d="M 1845 142 L 1845 965" class="a-default" stroke-width="0.8" stroke-dasharray="3,7"/>
 
         <!-- Activations -->
-        <rect x="433.3333333333333" y="170" width="10" height="56" rx="3" class="c-mask"/>
-        <rect x="433.3333333333333" y="170" width="10" height="56" rx="3" class="c-frontend" stroke-width="1"/>
-        <rect x="714.6666666666666" y="208" width="10" height="90" rx="3" class="c-mask"/>
-        <rect x="714.6666666666666" y="208" width="10" height="90" rx="3" class="c-frontend" stroke-width="1"/>
-        <rect x="996" y="246" width="10" height="244" rx="3" class="c-mask"/>
-        <rect x="996" y="246" width="10" height="244" rx="3" class="c-backend" stroke-width="1"/>
-        <rect x="1277.3333333333333" y="322" width="10" height="126" rx="3" class="c-mask"/>
-        <rect x="1277.3333333333333" y="322" width="10" height="126" rx="3" class="c-backend" stroke-width="1"/>
-        <rect x="1558.6666666666665" y="360" width="10" height="50" rx="3" class="c-mask"/>
-        <rect x="1558.6666666666665" y="360" width="10" height="50" rx="3" class="c-external" stroke-width="1"/>
-        <rect x="1277.3333333333333" y="528" width="10" height="124" rx="3" class="c-mask"/>
-        <rect x="1277.3333333333333" y="528" width="10" height="124" rx="3" class="c-backend" stroke-width="1"/>
-        <rect x="996" y="560" width="10" height="130" rx="3" class="c-mask"/>
-        <rect x="996" y="560" width="10" height="130" rx="3" class="c-backend" stroke-width="1"/>
-        <rect x="433.3333333333333" y="750" width="10" height="12" rx="3" class="c-mask"/>
-        <rect x="433.3333333333333" y="750" width="10" height="12" rx="3" class="c-frontend" stroke-width="1"/>
-        <rect x="433.3333333333333" y="798" width="10" height="52" rx="3" class="c-mask"/>
-        <rect x="433.3333333333333" y="798" width="10" height="52" rx="3" class="c-frontend" stroke-width="1"/>
-        <rect x="714.6666666666666" y="836" width="10" height="54" rx="3" class="c-mask"/>
-        <rect x="714.6666666666666" y="836" width="10" height="54" rx="3" class="c-frontend" stroke-width="1"/>
-        <rect x="996" y="874" width="10" height="56" rx="3" class="c-mask"/>
-        <rect x="996" y="874" width="10" height="56" rx="3" class="c-backend" stroke-width="1"/>
+        <rect x="433.3333333333333" y="170" width="10" height="52" rx="3" class="c-mask"/>
+        <rect x="433.3333333333333" y="170" width="10" height="52" rx="3" class="c-frontend" stroke-width="1"/>
+        <rect x="714.6666666666666" y="205" width="10" height="47" rx="3" class="c-mask"/>
+        <rect x="714.6666666666666" y="205" width="10" height="47" rx="3" class="c-frontend" stroke-width="1"/>
+        <rect x="996" y="240" width="10" height="292" rx="3" class="c-mask"/>
+        <rect x="996" y="240" width="10" height="292" rx="3" class="c-backend" stroke-width="1"/>
+        <rect x="1277.3333333333333" y="310" width="10" height="187" rx="3" class="c-mask"/>
+        <rect x="1277.3333333333333" y="310" width="10" height="187" rx="3" class="c-backend" stroke-width="1"/>
+        <rect x="1558.6666666666665" y="415" width="10" height="47" rx="3" class="c-mask"/>
+        <rect x="1558.6666666666665" y="415" width="10" height="47" rx="3" class="c-external" stroke-width="1"/>
+        <rect x="1277.3333333333333" y="555" width="10" height="117" rx="3" class="c-mask"/>
+        <rect x="1277.3333333333333" y="555" width="10" height="117" rx="3" class="c-backend" stroke-width="1"/>
+        <rect x="1558.6666666666665" y="555" width="10" height="12" rx="3" class="c-mask"/>
+        <rect x="1558.6666666666665" y="555" width="10" height="12" rx="3" class="c-external" stroke-width="1"/>
+        <rect x="996" y="590" width="10" height="117" rx="3" class="c-mask"/>
+        <rect x="996" y="590" width="10" height="117" rx="3" class="c-backend" stroke-width="1"/>
+        <rect x="433.3333333333333" y="765" width="10" height="12" rx="3" class="c-mask"/>
+        <rect x="433.3333333333333" y="765" width="10" height="12" rx="3" class="c-frontend" stroke-width="1"/>
+        <rect x="433.3333333333333" y="800" width="10" height="52" rx="3" class="c-mask"/>
+        <rect x="433.3333333333333" y="800" width="10" height="52" rx="3" class="c-frontend" stroke-width="1"/>
+        <rect x="714.6666666666666" y="836" width="10" height="46" rx="3" class="c-mask"/>
+        <rect x="714.6666666666666" y="836" width="10" height="46" rx="3" class="c-frontend" stroke-width="1"/>
+        <rect x="996" y="870" width="10" height="52" rx="3" class="c-mask"/>
+        <rect x="996" y="870" width="10" height="52" rx="3" class="c-backend" stroke-width="1"/>
 
         <!-- Messages -->
         <g data-edge-from="user" data-edge-to="authpad" data-edge-label="клик из off" data-edge-key="0">
@@ -4960,154 +4962,170 @@
         </g>
 
         <g data-edge-from="authpad" data-edge-to="authcont" data-edge-label="onToggleReg()" data-edge-key="1">
-          <path data-composition-edge-from="authpad" data-composition-edge-to="authcont" data-composition-points="445.3333333333333,214;712.6666666666666,214" d="M 445.3333333333333 214 L 712.6666666666666 214" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+          <path data-composition-edge-from="authpad" data-composition-edge-to="authcont" data-composition-points="445.3333333333333,211;712.6666666666666,211" d="M 445.3333333333333 211 L 712.6666666666666 211" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
         <g data-detail="context">
-          <rect x="539.2" y="194" width="79.60000000000001" height="16" rx="3" class="c-mask"/>
-          <text x="579" y="204" class="t-backend" font-size="9" text-anchor="middle">onToggleReg()</text>
+          <rect x="539.2" y="191" width="79.60000000000001" height="16" rx="3" class="c-mask"/>
+          <text x="579" y="201" class="t-backend" font-size="9" text-anchor="middle">onToggleReg()</text>
         </g>
         </g>
 
         <g data-edge-from="authcont" data-edge-to="actions" data-edge-label="handleClkRegister(реквизиты AD)" data-edge-key="2">
-          <path data-composition-edge-from="authcont" data-composition-edge-to="actions" data-composition-points="726.6666666666666,252;994,252" d="M 726.6666666666666 252 L 994 252" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+          <path data-composition-edge-from="authcont" data-composition-edge-to="actions" data-composition-points="726.6666666666666,246;994,246" d="M 726.6666666666666 246 L 994 246" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
         <g data-detail="context">
-          <rect x="773.7333333333332" y="232" width="173.20000000000002" height="16" rx="3" class="c-mask"/>
-          <text x="860.3333333333333" y="242" class="t-backend" font-size="9" text-anchor="middle">handleClkRegister(реквизиты AD)</text>
+          <rect x="773.7333333333332" y="226" width="173.20000000000002" height="16" rx="3" class="c-mask"/>
+          <text x="860.3333333333333" y="236" class="t-backend" font-size="9" text-anchor="middle">handleClkRegister(реквизиты AD)</text>
         </g>
         </g>
 
-        <g data-edge-from="actions" data-edge-to="rdcr" data-edge-label="CONNECT_REQUEST (regState=off)" data-edge-key="3">
-          <path data-composition-edge-from="actions" data-composition-edge-to="rdcr" data-composition-points="1008,290;1838,290" d="M 1008 290 L 1838 290" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <g data-edge-from="actions" data-edge-to="rdcr" data-edge-label="STORE_VALUE ×2 (uriWebRtc, callerUserNum)" data-edge-key="3">
+          <path data-composition-edge-from="actions" data-composition-edge-to="rdcr" data-composition-points="1008,281;1838,281" d="M 1008 281 L 1838 281" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
         <g data-detail="context">
-          <rect x="1339" y="270" width="168" height="16" rx="3" class="c-mask"/>
-          <text x="1423" y="280" class="t-backend" font-size="9" text-anchor="middle">CONNECT_REQUEST (regState=off)</text>
+          <rect x="1310.4" y="261" width="225.20000000000002" height="16" rx="3" class="c-mask"/>
+          <text x="1423" y="271" class="t-backend" font-size="9" text-anchor="middle">STORE_VALUE ×2 (uriWebRtc, callerUserNum)</text>
         </g>
         </g>
 
-        <g data-edge-from="actions" data-edge-to="runtime" data-edge-label="registerSipUserAgent(formData)" data-edge-key="4">
-          <path data-composition-edge-from="actions" data-composition-edge-to="runtime" data-composition-points="1008,328;1275.3333333333333,328" d="M 1008 328 L 1275.3333333333333 328" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <g data-edge-from="actions" data-edge-to="runtime" data-edge-label="registerSipUserAgent(formData, handlers)" data-edge-key="4">
+          <path data-composition-edge-from="actions" data-composition-edge-to="runtime" data-composition-points="1008,316;1275.3333333333333,316" d="M 1008 316 L 1275.3333333333333 316" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
         <g data-detail="context">
-          <rect x="1057.6666666666665" y="308" width="168" height="16" rx="3" class="c-mask"/>
-          <text x="1141.6666666666665" y="318" class="t-backend" font-size="9" text-anchor="middle">registerSipUserAgent(formData)</text>
+          <rect x="1031.6666666666665" y="296" width="220" height="16" rx="3" class="c-mask"/>
+          <text x="1141.6666666666665" y="306" class="t-backend" font-size="9" text-anchor="middle">registerSipUserAgent(formData, handlers)</text>
         </g>
         </g>
 
-        <g data-edge-from="runtime" data-edge-to="registerer" data-edge-label="start() + register()" data-edge-key="5">
-          <path data-composition-edge-from="runtime" data-composition-edge-to="registerer" data-composition-points="1289.3333333333333,366;1556.6666666666665,366" d="M 1289.3333333333333 366 L 1556.6666666666665 366" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <g data-edge-from="runtime" data-edge-to="actions" data-edge-label="handlers.onConnectRequest" data-edge-key="5">
+          <path data-composition-edge-from="runtime" data-composition-edge-to="actions" data-composition-points="1275.3333333333333,351;1008,351" d="M 1275.3333333333333 351 L 1008 351" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
         <g data-detail="context">
-          <rect x="1365" y="346" width="116" height="16" rx="3" class="c-mask"/>
-          <text x="1423" y="356" class="t-backend" font-size="9" text-anchor="middle">start() + register()</text>
+          <rect x="1070.6666666666665" y="331" width="142" height="16" rx="3" class="c-mask"/>
+          <text x="1141.6666666666665" y="341" class="t-backend" font-size="9" text-anchor="middle">handlers.onConnectRequest</text>
         </g>
         </g>
 
-        <g data-edge-from="registerer" data-edge-to="runtime" data-edge-label="200 OK" data-edge-key="6">
-          <path data-composition-edge-from="registerer" data-composition-edge-to="runtime" data-composition-points="1556.6666666666665,404;1289.3333333333333,404" d="M 1556.6666666666665 404 L 1289.3333333333333 404" class="a-default" stroke-width="1.4" stroke-dasharray="3,5" marker-end="url(#arrowhead)"/>
+        <g data-edge-from="actions" data-edge-to="rdcr" data-edge-label="CONNECT_REQUEST (regState=off)" data-edge-key="6">
+          <path data-composition-edge-from="actions" data-composition-edge-to="rdcr" data-composition-points="1008,386;1838,386" d="M 1008 386 L 1838 386" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
         <g data-detail="context">
-          <rect x="1401.4" y="384" width="43.2" height="16" rx="3" class="c-mask"/>
-          <text x="1423" y="394" class="t-muted" font-size="9" text-anchor="middle">200 OK</text>
+          <rect x="1339" y="366" width="168" height="16" rx="3" class="c-mask"/>
+          <text x="1423" y="376" class="t-backend" font-size="9" text-anchor="middle">CONNECT_REQUEST (regState=off)</text>
         </g>
         </g>
 
-        <g data-edge-from="runtime" data-edge-to="actions" data-edge-label="onConnectSuccess" data-edge-key="7">
-          <path data-composition-edge-from="runtime" data-composition-edge-to="actions" data-composition-points="1275.3333333333333,442;1008,442" d="M 1275.3333333333333 442 L 1008 442" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <g data-edge-from="runtime" data-edge-to="registerer" data-edge-label="start() + register()" data-edge-key="7">
+          <path data-composition-edge-from="runtime" data-composition-edge-to="registerer" data-composition-points="1289.3333333333333,421;1556.6666666666665,421" d="M 1289.3333333333333 421 L 1556.6666666666665 421" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
         <g data-detail="context">
-          <rect x="1094.0666666666666" y="422" width="95.2" height="16" rx="3" class="c-mask"/>
-          <text x="1141.6666666666665" y="432" class="t-backend" font-size="9" text-anchor="middle">onConnectSuccess</text>
+          <rect x="1365" y="401" width="116" height="16" rx="3" class="c-mask"/>
+          <text x="1423" y="411" class="t-backend" font-size="9" text-anchor="middle">start() + register()</text>
         </g>
         </g>
 
-        <g data-edge-from="actions" data-edge-to="rdcr" data-edge-label="CONNECT_SUCCESS (regState=ok)" data-edge-key="8">
-          <path data-composition-edge-from="actions" data-composition-edge-to="rdcr" data-composition-points="1008,480;1838,480" d="M 1008 480 L 1838 480" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+        <g data-edge-from="registerer" data-edge-to="runtime" data-edge-label="200 OK" data-edge-key="8">
+          <path data-composition-edge-from="registerer" data-composition-edge-to="runtime" data-composition-points="1556.6666666666665,456;1289.3333333333333,456" d="M 1556.6666666666665 456 L 1289.3333333333333 456" class="a-default" stroke-width="1.4" stroke-dasharray="3,5" marker-end="url(#arrowhead)"/>
         <g data-detail="context">
-          <rect x="1341.6" y="460" width="162.8" height="16" rx="3" class="c-mask"/>
-          <text x="1423" y="470" class="t-backend" font-size="9" text-anchor="middle">CONNECT_SUCCESS (regState=ok)</text>
+          <rect x="1401.4" y="436" width="43.2" height="16" rx="3" class="c-mask"/>
+          <text x="1423" y="446" class="t-muted" font-size="9" text-anchor="middle">200 OK</text>
         </g>
         </g>
 
-        <g data-edge-from="registerer" data-edge-to="runtime" data-edge-label="401 / 403 / таймаут" data-edge-key="9">
-          <path data-composition-edge-from="registerer" data-composition-edge-to="runtime" data-composition-points="1556.6666666666665,528;1289.3333333333333,528" d="M 1556.6666666666665 528 L 1289.3333333333333 528" class="a-default" stroke-width="1.4" stroke-dasharray="3,5" marker-end="url(#arrowhead)"/>
+        <g data-edge-from="runtime" data-edge-to="actions" data-edge-label="handlers.onConnectSuccess" data-edge-key="9">
+          <path data-composition-edge-from="runtime" data-composition-edge-to="actions" data-composition-points="1275.3333333333333,491;1008,491" d="M 1275.3333333333333 491 L 1008 491" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
         <g data-detail="context">
-          <rect x="1367.6" y="508" width="110.8" height="16" rx="3" class="c-mask"/>
-          <text x="1423" y="518" class="t-muted" font-size="9" text-anchor="middle">401 / 403 / таймаут</text>
+          <rect x="1070.6666666666665" y="471" width="142" height="16" rx="3" class="c-mask"/>
+          <text x="1141.6666666666665" y="481" class="t-backend" font-size="9" text-anchor="middle">handlers.onConnectSuccess</text>
         </g>
         </g>
 
-        <g data-edge-from="runtime" data-edge-to="actions" data-edge-label="onConnectError" data-edge-key="10">
-          <path data-composition-edge-from="runtime" data-composition-edge-to="actions" data-composition-points="1275.3333333333333,566;1008,566" d="M 1275.3333333333333 566 L 1008 566" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <g data-edge-from="actions" data-edge-to="rdcr" data-edge-label="CONNECT_SUCCESS (regState=ok)" data-edge-key="10">
+          <path data-composition-edge-from="actions" data-composition-edge-to="rdcr" data-composition-points="1008,526;1838,526" d="M 1008 526 L 1838 526" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
         <g data-detail="context">
-          <rect x="1099.2666666666664" y="546" width="84.8" height="16" rx="3" class="c-mask"/>
-          <text x="1141.6666666666665" y="556" class="t-backend" font-size="9" text-anchor="middle">onConnectError</text>
+          <rect x="1341.6" y="506" width="162.8" height="16" rx="3" class="c-mask"/>
+          <text x="1423" y="516" class="t-backend" font-size="9" text-anchor="middle">CONNECT_SUCCESS (regState=ok)</text>
         </g>
         </g>
 
-        <g data-edge-from="actions" data-edge-to="rdcr" data-edge-label="CONNECT_ERROR (regState=fail)" data-edge-key="11">
-          <path data-composition-edge-from="actions" data-composition-edge-to="rdcr" data-composition-points="1008,604;1838,604" d="M 1008 604 L 1838 604" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+        <g data-edge-from="registerer" data-edge-to="runtime" data-edge-label="401 / 403 / таймаут" data-edge-key="11">
+          <path data-composition-edge-from="registerer" data-composition-edge-to="runtime" data-composition-points="1556.6666666666665,561;1289.3333333333333,561" d="M 1556.6666666666665 561 L 1289.3333333333333 561" class="a-default" stroke-width="1.4" stroke-dasharray="3,5" marker-end="url(#arrowhead)"/>
         <g data-detail="context">
-          <rect x="1341.6" y="584" width="162.8" height="16" rx="3" class="c-mask"/>
-          <text x="1423" y="594" class="t-backend" font-size="9" text-anchor="middle">CONNECT_ERROR (regState=fail)</text>
+          <rect x="1367.6" y="541" width="110.8" height="16" rx="3" class="c-mask"/>
+          <text x="1423" y="551" class="t-muted" font-size="9" text-anchor="middle">401 / 403 / таймаут</text>
         </g>
         </g>
 
-        <g data-edge-from="runtime" data-edge-to="actions" data-edge-label="через 3 с: onUnregistered" data-edge-key="12">
-          <path data-composition-edge-from="runtime" data-composition-edge-to="actions" data-composition-points="1275.3333333333333,642;1008,642" d="M 1275.3333333333333 642 L 1008 642" class="a-dashed" stroke-width="1.4" marker-end="url(#arrowhead-dashed)"/>
+        <g data-edge-from="runtime" data-edge-to="actions" data-edge-label="handlers.onConnectError" data-edge-key="12">
+          <path data-composition-edge-from="runtime" data-composition-edge-to="actions" data-composition-points="1275.3333333333333,596;1008,596" d="M 1275.3333333333333 596 L 1008 596" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
         <g data-detail="context">
-          <rect x="1070.6666666666665" y="622" width="142" height="16" rx="3" class="c-mask"/>
-          <text x="1141.6666666666665" y="632" class="t-messagebus" font-size="9" text-anchor="middle">через 3 с: onUnregistered</text>
+          <rect x="1075.8666666666666" y="576" width="131.60000000000002" height="16" rx="3" class="c-mask"/>
+          <text x="1141.6666666666665" y="586" class="t-backend" font-size="9" text-anchor="middle">handlers.onConnectError</text>
         </g>
         </g>
 
-        <g data-edge-from="actions" data-edge-to="rdcr" data-edge-label="UNREGISTER (displayReg=false)" data-edge-key="13">
-          <path data-composition-edge-from="actions" data-composition-edge-to="rdcr" data-composition-points="1008,680;1838,680" d="M 1008 680 L 1838 680" class="a-dashed" stroke-width="1.4" marker-end="url(#arrowhead-dashed)"/>
+        <g data-edge-from="actions" data-edge-to="rdcr" data-edge-label="CONNECT_ERROR (regState=fail)" data-edge-key="13">
+          <path data-composition-edge-from="actions" data-composition-edge-to="rdcr" data-composition-points="1008,631;1838,631" d="M 1008 631 L 1838 631" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
         <g data-detail="context">
-          <rect x="1341.6" y="660" width="162.8" height="16" rx="3" class="c-mask"/>
-          <text x="1423" y="670" class="t-messagebus" font-size="9" text-anchor="middle">UNREGISTER (displayReg=false)</text>
+          <rect x="1341.6" y="611" width="162.8" height="16" rx="3" class="c-mask"/>
+          <text x="1423" y="621" class="t-backend" font-size="9" text-anchor="middle">CONNECT_ERROR (regState=fail)</text>
         </g>
         </g>
 
-        <g data-edge-from="authcont" data-edge-to="authpad" data-edge-label="displayAuthPad=true" data-edge-key="14">
-          <path data-composition-edge-from="authcont" data-composition-edge-to="authpad" data-composition-points="712.6666666666666,718;445.3333333333333,718" d="M 712.6666666666666 718 L 445.3333333333333 718" class="a-dashed" stroke-width="1.4" marker-end="url(#arrowhead-dashed)"/>
+        <g data-edge-from="runtime" data-edge-to="actions" data-edge-label="через 3 с: handlers.onUnregistered" data-edge-key="14">
+          <path data-composition-edge-from="runtime" data-composition-edge-to="actions" data-composition-points="1275.3333333333333,666;1008,666" d="M 1275.3333333333333 666 L 1008 666" class="a-dashed" stroke-width="1.4" marker-end="url(#arrowhead-dashed)"/>
         <g data-detail="context">
-          <rect x="523.6" y="698" width="110.8" height="16" rx="3" class="c-mask"/>
-          <text x="579" y="708" class="t-messagebus" font-size="9" text-anchor="middle">displayAuthPad=true</text>
+          <rect x="1047.2666666666664" y="646" width="188.8" height="16" rx="3" class="c-mask"/>
+          <text x="1141.6666666666665" y="656" class="t-messagebus" font-size="9" text-anchor="middle">через 3 с: handlers.onUnregistered</text>
         </g>
         </g>
 
-        <g data-edge-from="user" data-edge-to="authpad" data-edge-label="клик по красному → regState=off" data-edge-key="15">
-          <path data-composition-edge-from="user" data-composition-edge-to="authpad" data-composition-points="164,756;431.3333333333333,756" d="M 164 756 L 431.3333333333333 756" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+        <g data-edge-from="actions" data-edge-to="rdcr" data-edge-label="UNREGISTER (registrationLost=true)" data-edge-key="15">
+          <path data-composition-edge-from="actions" data-composition-edge-to="rdcr" data-composition-points="1008,701;1838,701" d="M 1008 701 L 1838 701" class="a-dashed" stroke-width="1.4" marker-end="url(#arrowhead-dashed)"/>
         <g data-detail="context">
-          <rect x="211.0666666666666" y="736" width="173.20000000000002" height="16" rx="3" class="c-mask"/>
-          <text x="297.66666666666663" y="746" class="t-backend" font-size="9" text-anchor="middle">клик по красному → regState=off</text>
+          <rect x="1328.6" y="681" width="188.8" height="16" rx="3" class="c-mask"/>
+          <text x="1423" y="691" class="t-messagebus" font-size="9" text-anchor="middle">UNREGISTER (registrationLost=true)</text>
         </g>
         </g>
 
-        <g data-edge-from="user" data-edge-to="authpad" data-edge-label="клик по зелёному" data-edge-key="16">
-          <path data-composition-edge-from="user" data-composition-edge-to="authpad" data-composition-points="164,804;431.3333333333333,804" d="M 164 804 L 431.3333333333333 804" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+        <g data-edge-from="authcont" data-edge-to="authpad" data-edge-label="displayAuthPad=true" data-edge-key="16">
+          <path data-composition-edge-from="authcont" data-composition-edge-to="authpad" data-composition-points="712.6666666666666,736;445.3333333333333,736" d="M 712.6666666666666 736 L 445.3333333333333 736" class="a-dashed" stroke-width="1.4" marker-end="url(#arrowhead-dashed)"/>
         <g data-detail="context">
-          <rect x="250.06666666666663" y="784" width="95.2" height="16" rx="3" class="c-mask"/>
-          <text x="297.66666666666663" y="794" class="t-backend" font-size="9" text-anchor="middle">клик по зелёному</text>
+          <rect x="523.6" y="716" width="110.8" height="16" rx="3" class="c-mask"/>
+          <text x="579" y="726" class="t-messagebus" font-size="9" text-anchor="middle">displayAuthPad=true</text>
         </g>
         </g>
 
-        <g data-edge-from="authpad" data-edge-to="authcont" data-edge-label="onToggleReg()" data-edge-key="17">
-          <path data-composition-edge-from="authpad" data-composition-edge-to="authcont" data-composition-points="445.3333333333333,842;712.6666666666666,842" d="M 445.3333333333333 842 L 712.6666666666666 842" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <g data-edge-from="user" data-edge-to="authpad" data-edge-label="клик по красному → regState=off" data-edge-key="17">
+          <path data-composition-edge-from="user" data-composition-edge-to="authpad" data-composition-points="164,771;431.3333333333333,771" d="M 164 771 L 431.3333333333333 771" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
         <g data-detail="context">
-          <rect x="539.2" y="822" width="79.60000000000001" height="16" rx="3" class="c-mask"/>
-          <text x="579" y="832" class="t-backend" font-size="9" text-anchor="middle">onToggleReg()</text>
+          <rect x="211.0666666666666" y="751" width="173.20000000000002" height="16" rx="3" class="c-mask"/>
+          <text x="297.66666666666663" y="761" class="t-backend" font-size="9" text-anchor="middle">клик по красному → regState=off</text>
         </g>
         </g>
 
-        <g data-edge-from="authcont" data-edge-to="actions" data-edge-label="handleClkUnregister(phoneControlRdcr)" data-edge-key="18">
-          <path data-composition-edge-from="authcont" data-composition-edge-to="actions" data-composition-points="726.6666666666666,880;994,880" d="M 726.6666666666666 880 L 994 880" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <g data-edge-from="user" data-edge-to="authpad" data-edge-label="клик по зелёному" data-edge-key="18">
+          <path data-composition-edge-from="user" data-composition-edge-to="authpad" data-composition-points="164,806;431.3333333333333,806" d="M 164 806 L 431.3333333333333 806" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
         <g data-detail="context">
-          <rect x="758.1333333333332" y="860" width="204.4" height="16" rx="3" class="c-mask"/>
-          <text x="860.3333333333333" y="870" class="t-backend" font-size="9" text-anchor="middle">handleClkUnregister(phoneControlRdcr)</text>
+          <rect x="250.06666666666663" y="786" width="95.2" height="16" rx="3" class="c-mask"/>
+          <text x="297.66666666666663" y="796" class="t-backend" font-size="9" text-anchor="middle">клик по зелёному</text>
         </g>
         </g>
 
-        <g data-edge-from="actions" data-edge-to="rdcr" data-edge-label="UNREGISTER + STORE_VALUE (off)" data-edge-key="19">
-          <path data-composition-edge-from="actions" data-composition-edge-to="rdcr" data-composition-points="1008,918;1838,918" d="M 1008 918 L 1838 918" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <g data-edge-from="authpad" data-edge-to="authcont" data-edge-label="onToggleReg()" data-edge-key="19">
+          <path data-composition-edge-from="authpad" data-composition-edge-to="authcont" data-composition-points="445.3333333333333,841;712.6666666666666,841" d="M 445.3333333333333 841 L 712.6666666666666 841" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
         <g data-detail="context">
-          <rect x="1339" y="898" width="168" height="16" rx="3" class="c-mask"/>
-          <text x="1423" y="908" class="t-backend" font-size="9" text-anchor="middle">UNREGISTER + STORE_VALUE (off)</text>
+          <rect x="539.2" y="821" width="79.60000000000001" height="16" rx="3" class="c-mask"/>
+          <text x="579" y="831" class="t-backend" font-size="9" text-anchor="middle">onToggleReg()</text>
+        </g>
+        </g>
+
+        <g data-edge-from="authcont" data-edge-to="actions" data-edge-label="handleClkUnregister(phoneControlRdcr)" data-edge-key="20">
+          <path data-composition-edge-from="authcont" data-composition-edge-to="actions" data-composition-points="726.6666666666666,876;994,876" d="M 726.6666666666666 876 L 994 876" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <g data-detail="context">
+          <rect x="758.1333333333332" y="856" width="204.4" height="16" rx="3" class="c-mask"/>
+          <text x="860.3333333333333" y="866" class="t-backend" font-size="9" text-anchor="middle">handleClkUnregister(phoneControlRdcr)</text>
+        </g>
+        </g>
+
+        <g data-edge-from="actions" data-edge-to="rdcr" data-edge-label="UNREGISTER + STORE_VALUE (off)" data-edge-key="21">
+          <path data-composition-edge-from="actions" data-composition-edge-to="rdcr" data-composition-points="1008,911;1838,911" d="M 1008 911 L 1838 911" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <g data-detail="context">
+          <rect x="1339" y="891" width="168" height="16" rx="3" class="c-mask"/>
+          <text x="1423" y="901" class="t-backend" font-size="9" text-anchor="middle">UNREGISTER + STORE_VALUE (off)</text>
         </g>
         </g>
 
@@ -5117,16 +5135,16 @@
           <text x="62" y="141" class="t-dim" font-size="9" font-weight="600">Регистрация из off</text>
         </g>
         <g data-graph-role="segment-label" data-segment-id="1">
-          <rect x="56" y="378" width="42" height="18" rx="3" class="c-mask"/>
-          <text x="62" y="391" class="t-dim" font-size="9" font-weight="600">Успех</text>
+          <rect x="56" y="318" width="42" height="18" rx="3" class="c-mask"/>
+          <text x="62" y="331" class="t-dim" font-size="9" font-weight="600">Успех</text>
         </g>
         <g data-graph-role="segment-label" data-segment-id="2">
-          <rect x="56" y="483" width="92" height="18" rx="3" class="c-mask"/>
-          <text x="62" y="496" class="t-dim" font-size="9" font-weight="600">Отказ и возврат</text>
+          <rect x="56" y="528" width="92" height="18" rx="3" class="c-mask"/>
+          <text x="62" y="541" class="t-dim" font-size="9" font-weight="600">Отказ и возврат</text>
         </g>
         <g data-graph-role="segment-label" data-segment-id="3">
-          <rect x="56" y="758" width="86.8" height="18" rx="3" class="c-mask"/>
-          <text x="62" y="771" class="t-dim" font-size="9" font-weight="600">Разрегистрация</text>
+          <rect x="56" y="773" width="86.8" height="18" rx="3" class="c-mask"/>
+          <text x="62" y="786" class="t-dim" font-size="9" font-weight="600">Разрегистрация</text>
         </g>
 
         <!-- Participants -->
@@ -5427,7 +5445,7 @@
         <ul>
           <li>&bull; regState: off / ok (зелёный) / fail (красный)</li>
           <li>&bull; off → handleClkRegister, ok → handleClkUnregister</li>
-          <li>&bull; fail → сброс в off; без пары AD-реквизитов тумблер выключен</li>
+          <li>&bull; fail → сброс в off; без AD-реквизитов тумблер выключен</li>
         </ul>
       </div>
 
@@ -5446,12 +5464,12 @@
       <div class="card">
         <div class="card-header">
           <div class="card-dot emerald"></div>
-          <h3>Потеря регистрации → AuthPad</h3>
+          <h3>Старт и потеря регистрации</h3>
         </div>
         <ul>
-          <li>&bull; onUnregistered шлёт UNREGISTER с payload.registrationLost</li>
-          <li>&bull; displayReg=false — форма PhoneReg не форсируется</li>
-          <li>&bull; мост PHONECTL_ → AUTHCTL_ по regState=fail: displayAuthPad</li>
+          <li>&bull; старт: PhoneReg открыта поверх AuthLinks (displayReg)</li>
+          <li>&bull; submit PhoneReg и тумблер AuthPad — тот же thunk</li>
+          <li>&bull; потеря сессии: registrationLost, PhoneReg не форсируется</li>
         </ul>
       </div>
     </div>

@@ -4840,8 +4840,8 @@
       </div>
     </div>
 
-    <script id="archify-guided-views-data" type="application/json">[{"id":"main-flow","label":"Основной поток данных","focus":["users","ui","containers","actions","runtime","sbc"],"note":"События UI проходят контейнеры и thunk-и, SIP-операции уходят в phoneRuntime и на SIP SBC по WSS."},{"id":"ad-bridge","label":"Мост AD → SIP","focus":["ad","actions","containers","store","ui"],"note":"AuthContainer — мост AUTHCTL_ ↔ PHONECTL_: реквизиты AD попадают в PhoneReg, регистрация — по тумблеру AuthPad (off / ok / fail)."},{"id":"livekit-path","label":"Ветка LiveKit","focus":["actions","ui","lkRuntime","livekit"],"note":"handleLkTokenSubmit берёт lk_token, LkMeet через lkRuntime подключается к комнате LiveKit."},{"id":"state-and-storage","label":"Состояние и хранилища","focus":["store","storage","actions","runtime"],"note":"Слой store собирает сид из сервисов, Redux хранит UI-состояние, звонки и чат персистятся в localStorage."}]</script>
-    <script id="archify-source-evidence-data" type="application/json">{"schemaVersion":1,"verified":true,"repository":{"url":"https://github.com/ars-anosov/sipjs-react","revision":"1a4a57e7af8985e33f9ca8b168cf3469d8d2e381","shortRevision":"1a4a57e"},"referenceCount":14,"nodes":{"ui":[{"path":"src/components/PhonePad.jsx","label":"телефон","href":"https://github.com/ars-anosov/sipjs-react/blob/1a4a57e7af8985e33f9ca8b168cf3469d8d2e381/src/components/PhonePad.jsx"},{"path":"src/components/AuthPad.jsx","label":"мост к сервисам","href":"https://github.com/ars-anosov/sipjs-react/blob/1a4a57e7af8985e33f9ca8b168cf3469d8d2e381/src/components/AuthPad.jsx"},{"path":"src/components/LkMeet.jsx","label":"LiveKit-встреча","href":"https://github.com/ars-anosov/sipjs-react/blob/1a4a57e7af8985e33f9ca8b168cf3469d8d2e381/src/components/LkMeet.jsx"}],"containers":[{"path":"src/containers/AuthContainer.jsx","line":56,"label":"мост AUTHCTL_ → PHONECTL_","href":"https://github.com/ars-anosov/sipjs-react/blob/1a4a57e7af8985e33f9ca8b168cf3469d8d2e381/src/containers/AuthContainer.jsx#L56"},{"path":"src/containers/PhoneContainer.jsx","line":16,"href":"https://github.com/ars-anosov/sipjs-react/blob/1a4a57e7af8985e33f9ca8b168cf3469d8d2e381/src/containers/PhoneContainer.jsx#L16"}],"actions":[{"path":"src/actions/authControlActions.js","line":45,"label":"POST uriAdAuth","href":"https://github.com/ars-anosov/sipjs-react/blob/1a4a57e7af8985e33f9ca8b168cf3469d8d2e381/src/actions/authControlActions.js#L45"},{"path":"src/actions/phoneControlActions.js","line":456,"label":"SIP MESSAGE","href":"https://github.com/ars-anosov/sipjs-react/blob/1a4a57e7af8985e33f9ca8b168cf3469d8d2e381/src/actions/phoneControlActions.js#L456"}],"runtime":[{"path":"src/services/phoneRuntime.js","line":993,"label":"публичный API","href":"https://github.com/ars-anosov/sipjs-react/blob/1a4a57e7af8985e33f9ca8b168cf3469d8d2e381/src/services/phoneRuntime.js#L993"}],"store":[{"path":"src/store/preloadedState.js","line":19,"label":"сид из сервисов","href":"https://github.com/ars-anosov/sipjs-react/blob/1a4a57e7af8985e33f9ca8b168cf3469d8d2e381/src/store/preloadedState.js#L19"},{"path":"src/store/configureStore.js","line":12,"label":"thunk + logger","href":"https://github.com/ars-anosov/sipjs-react/blob/1a4a57e7af8985e33f9ca8b168cf3469d8d2e381/src/store/configureStore.js#L12"}],"storage":[{"path":"src/services/phoneStorage.js","line":15,"label":"настройки телефона","href":"https://github.com/ars-anosov/sipjs-react/blob/1a4a57e7af8985e33f9ca8b168cf3469d8d2e381/src/services/phoneStorage.js#L15"}],"ad":[{"path":"src/services/adAuth.js","line":48,"label":"loginAd","href":"https://github.com/ars-anosov/sipjs-react/blob/1a4a57e7af8985e33f9ca8b168cf3469d8d2e381/src/services/adAuth.js#L48"}],"dir":[{"path":"src/services/phoneDirectory.js","line":11,"label":"fetchPhoneDir","href":"https://github.com/ars-anosov/sipjs-react/blob/1a4a57e7af8985e33f9ca8b168cf3469d8d2e381/src/services/phoneDirectory.js#L11"}],"lkRuntime":[{"path":"src/services/lkRuntime.js","line":5,"label":"getLiveKitRoom","href":"https://github.com/ars-anosov/sipjs-react/blob/1a4a57e7af8985e33f9ca8b168cf3469d8d2e381/src/services/lkRuntime.js#L5"}]}}</script>
+    <script id="archify-guided-views-data" type="application/json">[{"id":"main-flow","label":"Основной поток данных","focus":["users","ui","containers","actions","runtime","sbc"],"note":"События UI проходят контейнеры и thunk-и, SIP-операции уходят в phoneRuntime и на SIP SBC по WSS."},{"id":"ad-bridge","label":"Мост AD → SIP","focus":["ad","actions","containers","store","ui"],"note":"AuthLinks открывает обе формы входа; AuthContainer — мост AUTHCTL_ ↔ PHONECTL_, тумблер AuthPad отражает regState (off / ok / fail)."},{"id":"livekit-path","label":"Ветка LiveKit","focus":["actions","ui","lkRuntime","livekit"],"note":"handleLkTokenSubmit берёт lk_token, LkMeet через lkRuntime подключается к комнате LiveKit."},{"id":"state-and-storage","label":"Состояние и хранилища","focus":["store","storage","actions","runtime"],"note":"Слой store собирает сид из сервисов, Redux хранит UI-состояние, звонки и чат персистятся в localStorage."}]</script>
+    <script id="archify-source-evidence-data" type="application/json">{"schemaVersion":1,"verified":true,"repository":{"url":"https://github.com/ars-anosov/sipjs-react","revision":"8d453dceb0cea81775ffbc2189b6a858b2866d38","shortRevision":"8d453dc"},"referenceCount":15,"nodes":{"ui":[{"path":"src/components/AuthLinks.jsx","line":17,"label":"стартовый экран","href":"https://github.com/ars-anosov/sipjs-react/blob/8d453dceb0cea81775ffbc2189b6a858b2866d38/src/components/AuthLinks.jsx#L17"},{"path":"src/components/PhonePad.jsx","line":52,"label":"телефон","href":"https://github.com/ars-anosov/sipjs-react/blob/8d453dceb0cea81775ffbc2189b6a858b2866d38/src/components/PhonePad.jsx#L52"},{"path":"src/components/LkMeet.jsx","line":228,"label":"встреча","href":"https://github.com/ars-anosov/sipjs-react/blob/8d453dceb0cea81775ffbc2189b6a858b2866d38/src/components/LkMeet.jsx#L228"}],"containers":[{"path":"src/containers/AuthContainer.jsx","line":70,"label":"мост AUTHCTL_ ↔ PHONECTL_","href":"https://github.com/ars-anosov/sipjs-react/blob/8d453dceb0cea81775ffbc2189b6a858b2866d38/src/containers/AuthContainer.jsx#L70"},{"path":"src/containers/PhoneContainer.jsx","line":16,"label":"домен phoneControlRdcr","href":"https://github.com/ars-anosov/sipjs-react/blob/8d453dceb0cea81775ffbc2189b6a858b2866d38/src/containers/PhoneContainer.jsx#L16"}],"actions":[{"path":"src/actions/authControlActions.js","line":15,"label":"handleAdRegister","href":"https://github.com/ars-anosov/sipjs-react/blob/8d453dceb0cea81775ffbc2189b6a858b2866d38/src/actions/authControlActions.js#L15"},{"path":"src/actions/phoneControlActions.js","line":99,"label":"handleClkRegister","href":"https://github.com/ars-anosov/sipjs-react/blob/8d453dceb0cea81775ffbc2189b6a858b2866d38/src/actions/phoneControlActions.js#L99"},{"path":"src/actions/phoneControlActions.js","line":434,"label":"SIP MESSAGE","href":"https://github.com/ars-anosov/sipjs-react/blob/8d453dceb0cea81775ffbc2189b6a858b2866d38/src/actions/phoneControlActions.js#L434"}],"runtime":[{"path":"src/services/phoneRuntime.js","line":336,"label":"registerSipUserAgent","href":"https://github.com/ars-anosov/sipjs-react/blob/8d453dceb0cea81775ffbc2189b6a858b2866d38/src/services/phoneRuntime.js#L336"}],"store":[{"path":"src/store/preloadedState.js","line":14,"label":"сид из сервисов","href":"https://github.com/ars-anosov/sipjs-react/blob/8d453dceb0cea81775ffbc2189b6a858b2866d38/src/store/preloadedState.js#L14"},{"path":"src/store/configureStore.js","line":21,"label":"thunk + logger","href":"https://github.com/ars-anosov/sipjs-react/blob/8d453dceb0cea81775ffbc2189b6a858b2866d38/src/store/configureStore.js#L21"}],"storage":[{"path":"src/services/phoneStorage.js","line":15,"label":"настройки телефона","href":"https://github.com/ars-anosov/sipjs-react/blob/8d453dceb0cea81775ffbc2189b6a858b2866d38/src/services/phoneStorage.js#L15"}],"ad":[{"path":"src/services/adAuth.js","line":41,"label":"loginAd → POST uriAdAuth","href":"https://github.com/ars-anosov/sipjs-react/blob/8d453dceb0cea81775ffbc2189b6a858b2866d38/src/services/adAuth.js#L41"}],"dir":[{"path":"src/services/phoneDirectory.js","line":11,"label":"fetchPhoneDir","href":"https://github.com/ars-anosov/sipjs-react/blob/8d453dceb0cea81775ffbc2189b6a858b2866d38/src/services/phoneDirectory.js#L11"}],"lkRuntime":[{"path":"src/services/lkRuntime.js","line":5,"label":"getLiveKitRoom","href":"https://github.com/ars-anosov/sipjs-react/blob/8d453dceb0cea81775ffbc2189b6a858b2866d38/src/services/lkRuntime.js#L5"}]}}</script>
     <div class="guided-views no-print" id="guided-views" hidden aria-label="Guided diagram views">
       <button id="guided-view-prev" type="button" aria-label="Previous guided view" title="Previous guided view ([)">&#8592;</button>
       <div class="guided-view-copy">
@@ -4922,7 +4922,7 @@
         <path data-edge-from="store" data-edge-to="ui" data-edge-label="состояние → пропсы" data-edge-key="6" data-edge-id="store-to-ui" data-composition-points="510.5,128;510.5,170;342.5,170;342.5,212" d="M 510.5 128 L 510.5 162 Q 510.5 170 502.5 170 L 350.5 170 Q 342.5 170 342.5 178 L 342.5 212" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
         <path data-edge-from="storage" data-edge-to="store" data-edge-label="сид preloadedState" data-edge-key="7" data-edge-id="storage-to-store" data-composition-points="1040,92;615,92" d="M 1040 92 L 615 92" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
         <path data-edge-from="runtime" data-edge-to="storage" data-edge-label="logCall · saveChatMessage" data-edge-key="8" data-edge-id="runtime-to-storage" data-composition-points="1135,212;1135,188;1153.5,188;1153.5,152;1137.5,152;1137.5,128" d="M 1135 212 L 1135 196 Q 1135 188 1143 188 L 1145.5 188 Q 1153.5 188 1153.5 180 L 1153.5 160 Q 1153.5 152 1145.5 152 L 1145.5 152 Q 1137.5 152 1137.5 144 L 1137.5 128" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="actions" data-edge-to="ad" data-edge-label="POST uriAdAuth" data-edge-key="9" data-edge-id="actions-to-ad" data-composition-points="870,284;870,336;1220,336;1220,388" d="M 870 284 L 870 328 Q 870 336 878 336 L 1212 336 Q 1220 336 1220 344 L 1220 388" class="a-security" stroke-width="1.5" marker-end="url(#arrowhead-security)"/>
+        <path data-edge-from="actions" data-edge-to="ad" data-edge-label="POST uriAdAuth · adAuth.js" data-edge-key="9" data-edge-id="actions-to-ad" data-composition-points="870,284;870,336;1220,336;1220,388" d="M 870 284 L 870 328 Q 870 336 878 336 L 1212 336 Q 1220 336 1220 344 L 1220 388" class="a-security" stroke-width="1.5" marker-end="url(#arrowhead-security)"/>
         <path data-edge-from="actions" data-edge-to="dir" data-edge-label="GET /user/phonedir" data-edge-key="10" data-edge-id="actions-to-dir" data-composition-points="870,284;870,336;935,336;935,388" d="M 870 284 L 870 328 Q 870 336 878 336 L 927 336 Q 935 336 935 344 L 935 388" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
         <path data-edge-from="ui" data-edge-to="lkRuntime" data-edge-label="getLiveKitRoom" data-edge-key="11" data-edge-id="ui-to-lkruntime" data-composition-points="342.5,284;342.5,336;325,336;325,388" d="M 342.5 284 L 342.5 328 Q 342.5 336 334.5 336 L 333 336 Q 325 336 325 344 L 325 388" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
         <path data-edge-from="lkRuntime" data-edge-to="livekit" data-edge-label="комната по WSS" data-edge-key="12" data-edge-id="lkruntime-to-livekit" data-composition-points="420,424;540,424" d="M 420 424 L 540 424" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
@@ -4940,8 +4940,8 @@
         <text data-detail="context" x="105" y="262" class="t-muted" font-size="9" text-anchor="middle">браузер Chrome / Edge</text>
         </g>
 
-        <g id="node-ui" data-node-id="ui" data-node-label="Компоненты React" tabindex="0" role="button" aria-label="Focus Компоненты React, PhonePad · AuthPad · LkMeet, Клиент — SPA в браузере" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="PhonePad · AuthPad · LkMeet" data-node-tag="MUI 9" data-node-context="Клиент — SPA в браузере">
-          <title>Компоненты React · PhonePad · AuthPad · LkMeet · Клиент — SPA в браузере · MUI 9</title>
+        <g id="node-ui" data-node-id="ui" data-node-label="Компоненты React" tabindex="0" role="button" aria-label="Focus Компоненты React, AuthLinks · PhoneReg · LkMeet, Клиент — SPA в браузере" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="AuthLinks · PhoneReg · LkMeet" data-node-tag="MUI 9" data-node-context="Клиент — SPA в браузере">
+          <title>Компоненты React · AuthLinks · PhoneReg · LkMeet · Клиент — SPA в браузере · MUI 9</title>
           <rect x="250" y="212" width="185" height="72" rx="6" class="c-mask"/>
           <rect x="250" y="212" width="185" height="72" rx="6" class="c-frontend" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(256 218) scale(0.6875)">
@@ -4951,7 +4951,7 @@
             <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
           </g>
           <text data-detail-anchor x="342.5" y="246" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Компоненты React</text>
-        <text data-detail="context" x="342.5" y="262" class="t-muted" font-size="9" text-anchor="middle">PhonePad · AuthPad · LkMeet</text>
+        <text data-detail="context" x="342.5" y="262" class="t-muted" font-size="9" text-anchor="middle">AuthLinks · PhoneReg · LkMeet</text>
         <text data-detail="fine" x="342.5" y="276" class="t-frontend" font-size="7" text-anchor="middle">MUI 9</text>
         </g>
 
@@ -5121,9 +5121,9 @@
           <rect x="1079.25" y="168" width="130" height="14" rx="3" class="c-mask"/>
           <text x="1144.25" y="178" class="t-muted" font-size="8" text-anchor="middle">logCall · saveChatMessage</text>
         </g>
-        <g data-detail="context" data-edge-from="actions" data-edge-to="ad" data-edge-label="POST uriAdAuth" data-edge-key="9" data-edge-id="actions-to-ad">
-          <rect x="1006.4" y="316" width="77.2" height="14" rx="3" class="c-mask"/>
-          <text x="1045" y="326" class="t-security" font-size="8" text-anchor="middle">POST uriAdAuth</text>
+        <g data-detail="context" data-edge-from="actions" data-edge-to="ad" data-edge-label="POST uriAdAuth · adAuth.js" data-edge-key="9" data-edge-id="actions-to-ad">
+          <rect x="977.6" y="316" width="134.8" height="14" rx="3" class="c-mask"/>
+          <text x="1045" y="326" class="t-security" font-size="8" text-anchor="middle">POST uriAdAuth · adAuth.js</text>
         </g>
         <g data-detail="context" data-edge-from="actions" data-edge-to="dir" data-edge-label="GET /user/phonedir" data-edge-key="10" data-edge-id="actions-to-dir">
           <rect x="886.8" y="348" width="96.39999999999999" height="14" rx="3" class="c-mask"/>
@@ -5354,31 +5354,31 @@
           <li>&bull; components/ — презентация на MUI: sip.js и livekit-client здесь не импортируются</li>
           <li>&bull; containers/ — useSelector + bindActionCreators; мосты AUTHCTL_ ↔ PHONECTL_ только в AuthContainer</li>
           <li>&bull; actions/ — thunk: валидация → сервис → dispatch; чужой срез не читается через getState()</li>
-          <li>&bull; services/ — phoneRuntime, lkRuntime, adAuth, lkToken, phoneDirectory, phoneStorage, phoneNotifications</li>
+          <li>&bull; services/ + store/ — сервисы, сид preloadedState и инъекция middleware в configureStore</li>
         </ul>
       </div>
 
       <div class="card">
         <div class="card-header">
           <div class="card-dot emerald"></div>
-          <h3>Мост к сервисам</h3>
+          <h3>Стартовый экран и владение рендером</h3>
         </div>
         <ul>
-          <li>&bull; handleAdRegister → adAuth.loginAd → POST uriAdAuth → AUTHCTL_SUBMIT_SUCCESS</li>
-          <li>&bull; AuthContainer подставляет sip_username/sip_secret в PhoneReg и показывает AuthPad</li>
-          <li>&bull; тумблер AuthPad трёхпозиционный по regState (off / ok / fail); authTimeoutMiddleware раз в 10 с проверяет AD-сессию (24 ч)</li>
+          <li>&bull; на старте displayReg=true: модальная форма SIP открыта поверх блока AuthLinks</li>
+          <li>&bull; AuthLinks виден, пока status ≠ success и regState ≠ ok; ссылки открывают формы AD и SIP</li>
+          <li>&bull; владение по срезу: AuthContainer — AuthLinks/AuthAd/AuthPad, PhoneContainer — PhoneReg/PhonePad/PhoneHistory/PhoneChat</li>
         </ul>
       </div>
 
       <div class="card">
         <div class="card-header">
           <div class="card-dot violet"></div>
-          <h3>Состояние и хранилища</h3>
+          <h3>Мост AD → SIP и состояние</h3>
         </div>
         <ul>
-          <li>&bull; слой store/ — preloadedState.js собирает сид из сервисов, configureStore передаёт срезы и инжектит middleware</li>
-          <li>&bull; Redux — UI-флаги, заголовки, настройки (uriWebRtc, callerUserNum, useIce), звонки и чат</li>
-          <li>&bull; localStorage — настройки, звонки, чат и сессия AD; HTTP (ky) и localStorage только в services/</li>
+          <li>&bull; handleAdRegister → adAuth.loginAd → POST uriAdAuth → AUTHCTL_SUBMIT_SUCCESS</li>
+          <li>&bull; тумблер AuthPad трёхпозиционный по regState (off / ok / fail)</li>
+          <li>&bull; authTimeoutMiddleware раз в 10 с проверяет AD-сессию (24 ч); ky и localStorage только в services/</li>
         </ul>
       </div>
     </div>
