@@ -49,7 +49,8 @@ function PhoneReg(props) {
 
   const handleRegister = (event) => {
     event.preventDefault();
-    if (!callerUserNum.trim() || !regUserPass.trim() || !uriWebRtc.trim()) return;
+    // Пустые поля не глотаем: валидацию и алерт «Заполните все поля.» даёт handleClkRegister.
+    // Это важно после разрегистрации — пароль в форме не хранится (PHONECTL_CONNECT_SUCCESS).
     phoneControlActions.handleClkRegister({ callerUserNum, regUserPass, uriWebRtc }, phoneControlRdcr);
   };
 
@@ -58,6 +59,12 @@ function PhoneReg(props) {
   };
 
   const isRegistered = phoneControlRdcr.regState === "ok";
+
+  // Секрет убирается из формы при успешной регистрации (PHONECTL_CONNECT_SUCCESS) —
+  // сбрасываем и режим показа, чтобы при следующем открытии формы пароль не вводился открытым текстом
+  useEffect(() => {
+    if (isRegistered) setShowPassword(false);
+  }, [isRegistered]);
 
   // Модальное окно: портал вне потока документа, поэтому форма не раздвигает
   // остальные компоненты; Escape и клик по подложке закрывают её через onClose.

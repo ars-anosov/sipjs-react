@@ -1,5 +1,5 @@
 import { Grid } from "@mui/material";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { bindActionCreators } from "redux";
 // Actions
@@ -20,7 +20,25 @@ const PhoneContainer = () => {
 
   const phoneControlActions = useMemo(() => bindActionCreators(phoneActions, dispatch), [dispatch]);
 
-  const { displayReg, displayPad, displayHistory, displayChat, errComponent } = phoneControlRdcr;
+  const { displayReg, displayPad, displayHistory, displayChat, errComponent, regState } = phoneControlRdcr;
+
+  // F5 рвёт SIP-сессию: WebSocket, SIP-диалог и RTCPeerConnection живут только в памяти
+  // страницы (singleton phoneRuntime) и после перезагрузки не восстанавливаются.
+  // Пока регистрация активна, предупреждаем о перезагрузке/закрытии вкладки.
+  // https://developer.mozilla.org/ru/docs/Web/API/Window/beforeunload_event
+  useEffect(() => {
+    if (regState !== "ok") return;
+
+    const handleBeforeUnload = (event) => {
+      // Современный способ включить диалог подтверждения; текст браузер не показывает
+      event.preventDefault();
+      // Легаси-совместимость: без заполненного returnValue диалог не выводится
+      event.returnValue = "";
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [regState]);
 
   // Форма входа — модальный Dialog (портал), в потоке документа она места не занимает,
   // поэтому телефон под ней не сдвигается

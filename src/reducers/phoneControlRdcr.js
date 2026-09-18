@@ -84,6 +84,10 @@ export default function phoneControlRdcr(state = initialState, action) {
         ...state,
         connectStatus: "Success",
         regState: "ok",
+        // Секрет нужен только на время REGISTER: sip.js держит его в userAgentOptions
+        // (re-REGISTER и reconnect идут через тот же UserAgent), поэтому из формы он убирается —
+        // иначе после разрегистрации форма открывалась бы с уже подставленным паролем
+        regUserPass: "",
         displayReg: false,
         displayPad: true,
         displayHistory: false,
