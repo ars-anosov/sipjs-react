@@ -6,7 +6,7 @@
     "quality_profile": "showcase",
     "repository": {
       "url": "https://github.com/ars-anosov/sipjs-react.git",
-      "revision": "8d453dceb0cea81775ffbc2189b6a858b2866d38"
+      "revision": "9bebf74019c6374eb574e450f23298f3e978bed4"
     },
     "legend": {
       "mode": "auto",
@@ -52,7 +52,7 @@
           "store",
           "ui"
         ],
-        "note": "AuthLinks открывает обе формы входа; AuthContainer — мост AUTHCTL_ ↔ PHONECTL_, тумблер AuthPad отражает regState (off / ok / fail)."
+        "note": "AuthLinks открывает SIP-форму (displayReg); AD-форма живёт в AuthContainer — мост AUTHCTL_ ↔ PHONECTL_, тумблер AuthPad по regState."
       },
       {
         "id": "livekit-path",
@@ -496,18 +496,18 @@
       "dot": "emerald",
       "title": "Стартовый экран и владение рендером",
       "items": [
-        "на старте displayReg=true: модальная форма SIP открыта поверх блока AuthLinks",
-        "AuthLinks виден, пока status ≠ success и regState ≠ ok; ссылки открывают формы AD и SIP",
+        "на старте displayReg=false: виден AuthLinks; клик открывает PhoneReg модальным Dialog",
+        "AuthLinks виден, пока authStatus ≠ success и regState ≠ ok; иконка AD-формы закомментирована",
         "владение по срезу: AuthContainer — AuthLinks/AuthAd/AuthPad, PhoneContainer — PhoneReg/PhonePad/PhoneHistory/PhoneChat"
       ]
     },
     {
       "dot": "violet",
-      "title": "Мост AD → SIP и состояние",
+      "title": "Мост AD → SIP и защита сессии",
       "items": [
         "handleAdRegister → adAuth.loginAd → POST uriAdAuth → AUTHCTL_SUBMIT_SUCCESS",
-        "тумблер AuthPad трёхпозиционный по regState (off / ok / fail)",
-        "authTimeoutMiddleware раз в 10 с проверяет AD-сессию (24 ч); ky и localStorage только в services/"
+        "тумблер AuthPad трёхпозиционный по regState (off / ok / fail); успех стирает regUserPass из формы",
+        "при regState=ok PhoneContainer вешает beforeunload: F5 рвёт SIP-сессию в памяти singleton phoneRuntime"
       ]
     }
   ]

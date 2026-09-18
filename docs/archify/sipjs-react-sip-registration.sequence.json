@@ -34,7 +34,7 @@
           "actions",
           "runtime"
         ],
-        "note": "Форма PhoneReg открыта на старте (displayReg=true); тумблер AuthPad из off запускает handleClkRegister с реквизитами AD."
+        "note": "displayReg стартует false: сначала виден AuthLinks, форму PhoneReg открывает клик; из off тумблер AuthPad зовёт handleClkRegister."
       },
       {
         "id": "reject-and-red",
@@ -366,7 +366,7 @@
       "items": [
         "regState: off / ok (зелёный) / fail (красный)",
         "off → handleClkRegister, ok → handleClkUnregister",
-        "fail → сброс в off; без AD-реквизитов тумблер выключен"
+        "fail → сброс в off; displayReg стартует false — форму открывает AuthLinks"
       ]
     },
     {
@@ -375,16 +375,16 @@
       "items": [
         "runtime через 3 с сам гасит UserAgent после отказа",
         "UNREGISTER не трогает regState — красный не гаснет",
-        "явная разрегистрация сбрасывает regState в off"
+        "успех стирает regUserPass из формы; явная разрегистрация сбрасывает regState в off"
       ]
     },
     {
       "dot": "emerald",
-      "title": "Старт и потеря регистрации",
+      "title": "Старт и защита сессии",
       "items": [
-        "старт: PhoneReg открыта поверх AuthLinks (displayReg)",
+        "старт: AuthLinks, PhoneReg открывается модальным Dialog",
         "submit PhoneReg и тумблер AuthPad — тот же thunk",
-        "потеря сессии: registrationLost, PhoneReg не форсируется"
+        "при regState=ok PhoneContainer вешает beforeunload (F5 рвёт сессию)"
       ]
     }
   ]

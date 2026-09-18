@@ -4840,7 +4840,7 @@
       </div>
     </div>
 
-    <script id="archify-guided-views-data" type="application/json">[{"id":"start-registration","label":"Регистрация из off","focus":["user","authpad","authcont","actions","runtime"],"note":"Форма PhoneReg открыта на старте (displayReg=true); тумблер AuthPad из off запускает handleClkRegister с реквизитами AD."},{"id":"reject-and-red","label":"Отказ → красный","focus":["registerer","runtime","actions","rdcr","authcont","authpad"],"note":"Отказ даёт regState=fail; PhoneReg не форсируется, показывается AuthPad."},{"id":"unregister","label":"Разрегистрация из ok","focus":["user","authpad","authcont","actions","rdcr"],"note":"Клик по зелёному тумблеру разрегистрирует сессию и возвращает regState в off."}]</script>
+    <script id="archify-guided-views-data" type="application/json">[{"id":"start-registration","label":"Регистрация из off","focus":["user","authpad","authcont","actions","runtime"],"note":"displayReg стартует false: сначала виден AuthLinks, форму PhoneReg открывает клик; из off тумблер AuthPad зовёт handleClkRegister."},{"id":"reject-and-red","label":"Отказ → красный","focus":["registerer","runtime","actions","rdcr","authcont","authpad"],"note":"Отказ даёт regState=fail; PhoneReg не форсируется, показывается AuthPad."},{"id":"unregister","label":"Разрегистрация из ok","focus":["user","authpad","authcont","actions","rdcr"],"note":"Клик по зелёному тумблеру разрегистрирует сессию и возвращает regState в off."}]</script>
 
     <div class="guided-views no-print" id="guided-views" hidden aria-label="Guided diagram views">
       <button id="guided-view-prev" type="button" aria-label="Previous guided view" title="Previous guided view ([)">&#8592;</button>
@@ -5445,7 +5445,7 @@
         <ul>
           <li>&bull; regState: off / ok (зелёный) / fail (красный)</li>
           <li>&bull; off → handleClkRegister, ok → handleClkUnregister</li>
-          <li>&bull; fail → сброс в off; без AD-реквизитов тумблер выключен</li>
+          <li>&bull; fail → сброс в off; displayReg стартует false — форму открывает AuthLinks</li>
         </ul>
       </div>
 
@@ -5457,19 +5457,19 @@
         <ul>
           <li>&bull; runtime через 3 с сам гасит UserAgent после отказа</li>
           <li>&bull; UNREGISTER не трогает regState — красный не гаснет</li>
-          <li>&bull; явная разрегистрация сбрасывает regState в off</li>
+          <li>&bull; успех стирает regUserPass из формы; явная разрегистрация сбрасывает regState в off</li>
         </ul>
       </div>
 
       <div class="card">
         <div class="card-header">
           <div class="card-dot emerald"></div>
-          <h3>Старт и потеря регистрации</h3>
+          <h3>Старт и защита сессии</h3>
         </div>
         <ul>
-          <li>&bull; старт: PhoneReg открыта поверх AuthLinks (displayReg)</li>
+          <li>&bull; старт: AuthLinks, PhoneReg открывается модальным Dialog</li>
           <li>&bull; submit PhoneReg и тумблер AuthPad — тот же thunk</li>
-          <li>&bull; потеря сессии: registrationLost, PhoneReg не форсируется</li>
+          <li>&bull; при regState=ok PhoneContainer вешает beforeunload (F5 рвёт сессию)</li>
         </ul>
       </div>
     </div>
