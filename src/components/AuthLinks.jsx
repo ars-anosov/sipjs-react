@@ -1,4 +1,4 @@
-import { AdminPanelSettings, DialerSip } from "@mui/icons-material";
+import { DialerSip } from "@mui/icons-material";
 import { IconButton, Stack, Tooltip, Typography } from "@mui/material";
 import PropTypes from "prop-types";
 
@@ -14,7 +14,7 @@ const iconButtonSx = {
   "&:hover": { borderColor: "primary.main", backgroundColor: "action.hover" },
 };
 
-function AuthLinks({ onOpenReg, onOpenAd }) {
+function AuthLinks({ onOpenReg }) {
   return (
     // flexGrow занимает свободное место окна, поэтому блок стоит по центру между
     // AppBar и футером (auto-отступ футера забирает остаток, только когда блока нет)
@@ -28,11 +28,11 @@ function AuthLinks({ onOpenReg, onOpenAd }) {
           </IconButton>
         </Tooltip>
 
-        <Tooltip title="Получить атрибуты через AD">
+        {/* <Tooltip title="Получить атрибуты через AD">
           <IconButton aria-label="Получить атрибуты через AD" onClick={onOpenAd} sx={iconButtonSx}>
             <AdminPanelSettings />
           </IconButton>
-        </Tooltip>
+        </Tooltip> */}
       </Stack>
     </Stack>
   );
@@ -40,7 +40,6 @@ function AuthLinks({ onOpenReg, onOpenAd }) {
 
 AuthLinks.propTypes = {
   onOpenReg: PropTypes.func.isRequired,
-  onOpenAd: PropTypes.func.isRequired,
 };
 
 export default AuthLinks;
