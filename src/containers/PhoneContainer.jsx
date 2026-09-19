@@ -51,7 +51,7 @@ const PhoneContainer = () => {
         spacing={2}
         sx={{
           justifyContent: "center",
-          alignItems: "top",
+          alignItems: "start",
           width: "100%",
         }}
       >
