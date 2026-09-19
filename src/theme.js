@@ -7,6 +7,10 @@ export const HEADER_BACKGROUND = "grey.100";
 // AuthPad/PhoneChat/PhonePad/PhoneHistory и верхняя панель с меню. Сейчас белый.
 export const PAPER_BACKGROUND = "background.paper";
 
+// Тёмное «полотно» видео-плиток LiveKit — единственная тёмная поверхность
+// в светлой теме: нейтральный grey.900 вместо хардкода цвета в компоненте.
+export const VIDEO_SURFACE_BACKGROUND = "grey.900";
+
 // Современная тема в стиле чистых интерфейсов Material You / Modern UI
 const theme = createTheme({
   cssVariables: true,

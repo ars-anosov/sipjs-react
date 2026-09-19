@@ -33,6 +33,7 @@ flowchart LR
 - `lkRuntime.js` — LiveKit-комната (singleton, `getLiveKitRoom`).
 - `adAuth.js` — AD-вход (`loginAd`), адрес сервиса и срок AD-сессии в `localStorage`.
 - `lkToken.js` — конфиг LiveKit и запрос токена (`requestLkToken`).
+- Стенд встреч (OpenVidu Community — форк LiveKit), токены для проверок и приёмы отладки — `docs/LIVEKIT.md`.
 - `phoneDirectory.js` — HTTP телефонного справочника.
 - `phoneNotifications.js` — Service Worker / Notifications.
 - `phoneStorage.js` — настройки подключения, звонки и чат в `localStorage`.

@@ -43,8 +43,9 @@ mock/             # mock API для dev (vite plugin, apply: "serve")
 public/           # статика: img/, sounds/, sw.js
 img/              # скриншоты компонентов для README
 docs/             # документация и GitHub Pages (ars-anosov.github.io/sipjs-react):
-                  # index.html (лендинг), STATE.md (Mermaid-схемы), archify/ (генерация skill'ом
-                  # archify, исключён из Biome), .nojekyll
+                  # index.html (лендинг), STATE.md (Mermaid-схемы), LIVEKIT.md (стенд встреч,
+                  # токены, проверка), archify/ (генерация skill'ом archify, исключён из
+                  # Biome), .nojekyll
 dist/             # результат npm run build — вручную не править
 .github/          # CI (workflows/ci.yml: npm ci + build) и адаптер copilot-instructions.md
 .dsh/             # навыки агента (skills/ui-verify) и обёртка bin/browser
@@ -79,6 +80,15 @@ LICENSE           # MIT
 ## Mock API
 
 `mock/vite-mock-api.js` (Vite-плагин, `apply: "serve"`, только dev): `POST /user/ad`, `POST /user/lk`, `GET /user/phonedir`. Токен LiveKit подписывается dev-ключом.
+
+## LiveKit
+
+Бэкенд встреч — **OpenVidu Community в docker** (форк LiveKit, совместим по SDK и токенам), клиент — чистый `livekit-client`; OpenVidu-API проект не вызывает. Стенд, готовый токен, приёмы проверки и полный список грабель — `docs/LIVEKIT.md`. Самое дорогое при прогоне:
+
+- адрес сервера — `localStorage.uriLk`; если `https://…:7443` (Caddy) не отвечает (`curl` даёт `000`), у того же стенда есть LiveKit напрямую — `ws://localhost:7880`;
+- для проверок брать **свою комнату и свой identity**: комнату `9994` занимает личный браузер разработчика, и LiveKit выбивает чужого с тем же identity (`DUPLICATE_IDENTITY`);
+- `.lk-control-bar` появляется сразу при монтировании `LiveKitRoom` и **не доказывает подключение** — смотреть плитки сетки и `docker logs openvidu`;
+- панель `LkMeet` заполняет доступное место и не имеет внутренней прокрутки (Grid + `align-content: stretch`) — не откатывать к фиксированной высоте со скроллом.
 
 ## Соглашения кода
 
