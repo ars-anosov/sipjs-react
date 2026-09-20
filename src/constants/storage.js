@@ -15,3 +15,6 @@ export const PHONE_URI_DIR_KEY = "uriPhoneDir";
 
 export const LK_URI_KEY = "uriLk";
 export const LK_URI_TOKEN_KEY = "uriLkToken";
+// Список приглашений в свою комнату: в localStorage одно актуальное приглашение на номер
+export const LK_INVITES_KEY = "lkInvites";
+export const LK_MAX_INVITES = 20;

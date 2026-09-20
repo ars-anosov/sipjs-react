@@ -37,7 +37,7 @@ function isAdAuthSessionExpired() {
   return Number.isFinite(expireTime) && Date.now() > expireTime;
 }
 
-// Адрес сохраняем до запроса (как раньше в action), сессию — только после успеха.
+// Адрес сохраняем до запроса, сессию — только после успеха.
 async function loginAd({ login, password, uriAdAuth }) {
   storeAdAuthUri(uriAdAuth);
 

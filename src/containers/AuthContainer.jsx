@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useSearchParams } from "react-router-dom";
 import { bindActionCreators } from "redux";
 import * as authActions from "../actions/authControlActions.js";
 import * as lkActions from "../actions/lkControlActions.js";
@@ -13,10 +14,10 @@ const buildSipKey = (sipUsername, sipSecret) => `${sipUsername}\u0000${sipSecret
 
 const AuthContainer = () => {
   const dispatch = useDispatch();
+  const [searchParams] = useSearchParams();
 
   const phoneControlRdcr = useSelector((state) => state.phoneControlRdcr);
   const authControlRdcr = useSelector((state) => state.authControlRdcr);
-  const lkControlRdcr = useSelector((state) => state.lkControlRdcr);
 
   const phoneControlActions = useMemo(() => bindActionCreators(phoneActions, dispatch), [dispatch]);
   const authControlActions = useMemo(() => bindActionCreators(authActions, dispatch), [dispatch]);
@@ -26,6 +27,9 @@ const AuthContainer = () => {
   const { callerUserNum, uriWebRtc, connectStatus, regState } = phoneControlRdcr;
 
   const isRegistered = regState === "ok";
+
+  // Гость по ссылке-приглашению: токен в query — это вход во встречу, а не логин
+  const hasInvite = Boolean(searchParams.get("lk_token"));
 
   const sipUsername = responseData?.sip_username || "";
   const sipSecret = responseData?.sip_secret || "";
@@ -70,11 +74,6 @@ const AuthContainer = () => {
     phoneControlActions.handleClkRegister({ callerUserNum: sipUsername, regUserPass: sipSecret, uriWebRtc }, phoneControlRdcr);
   };
 
-  // Мост AUTHCTL_ → LK_: тумблер AuthPad просто показывает/скрывает LkMeet
-  const handleToggleMeet = (checked) => {
-    lkControlActions.handleChangeStore("displayControl", checked);
-  };
-
   const handleCloseAuthPad = () => {
     authControlActions.handleChangeStore("displayAuthPad", false);
   };
@@ -110,9 +109,20 @@ const AuthContainer = () => {
     authControlActions.handleChangeStore("displayAuthPad", true);
   }, [regState, authControlActions]);
 
+  // Мост URL → LK: гость по ссылке-приглашению сразу видит панель встречи.
+  // Эффект срабатывает на появление lk_token в query: если гость закрыл панель сам
+  // (displayControl=false, а query не менялся), заново её никто не открывает.
+  useEffect(() => {
+    if (!hasInvite) return;
+
+    lkControlActions.handleChangeStore("displayControl", true);
+  }, [hasInvite, lkControlActions]);
+
   // Стартовый экран — ссылки на обе формы, пока ни одна авторизация не прошла.
-  // Дальше: успех AD → мост AuthPad, успешная SIP-регистрация → телефон PhonePad
-  const showAuthLinks = authStatus !== "success" && regState !== "ok";
+  // Дальше: успех AD → мост AuthPad, успешная SIP-регистрация → телефон PhonePad.
+  // Гость по ссылке-приглашению входит во встречу сразу, поэтому экран «Войти» ему
+  // не показываем, а панель LkMeet открываем без похода в меню
+  const showAuthLinks = authStatus !== "success" && regState !== "ok" && !hasInvite;
 
   // Оба блока AD-домена: форма входа (displayAd) и мост к сервисам (displayAuthPad).
   // Форма — модальный Dialog (портал), в потоке документа она места не занимает
@@ -122,16 +132,7 @@ const AuthContainer = () => {
 
       {(displayAd || authErrComponent === "AuthAd") && <AuthAd authControlRdcr={authControlRdcr} authControlActions={authControlActions} />}
 
-      {displayAuthPad && (
-        <AuthPad
-          authControlRdcr={authControlRdcr}
-          lkControlRdcr={lkControlRdcr}
-          regState={regState}
-          onToggleReg={handleToggleReg}
-          onToggleMeet={handleToggleMeet}
-          onClose={handleCloseAuthPad}
-        />
-      )}
+      {displayAuthPad && <AuthPad authControlRdcr={authControlRdcr} regState={regState} onToggleReg={handleToggleReg} onClose={handleCloseAuthPad} />}
     </>
   );
 };

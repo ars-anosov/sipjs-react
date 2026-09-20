@@ -71,7 +71,7 @@ function PhoneDir(props) {
             setDirPart(newInputValue);
           }
         }}
-        // Условие "> 3" теперь живет в одном месте и управляет выдачей результатов
+        // Условие "> 3" живёт в одном месте и управляет выдачей результатов
         filterOptions={(options, params) => {
           if (dirPart.length <= 3) return []; // Если символов мало — результатов нет
           return filter(options, {
@@ -100,8 +100,8 @@ function PhoneDir(props) {
             },
           },
           clearIndicator: {
-            // Цвет контролов — из темы: шапка теперь светлая (белый AppBar),
-            // прежние белые подписи и рамки на ней не читались.
+            // Цвет контролов — из темы: шапка светлая (белый AppBar), цвет подписей и рамок
+            // берётся из палитры.
             sx: { color: "text.secondary" },
           },
         }}

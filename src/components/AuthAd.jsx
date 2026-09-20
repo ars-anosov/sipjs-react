@@ -249,7 +249,6 @@ AdAuth.propTypes = {
     responseData: PropTypes.shape({
       sip_username: PropTypes.string,
       sip_secret: PropTypes.string,
-      lk_token: PropTypes.string,
       ad_login: PropTypes.string,
       ad_cn: PropTypes.string,
       ad_title: PropTypes.string,

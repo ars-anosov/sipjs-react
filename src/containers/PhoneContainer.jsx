@@ -1,6 +1,7 @@
 import { Grid } from "@mui/material";
 import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useSearchParams } from "react-router-dom";
 import { bindActionCreators } from "redux";
 // Actions
 import * as phoneActions from "../actions/phoneControlActions.js";
@@ -15,12 +16,24 @@ import PhoneReg from "../components/PhoneReg.jsx";
 // AD-вход (AuthAd) относится к authControlRdcr — его рендерит AuthContainer, чужой срез здесь не читается.
 const PhoneContainer = () => {
   const dispatch = useDispatch();
+  const [searchParams] = useSearchParams();
 
   const phoneControlRdcr = useSelector((state) => state.phoneControlRdcr);
 
   const phoneControlActions = useMemo(() => bindActionCreators(phoneActions, dispatch), [dispatch]);
 
   const { displayReg, displayPad, displayHistory, displayChat, errComponent, regState } = phoneControlRdcr;
+
+  // Гость по ссылке-приглашению пришёл на встречу, а не регистрировать телефон, поэтому
+  // форма входа не открывается сама (initialState.displayReg = true); из меню её по-прежнему
+  // можно открыть — флаг снимается, а не подменяется на время рендера
+  const hasInvite = Boolean(searchParams.get("lk_token"));
+
+  useEffect(() => {
+    if (!hasInvite) return;
+
+    phoneControlActions.handleChangeStore("displayReg", false);
+  }, [hasInvite, phoneControlActions]);
 
   // F5 рвёт SIP-сессию: WebSocket, SIP-диалог и RTCPeerConnection живут только в памяти
   // страницы (singleton phoneRuntime) и после перезагрузки не восстанавливаются.

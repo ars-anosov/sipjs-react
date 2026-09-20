@@ -2,10 +2,10 @@ import { initialState as authControlInitialState } from "../reducers/authControl
 import { initialState as lkControlInitialState } from "../reducers/lkControlRdcr";
 import { initialState as phoneControlInitialState } from "../reducers/phoneControlRdcr";
 import { getStoredAdAuthUri } from "../services/adAuth";
-import { getStoredLkTokenUri, getStoredLkUri } from "../services/lkToken";
+import { getStoredLkInvites, getStoredLkTokenUri, getStoredLkUri } from "../services/lkToken";
 import { getStoredCallerUserNum, getStoredUriWebRtc, getStoredUseIce } from "../services/phoneStorage";
 
-// Нормализация сохранённого адреса WebRTC (раньше — в initialState редьюсера).
+// Нормализация сохранённого адреса WebRTC.
 const parseUriWebRtcValue = (uriWebRtc = "") => (typeof uriWebRtc === "string" ? uriWebRtc.trim() : "");
 
 // Сид стора: чтение localStorage живёт в слое стора, а не внутри reducers.
@@ -27,6 +27,7 @@ export default function getPreloadedState() {
       ...lkControlInitialState,
       uriLk: getStoredLkUri(),
       uriLkToken: getStoredLkTokenUri(),
+      invites: getStoredLkInvites(),
     },
   };
 }

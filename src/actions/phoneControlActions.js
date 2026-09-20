@@ -70,6 +70,28 @@ const appendChatMessage = (message, dispatch) => {
   });
 };
 
+// Общий хвост отправки: запись в чат (localStorage + PHONECTL_MESSAGE_ADD), текущий
+// собеседник и транспорт со статусами доставки (PHONECTL_MESSAGE_UPDATE)
+const sendChatMessage = (chatMessage, uriHost, dispatch) => {
+  appendChatMessage(chatMessage, dispatch);
+
+  dispatch({
+    type: PHONECTL_STORE_VALUE,
+    payload: { storeDataKey: "calleePhoneNum", storeDataValue: chatMessage.peer },
+  });
+
+  transmitSipMessage({
+    chatMessage,
+    uriHost,
+    onStatusChange: (chatMessages) => {
+      dispatch({
+        type: PHONECTL_MESSAGE_UPDATE,
+        payload: { chatMessages },
+      });
+    },
+  });
+};
+
 const CallsArrUpdate = () => (dispatch, getState) => {
   const displayHistory = getState().phoneControlRdcr.displayHistory;
   let callsArr = loadCallsArr();
@@ -480,23 +502,24 @@ const handleSendMessage = (peerPhoneNum, messageBody, rdcr) => (dispatch) => {
 
   clearChatAlert();
 
-  const chatMessage = createChatMessage(peer, body, "out", "sending");
-  appendChatMessage(chatMessage, dispatch);
-  dispatch({
-    type: PHONECTL_STORE_VALUE,
-    payload: { storeDataKey: "calleePhoneNum", storeDataValue: peer },
-  });
+  sendChatMessage(createChatMessage(peer, body, "out", "sending"), uriHost, dispatch);
+};
 
-  transmitSipMessage({
-    chatMessage,
-    uriHost,
-    onStatusChange: (chatMessages) => {
-      dispatch({
-        type: PHONECTL_MESSAGE_UPDATE,
-        payload: { chatMessages },
-      });
-    },
-  });
+// Приглашение в комнату LK (мост LK_ → PHONECTL_ живёт в LkContainer): адресат и текст со
+// ссылкой приходят из LK-домена, а запись чата, отправка и статусы доставки — здесь.
+const handleSendInviteMessage = (inviteMessage, rdcr) => (dispatch) => {
+  const peer = typeof inviteMessage?.num === "string" ? inviteMessage.num.trim() : "";
+  const body = typeof inviteMessage?.body === "string" ? inviteMessage.body.trim() : "";
+
+  if (!peer || !body || !isSipConnected()) return;
+
+  const uriHost = getUriHostFromWebRtc(rdcr.uriWebRtc);
+  if (!isValidSipTarget(peer, uriHost)) {
+    console.warn(`Некорректный SIP URI приглашения: sip:${peer}@${uriHost}`);
+    return;
+  }
+
+  sendChatMessage(createChatMessage(peer, body, "out", "sending"), uriHost, dispatch);
 };
 
 const getPhoneDir = () => async () => {
@@ -531,6 +554,7 @@ export {
   handleClkSubmitIn,
   handleClkSubmitOut,
   handleClkUnregister,
+  handleSendInviteMessage,
   handleSendMessage,
   MessagesArrUpdate,
   markCallsRead,

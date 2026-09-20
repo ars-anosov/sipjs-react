@@ -1,7 +1,7 @@
 # LiveKit в sipjs-react: стенд, токены, проверка
 
 Заметки для AI-агентов: чем на самом деле является бэкенд встреч, как подключиться к комнате
-без AD, как проверить правку и на каких граблях уже теряли прогоны. Правила проекта — в
+без AD, как проверить правку и какие грабли ломают прогоны. Правила проекта — в
 `AGENTS.md`, потоки — в `docs/STATE.md`.
 
 ## Что где
@@ -16,9 +16,17 @@
   `devkey`/`secret`.
 - **Контракт подключения**: `#/?lk_room=<комната>&lk_token=<jwt>`. `uriLk` (адрес сервера) и
   `uriLkToken` (эндпоинт выдачи) лежат в `localStorage` (`constants/storage.js`), dev-дефолты
-  пишет корневой `index.html`.
-- **Показ панели**: `lkControlRdcr.displayControl` — пункт меню «LiveKit Встреча» или тумблер в
-  `AuthPad`. Сам `LkMeet` без `lk_token`/AD показывает информирующий текст.
+  пишет корневой `index.html`. Токен выдаёт только `uriLkToken`: своя комната — `POST` с
+  `num` = `room` = свой номер (кнопка «Создать» в `LkMeet`), приглашение — `num` приглашаемого и
+  `room` своей комнаты; токен LiveKit AD (`POST /user/ad`) не выдаёт.
+- **Показ панели**: `lkControlRdcr.displayControl` — пункт меню «LiveKit Встреча» (панель `AuthPad`
+  отвечает только за SIP-регистрацию). По ссылке-приглашению
+  (`lk_token` в query) панель открывается сама, а гостю не показывают стартовый экран `AuthLinks`
+  и модальную форму `PhoneReg` (оба флага снимают контейнеры по query, из меню форма регистрации
+  доступна). Своя комната и приглашение доступны только при **живой SIP-регистрации**
+  (`phoneControlRdcr.regState === "ok"`; приглашение уходит SIP MESSAGE, AD для этого не нужен) —
+  номер комнаты берётся из `callerUserNum`. Без регистрации и без токена в query `LkMeet`
+  показывает информирующий текст про ссылку-приглашение.
 
 ## Локальный стенд
 
@@ -60,8 +68,10 @@ node -e "const jwt=require('jsonwebtoken');console.log(jwt.sign({video:{roomJoin
 
 `video.room` — комната, `subject` — identity участника. Дальше достаточно открыть
 `http://localhost:<порт>/#/?lk_room=grid3&lk_token=<jwt>` — **AD и авторизация для этого не нужны**:
-достаточно тумблера/пункта меню «LiveKit Встреча». Если Caddy лежит, перед загрузкой страницы
-подставить `localstorage-set uriLk ws://localhost:7880`.
+панель встречи открывается сама, стартовый экран «Войти» и форма SIP-регистрации гостю не
+показываются (встречу всегда можно открыть и пунктом меню «LiveKit Встреча»). Если Caddy лежит,
+перед загрузкой страницы подставить `localstorage-set uriLk ws://localhost:7880` и **перезагрузить
+документ** — стор читает `localStorage` только на старте, смена одного лишь `#hash` его не перечитывает.
 
 ## Проверка в браузере
 
@@ -75,7 +85,7 @@ node -e "const jwt=require('jsonwebtoken');console.log(jwt.sign({video:{roomJoin
   role-локаторы (`getByRole`, `getByText` через `waitFor`) не находят элементы — закрывать первым делом.
 - Тумблеры MUI `Switch` в этом проекте **не находятся** через `getByRole("checkbox", { name })`
   (проверено, локатор ждёт таймаут) — брать CSS:
-  `page.locator('input[aria-label="Показ LiveKit Встречи"]')`.
+  `page.locator('input[aria-label="Тумблер SIP регистрации"]')`.
 - AD-диалог закрывается сам на `AUTHCTL_SUBMIT_SUCCESS` (`displayAd: false`) — ждать «Мост к
   сервисам», а не текст успеха.
 - Сценарий — одной цепочкой в одном вызове `bash` (демон CLI живёт только внутри вызова), включая
@@ -89,7 +99,7 @@ node -e "const jwt=require('jsonwebtoken');console.log(jwt.sign({video:{roomJoin
   после проверки вернуть файл: `git checkout -- .playwright/cli.config.json`.
 - Несколько вкладок = несколько участников: одна вкладка — один identity, все в своей комнате.
 
-## Грабли, которые уже стоили прогонов
+## Грабли, которые ломают прогоны
 
 - **`.lk-control-bar` не доказывает подключение.** `LiveKitRoom` рендерит `ControlBar` сразу при
   монтировании, ещё до (и без) успешного `connect()`. Подключение проверять по плиткам
@@ -100,8 +110,10 @@ node -e "const jwt=require('jsonwebtoken');console.log(jwt.sign({video:{roomJoin
   треки публикует настоящие (`useRealTracks: true`) — без фейковых устройств падает, а смена
   значения на лету ломает симуляцию. Для проверки раскладки надёжнее реальная комната.
 - **Мок `/user/ad` отдаёт пустой `sip_secret`** → мост `AuthContainer` не заполняет `callerUserNum`,
-  и форма приглашения падает с «Заполните num и room.». Чтобы проверить приглашение, подменить ответ
-  (`page.route("**/user/ad", …)` с непустым `sip_secret`) и при необходимости `**/user/lk`.
+  и форма приглашения падает с «Заполните num и room.». Приглашение к тому же требует живой
+  SIP-регистрации (`regState === "ok"`): без настоящего SBC её даёт только заглушка SIP-over-WebSocket
+  (эхо `Sec-WebSocket-Protocol: sip` в рукопожатии, эхо `Contact` из запроса в 200 OK на REGISTER) —
+  рецепт и грабли в навыке `ui-verify`.
 - **MUI 9 `Grid` — это flexbox, а не CSS grid** (`@mui/system/Grid/gridGenerator.mjs`:
   `display: flex; flexWrap: wrap; gap`). Ряды делят высоту через `align-content: stretch`;
   `gridAutoRows` и `grid-template-columns` тут не работают.
@@ -136,9 +148,9 @@ node -e "const jwt=require('jsonwebtoken');console.log(jwt.sign({video:{roomJoin
 кодека (`publishOptions`) есть только у `TrackToggle`. Компоненты не импортируют `livekit-client`
 (исключение — `LkMeet` → `lkRuntime` и `@livekit/components-react`).
 
-Строка `backupCodec: "h264"` из старой конфигурации убрана: тип в `livekit-client` —
-`true | false | { codec }`, а строка давала `backupCodec.codec === undefined` и лишний дубль-кодек
-в `AddTrackRequest`. Для VP8-камеры дефолт (`true`) — no-op, для VP9-демонстрации даёт дубль VP8.
+`backupCodec` принимает `true | false | { codec }`; строка (`"h264"`) дала бы
+`backupCodec.codec === undefined` и лишний дубль-кодек в `AddTrackRequest`, поэтому в конфигурации
+стоит `true`. Для VP8-камеры дефолт (`true`) — no-op, для VP9-демонстрации даёт дубль VP8.
 
 ## Разрешение видео: кто что зажимает
 
@@ -207,4 +219,4 @@ navigator.mediaDevices.getDisplayMedia = async (c) => { window.__captured.push(c
 - [OpenVidu vs LiveKit](https://openvidu.io/openvidu-vs-livekit/) — форк, совместимость, где LiveKit впереди.
 - [OpenVidu: access tokens](https://openvidu.io/latest/docs/reference/access-tokens/) — состав JWT-гранта и параметры.
 - [OpenVidu: local deployment](https://openvidu.io/latest/docs/self-hosting/local/) — чем поднимается локальный стенд.
-- [`useSearchParams`](https://reactrouter.com/api/hooks/useSearchParams), [`createSearchParams`](https://reactrouter.com/api/utils/createSearchParams) — разбор `lk_room`/`lk_token` из query.
+- [`useSearchParams`](https://reactrouter.com/api/hooks/useSearchParams), [`useNavigate`](https://reactrouter.com/api/hooks/useNavigate), [`createSearchParams`](https://reactrouter.com/api/utils/createSearchParams) — разбор `lk_room`/`lk_token` из query и переход в свою комнату после `POST /user/lk`.

@@ -11,6 +11,20 @@ export const PAPER_BACKGROUND = "background.paper";
 // в светлой теме: нейтральный grey.900 вместо хардкода цвета в компоненте.
 export const VIDEO_SURFACE_BACKGROUND = "grey.900";
 
+// Оформление ссылки-приглашения в комнату — одинаковое в PhoneChat и LkMeet:
+// акцент темы, иконка нового окна и подчёркивание. Цвет задаётся через sx, потому что
+// проп color у Typography-базы в MUI 9 ждёт camelCase-путь (textSecondary), а не text.secondary.
+export const MEETING_LINK_SX = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 0.5,
+  fontWeight: 500,
+  wordBreak: "break-all",
+  color: "primary.main",
+  textDecorationColor: "currentColor",
+  "&:hover": { color: "primary.dark", textDecorationColor: "currentColor" },
+};
+
 // Современная тема в стиле чистых интерфейсов Material You / Modern UI
 const theme = createTheme({
   cssVariables: true,

@@ -47,7 +47,7 @@ npm run check   # линт + форматирование с записью
 ![component_PhoneIco.png](img/component_PhoneIco.png)
 
 ## PhoneChat.jsx
-Чат по SIP MESSAGE
+Чат по SIP MESSAGE; ссылка-приглашение в комнату (параметр `lk_room`) выделена акцентом: в исходящем сообщении открывается в новом окне, во входящем — переход тут же (react-router, текущая вкладка); остальные ссылки — как обычно. Отправка — Enter (Shift+Enter/Ctrl+Enter — перенос строки), поле «Вн.номер» следует за собеседником последней отправки (крестик в поле показывает все сообщения).
 
 # Доп. компоненты
 Плюшки для интеграции с внешними сервисами
@@ -58,7 +58,6 @@ POST-запрос к серверу авторизации, ожидаемый �
 {
   "sip_username"  : "1234",
   "sip_secret"    : "SECRET",
-  "lk_token"      : "LiveKit Token",
   "ad_login"      : "login",
   "ad_cn"         : "ФИО",
   "ad_title"      : "Должность",
@@ -66,13 +65,16 @@ POST-запрос к серверу авторизации, ожидаемый �
 }
 ```
 
+Токен LiveKit в этом ответе не приходит: его выдаёт отдельный `POST` на `uriLkToken` (в dev — мок
+`/user/lk`), см. `LkMeet.jsx`.
+
 ![component_AuthAd.png](img/component_AuthAd.png)
 
 ## AuthIco.jsx + AuthAdInfo.jsx
 Индикация данных AD-сессии в интерфейсе.
 
 ## AuthPad.jsx
-Панель «Мост к сервисам»: тумблеры активируют соответствующий сервис.
+Панель «Мост к сервисам»: тумблер SIP-регистрации; встреча LiveKit открывается пунктом меню «LiveKit Встреча» (или сама по ссылке-приглашению).
 
 ## PhoneDir.jsx
 GET-запрос к серверу справочнику, ожидаемый ответ:
@@ -88,7 +90,7 @@ GET-запрос к серверу справочнику, ожидаемый о
 ![component_PhoneDir.png](img/component_PhoneDir.png)
 
 ## LkMeet.jsx
-Видеовстреча на [LiveKit](https://livekit.io/) (локальный деплой — [openvidu-local-deployment](https://github.com/OpenVidu/openvidu-local-deployment)); комната из query `lk_room`/`lk_token`.
+Видеовстреча на [LiveKit](https://livekit.io/) (локальный деплой — [openvidu-local-deployment](https://github.com/OpenVidu/openvidu-local-deployment)); комната из query `lk_room`/`lk_token`. Свою комнату и ссылку-приглашение выдаёт `POST` на `uriLkToken` (в dev — мок `/user/lk`). Ссылка-приглашение в панели оформлена так же, как в чате, и подписана сроком действия токена (`exp` из JWT, время или дата со временем). Приглашений может быть несколько: панель показывает их списком, хранит в `localStorage` (ключ `lkInvites`, одно актуальное приглашение на номер) и позволяет убрать строку крестиком.
 
 ![component_LkMeet.png](img/component_LkMeet.png)
 

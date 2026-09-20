@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import { HEADER_BACKGROUND, PAPER_BACKGROUND } from "../theme.js";
 
 function AuthPad(props) {
-  const { authControlRdcr, lkControlRdcr, regState, onToggleReg, onToggleMeet, onClose } = props;
+  const { authControlRdcr, regState, onToggleReg, onClose } = props;
 
   useEffect(() => {
     if (import.meta.env.DEV) console.log("AuthPad MOUNT");
@@ -22,20 +22,14 @@ function AuthPad(props) {
   const sipSecret = authControlRdcr?.responseData?.sip_secret || "";
   const hasSipData = Boolean(sipUsername && sipSecret);
 
-  // lk_token приходит либо из AD-ответа, либо из формы LkToken
-  const lkToken = authControlRdcr?.responseData?.lk_token || lkControlRdcr?.responseData?.lk_token || "";
-  const hasLkToken = Boolean(lkToken);
-  const meetVisible = !!lkControlRdcr?.displayControl;
-
   // Информируем, если AdAuth не выполнен или не содержит нужные поля
   const missingFields = [];
   if (!sipUsername) missingFields.push("sip_username");
   if (!sipSecret) missingFields.push("sip_secret");
-  if (!lkToken) missingFields.push("lk_token");
 
   let infoText = "";
   if (authControlRdcr?.status !== "success") {
-    infoText = "AD авторизация не выполнена — sip_username / sip_secret / lk_token недоступны.";
+    infoText = "AD авторизация не выполнена — sip_username / sip_secret недоступны.";
   } else if (missingFields.length > 0) {
     infoText = `AD не вернул: ${missingFields.join(", ")}.`;
   }
@@ -44,10 +38,6 @@ function AuthPad(props) {
   // регистрацию, из цветного состояния — разрегистрацию (решает AuthContainer)
   const handleToggleReg = () => {
     onToggleReg();
-  };
-  // Тумблер показа компоненты LkMeet
-  const handleToggleMeet = (event) => {
-    onToggleMeet(event.target.checked);
   };
 
   return (
@@ -106,20 +96,6 @@ function AuthPad(props) {
               }}
             />
           </Stack>
-
-          <Stack direction="row" spacing={2} sx={{ alignItems: "center", justifyContent: "space-between" }}>
-            <Typography variant="body1" color="text.primary">
-              LiveKit Встреча
-            </Typography>
-            <Switch
-              checked={meetVisible}
-              disabled={!hasLkToken}
-              onChange={handleToggleMeet}
-              slotProps={{
-                input: { "aria-label": "Показ LiveKit Встречи" },
-              }}
-            />
-          </Stack>
         </Stack>
 
         {infoText && (
@@ -141,18 +117,10 @@ AuthPad.propTypes = {
     responseData: PropTypes.shape({
       sip_username: PropTypes.string,
       sip_secret: PropTypes.string,
-      lk_token: PropTypes.string,
-    }),
-  }).isRequired,
-  lkControlRdcr: PropTypes.shape({
-    displayControl: PropTypes.bool,
-    responseData: PropTypes.shape({
-      lk_token: PropTypes.string,
     }),
   }).isRequired,
   regState: PropTypes.oneOf(["off", "ok", "fail"]).isRequired,
   onToggleReg: PropTypes.func.isRequired,
-  onToggleMeet: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired,
 };
 

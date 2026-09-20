@@ -24,7 +24,7 @@ const storeCallerUserNum = (callerUserNum) => {
   localStorage.setItem(PHONE_CALLER_USER_NUM_KEY, callerUserNum);
 };
 
-// Ключа нет — ICE включён по умолчанию (как было в initialState).
+// Ключа нет — ICE включён по умолчанию.
 const getStoredUseIce = () => {
   const raw = localStorage.getItem(PHONE_USE_ICE_KEY);
   return raw === null ? true : raw === "true";

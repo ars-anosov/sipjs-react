@@ -15,29 +15,40 @@ import {
 import "@livekit/components-styles";
 import {
   AddCircleOutlined as AddCircleOutlinedIcon,
-  Close as IconClose,
   DeleteOutlined as DeleteOutlinedIcon,
+  GroupAdd as GroupAddIcon,
+  Close as IconClose,
   Fullscreen as IconFullscreen,
   FullscreenExit as IconFullscreenExit,
-  GroupAdd as GroupAddIcon,
-  Mic as IconMicOn,
   MicOff as IconMicOff,
+  Mic as IconMicOn,
+  OpenInNew as IconOpenInNew,
   VideoCallOutlined as VideoCallOutlinedIcon,
 } from "@mui/icons-material";
-import { alpha, Box, Button, Divider, GlobalStyles, Grid, IconButton, Link, Paper, Stack, Typography } from "@mui/material";
+import { Alert, alpha, Box, Button, CircularProgress, Divider, GlobalStyles, Grid, IconButton, Link, Paper, Stack, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+import { format, isToday } from "date-fns";
 import PropTypes from "prop-types";
 import { useEffect, useRef, useState } from "react";
-import { createSearchParams, Link as RouterLink, useSearchParams } from "react-router-dom";
+import { createSearchParams, Link as RouterLink, useNavigate, useSearchParams } from "react-router-dom";
 import { PANEL_HEIGHT } from "../constants/ui.js";
 import { getLiveKitRoom, screenShareCaptureOptions, screenSharePublishOptions, Track } from "../services/lkRuntime";
-import { HEADER_BACKGROUND, PAPER_BACKGROUND, VIDEO_SURFACE_BACKGROUND } from "../theme.js";
+import { HEADER_BACKGROUND, MEETING_LINK_SX, PAPER_BACKGROUND, VIDEO_SURFACE_BACKGROUND } from "../theme.js";
 import { getLiveKitMuiStyles } from "./LkThemeStyles";
 import LkToken from "./LkToken";
 
 // Комната и токен живут только в query текущего маршрута (`#/?lk_room=…&lk_token=…`):
 // приглашение остаётся обычной ссылкой, а состояние не дублируется в useState.
 const buildRoomSearch = (room, token) => createSearchParams({ lk_room: room, lk_token: token }).toString();
+
+// Срок действия токена приглашения (exp из JWT, см. services/lkToken.js): время — до минут,
+// с датой, если токен живёт дольше сегодняшнего дня
+const formatInviteValidUntil = (expiresAt) => {
+  if (typeof expiresAt !== "number") return "";
+
+  const date = new Date(expiresAt);
+  return Number.isNaN(date.getTime()) ? "" : format(date, isToday(date) ? "HH:mm" : "dd.MM HH:mm");
+};
 
 function MicrophoneStatusIcon({ trackRef }) {
   const participant = trackRef?.participant;
@@ -297,9 +308,10 @@ function MeetControlBar() {
 }
 
 function LkMeet(props) {
-  const { authControlRdcr, lkControlRdcr, lkControlActions } = props;
+  const { phoneControlRdcr, lkControlRdcr, lkControlActions } = props;
   const theme = useTheme();
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [isRoomActive, setIsRoomActive] = useState(false);
   const [customRoom] = useState(() => getLiveKitRoom());
   const lkStyles = getLiveKitMuiStyles(theme);
@@ -308,21 +320,41 @@ function LkMeet(props) {
   const room = searchParams.get("lk_room") || "";
   const token = searchParams.get("lk_token") || "";
 
-  const adData = authControlRdcr?.responseData || {};
-  const inviteData = lkControlRdcr?.responseData || {};
-  const hasLkToken = Boolean(adData.lk_token || token);
-  // Ряд кнопок нужен, когда есть чем создать комнату; приглашение — только из своей
-  const canManageRoom = Boolean(adData.sip_username && adData.lk_token);
-  const isOwnRoom = Boolean(adData.sip_username) && adData.sip_username === room;
-  const invitationSearch = token && inviteData.lk_token ? buildRoomSearch(adData.sip_username, inviteData.lk_token) : "";
+  // Своя комната и приглашение опираются на живую SIP-регистрацию, а не на AD: приглашение
+  // уходит SIP MESSAGE, и номер комнаты — зарегистрированный внутренний номер (callerUserNum)
+  const ownNum = phoneControlRdcr?.callerUserNum || "";
+  const isSipRegistered = phoneControlRdcr?.regState === "ok";
+  const canManageRoom = Boolean(isSipRegistered && ownNum);
+  // Токен приходит только из query: свой токен для своей комнаты выдаёт /user/lk
+  // (кнопка «Создать»), а по ссылке-приглашению он уже в query — тогда регистрация не нужна
+  const hasLkAccess = Boolean(token || canManageRoom);
+  const isOwnRoom = canManageRoom && ownNum === room;
+  // Список приглашений — из среза (сид из localStorage, см. services/lkToken.js):
+  // на номер хранится одно актуальное приглашение; показываем его только в своей комнате
+  // при живой SIP-регистрации — как и кнопки управления
+  const invites = lkControlRdcr?.invites || [];
+  const isCreating = lkControlRdcr?.createStatus === "loading";
 
   let infoText = "";
-  if (!hasLkToken) {
-    infoText = authControlRdcr?.status === "success" ? "AD не вернул lk_token." : "AD авторизация не выполнена — lk_token недоступен.";
+  if (!hasLkAccess) {
+    infoText = isSipRegistered ? "Не задан внутренний номер SIP." : "SIP регистрация не выполнена, встреча возможна по ссылке-приглашению.";
   }
 
   const handleInvite = () => lkControlActions.handleChangeStore("displayLkToken", true);
   const handleClose = () => lkControlActions.handleChangeStore("displayControl", false);
+  // Своя комната создаётся только запросом к /user/lk: токен из ответа кладём в query
+  const handleCreateRoom = async () => {
+    const responseData = await lkControlActions.handleLkRoomCreate({
+      num: ownNum,
+      room: ownNum,
+      uriLkToken: lkControlRdcr.uriLkToken,
+    });
+
+    const createdToken = responseData?.lk_token;
+    if (!createdToken) return;
+
+    navigate({ pathname: "/", search: buildRoomSearch(responseData.lk_room || ownNum, createdToken) });
+  };
 
   if (!lkControlRdcr?.displayControl) return null;
 
@@ -372,87 +404,137 @@ function LkMeet(props) {
       <Divider />
 
       <Box sx={{ p: 1, flex: 1, minHeight: 0, display: "flex", flexDirection: "column", gap: 1 }}>
-        {infoText ? (
-          <Typography variant="body2" color="warning.main" sx={{ px: 0.5 }}>
+        {canManageRoom && (
+          <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap", alignItems: "center", flexShrink: 0 }}>
+            {token ? (
+              <Button variant="outlined" color="error" size="small" disabled={isRoomActive} component={RouterLink} to="/" startIcon={<DeleteOutlinedIcon />}>
+                Удалить
+              </Button>
+            ) : (
+              <Button
+                variant="outlined"
+                color="primary"
+                size="small"
+                disabled={isRoomActive || isCreating}
+                onClick={handleCreateRoom}
+                startIcon={isCreating ? <CircularProgress size={16} color="inherit" /> : <AddCircleOutlinedIcon />}
+              >
+                Создать
+              </Button>
+            )}
+
+            {isOwnRoom &&
+              (lkControlRdcr.displayLkToken ? (
+                <LkToken {...props} />
+              ) : (
+                <Button variant="outlined" size="small" onClick={handleInvite} startIcon={<GroupAddIcon />}>
+                  Пригласить
+                </Button>
+              ))}
+          </Stack>
+        )}
+
+        {lkControlRdcr.createStatus === "error" && (
+          <Alert severity="error" variant="standard" sx={{ py: 0, px: 1, fontSize: "0.8rem" }}>
+            {lkControlRdcr.createMessage}
+          </Alert>
+        )}
+
+        {isOwnRoom && invites.length > 0 && (
+          // Строк может быть много: список ограничен по высоте и прокручивается, чтобы
+          // не выдавливать кнопку подключения из панели
+          <Stack spacing={0.25} sx={{ flexShrink: 0, maxHeight: 160, overflowY: "auto", pr: 0.5 }}>
+            {invites.map((invite) => {
+              const validUntil = formatInviteValidUntil(invite.expiresAt);
+
+              return (
+                <Stack key={invite.num} direction="row" spacing={0.5} sx={{ alignItems: "center", justifyContent: "center", flexWrap: "wrap" }}>
+                  <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                    Приглашение для
+                  </Typography>
+
+                  <Link
+                    component={RouterLink}
+                    to={{ pathname: "/", search: buildRoomSearch(invite.room, invite.token) }}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="Открыть встречу в новом окне"
+                    sx={MEETING_LINK_SX}
+                  >
+                    <IconOpenInNew sx={{ fontSize: 14, flexShrink: 0 }} />
+                    {invite.num}
+                  </Link>
+
+                  {validUntil && (
+                    <Typography variant="caption" sx={{ color: "text.secondary" }}>
+                      {`до ${validUntil}`}
+                    </Typography>
+                  )}
+
+                  <IconButton
+                    size="small"
+                    aria-label={`Убрать приглашение для ${invite.num}`}
+                    title="Убрать из списка"
+                    onClick={() => lkControlActions.handleRemoveInvite(invite.num)}
+                    sx={{ color: "text.secondary" }}
+                  >
+                    <DeleteOutlinedIcon sx={{ fontSize: 15 }} />
+                  </IconButton>
+                </Stack>
+              );
+            })}
+          </Stack>
+        )}
+
+        {Boolean(token) &&
+          (isRoomActive ? (
+            <>
+              <GlobalStyles styles={lkStyles} />
+              <LiveKitRoom
+                data-lk-theme="default"
+                token={token}
+                serverUrl={lkControlRdcr.uriLk}
+                connect={isRoomActive}
+                video={false}
+                audio={false}
+                room={customRoom}
+                onDisconnected={() => setIsRoomActive(false)}
+                style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }}
+              >
+                <Box sx={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+                  <VideoGridSection />
+                </Box>
+                <MeetControlBar />
+                <RoomAudioRenderer />
+              </LiveKitRoom>
+            </>
+          ) : (
+            <Box sx={{ flex: 1, minHeight: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <Button
+                type="button"
+                variant="contained"
+                color="success"
+                size="large"
+                onClick={() => setIsRoomActive(true)}
+                startIcon={<VideoCallOutlinedIcon />}
+              >
+                Подключиться к {room}
+              </Button>
+            </Box>
+          ))}
+      </Box>
+
+      {/* Подвал панели: подсказка мелким текстом, тело остаётся рабочим (кнопки/комната).
+          Цвет — через sx: проп color="text.secondary" в MUI 9 не матчится с вариантом
+          (путь палитры там camelCase, textSecondary) и молча ничего не красит. */}
+      {infoText && (
+        <>
+          <Divider />
+          <Typography variant="caption" sx={{ display: "block", px: 1.5, py: 0.75, textAlign: "center", color: "text.secondary" }}>
             {infoText}
           </Typography>
-        ) : (
-          <>
-            {canManageRoom && (
-              <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap", alignItems: "center", flexShrink: 0 }}>
-                <Button
-                  variant="outlined"
-                  color={token ? "error" : "primary"}
-                  size="small"
-                  disabled={isRoomActive}
-                  component={RouterLink}
-                  to={token ? "/" : { pathname: "/", search: buildRoomSearch(adData.sip_username, adData.lk_token) }}
-                  startIcon={token ? <DeleteOutlinedIcon /> : <AddCircleOutlinedIcon />}
-                >
-                  {token ? "Удалить" : "Создать"}
-                </Button>
-
-                {isOwnRoom &&
-                  (lkControlRdcr.displayLkToken ? (
-                    <LkToken {...props} />
-                  ) : (
-                    <Button variant="outlined" size="small" onClick={handleInvite} startIcon={<GroupAddIcon />}>
-                      Пригласить
-                    </Button>
-                  ))}
-              </Stack>
-            )}
-
-            {invitationSearch && (
-              <Stack direction="row" spacing={0.5} sx={{ alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                <Typography variant="body2" color="text.secondary">
-                  Приглашение для
-                </Typography>
-                <Link component={RouterLink} to={{ pathname: "/", search: invitationSearch }} target="_blank" rel="noopener noreferrer" variant="body2">
-                  {inviteData.lk_num}
-                </Link>
-              </Stack>
-            )}
-
-            {Boolean(token) &&
-              (isRoomActive ? (
-                <>
-                  <GlobalStyles styles={lkStyles} />
-                  <LiveKitRoom
-                    data-lk-theme="default"
-                    token={token}
-                    serverUrl={lkControlRdcr.uriLk}
-                    connect={isRoomActive}
-                    video={false}
-                    audio={false}
-                    room={customRoom}
-                    onDisconnected={() => setIsRoomActive(false)}
-                    style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }}
-                  >
-                    <Box sx={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-                      <VideoGridSection />
-                    </Box>
-                    <MeetControlBar />
-                    <RoomAudioRenderer />
-                  </LiveKitRoom>
-                </>
-              ) : (
-                <Box sx={{ flex: 1, minHeight: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <Button
-                    type="button"
-                    variant="contained"
-                    color="success"
-                    size="large"
-                    onClick={() => setIsRoomActive(true)}
-                    startIcon={<VideoCallOutlinedIcon />}
-                  >
-                    Подключиться к {room}
-                  </Button>
-                </Box>
-              ))}
-          </>
-        )}
-      </Box>
+        </>
+      )}
     </Paper>
   );
 }
@@ -460,8 +542,8 @@ function LkMeet(props) {
 LkMeet.propTypes = {
   phoneControlRdcr: PropTypes.object.isRequired,
   phoneControlActions: PropTypes.object.isRequired,
-  authControlRdcr: PropTypes.object,
-  authControlActions: PropTypes.object,
+  lkControlRdcr: PropTypes.object,
+  lkControlActions: PropTypes.object,
 };
 
 ParticipantTileBox.propTypes = {

@@ -6,8 +6,8 @@ import { alpha, IconButton, keyframes, Tooltip, useTheme } from "@mui/material";
 import PropTypes from "prop-types";
 import { useEffect, useMemo } from "react";
 
-// Пульс берёт цвет из --status-pulse, который задаёт сам индикатор: на белой шапке
-// прежнее белое свечение было не видно.
+// Пульс берёт цвет из --status-pulse, который задаёт сам индикатор — так свечение
+// читается на белой шапке.
 const pulse = keyframes`
   0% { box-shadow: 0 0 0 0 var(--status-pulse); transform: scale(1); }
   70% { box-shadow: 0 0 0 8px rgba(0, 0, 0, 0); transform: scale(1.04); }

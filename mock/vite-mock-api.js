@@ -42,10 +42,10 @@ export const mockEndpoints = [
     methods: ["POST"],
     handler(_req, res, { body }) {
       const login = typeof body.login === "string" ? body.login : "";
+      // Токен LiveKit выдаёт /user/lk: и своя комната, и приглашение
       sendJson(res, 200, {
         sip_username: "9994",
         sip_secret: "",
-        lk_token: lkToken("9994", "9994", "1h"),
         ad_login: login,
         ad_cn: "Mock User",
         ad_title: "Mock Title",
@@ -56,6 +56,8 @@ export const mockEndpoints = [
   {
     path: "/user/lk",
     methods: ["POST"],
+    // Единственный источник lk_token: своя комната (num = room = свой номер) и
+    // приглашение (num — приглашаемый, room — своя комната)
     handler(_req, res, { body }) {
       const room = typeof body.room === "string" ? body.room : "";
       const num = typeof body.num === "string" ? body.num : "";

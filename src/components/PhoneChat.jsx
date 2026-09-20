@@ -1,11 +1,20 @@
-import { Backspace as IconBackspace, Close as IconClose, Delete as IconDelete, Send as IconSend } from "@mui/icons-material";
-import { Alert, Box, Button, Collapse, Divider, IconButton, InputAdornment, Paper, Stack, TextField, Typography } from "@mui/material";
+import { Close as IconClose, Delete as IconDelete, OpenInNew as IconOpenInNew, Send as IconSend } from "@mui/icons-material";
+import { Alert, Box, Button, Collapse, Divider, IconButton, InputAdornment, Link, Paper, Stack, TextField, Typography } from "@mui/material";
 import { alpha, useTheme } from "@mui/material/styles";
 import { format } from "date-fns";
 import PropTypes from "prop-types";
 import { useEffect, useRef, useState } from "react";
+import { Link as RouterLink } from "react-router-dom";
 import { PANEL_HEIGHT } from "../constants/ui.js";
-import { HEADER_BACKGROUND, PAPER_BACKGROUND } from "../theme.js";
+import { HEADER_BACKGROUND, MEETING_LINK_SX, PAPER_BACKGROUND } from "../theme.js";
+
+// Оформление прочих ссылок в теле сообщения: как обычный текст страницы
+const PLAIN_LINK_SX = { color: "inherit", textDecoration: "underline" };
+
+// Номер для поля собеседника: только цифры. Функция чистая и живёт вне компонента, чтобы
+// эффект синхронизации поля не зависел от её идентичности (иначе он срабатывал бы на каждом
+// рендере и затирал ручную очистку поля).
+const formatPhoneDigits = (value) => (value || "").replace(/\D/g, "");
 
 function PhoneChat(props) {
   if (import.meta.env.DEV) console.log("PhoneChat hook");
@@ -14,7 +23,6 @@ function PhoneChat(props) {
   const theme = useTheme();
   const messagesEndRef = useRef(null);
 
-  const formatPhoneDigits = (value) => (value || "").replace(/\D/g, "");
   const [peerTxt, setPeerTxt] = useState(formatPhoneDigits(phoneControlRdcr.calleePhoneNum));
   const [messageTxt, setMessageTxt] = useState("");
 
@@ -32,6 +40,13 @@ function PhoneChat(props) {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
 
+  // Собеседника меняет стор (отправка сообщения или приглашения из LkMeet) — панель должна
+  // переключиться на него, иначе только что ушедшее приглашение скрыто фильтром ниже.
+  // Очистка поля крестиком под фильтр не попадает: calleePhoneNum при этом не меняется.
+  useEffect(() => {
+    setPeerTxt(formatPhoneDigits(phoneControlRdcr.calleePhoneNum));
+  }, [phoneControlRdcr.calleePhoneNum]);
+
   const visibleMessages = peerTxt.trim() ? phoneControlRdcr.chatMessages.filter((msg) => msg.peer === peerTxt.trim()) : phoneControlRdcr.chatMessages;
 
   const handleClose = () => {
@@ -42,6 +57,10 @@ function PhoneChat(props) {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    // Пустое сообщение не отправляем: иначе Enter в пустом поле вызывает алерт
+    // из handleSendMessage
+    if (!messageTxt.trim()) return;
+
     phoneControlActions.handleSendMessage(peerTxt, messageTxt, phoneControlRdcr);
     setMessageTxt("");
   };
@@ -64,7 +83,7 @@ function PhoneChat(props) {
     return null;
   };
 
-  const renderMessageBody = (body) => {
+  const renderMessageBody = (body, direction) => {
     if (!body) return null;
 
     const parts = body.split(/(<a\s+href="[^"]+">.*?<\/a>)/gi);
@@ -77,21 +96,35 @@ function PhoneChat(props) {
       return `#/${href.replace(/^\/+/, "")}`;
     };
 
+    // Маршрут для react-router: «/?lk_room=…», «#/?lk_room=…» и абсолютный URL приложения
+    // сводятся к пути с query — переход остаётся внутри SPA, страница не перезагружается
+    const toRouterPath = (href) => href.replace(/^https?:\/\/[^/]+/i, "").replace(/^\/?#/, "/");
+
+    const isOutgoing = direction === "out";
+
     return parts.map((part, index) => {
       const match = part.match(/^<a\s+href="([^"]+)">([^<]+)<\/a>$/i);
       // biome-ignore lint/suspicious/noArrayIndexKey: <объяснение>
       if (!match) return <span key={`message-body-${index}`}>{part}</span>;
 
       const [, href, text] = match;
+      const isMeetingLink = /[?&]lk_room=/i.test(href);
+      // Новое окно — только у своего, исходящего приглашения (ссылку открывает отправитель);
+      // чужое, входящее приглашение ведёт тут же роутером, а обычные ссылки — в текущей вкладке
+      const isIncomingMeeting = isMeetingLink && !isOutgoing;
+      const opensNewWindow = isMeetingLink && isOutgoing;
+
       return (
-        <a
+        <Link
           // biome-ignore lint/suspicious/noArrayIndexKey: <объяснение>
           key={`message-body-${index}`}
-          href={normalizeLinkHref(href)}
-          style={{ color: "inherit", textDecoration: "underline" }}
+          {...(isIncomingMeeting ? { component: RouterLink, to: toRouterPath(href) } : { href: normalizeLinkHref(href) })}
+          {...(opensNewWindow ? { target: "_blank", rel: "noopener noreferrer", title: "Открыть встречу в новом окне" } : null)}
+          sx={isMeetingLink ? MEETING_LINK_SX : PLAIN_LINK_SX}
         >
+          {opensNewWindow && <IconOpenInNew sx={{ fontSize: 14, flexShrink: 0 }} />}
           {text}
-        </a>
+        </Link>
       );
     });
   };
@@ -177,8 +210,9 @@ function PhoneChat(props) {
               input: {
                 endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton onClick={() => setPeerTxt("")} size="small">
-                      <IconBackspace />
+                    {/* Крестик, а не Backspace: кнопка очищает номер собеседника целиком */}
+                    <IconButton onClick={() => setPeerTxt("")} size="small" aria-label="Очистить номер собеседника">
+                      <IconClose />
                     </IconButton>
                   </InputAdornment>
                 ),
@@ -227,7 +261,7 @@ function PhoneChat(props) {
                         </Typography>
                       </Stack>
                       <Typography variant="body2" sx={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
-                        {renderMessageBody(msg.body)}
+                        {renderMessageBody(msg.body, msg.direction)}
                       </Typography>
                       {deliveryStatus && (
                         <Typography
@@ -259,7 +293,9 @@ function PhoneChat(props) {
               value={messageTxt}
               onChange={(event) => setMessageTxt(event.target.value)}
               onKeyDown={(event) => {
-                if (event.key === "Enter" && event.ctrlKey) {
+                // Enter — отправка, Shift+Enter и Ctrl+Enter — перенос строки в многострочном
+                // поле; во время IME-композиции (ввод иероглифов) Enter подтверждает ввод
+                if (event.key === "Enter" && !event.shiftKey && !event.ctrlKey && !event.nativeEvent.isComposing) {
                   event.preventDefault();
                   handleSubmit(event);
                 }
