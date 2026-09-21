@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
 import { bindActionCreators } from "redux";
 // Actions
+import * as lkActions from "../actions/lkControlActions.js";
 import * as phoneActions from "../actions/phoneControlActions.js";
 
 // Components
@@ -13,14 +14,24 @@ import PhonePad from "../components/PhonePad.jsx";
 import PhoneReg from "../components/PhoneReg.jsx";
 
 // Контейнер среза телефона: форма входа PhoneReg и рабочие блоки PhonePad/PhoneHistory/PhoneChat.
-// AD-вход (AuthAd) относится к authControlRdcr — его рендерит AuthContainer, чужой срез здесь не читается.
+// AD-вход (AuthAd) относится к authControlRdcr — его рендерит AuthContainer. Из чужого среза
+// здесь читается только флаг показа панели встречи (подсветка кнопки LiveKit в PhonePad).
 const PhoneContainer = () => {
   const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
 
   const phoneControlRdcr = useSelector((state) => state.phoneControlRdcr);
+  const lkControlRdcr = useSelector((state) => state.lkControlRdcr);
 
   const phoneControlActions = useMemo(() => bindActionCreators(phoneActions, dispatch), [dispatch]);
+  const lkControlActions = useMemo(() => bindActionCreators(lkActions, dispatch), [dispatch]);
+
+  // Мост PHONECTL_ → LK_: кнопка LiveKit в PhonePad переключает панель LkMeet (саму панель
+  // рендерит LkContainer, состояние живёт в lkControlRdcr)
+  const handleToggleLk = useMemo(
+    () => () => lkControlActions.handleChangeStore("displayControl", !lkControlRdcr.displayControl),
+    [lkControlActions, lkControlRdcr.displayControl],
+  );
 
   const { displayReg, displayPad, displayHistory, displayChat, errComponent, regState } = phoneControlRdcr;
 
@@ -71,7 +82,13 @@ const PhoneContainer = () => {
         {/* Телефон */}
         {(displayPad || errComponent === "PhonePad") && (
           <Grid size={{ xs: 12, md: "auto" }}>
-            <PhonePad phoneControlRdcr={phoneControlRdcr} phoneControlActions={phoneControlActions} showInput />
+            <PhonePad
+              phoneControlRdcr={phoneControlRdcr}
+              phoneControlActions={phoneControlActions}
+              showInput
+              lkActive={lkControlRdcr.displayControl}
+              onToggleLk={handleToggleLk}
+            />
           </Grid>
         )}
 

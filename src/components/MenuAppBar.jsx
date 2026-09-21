@@ -247,7 +247,13 @@ function MenuAppBar(props) {
         <Box sx={{ p: 1 }}>
           <Typography variant="body2">{phoneControlRdcr.uriWebRtc || ""}</Typography>
           <Divider />
-          <PhonePad phoneControlRdcr={phoneControlRdcr} phoneControlActions={phoneControlActions} showInput={false} />
+          <PhonePad
+            phoneControlRdcr={phoneControlRdcr}
+            phoneControlActions={phoneControlActions}
+            showInput={false}
+            lkActive={!!lkControlRdcr?.displayControl}
+            onToggleLk={lkControlRdcr ? () => lkControlActions.handleChangeStore("displayControl", !lkControlRdcr.displayControl) : undefined}
+          />
         </Box>
       </Popover>
 

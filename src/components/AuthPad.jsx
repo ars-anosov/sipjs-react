@@ -1,5 +1,5 @@
 import { Close as IconClose, HowToReg as IconHowToReg, PersonOff as IconPersonOff } from "@mui/icons-material";
-import { Box, Button, Divider, IconButton, Paper, Stack, Switch, Tooltip, Typography } from "@mui/material";
+import { Box, Button, Divider, IconButton, Paper, Snackbar, Stack, Switch, Tooltip, Typography } from "@mui/material";
 import PropTypes from "prop-types";
 import { useEffect } from "react";
 import { HEADER_BACKGROUND, PAPER_BACKGROUND } from "../theme.js";
@@ -49,7 +49,7 @@ function AuthPad(props) {
 
   let infoText = "";
   if (authControlRdcr?.status !== "success") {
-    infoText = "AD авторизация не выполнена — sip_username / sip_secret недоступны.";
+    infoText = "Авторизуйтесь в AD чтобы получить SIP-данные.";
   } else if (missingFields.length > 0) {
     infoText = `AD не вернул: ${missingFields.join(", ")}.`;
   }
@@ -61,107 +61,121 @@ function AuthPad(props) {
   };
 
   return (
-    <Paper
-      elevation={8}
+    // Панель — всплывающий Snackbar справа внизу: корень MUI позиционирован fixed и места
+    // в потоке документа не занимает. onClose намеренно не передан: иначе MUI закрывал бы
+    // панель по клику мимо и Escape, а закрывает её только ✕ (проп onClose компоненты)
+    <Snackbar
+      open
+      anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       sx={{
-        maxWidth: 320,
-        width: "100%",
-        bgcolor: PAPER_BACKGROUND,
-        mx: "auto",
-        mt: 2,
-        borderRadius: 3,
-        position: "relative",
-        boxSizing: "border-box",
-        overflow: "hidden",
+        // Панель открывает модальную форму AuthAd, а zIndex.snackbar (1400) выше
+        // zIndex.modal (1300) — опускаем панель под подложку диалога
+        zIndex: (theme) => theme.zIndex.modal - 1,
+        // Ширину задаёт корень Snackbar: у fixed-элемента дочерний width: "100%"
+        // не от чего считать проценты (на xs ширину держат left/right: 8)
+        width: { xs: "auto", sm: 320 },
       }}
     >
-      <IconButton aria-label="Закрыть панель" onClick={onClose} sx={{ position: "absolute", top: 4, right: 4, zIndex: 1 }}>
-        <IconClose color="action" />
-      </IconButton>
-
-      <Stack
-        direction="row"
+      <Paper
+        elevation={8}
         sx={{
-          minHeight: 48,
-          pl: { xs: 1.5, sm: 2 },
-          pr: 6,
-          py: 0.5,
-          alignItems: "center",
-          bgcolor: HEADER_BACKGROUND,
+          maxWidth: 320,
+          width: "100%",
+          bgcolor: PAPER_BACKGROUND,
+          borderRadius: 3,
+          position: "relative",
+          boxSizing: "border-box",
+          overflow: "hidden",
         }}
       >
-        <Box sx={{ minWidth: 0 }}>
-          <Typography variant="h6" color="primary" noWrap>
-            Мост к сервисам
-          </Typography>
-        </Box>
-      </Stack>
+        <IconButton aria-label="Закрыть панель" onClick={onClose} sx={{ position: "absolute", top: 4, right: 4, zIndex: 1 }}>
+          <IconClose color="action" />
+        </IconButton>
 
-      <Divider />
-
-      {/* Тело панели: padding переехал с Paper на тело, чтобы шапка легла вплотную к краям */}
-      <Box sx={{ p: 1 }}>
-        <Stack spacing={1}>
-          <Stack direction="row" spacing={2} sx={{ alignItems: "center", justifyContent: "space-between" }}>
-            <Typography variant="body1" color="text.primary">
-              {`SIP Регистрация ${sipUsername || "—"}`}
+        <Stack
+          direction="row"
+          sx={{
+            minHeight: 48,
+            pl: { xs: 1.5, sm: 2 },
+            pr: 6,
+            py: 0.5,
+            alignItems: "center",
+            bgcolor: HEADER_BACKGROUND,
+          }}
+        >
+          <Box sx={{ minWidth: 0 }}>
+            <Typography variant="h6" color="primary" noWrap>
+              Мост к сервисам
             </Typography>
-            <Switch
-              checked={regOn}
-              color={regColor}
-              disabled={!regOn && !hasSipData}
-              onChange={handleToggleReg}
-              slotProps={{
-                input: { "aria-label": "Тумблер SIP регистрации" },
-              }}
-            />
-          </Stack>
+          </Box>
         </Stack>
 
-        {infoText && (
-          <>
-            <Divider sx={{ mt: 1 }} />
-            <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 1, textAlign: "center" }}>
-              {infoText}
-            </Typography>
-          </>
-        )}
-      </Box>
+        <Divider />
 
-      <Divider />
+        {/* Тело панели: padding переехал с Paper на тело, чтобы шапка легла вплотную к краям */}
+        <Box sx={{ p: 1 }}>
+          <Stack spacing={1}>
+            <Stack direction="row" spacing={2} sx={{ alignItems: "center", justifyContent: "space-between" }}>
+              <Typography variant="body1" color="text.primary">
+                {`SIP Регистрация ${sipUsername || "—"}`}
+              </Typography>
+              <Switch
+                checked={regOn}
+                color={regColor}
+                disabled={!regOn && !hasSipData}
+                onChange={handleToggleReg}
+                slotProps={{
+                  input: { "aria-label": "Тумблер SIP регистрации" },
+                }}
+              />
+            </Stack>
+          </Stack>
 
-      {/* Подвал панели: слева состояние AD-сессии. Кнопка кликабельна — открывает
+          {infoText && (
+            <>
+              <Divider sx={{ mt: 1 }} />
+              <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 1, textAlign: "center" }}>
+                {infoText}
+              </Typography>
+            </>
+          )}
+        </Box>
+
+        <Divider />
+
+        {/* Подвал панели: слева состояние AD-сессии. Кнопка кликабельна — открывает
           форму входа AuthAd, где видно сеанс и есть выход из него */}
-      <Stack
-        direction="row"
-        sx={{
-          px: { xs: 1.5, sm: 2 },
-          py: 0.75,
-          alignItems: "center",
-          bgcolor: HEADER_BACKGROUND,
-        }}
-      >
-        <Tooltip title="Открыть форму входа AD">
-          {/* Цветная иконка с подписью, без подложки и рамки — остаётся только
+        <Stack
+          direction="row"
+          sx={{
+            px: { xs: 1.5, sm: 2 },
+            py: 0.75,
+            alignItems: "center",
+            bgcolor: HEADER_BACKGROUND,
+          }}
+        >
+          <Tooltip title="Открыть форму входа AD">
+            {/* Цветная иконка с подписью, без подложки и рамки — остаётся только
               hover-подсветка MUI (вариант text) */}
-          <Button
-            size="small"
-            variant="text"
-            color={adConnection.color}
-            startIcon={adConnection.icon}
-            onClick={onOpenAd}
-            aria-label={`AD: ${adConnection.label}. Открыть форму входа`}
-            sx={{ maxWidth: "100%" }}
-          >
-            {/* Длинный логин (почта, домен) не должен растягивать подвал:
+            <Button
+              size="small"
+              variant="text"
+              color={adConnection.color}
+              startIcon={adConnection.icon}
+              onClick={onOpenAd}
+              aria-label={`AD: ${adConnection.label}. Открыть форму входа`}
+              sx={{ maxWidth: "100%" }}
+            >
+              {/* Длинный логин (почта, домен) не должен растягивать подвал:
                 многоточие работает только на flex-элементе с minWidth 0 */}
-            <Box component="span" sx={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-              {adConnection.label}
-            </Box>
-          </Button>
-        </Tooltip>
-      </Stack>
-    </Paper>
+              <Box component="span" sx={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {adConnection.label}
+              </Box>
+            </Button>
+          </Tooltip>
+        </Stack>
+      </Paper>
+    </Snackbar>
   );
 }
 

@@ -123,7 +123,7 @@ node -e "const jwt=require('jsonwebtoken');console.log(jwt.sign({video:{roomJoin
 
 ## Вёрстка панели `LkMeet` (инварианты)
 
-- Панель занимает всё доступное место: `flex: 1; minHeight: PANEL_HEIGHT` (528 — **нижняя граница**,
+- Панель занимает всё доступное место: `flex: 1; minHeight: PANEL_HEIGHT` (572 — **нижняя граница**,
   не фиксированная высота), `width: 100%`, без `maxWidth`.
 - Внутри компоненты **нет полос прокрутки**: сцена — `overflow: hidden`, сетка —
   `flex: 1; minHeight: 0; alignContent: stretch`.

@@ -13,6 +13,7 @@ import {
   History as IconPhoneHistory,
   PhoneInTalk as IconPhoneInTalk,
   PlayArrow as IconResume,
+  VideoCallOutlined as IconVideoCall,
 } from "@mui/icons-material";
 import {
   Alert,
@@ -50,10 +51,25 @@ const kbdStyles = {
   },
 };
 
+// Состояние SIP-регистрации для кнопки в подвале панели: статусы и иконки те же,
+// что были у иконки регистрации в теле (Online — регистрация есть, Offline — нет).
+// У живой регистрации вместо слова «Подключено» — внутренний номер, под которым вошли
+function getSipConnectionConfig(regState, callerUserNum) {
+  switch (regState) {
+    case "ok":
+      // Номер может не прийти (регистрация без callerUserNum)
+      return { label: callerUserNum || "Подключено", color: "success", icon: <IconOnline /> };
+    case "fail":
+      return { label: "Ошибка регистрации", color: "error", icon: <IconOffline /> };
+    default:
+      return { label: "SIP не подключено", color: "inherit", icon: <IconOffline /> };
+  }
+}
+
 function PhonePad(props) {
   if (import.meta.env.DEV) console.log("PhonePad hook");
 
-  const { phoneControlRdcr, phoneControlActions, showInput } = props;
+  const { phoneControlRdcr, phoneControlActions, showInput, lkActive, onToggleLk } = props;
   const callNow = phoneControlRdcr.incomeCallNow || phoneControlRdcr.outgoCallNow;
   const callStartRef = useRef(null);
 
@@ -172,7 +188,9 @@ function PhonePad(props) {
   };
 
   const isRegistered = phoneControlRdcr.regState === "ok";
-  const regButtonColor = isRegistered ? "success" : "error";
+
+  // Подпись, цвет и иконка кнопки состояния SIP в подвале панели
+  const sipConnection = getSipConnectionConfig(phoneControlRdcr.regState, phoneControlRdcr.callerUserNum || "");
 
   const callActionSx = {
     minWidth: 64,
@@ -398,54 +416,48 @@ function PhonePad(props) {
             </Grid>
           )}
 
-          <Stack
-            direction="row"
-            spacing={1}
-            sx={{
-              mt: 2,
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Tooltip title={isRegistered ? "Разрегистрироваться" : "Зарегистрироваться"}>
-              <IconButton color={regButtonColor} onClick={toggleReg}>
-                {isRegistered ? <IconOnline /> : <IconOffline />}
-              </IconButton>
-            </Tooltip>
-
-            <Stack direction="row" spacing={1}>
-              {showInput && (
-                <Tooltip title="Префикс">
-                  <IconButton color={phoneControlRdcr.addPrefix ? "primary" : "default"} onClick={togglePrefix}>
-                    <IconDialpad />
-                  </IconButton>
-                </Tooltip>
-              )}
-              <Badge
-                badgeContent={phoneControlRdcr.callUnread}
-                color="error"
-                overlap="circular"
-                invisible={!phoneControlRdcr.callUnread || phoneControlRdcr.displayHistory}
-              >
-                <Tooltip title="История">
-                  <IconButton color={phoneControlRdcr.displayHistory ? "primary" : "default"} onClick={toggleHistory}>
-                    <IconPhoneHistory />
-                  </IconButton>
-                </Tooltip>
-              </Badge>
-              <Badge
-                badgeContent={phoneControlRdcr.chatUnread}
-                color="error"
-                overlap="circular"
-                invisible={!phoneControlRdcr.chatUnread || phoneControlRdcr.displayChat}
-              >
-                <Tooltip title="Сообщения">
-                  <IconButton color={phoneControlRdcr.displayChat ? "primary" : "default"} onClick={toggleChat}>
-                    <IconChatOutlined />
-                  </IconButton>
-                </Tooltip>
-              </Badge>
-            </Stack>
+          <Stack direction="row" spacing={1} sx={{ mt: 2, justifyContent: "flex-end", alignItems: "center" }}>
+            {showInput && (
+              <Tooltip title="Префикс">
+                <IconButton color={phoneControlRdcr.addPrefix ? "primary" : "default"} onClick={togglePrefix}>
+                  <IconDialpad />
+                </IconButton>
+              </Tooltip>
+            )}
+            <Badge
+              badgeContent={phoneControlRdcr.callUnread}
+              color="error"
+              overlap="circular"
+              invisible={!phoneControlRdcr.callUnread || phoneControlRdcr.displayHistory}
+            >
+              <Tooltip title="История">
+                <IconButton color={phoneControlRdcr.displayHistory ? "primary" : "default"} onClick={toggleHistory}>
+                  <IconPhoneHistory />
+                </IconButton>
+              </Tooltip>
+            </Badge>
+            <Badge
+              badgeContent={phoneControlRdcr.chatUnread}
+              color="error"
+              overlap="circular"
+              invisible={!phoneControlRdcr.chatUnread || phoneControlRdcr.displayChat}
+            >
+              <Tooltip title="Сообщения">
+                <IconButton color={phoneControlRdcr.displayChat ? "primary" : "default"} onClick={toggleChat}>
+                  <IconChatOutlined />
+                </IconButton>
+              </Tooltip>
+            </Badge>
+            {/* Панель LkMeet живёт в срезе lkControlRdcr, поэтому PhonePad её не переключает
+                сам: состояние подсветки и колбэк приходят из контейнера
+                (PhoneContainer / MenuAppBar) */}
+            {onToggleLk && (
+              <Tooltip title="LiveKit Встреча">
+                <IconButton color={lkActive ? "primary" : "default"} onClick={onToggleLk} aria-label="Открыть панель LiveKit Встреча">
+                  <IconVideoCall />
+                </IconButton>
+              </Tooltip>
+            )}
           </Stack>
         </Box>
 
@@ -455,6 +467,40 @@ function PhonePad(props) {
           </Alert>
         </Collapse>
       </Box>
+
+      <Divider />
+
+      {/* Подвал панели: слева состояние SIP-регистрации. Кнопка кликабельна — открывает
+          форму входа PhoneReg, где видно данные подключения и есть отключение телефона */}
+      <Stack
+        direction="row"
+        sx={{
+          px: { xs: 1.5, sm: 2 },
+          py: 0.75,
+          alignItems: "center",
+          bgcolor: HEADER_BACKGROUND,
+        }}
+      >
+        <Tooltip title="Открыть форму SIP регистрации">
+          {/* Цветная иконка с подписью, без подложки и рамки — остаётся только
+              hover-подсветка MUI (вариант text) */}
+          <Button
+            size="small"
+            variant="text"
+            color={sipConnection.color}
+            startIcon={sipConnection.icon}
+            onClick={toggleReg}
+            aria-label={`SIP: ${sipConnection.label}. Открыть форму регистрации`}
+            sx={{ maxWidth: "100%" }}
+          >
+            {/* Длинный номер не должен растягивать подвал: многоточие работает
+                только на flex-элементе с minWidth 0 */}
+            <Box component="span" sx={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {sipConnection.label}
+            </Box>
+          </Button>
+        </Tooltip>
+      </Stack>
 
       <Snackbar open={info.open} onClose={handleCloseInfo} anchorOrigin={{ vertical: "bottom", horizontal: "left" }}>
         <Alert onClose={handleCloseInfo} severity="info" sx={{ ...kbdStyles, width: "100%" }}>
@@ -506,6 +552,10 @@ PhonePad.propTypes = {
   phoneControlRdcr: PropTypes.object.isRequired,
   phoneControlActions: PropTypes.object.isRequired,
   showInput: PropTypes.bool.isRequired,
+  // Панель LiveKit Встреча открыта — кнопка подсвечивается primary, как история и чат
+  lkActive: PropTypes.bool,
+  // Переключить панель LiveKit Встреча (срез lkControlRdcr — диспатчит контейнер)
+  onToggleLk: PropTypes.func,
 };
 
 export default PhonePad;
