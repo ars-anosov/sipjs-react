@@ -6,7 +6,7 @@
     "quality_profile": "showcase",
     "repository": {
       "url": "https://github.com/ars-anosov/sipjs-react.git",
-      "revision": "9bebf74019c6374eb574e450f23298f3e978bed4"
+      "revision": "2ca17e1d9b1481d853e36d615ad4432e30e7c63a"
     },
     "legend": {
       "mode": "auto",
@@ -52,7 +52,7 @@
           "store",
           "ui"
         ],
-        "note": "AuthLinks открывает SIP-форму (displayReg); AD-форма живёт в AuthContainer — мост AUTHCTL_ ↔ PHONECTL_, тумблер AuthPad по regState."
+        "note": "AuthLinks открывает SIP-форму (displayReg); AD-форма в AuthContainer, тумблер AuthPad по regState, подвал AuthPad открывает AuthAd."
       },
       {
         "id": "livekit-path",
@@ -115,12 +115,12 @@
         },
         {
           "path": "src/components/PhonePad.jsx",
-          "line": 52,
+          "line": 53,
           "label": "телефон"
         },
         {
           "path": "src/components/LkMeet.jsx",
-          "line": 228,
+          "line": 310,
           "label": "встреча"
         }
       ]
@@ -142,12 +142,12 @@
       "sources": [
         {
           "path": "src/containers/AuthContainer.jsx",
-          "line": 70,
+          "line": 59,
           "label": "мост AUTHCTL_ ↔ PHONECTL_"
         },
         {
           "path": "src/containers/PhoneContainer.jsx",
-          "line": 16,
+          "line": 21,
           "label": "домен phoneControlRdcr"
         }
       ]
@@ -174,12 +174,12 @@
         },
         {
           "path": "src/actions/phoneControlActions.js",
-          "line": 99,
+          "line": 121,
           "label": "handleClkRegister"
         },
         {
           "path": "src/actions/phoneControlActions.js",
-          "line": 434,
+          "line": 456,
           "label": "SIP MESSAGE"
         }
       ]
@@ -331,7 +331,7 @@
       "sources": [
         {
           "path": "src/services/lkRuntime.js",
-          "line": 5,
+          "line": 21,
           "label": "getLiveKitRoom"
         }
       ]
@@ -496,7 +496,7 @@
       "dot": "emerald",
       "title": "Стартовый экран и владение рендером",
       "items": [
-        "на старте displayReg=false: виден AuthLinks; клик открывает PhoneReg модальным Dialog",
+        "на старте displayReg=true: PhoneReg открыт модальным Dialog, AuthLinks за ним",
         "AuthLinks виден, пока authStatus ≠ success и regState ≠ ok; иконка AD-формы закомментирована",
         "владение по срезу: AuthContainer — AuthLinks/AuthAd/AuthPad, PhoneContainer — PhoneReg/PhonePad/PhoneHistory/PhoneChat"
       ]
@@ -507,7 +507,8 @@
       "items": [
         "handleAdRegister → adAuth.loginAd → POST uriAdAuth → AUTHCTL_SUBMIT_SUCCESS",
         "тумблер AuthPad трёхпозиционный по regState (off / ok / fail); успех стирает regUserPass из формы",
-        "при regState=ok PhoneContainer вешает beforeunload: F5 рвёт SIP-сессию в памяти singleton phoneRuntime"
+        "при regState=ok PhoneContainer вешает beforeunload: F5 рвёт SIP-сессию в памяти singleton phoneRuntime",
+        "подвал AuthPad: состояние AD → onOpenAd → AuthAd"
       ]
     }
   ]

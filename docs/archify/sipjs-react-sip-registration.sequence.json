@@ -34,7 +34,7 @@
           "actions",
           "runtime"
         ],
-        "note": "displayReg стартует false: сначала виден AuthLinks, форму PhoneReg открывает клик; из off тумблер AuthPad зовёт handleClkRegister."
+        "note": "displayReg стартует true: сначала виден AuthLinks, поверх него PhoneReg; из off тумблер AuthPad зовёт handleClkRegister."
       },
       {
         "id": "reject-and-red",
@@ -382,7 +382,7 @@
       "dot": "emerald",
       "title": "Старт и защита сессии",
       "items": [
-        "старт: AuthLinks, PhoneReg открывается модальным Dialog",
+        "старт: displayReg=true — PhoneReg в модальном Dialog",
         "submit PhoneReg и тумблер AuthPad — тот же thunk",
         "при regState=ok PhoneContainer вешает beforeunload (F5 рвёт сессию)"
       ]

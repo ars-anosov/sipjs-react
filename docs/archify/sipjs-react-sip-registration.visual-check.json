@@ -6,8 +6,8 @@
   "visualReview": "pending",
   "artifact": {
     "path": "\\\\wsl.localhost\\Ubuntu\\home\\ars\\_git\\sipjs-react\\docs\\archify\\sipjs-react-sip-registration.html",
-    "sha256": "23cfd3347887c189e347033605fc6e2c75e5b47b5a14f6cffb713d723417ba80",
-    "bytes": 649967
+    "sha256": "a801d4fdc5e482d3cca1bf83cd2bc8cea5c356be5d54344ac8bcdd32f0f3f119",
+    "bytes": 649938
   },
   "state": {
     "detail": "read",

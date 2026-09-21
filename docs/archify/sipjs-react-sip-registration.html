@@ -4840,7 +4840,7 @@
       </div>
     </div>
 
-    <script id="archify-guided-views-data" type="application/json">[{"id":"start-registration","label":"Регистрация из off","focus":["user","authpad","authcont","actions","runtime"],"note":"displayReg стартует false: сначала виден AuthLinks, форму PhoneReg открывает клик; из off тумблер AuthPad зовёт handleClkRegister."},{"id":"reject-and-red","label":"Отказ → красный","focus":["registerer","runtime","actions","rdcr","authcont","authpad"],"note":"Отказ даёт regState=fail; PhoneReg не форсируется, показывается AuthPad."},{"id":"unregister","label":"Разрегистрация из ok","focus":["user","authpad","authcont","actions","rdcr"],"note":"Клик по зелёному тумблеру разрегистрирует сессию и возвращает regState в off."}]</script>
+    <script id="archify-guided-views-data" type="application/json">[{"id":"start-registration","label":"Регистрация из off","focus":["user","authpad","authcont","actions","runtime"],"note":"displayReg стартует true: сначала виден AuthLinks, поверх него PhoneReg; из off тумблер AuthPad зовёт handleClkRegister."},{"id":"reject-and-red","label":"Отказ → красный","focus":["registerer","runtime","actions","rdcr","authcont","authpad"],"note":"Отказ даёт regState=fail; PhoneReg не форсируется, показывается AuthPad."},{"id":"unregister","label":"Разрегистрация из ok","focus":["user","authpad","authcont","actions","rdcr"],"note":"Клик по зелёному тумблеру разрегистрирует сессию и возвращает regState в off."}]</script>
 
     <div class="guided-views no-print" id="guided-views" hidden aria-label="Guided diagram views">
       <button id="guided-view-prev" type="button" aria-label="Previous guided view" title="Previous guided view ([)">&#8592;</button>
@@ -5467,7 +5467,7 @@
           <h3>Старт и защита сессии</h3>
         </div>
         <ul>
-          <li>&bull; старт: AuthLinks, PhoneReg открывается модальным Dialog</li>
+          <li>&bull; старт: displayReg=true — PhoneReg в модальном Dialog</li>
           <li>&bull; submit PhoneReg и тумблер AuthPad — тот же thunk</li>
           <li>&bull; при regState=ok PhoneContainer вешает beforeunload (F5 рвёт сессию)</li>
         </ul>
