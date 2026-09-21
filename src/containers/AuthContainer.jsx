@@ -132,7 +132,9 @@ const AuthContainer = () => {
 
       {(displayAd || authErrComponent === "AuthAd") && <AuthAd authControlRdcr={authControlRdcr} authControlActions={authControlActions} />}
 
-      {displayAuthPad && <AuthPad authControlRdcr={authControlRdcr} regState={regState} onToggleReg={handleToggleReg} onClose={handleCloseAuthPad} />}
+      {displayAuthPad && (
+        <AuthPad authControlRdcr={authControlRdcr} regState={regState} onToggleReg={handleToggleReg} onOpenAd={handleOpenAd} onClose={handleCloseAuthPad} />
+      )}
     </>
   );
 };

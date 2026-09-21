@@ -1,11 +1,28 @@
-import { Close as IconClose } from "@mui/icons-material";
-import { Box, Divider, IconButton, Paper, Stack, Switch, Typography } from "@mui/material";
+import { Close as IconClose, HowToReg as IconHowToReg, PersonOff as IconPersonOff } from "@mui/icons-material";
+import { Box, Button, Divider, IconButton, Paper, Stack, Switch, Tooltip, Typography } from "@mui/material";
 import PropTypes from "prop-types";
 import { useEffect } from "react";
 import { HEADER_BACKGROUND, PAPER_BACKGROUND } from "../theme.js";
 
+// Состояние AD-подключения для кнопки в подвале панели: статусы и иконки те же,
+// что у кнопки состояния в AuthAdInfo (HowToReg — сессия есть, PersonOff — нет).
+// У подключённой сессии вместо слова «Подключено» — логин, под которым вошли
+function getAdConnectionConfig(status, adLogin) {
+  switch (status) {
+    case "loading":
+      return { label: "Авторизация…", color: "warning", icon: <IconPersonOff /> };
+    case "success":
+      // Логин может не прийти (ответ AD без ad_login)
+      return { label: adLogin || "Подключено", color: "success", icon: <IconHowToReg /> };
+    case "error":
+      return { label: "Ошибка авторизации", color: "error", icon: <IconPersonOff /> };
+    default:
+      return { label: "AD не подключено", color: "inherit", icon: <IconPersonOff /> };
+  }
+}
+
 function AuthPad(props) {
-  const { authControlRdcr, regState, onToggleReg, onClose } = props;
+  const { authControlRdcr, regState, onToggleReg, onOpenAd, onClose } = props;
 
   useEffect(() => {
     if (import.meta.env.DEV) console.log("AuthPad MOUNT");
@@ -21,6 +38,9 @@ function AuthPad(props) {
   const sipUsername = authControlRdcr?.responseData?.sip_username || "";
   const sipSecret = authControlRdcr?.responseData?.sip_secret || "";
   const hasSipData = Boolean(sipUsername && sipSecret);
+
+  // Подпись, цвет и иконка кнопки состояния AD в подвале панели
+  const adConnection = getAdConnectionConfig(authControlRdcr?.status, authControlRdcr?.responseData?.ad_login || "");
 
   // Информируем, если AdAuth не выполнен или не содержит нужные поля
   const missingFields = [];
@@ -107,6 +127,40 @@ function AuthPad(props) {
           </>
         )}
       </Box>
+
+      <Divider />
+
+      {/* Подвал панели: слева состояние AD-сессии. Кнопка кликабельна — открывает
+          форму входа AuthAd, где видно сеанс и есть выход из него */}
+      <Stack
+        direction="row"
+        sx={{
+          px: { xs: 1.5, sm: 2 },
+          py: 0.75,
+          alignItems: "center",
+          bgcolor: HEADER_BACKGROUND,
+        }}
+      >
+        <Tooltip title="Открыть форму входа AD">
+          {/* Цветная иконка с подписью, без подложки и рамки — остаётся только
+              hover-подсветка MUI (вариант text) */}
+          <Button
+            size="small"
+            variant="text"
+            color={adConnection.color}
+            startIcon={adConnection.icon}
+            onClick={onOpenAd}
+            aria-label={`AD: ${adConnection.label}. Открыть форму входа`}
+            sx={{ maxWidth: "100%" }}
+          >
+            {/* Длинный логин (почта, домен) не должен растягивать подвал:
+                многоточие работает только на flex-элементе с minWidth 0 */}
+            <Box component="span" sx={{ minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+              {adConnection.label}
+            </Box>
+          </Button>
+        </Tooltip>
+      </Stack>
     </Paper>
   );
 }
@@ -117,10 +171,14 @@ AuthPad.propTypes = {
     responseData: PropTypes.shape({
       sip_username: PropTypes.string,
       sip_secret: PropTypes.string,
+      // Логин AD — подпись кнопки состояния в подвале панели
+      ad_login: PropTypes.string,
     }),
   }).isRequired,
   regState: PropTypes.oneOf(["off", "ok", "fail"]).isRequired,
   onToggleReg: PropTypes.func.isRequired,
+  // Клик по кнопке состояния в подвале — открыть форму входа AD (AuthAd)
+  onOpenAd: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired,
 };
 
