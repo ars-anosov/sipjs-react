@@ -5,6 +5,8 @@ export const CALLS_STORAGE_KEY = "sipCalls";
 export const CALLS_MAX_CALLS = 50;
 
 export const AD_URI_AUTH_KEY = "uriAdAuth";
+// Адрес PHP-пробивки: GET uriAdPhpAuth?PHPSESSID=<cookie> вместо формы AuthAd
+export const AD_URI_PHP_AUTH_KEY = "uriAdPhpAuth";
 export const AD_LOGIN_KEY = "adLogin";
 export const AD_AUTH_EXPIRE_TIME_KEY = "adAuthExpireTime";
 

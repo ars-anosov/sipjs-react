@@ -14,6 +14,10 @@ export const initialState = {
   displayAd: false,
   displayAuthPad: false,
   uriAdAuth: "",
+  // Адрес PHP-пробивки и её итог: idle — ещё не пробовали, loading — запрос идёт,
+  // success — вход без формы, fail — форму AuthAd показывать можно
+  uriAdPhpAuth: "",
+  phpProbe: "idle",
   status: "idle", // 'idle' | 'loading' | 'success' | 'error'
   responseData: null,
   errComponent: "",
@@ -63,6 +67,9 @@ export default function authControlRdcr(state = initialState, action) {
         responseData: null,
         errComponent: "",
         errText: "",
+        // Пробивка — одна на загрузку страницы: выход из AD-сессии её не повторяет,
+        // а помечает исчерпанной (fail), чтобы форма AuthAd открылась сразу
+        phpProbe: "fail",
       };
 
     case AUTHCTL_STORE_VALUE:

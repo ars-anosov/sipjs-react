@@ -54,6 +54,30 @@ export const mockEndpoints = [
     },
   },
   {
+    path: "/user/adphp",
+    methods: ["GET"],
+    // Пробивка PHP-сессии (AuthContainer → handleAdPhpProbe): PHPSESSID приходит
+    // параметром строки запроса, без него живой сессии нет и форма AuthAd остаётся
+    handler(req, res) {
+      const url = new URL(req.url, `http://${req.headers.host}`);
+      const phpSessId = url.searchParams.get("PHPSESSID") || "";
+
+      if (!phpSessId) {
+        sendJson(res, 401, { error: "PHPSESSID не передан" });
+        return;
+      }
+
+      sendJson(res, 200, {
+        sip_username: "9994",
+        sip_secret: "",
+        ad_login: "php-session",
+        ad_cn: "Mock PHP User",
+        ad_title: "Mock Title",
+        ad_department: "Mock Department",
+      });
+    },
+  },
+  {
     path: "/user/lk",
     methods: ["POST"],
     // Единственный источник lk_token: своя комната (num = room = свой номер) и

@@ -105,9 +105,11 @@ Thunk-и namespace-чистые: `authControlActions` не диспатчит `P
 
 В том же ряду иконок тела крайняя справа — кнопка LiveKit (`VideoCallOutlined`, `aria-label` «Открыть панель LiveKit Встреча»): как история и чат, она работает переключателем и подсвечивается `primary`, когда панель открыта. Сама кнопка ничего не диспатчит — проп `lkActive` (флаг `lkControlRdcr.displayControl`) задаёт цвет, проп `onToggleLk` закрывает панель повторным кликом. Пропы приходят из контейнеров: `PhoneContainer` — для панели в потоке страницы, `MenuAppBar` — для компактного `PhonePad` (`showInput={false}`) в поповере «SIP Кругляш». Без колбэка кнопка не рендерится; подсветка живёт на изменении флага, поэтому закрытие панели её собственным ✕ гасит кнопку.
 
-Владение рендером — по срезу: `AuthContainer` (домен `authControlRdcr`, плюс стартовый блок `AuthLinks` и мост) держит форму `AuthAd` (флаг `displayAd` или `errComponent === "AuthAd"`), `AuthPad` и `AuthLinks`; `PhoneContainer` (домен `phoneControlRdcr`) рендерит форму входа `PhoneReg` (флаг `displayReg` или `errComponent === "PhoneReg"`) и рабочие блоки `PhonePad` / `PhoneHistory` / `PhoneChat`, auth-срез не читает. Обе формы входа — модальный `Dialog` в портале, вне потока документа, поэтому их показ не раздвигает вёрстку; `AuthPad` тоже вне потока — это `Snackbar` (`position: fixed`); чужие срезы читает лишь `AuthContainer` — как мост.
+Владение рендером — по срезу: `AuthContainer` (домен `authControlRdcr`, плюс стартовый блок `AuthLinks` и мост) держит форму `AuthAd` (флаг `displayAd` или `errComponent === "AuthAd"`, и только когда пробивка PHP-сессии не удалась — `phpProbe`), `AuthPad` и `AuthLinks`; `PhoneContainer` (домен `phoneControlRdcr`) рендерит форму входа `PhoneReg` (флаг `displayReg` или `errComponent === "PhoneReg"`) и рабочие блоки `PhonePad` / `PhoneHistory` / `PhoneChat`, auth-срез не читает. Обе формы входа — модальный `Dialog` в портале, вне потока документа, поэтому их показ не раздвигает вёрстку; `AuthPad` тоже вне потока — это `Snackbar` (`position: fixed`); чужие срезы читает лишь `AuthContainer` — как мост.
 
 Стартовый экран: пока `authControlRdcr.status !== "success"` и `phoneControlRdcr.regState !== "ok"`, показан блок `AuthLinks` (иконка-вход в SIP-форму; сам ничего не диспатчит — колбэк `AuthContainer` пишет в `phoneControlRdcr`), а поверх него — модальный `PhoneReg`: `initialState.displayReg = true`, поэтому форма открыта сама, а её закрытие оставляет `AuthLinks`. Исключение — гость по ссылке-приглашению (`lk_token` в query маршрута): ему `AuthLinks` не показывают, `LkMeet` открывается сразу (мост URL → LK в `AuthContainer`), а `PhoneReg` не открывается сама (мост URL → PHONECTL в `PhoneContainer`: `displayReg` снимается, но из меню форма по-прежнему доступна). Успех AD → `AuthPad`, успешная SIP-регистрация → телефон (`displayPad` на `PHONECTL_CONNECT_SUCCESS`); заголовок `App` — flex-колонка на высоту экрана, поэтому стартовый блок центрируется между AppBar и футером.
+
+Вход в AD начинается с пробивки PHP-сессии. Когда форму запросили (`displayAd`, `status === "idle"`) и задан `uriAdPhpAuth` (ключ localStorage, сид `preloadedState.js`), `AuthContainer` зовёт `handleAdPhpProbe` → сервис `adAuth.probeAdPhpSession` делает `GET uriAdPhpAuth?PHPSESSID=<cookie>`. Успех — `AUTHCTL_SUBMIT_SUCCESS` (тихий вход, форма `AuthAd` не монтируется), неуспех (нет `PHPSESSID`, 4xx/5xx, таймаут) — `phpProbe = "fail"` и форма. Пробивка одна на загрузку страницы: `AUTHCTL_CLEAR` помечает её исчерпанной, а ошибкой AD она не считается — в форме ничего не появляется.
 
 ```mermaid
 sequenceDiagram
@@ -122,6 +124,17 @@ sequenceDiagram
 
   Note over User,Dispatch: Старт: displayAd=false, displayAuthPad=false, displayReg=true, regState=off
   Note over User,Dispatch: на экране AuthLinks, поверх него — модальный PhoneReg
+
+  Note over User,AuthCont: Форму запросили (displayAd=true), status=idle, uriAdPhpAuth задан → пробивка
+  AuthCont->>AdAuth: probeAdPhpSession(uriAdPhpAuth)
+  AdAuth->>AdAuth: GET uriAdPhpAuth?PHPSESSID=<cookie>
+  alt Сессия жива (2xx)
+    AuthAct->>Dispatch: AUTHCTL_SUBMIT_SUCCESS (responseData) + phpProbe=success
+    Note over AuthCont: форма AuthAd не монтируется — тихий вход
+  else Нет PHPSESSID, 4xx/5xx или таймаут
+    AuthAct->>Dispatch: AUTHCTL_STORE_VALUE (phpProbe=fail)
+    Note over AuthCont: рендер формы AuthAd
+  end
 
   User->>AuthAd: Ввод AD-логина и пароля
   AuthAd->>AuthAct: handleAdRegister(formData)

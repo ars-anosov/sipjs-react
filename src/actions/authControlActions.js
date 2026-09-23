@@ -53,6 +53,36 @@ const handleAdAuthClear = () => (dispatch) => {
   dispatch({ type: AUTHCTL_CLEAR });
 };
 
+// Пробивка PHP-сессии (GET uriAdPhpAuth?PHPSESSID=<cookie>): успех — тихий AD-вход без
+// формы (AUTHCTL_SUBMIT_SUCCESS), неуспех — форма AuthAd (сюда AuthContainer смотрит
+// на phpProbe). Ошибку пробивки пользователю не показываем: это ожидаемый фолбэк.
+const handleAdPhpProbe = (uriAdPhpAuth) => async (dispatch) => {
+  const phpAuthUri = typeof uriAdPhpAuth === "string" ? uriAdPhpAuth.trim() : "";
+
+  if (!phpAuthUri) {
+    dispatch(handleChangeStore("phpProbe", "fail"));
+    return;
+  }
+
+  dispatch(handleChangeStore("phpProbe", "loading"));
+
+  try {
+    const responseData = await adAuth.probeAdPhpSession(phpAuthUri);
+
+    dispatch({
+      type: AUTHCTL_SUBMIT_SUCCESS,
+      payload: { responseData },
+    });
+    dispatch(handleChangeStore("phpProbe", "success"));
+  } catch (error) {
+    if (import.meta.env.DEV) {
+      console.warn("Пробивка uriAdPhpAuth не прошла — показываем форму AuthAd:", error);
+    }
+
+    dispatch(handleChangeStore("phpProbe", "fail"));
+  }
+};
+
 const handleChangeStore = (storeDataKey, storeDataValue) => (dispatch) => {
   dispatch({
     type: AUTHCTL_STORE_VALUE,
@@ -60,4 +90,4 @@ const handleChangeStore = (storeDataKey, storeDataValue) => (dispatch) => {
   });
 };
 
-export { handleAdAuthClear, handleAdRegister, handleChangeStore };
+export { handleAdAuthClear, handleAdPhpProbe, handleAdRegister, handleChangeStore };

@@ -23,7 +23,7 @@ const AuthContainer = () => {
   const authControlActions = useMemo(() => bindActionCreators(authActions, dispatch), [dispatch]);
   const lkControlActions = useMemo(() => bindActionCreators(lkActions, dispatch), [dispatch]);
 
-  const { responseData, displayAd, displayAuthPad, status: authStatus, errComponent: authErrComponent } = authControlRdcr;
+  const { responseData, displayAd, displayAuthPad, status: authStatus, errComponent: authErrComponent, uriAdPhpAuth, phpProbe } = authControlRdcr;
   const { callerUserNum, uriWebRtc, connectStatus, regState } = phoneControlRdcr;
 
   const isRegistered = regState === "ok";
@@ -88,6 +88,22 @@ const AuthContainer = () => {
     authControlActions.handleChangeStore("displayAd", true);
   };
 
+  // Пробивка PHP-сессии идёт впереди формы AuthAd: пока запрос в пути, модальное окно
+  // не монтируется — на экран оно попадает только при неуспехе пробивки. Уже пройденный
+  // AD (status не idle, в том числе успех) пробивать незачем: там форма нужна лишь для
+  // просмотра сеанса и выхода из него.
+  const isAdFormRequested = displayAd || authErrComponent === "AuthAd";
+  const needsAdPhpProbe = authStatus === "idle" && Boolean(uriAdPhpAuth);
+  const isAdPhpProbePending = needsAdPhpProbe && phpProbe !== "fail";
+
+  useEffect(() => {
+    // phpProbe != "idle" — пробивка одна на загрузку страницы: ни закрытие формы,
+    // ни выход из AD-сессии её не повторяют
+    if (!isAdFormRequested || !needsAdPhpProbe || phpProbe !== "idle") return;
+
+    authControlActions.handleAdPhpProbe(uriAdPhpAuth);
+  }, [isAdFormRequested, needsAdPhpProbe, phpProbe, uriAdPhpAuth, authControlActions]);
+
   // Мост PHONECTL_ → AUTHCTL_: AuthAdInfo/LkMeet читают sip_username из authControlRdcr
   useEffect(() => {
     if (!callerUserNum) return;
@@ -130,7 +146,7 @@ const AuthContainer = () => {
     <>
       {showAuthLinks && <AuthLinks onOpenReg={handleOpenReg} onOpenAd={handleOpenAd} />}
 
-      {(displayAd || authErrComponent === "AuthAd") && <AuthAd authControlRdcr={authControlRdcr} authControlActions={authControlActions} />}
+      {isAdFormRequested && !isAdPhpProbePending && <AuthAd authControlRdcr={authControlRdcr} authControlActions={authControlActions} />}
 
       {displayAuthPad && (
         <AuthPad authControlRdcr={authControlRdcr} regState={regState} onToggleReg={handleToggleReg} onOpenAd={handleOpenAd} onClose={handleCloseAuthPad} />

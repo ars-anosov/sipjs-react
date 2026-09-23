@@ -1,7 +1,7 @@
 import { initialState as authControlInitialState } from "../reducers/authControlRdcr";
 import { initialState as lkControlInitialState } from "../reducers/lkControlRdcr";
 import { initialState as phoneControlInitialState } from "../reducers/phoneControlRdcr";
-import { getStoredAdAuthUri } from "../services/adAuth";
+import { getStoredAdAuthUri, getStoredAdPhpAuthUri } from "../services/adAuth";
 import { getStoredLkInvites, getStoredLkTokenUri, getStoredLkUri } from "../services/lkToken";
 import { getStoredCallerUserNum, getStoredUriWebRtc, getStoredUseIce } from "../services/phoneStorage";
 
@@ -22,6 +22,7 @@ export default function getPreloadedState() {
     authControlRdcr: {
       ...authControlInitialState,
       uriAdAuth: getStoredAdAuthUri(),
+      uriAdPhpAuth: getStoredAdPhpAuthUri(),
     },
     lkControlRdcr: {
       ...lkControlInitialState,
