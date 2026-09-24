@@ -2,13 +2,10 @@
   "schema_version": 1,
   "diagram_type": "sequence",
   "meta": {
-    "title": "sipjs-react: sip.js — регистрация и store",
+    "title": "SIP регистрация",
     "quality_profile": "showcase",
     "column_fit": "spread",
-    "viewBox": [
-      1500,
-      720
-    ],
+    "viewBox": [1800, 780],
     "legend": {
       "mode": "auto",
       "entries": {
@@ -38,6 +35,12 @@
       "sublabel": "handleClkRegister"
     },
     {
+      "id": "storage",
+      "type": "database",
+      "label": "localStorage",
+      "sublabel": "uriWebRtc · callerUserNum"
+    },
+    {
       "id": "runtime",
       "type": "backend",
       "label": "phoneRuntime",
@@ -59,17 +62,17 @@
   "segments": [
     {
       "from": 150,
-      "to": 340,
+      "to": 385,
       "label": "Регистрация"
     },
     {
-      "from": 345,
-      "to": 490,
+      "from": 400,
+      "to": 555,
       "label": "Успех"
     },
     {
-      "from": 495,
-      "to": 660,
+      "from": 570,
+      "to": 720,
       "label": "Отказ и авто-стоп"
     }
   ],
@@ -83,10 +86,18 @@
       "variant": "default"
     },
     {
+      "id": "store-settings",
+      "from": "action",
+      "to": "storage",
+      "y": 225,
+      "label": "uriWebRtc · callerUserNum",
+      "variant": "default"
+    },
+    {
       "id": "register-call",
       "from": "action",
       "to": "runtime",
-      "y": 225,
+      "y": 265,
       "label": "registerSipUserAgent(handlers)",
       "variant": "default"
     },
@@ -94,7 +105,7 @@
       "id": "on-request",
       "from": "runtime",
       "to": "action",
-      "y": 265,
+      "y": 305,
       "label": "handlers.onConnectRequest",
       "variant": "default"
     },
@@ -102,7 +113,7 @@
       "id": "connect-request",
       "from": "action",
       "to": "rdcr",
-      "y": 305,
+      "y": 345,
       "label": "CONNECT_REQUEST (regState=off)",
       "variant": "default"
     },
@@ -110,7 +121,7 @@
       "id": "start-register",
       "from": "runtime",
       "to": "registerer",
-      "y": 365,
+      "y": 425,
       "label": "start() + register()",
       "variant": "emphasis"
     },
@@ -118,7 +129,7 @@
       "id": "ok-200",
       "from": "registerer",
       "to": "runtime",
-      "y": 405,
+      "y": 465,
       "label": "200 OK",
       "variant": "return"
     },
@@ -126,7 +137,7 @@
       "id": "on-success",
       "from": "runtime",
       "to": "action",
-      "y": 445,
+      "y": 505,
       "label": "handlers.onConnectSuccess",
       "variant": "default"
     },
@@ -134,7 +145,7 @@
       "id": "connect-success",
       "from": "action",
       "to": "rdcr",
-      "y": 480,
+      "y": 540,
       "label": "CONNECT_SUCCESS (regState=ok)",
       "variant": "emphasis"
     },
@@ -142,7 +153,7 @@
       "id": "reject",
       "from": "registerer",
       "to": "runtime",
-      "y": 520,
+      "y": 580,
       "label": "401/403/таймаут",
       "variant": "return"
     },
@@ -150,7 +161,7 @@
       "id": "on-error",
       "from": "runtime",
       "to": "action",
-      "y": 560,
+      "y": 620,
       "label": "handlers.onConnectError",
       "variant": "default"
     },
@@ -158,7 +169,7 @@
       "id": "connect-error",
       "from": "action",
       "to": "rdcr",
-      "y": 595,
+      "y": 655,
       "label": "CONNECT_ERROR (regState=fail)",
       "variant": "emphasis"
     },
@@ -166,7 +177,7 @@
       "id": "auto-stop",
       "from": "runtime",
       "to": "action",
-      "y": 635,
+      "y": 695,
       "label": "через 3с: onUnregistered",
       "variant": "dashed"
     }
@@ -175,25 +186,25 @@
     {
       "participant": "action",
       "from": 175,
-      "to": 610,
+      "to": 670,
       "type": "backend"
     },
     {
       "participant": "runtime",
-      "from": 220,
-      "to": 650,
+      "from": 260,
+      "to": 710,
       "type": "backend"
     },
     {
       "participant": "registerer",
-      "from": 360,
-      "to": 410,
+      "from": 420,
+      "to": 470,
       "type": "external"
     },
     {
       "participant": "registerer",
-      "from": 515,
-      "to": 525,
+      "from": 575,
+      "to": 585,
       "type": "external"
     }
   ],
@@ -212,6 +223,15 @@
       "items": [
         "runtime сам гасит UserAgent через 3 с после отказа",
         "при обрыве сети — attemptReconnection до исчерпания попыток"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Хранилище",
+      "items": [
+        "uriWebRtc и callerUserNum пишет phoneStorage при submit",
+        "сид среза phoneControlRdcr: uriWebRtc · callerUserNum · useIce",
+        "localStorage трогает только services/ — весь HTTP и ключи там же"
       ]
     }
   ]

@@ -6,8 +6,8 @@
   "visualReview": "pending",
   "artifact": {
     "path": "/home/ars/_git/sipjs-react/docs/archify/sipjs-react-livekit-store.html",
-    "sha256": "a5de97c5d3762a59f1209947585f948d6ef8e3be9c9c0f319cac2a7a28907974",
-    "bytes": 634897
+    "sha256": "67b3563c3710818cac3c54658e038bc9bac66c39570ce6577882f0908fd233a8",
+    "bytes": 638803
   },
   "state": {
     "detail": "read",
@@ -15,7 +15,7 @@
   },
   "chrome": {
     "status": "available",
-    "executable": "/home/ars/.cache/ms-playwright/chromium-1244/chrome-linux64/chrome"
+    "executable": "/home/ars/.cache/ms-playwright/chromium-1246/chrome-linux64/chrome"
   },
   "containment": {
     "status": "pass",

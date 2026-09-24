@@ -55,8 +55,8 @@ date-fns. Только JavaScript, форматирование — Biome. Те�
 - React: функциональные компоненты, `PropTypes`; презентация — `components/`, связка со store —
   `containers/` (`useSelector`, `bindActionCreators` + `useMemo`). UI — только MUI.
 - Biome: 2 пробела, без Tab, двойные кавычки; с автоформатом не спорить. Vite `base: './'` сохранять.
-- Диаграммы-артефакты — навык `archify` → `docs/archify/` (`sipjs-react-layers.*`,
-  `sipjs-react-auth-bridge.*`, `sipjs-react-sip-store.*`, `sipjs-react-livekit-store.*`), проверка
+- Диаграммы-артефакты — навык `archify` → `docs/archify/` (`sipjs-react-architecture.*`,
+  `sipjs-react-sip-store.*`, `sipjs-react-livekit-store.*`), проверка
   — навык `archify-visual-check`; для Mermaid в ответе эталон — `docs/STATE.md`.
 - Внешние библиотеки (sip.js, LiveKit): перед использованием незнакомого метода сверяться с
   официальной документацией и давать в ответе ссылку на неё; API по памяти не выдумывать.

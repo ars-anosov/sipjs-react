@@ -27,7 +27,7 @@ import {
 } from "@mui/icons-material";
 import { Alert, alpha, Box, Button, CircularProgress, Divider, GlobalStyles, Grid, IconButton, Link, Paper, Stack, Typography } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import { format, isToday } from "date-fns";
+import { format } from "date-fns";
 import PropTypes from "prop-types";
 import { useEffect, useRef, useState } from "react";
 import { createSearchParams, Link as RouterLink, useNavigate, useSearchParams } from "react-router-dom";
@@ -41,13 +41,13 @@ import LkToken from "./LkToken";
 // приглашение остаётся обычной ссылкой, а состояние не дублируется в useState.
 const buildRoomSearch = (room, token) => createSearchParams({ lk_room: room, lk_token: token }).toString();
 
-// Срок действия токена приглашения (exp из JWT, см. services/lkToken.js): время — до минут,
-// с датой, если токен живёт дольше сегодняшнего дня
+// Срок действия токена приглашения (exp из JWT, см. services/lkToken.js): всегда полная дата
+// с годом и время — токен может жить дольше сегодняшнего дня и перейти на следующий год
 const formatInviteValidUntil = (expiresAt) => {
   if (typeof expiresAt !== "number") return "";
 
   const date = new Date(expiresAt);
-  return Number.isNaN(date.getTime()) ? "" : format(date, isToday(date) ? "HH:mm" : "dd.MM HH:mm");
+  return Number.isNaN(date.getTime()) ? "" : format(date, "dd.MM.yyyy HH:mm");
 };
 
 function MicrophoneStatusIcon({ trackRef }) {

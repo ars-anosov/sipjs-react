@@ -6,8 +6,8 @@
   "visualReview": "pending",
   "artifact": {
     "path": "/home/ars/_git/sipjs-react/docs/archify/sipjs-react-sip-store.html",
-    "sha256": "96c085e2aa7fef05afe35a14e9a26ac2c16b36a50700030e765c39cb9663c0ad",
-    "bytes": 636387
+    "sha256": "1231701ff1e2761bdfa7ec59b2c6c2bee269db9e0af0344317fbc5301c9a2781",
+    "bytes": 639431
   },
   "state": {
     "detail": "read",
@@ -15,7 +15,7 @@
   },
   "chrome": {
     "status": "available",
-    "executable": "/home/ars/.cache/ms-playwright/chromium-1244/chrome-linux64/chrome"
+    "executable": "/home/ars/.cache/ms-playwright/chromium-1246/chrome-linux64/chrome"
   },
   "containment": {
     "status": "pass",

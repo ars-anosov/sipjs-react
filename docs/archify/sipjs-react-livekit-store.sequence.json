@@ -2,13 +2,10 @@
   "schema_version": 1,
   "diagram_type": "sequence",
   "meta": {
-    "title": "sipjs-react: LiveKit — комнаты и store",
+    "title": "LiveKit комнаты",
     "quality_profile": "showcase",
     "column_fit": "spread",
-    "viewBox": [
-      1500,
-      680
-    ],
+    "viewBox": [1800, 700],
     "legend": {
       "mode": "auto",
       "entries": {
@@ -38,6 +35,12 @@
       "sublabel": "handleLkRoomCreate"
     },
     {
+      "id": "storage",
+      "type": "database",
+      "label": "localStorage",
+      "sublabel": "uriLkToken · lkInvites"
+    },
+    {
       "id": "token",
       "type": "external",
       "label": "POST /user/lk",
@@ -65,12 +68,12 @@
   "segments": [
     {
       "from": 150,
-      "to": 350,
+      "to": 440,
       "label": "Своя комната / приглашение"
     },
     {
-      "from": 355,
-      "to": 530,
+      "from": 465,
+      "to": 600,
       "label": "Подключение к комнате"
     }
   ],
@@ -84,10 +87,18 @@
       "variant": "emphasis"
     },
     {
+      "id": "store-token-uri",
+      "from": "action",
+      "to": "storage",
+      "y": 225,
+      "label": "uriLkToken",
+      "variant": "default"
+    },
+    {
       "id": "post-lk",
       "from": "action",
       "to": "token",
-      "y": 225,
+      "y": 265,
       "label": "requestLkToken(num, room)",
       "variant": "default"
     },
@@ -95,15 +106,23 @@
       "id": "jwt",
       "from": "token",
       "to": "action",
-      "y": 265,
+      "y": 305,
       "label": "jwt (exp, room)",
       "variant": "return"
     },
     {
       "id": "store-invite",
       "from": "action",
+      "to": "storage",
+      "y": 345,
+      "label": "lkInvites: num · room · token",
+      "variant": "default"
+    },
+    {
+      "id": "store-rdcr",
+      "from": "action",
       "to": "rdcr",
-      "y": 305,
+      "y": 385,
       "label": "LKROOM_CREATE_* / LKTOKEN_SUBMIT_SUCCESS",
       "variant": "default"
     },
@@ -111,7 +130,7 @@
       "id": "bridge-note",
       "from": "action",
       "to": "rdcr",
-      "y": 340,
+      "y": 420,
       "label": "приглашение → мост LkContainer → SIP MESSAGE",
       "variant": "dashed"
     },
@@ -119,7 +138,7 @@
       "id": "open-url",
       "from": "user",
       "to": "runtime",
-      "y": 400,
+      "y": 485,
       "label": "#/?lk_room&lk_token → connect(url, token)",
       "variant": "emphasis"
     },
@@ -127,7 +146,7 @@
       "id": "connect",
       "from": "runtime",
       "to": "sfu",
-      "y": 440,
+      "y": 525,
       "label": "Room.connect()",
       "variant": "default"
     },
@@ -135,7 +154,7 @@
       "id": "tracks",
       "from": "sfu",
       "to": "runtime",
-      "y": 480,
+      "y": 565,
       "label": "треки участников",
       "variant": "return"
     }
@@ -144,25 +163,37 @@
     {
       "participant": "action",
       "from": 175,
-      "to": 350,
+      "to": 430,
       "type": "backend"
     },
     {
+      "participant": "storage",
+      "from": 215,
+      "to": 235,
+      "type": "database"
+    },
+    {
+      "participant": "storage",
+      "from": 335,
+      "to": 355,
+      "type": "database"
+    },
+    {
       "participant": "token",
-      "from": 220,
-      "to": 270,
+      "from": 260,
+      "to": 310,
       "type": "external"
     },
     {
       "participant": "runtime",
-      "from": 395,
-      "to": 490,
+      "from": 480,
+      "to": 575,
       "type": "backend"
     },
     {
       "participant": "sfu",
-      "from": 435,
-      "to": 485,
+      "from": 520,
+      "to": 570,
       "type": "external"
     }
   ],
@@ -177,10 +208,11 @@
     },
     {
       "dot": "cyan",
-      "title": "Список приглашений",
+      "title": "Хранилище",
       "items": [
-        "хранится в localStorage.lkInvites, лимит LK_MAX_INVITES",
-        "в срез lkControlRdcr попадает сидом через preloadedState.js"
+        "uriLkToken пишет lkToken перед запросом токена",
+        "приглашения — localStorage.lkInvites, лимит LK_MAX_INVITES",
+        "в срез lkControlRdcr всё попадает сидом через preloadedState.js"
       ]
     }
   ]

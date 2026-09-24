@@ -77,55 +77,37 @@ node -e "console.log(require(process.env.HOME + '/.dsh/profiles/web/package.json
 
 # Компоненты
 
-Презентационные компоненты (`src/components/`) получают данные и `*Actions` пропсами; со стором их связывают контейнеры (`src/containers/`): `PhoneContainer`, `AuthContainer`, `LkContainer`, `MenuAppContainer`.
+Презентационные компоненты (`src/components/`) получают данные и `*Actions` пропсами; со стором их
+связывают контейнеры (`src/containers/`): `PhoneContainer`, `AuthContainer`, `LkContainer`,
+`MenuAppContainer`. Группы ниже — по срезам store.
 
-## MenuAppBar.jsx
-Меню приложения: пункты «SIP …» (`phoneControlRdcr`), «AD …» (`authControlRdcr`), «LiveKit Встреча» (`lkControlRdcr`).
+## Каркас
 
-## PhoneReg.jsx
-![component_PhoneReg.png](img/component_PhoneReg.png)
+### MenuAppBar.jsx
+Меню и шапка приложения: пункты «SIP …» (`phoneControlRdcr`), «AD …» (`authControlRdcr`),
+«LiveKit Встреча» (`lkControlRdcr`); в шапке — индикаторы `PhoneIco` и `AuthIco`, в drawer —
+панели `PhoneDir`, `PhonePad`, `AuthAdInfo`.
 
-## PhonePad.jsx
-![component_PhonePad.png](img/component_PhonePad.png)
+## Срез PHONECTL_
 
-## PhoneHistory.jsx
-![component_PhoneHistory.png](img/component_PhoneHistory.png)
+### PhoneReg.jsx
+Модальная форма SIP-регистрации: user/secret.
 
-## PhoneIco.jsx
-![component_PhoneIco.png](img/component_PhoneIco.png)
+### PhonePad.jsx
+Рабочая панель «SIP Телефон». Кнопка LiveKit подсвечивается по `lkControlRdcr.displayControl`.
 
-## PhoneChat.jsx
-Чат по SIP MESSAGE; ссылка-приглашение в комнату (параметр `lk_room`) выделена акцентом: в исходящем сообщении открывается в новом окне, во входящем — переход тут же (react-router, текущая вкладка); остальные ссылки — как обычно. Отправка — Enter (Shift+Enter/Ctrl+Enter — перенос строки), поле «Вн.номер» следует за собеседником последней отправки (крестик в поле показывает все сообщения).
+### PhoneHistory.jsx
+Журнал «SIP Звонки» из `localStorage.sipCalls`.
 
-# Доп. компоненты
-Плюшки для интеграции с внешними сервисами
+### PhoneChat.jsx
+Чат по SIP MESSAGE (`localStorage.sipMessages`). Ссылка-приглашение в комнату (`lk_room`).
 
-## AuthAd.jsx
-POST-запрос к серверу авторизации, ожидаемый ответ:
-```json
-{
-  "sip_username"  : "1234",
-  "sip_secret"    : "SECRET",
-  "ad_login"      : "login",
-  "ad_cn"         : "ФИО",
-  "ad_title"      : "Должность",
-  "ad_department" : "Отдел"
-}
-```
+### PhoneIco.jsx
+Индикатор SIP-статуса и системные уведомления о входящем звонке (`phoneNotifications`).
 
-Токен LiveKit в этом ответе не приходит: его выдаёт отдельный `POST` на `uriLkToken` (в dev — мок
-`/user/lk`), см. `LkMeet.jsx`.
+### PhoneDir.jsx
+Справочник: поиск по `GET uriPhoneDir`. Ожидаемый ответ:
 
-![component_AuthAd.png](img/component_AuthAd.png)
-
-## AuthIco.jsx + AuthAdInfo.jsx
-Индикация данных AD-сессии в интерфейсе.
-
-## AuthPad.jsx
-Панель «Мост к сервисам»: тумблер SIP-регистрации; встреча LiveKit открывается пунктом меню «LiveKit Встреча» (или сама по ссылке-приглашению).
-
-## PhoneDir.jsx
-GET-запрос к серверу справочнику, ожидаемый ответ:
 ```json
 [
   { "label": "Москва префикс", "prefix": "1999" },
@@ -137,18 +119,56 @@ GET-запрос к серверу справочнику, ожидаемый о
 
 ![component_PhoneDir.png](img/component_PhoneDir.png)
 
-## LkMeet.jsx
-Видеовстреча на [LiveKit](https://livekit.io/) (локальный деплой — [openvidu-local-deployment](https://github.com/OpenVidu/openvidu-local-deployment)); комната из query `lk_room`/`lk_token`. Свою комнату и ссылку-приглашение выдаёт `POST` на `uriLkToken` (в dev — мок `/user/lk`). Ссылка-приглашение в панели оформлена так же, как в чате, и подписана сроком действия токена (`exp` из JWT, время или дата со временем). Приглашений может быть несколько: панель показывает их списком, хранит в `localStorage` (ключ `lkInvites`, одно актуальное приглашение на номер) и позволяет убрать строку крестиком.
+## Срез AUTHCTL_
+
+### AuthLinks.jsx
+Стартовый экран «Войти»: пока нет ни AD-сессии, ни SIP-регистрации.
+
+### AuthAd.jsx
+Модальная форма AD-входа: `POST` на `uriAdAuth`, ожидаемый ответ:
+
+```json
+{
+  "sip_username"  : "1234",
+  "sip_secret"    : "SECRET",
+  "ad_login"      : "login",
+  "ad_cn"         : "ФИО",
+  "ad_title"      : "Должность",
+  "ad_department" : "Отдел"
+}
+```
+
+### AuthIco.jsx
+Индикатор Auth-статуса.
+
+### AuthAdInfo.jsx
+Сведения об Auth-сессии.
+
+### AuthPad.jsx
+Панель «Мост к сервисам».
+
+## Срез LiveKit — LK_
+
+### LkMeet.jsx
+Видеовстреча на [LiveKit](https://livekit.io/) (локальный деплой — [openvidu-local-deployment](https://github.com/OpenVidu/openvidu-local-deployment)).
 
 ![component_LkMeet.png](img/component_LkMeet.png)
+
+### LkToken.jsx
+Компактная форма приглашения («Вн. номер» + отправка).
+
+### LkThemeStyles.js
+Не компонент, а стили: CSS-переменные `@livekit/components-styles` из палитры MUI (`getLiveKitMuiStyles(theme)`).
 
 
 
 # Документация
 
-[![Архитектура sipjs-react](docs/archify/sipjs-react-architecture.visual-check.2048x1320.light.png)](https://ars-anosov.github.io/sipjs-react/archify/sipjs-react-architecture.html)
+[![Архитектура](docs/archify/sipjs-react-architecture.visual-check.2048x1320.light.png)](https://ars-anosov.github.io/sipjs-react/archify/sipjs-react-architecture.html)
 
-[![SIP-регистрация](docs/archify/sipjs-react-sip-registration.visual-check.2048x1320.light.png)](https://ars-anosov.github.io/sipjs-react/archify/sipjs-react-sip-registration.html)
+[![SIP регистрация](docs/archify/sipjs-react-sip-store.visual-check.2048x1320.light.png)](https://ars-anosov.github.io/sipjs-react/archify/sipjs-react-sip-store.html)
+
+[![LiveKit комнаты](docs/archify/sipjs-react-livekit-store.visual-check.2048x1320.light.png)](https://ars-anosov.github.io/sipjs-react/archify/sipjs-react-livekit-store.html)
 
 
 Все документы: <https://ars-anosov.github.io/sipjs-react/>
