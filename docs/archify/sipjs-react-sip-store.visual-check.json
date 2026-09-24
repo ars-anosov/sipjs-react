@@ -5,9 +5,9 @@
   "status": "pass",
   "visualReview": "pending",
   "artifact": {
-    "path": "\\\\wsl.localhost\\Ubuntu\\home\\ars\\_git\\sipjs-react\\docs\\archify\\sipjs-react-architecture.html",
-    "sha256": "5f9ed5badcfc8d6d34f994719a9c92535579858f2945fa4a5aad1f957f459820",
-    "bytes": 653458
+    "path": "/home/ars/_git/sipjs-react/docs/archify/sipjs-react-sip-store.html",
+    "sha256": "96c085e2aa7fef05afe35a14e9a26ac2c16b36a50700030e765c39cb9663c0ad",
+    "bytes": 636387
   },
   "state": {
     "detail": "read",
@@ -15,7 +15,7 @@
   },
   "chrome": {
     "status": "available",
-    "executable": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+    "executable": "/home/ars/.cache/ms-playwright/chromium-1244/chrome-linux64/chrome"
   },
   "containment": {
     "status": "pass",
@@ -89,7 +89,7 @@
         "overflowY": false,
         "ok": true,
         "resolvedTheme": "light",
-        "file": "sipjs-react-architecture.visual-check.1440x900.light.png"
+        "file": "sipjs-react-sip-store.visual-check.1440x900.light.png"
       },
       {
         "width": 1440,
@@ -103,7 +103,7 @@
         "overflowY": false,
         "ok": true,
         "resolvedTheme": "dark",
-        "file": "sipjs-react-architecture.visual-check.1440x900.dark.png"
+        "file": "sipjs-react-sip-store.visual-check.1440x900.dark.png"
       },
       {
         "width": 2048,
@@ -117,7 +117,7 @@
         "overflowY": false,
         "ok": true,
         "resolvedTheme": "light",
-        "file": "sipjs-react-architecture.visual-check.2048x1320.light.png"
+        "file": "sipjs-react-sip-store.visual-check.2048x1320.light.png"
       },
       {
         "width": 2048,
@@ -131,13 +131,13 @@
         "overflowY": false,
         "ok": true,
         "resolvedTheme": "dark",
-        "file": "sipjs-react-architecture.visual-check.2048x1320.dark.png"
+        "file": "sipjs-react-sip-store.visual-check.2048x1320.dark.png"
       }
     ],
-    "contactSheet": "sipjs-react-architecture.visual-check.html"
+    "contactSheet": "sipjs-react-sip-store.visual-check.html"
   },
   "sidecars": {
-    "receipt": "sipjs-react-architecture.visual-check.json",
-    "contactSheet": "sipjs-react-architecture.visual-check.html"
+    "receipt": "sipjs-react-sip-store.visual-check.json",
+    "contactSheet": "sipjs-react-sip-store.visual-check.html"
   }
 }

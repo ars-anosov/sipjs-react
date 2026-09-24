@@ -59,26 +59,33 @@
       <p class="lead">WebRTC-телефон: SIP-клиент на <a href="https://sipjs.com/">sip.js</a>, видеовстречи на <a href="https://livekit.io/">LiveKit</a> и авторизация через Active Directory.</p>
       <ul>
         <li>
-          <a href="./archify/sipjs-react-architecture.html">
-            <div class="t">Диаграмма архитектуры (archify)</div>
-            <div class="d">
-              Интерактивная схема: UI → Redux → services → sip.js, мост AD → SIP и ветка LiveKit.
-            </div>
+          <a href="./archify/sipjs-react-layers.html">
+            <div class="t">Слои: UI / store / сервисы (archify)</div>
+            <div class="d">Components → Containers → actions → services → sip.js/livekit-client, store как сид.</div>
           </a>
         </li>
         <li>
-          <a href="./archify/sipjs-react-sip-registration.html">
-            <div class="t">SIP-регистрация (archify, sequence)</div>
-            <div class="d">
-              Путь клика по тумблеру AuthPad: handleClkRegister → phoneRuntime → Registerer,
-              успех / отказ, авто-останов и разрегистрация; regState — off / ok / fail.
-            </div>
+          <a href="./archify/sipjs-react-auth-bridge.html">
+            <div class="t">Мост AuthContainer → сервисы (archify)</div>
+            <div class="d">AD-вход → тумблер AuthPad → handleClkRegister; regState — off / ok / fail.</div>
+          </a>
+        </li>
+        <li>
+          <a href="./archify/sipjs-react-sip-store.html">
+            <div class="t">sip.js: регистрация и store (archify, sequence)</div>
+            <div class="d">phoneRuntime → Registerer, успех/отказ, авто-останов через 3 с.</div>
+          </a>
+        </li>
+        <li>
+          <a href="./archify/sipjs-react-livekit-store.html">
+            <div class="t">LiveKit: комнаты и store (archify, sequence)</div>
+            <div class="d">POST /user/lk → invites, подключение lkRuntime к комнате.</div>
           </a>
         </li>
         <li>
           <a href="https://github.com/ars-anosov/sipjs-react/blob/main/docs/STATE.md">
             <div class="t">Mermaid-схемы (STATE.md)</div>
-            <div class="d">Слой стора и Redux, регистрация, звонки и чат.</div>
+            <div class="d">Те же 4 блока в компактном Mermaid — без archify.</div>
           </a>
         </li>
       </ul>

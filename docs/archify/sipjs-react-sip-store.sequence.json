@@ -1,0 +1,218 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "sipjs-react: sip.js — регистрация и store",
+    "quality_profile": "showcase",
+    "column_fit": "spread",
+    "viewBox": [
+      1500,
+      720
+    ],
+    "legend": {
+      "mode": "auto",
+      "entries": {
+        "emphasis": {
+          "label": "ключевой шаг"
+        },
+        "dashed": {
+          "label": "по таймеру/реконнект"
+        },
+        "return": {
+          "label": "ответ"
+        }
+      }
+    }
+  },
+  "participants": [
+    {
+      "id": "user",
+      "type": "external",
+      "label": "PhoneReg",
+      "sublabel": "форма/тумблер"
+    },
+    {
+      "id": "action",
+      "type": "backend",
+      "label": "phoneControlActions",
+      "sublabel": "handleClkRegister"
+    },
+    {
+      "id": "runtime",
+      "type": "backend",
+      "label": "phoneRuntime",
+      "sublabel": "singleton sip.js"
+    },
+    {
+      "id": "registerer",
+      "type": "external",
+      "label": "Registerer",
+      "sublabel": "REGISTER к SBC"
+    },
+    {
+      "id": "rdcr",
+      "type": "database",
+      "label": "phoneControlRdcr",
+      "sublabel": "regState"
+    }
+  ],
+  "segments": [
+    {
+      "from": 150,
+      "to": 340,
+      "label": "Регистрация"
+    },
+    {
+      "from": 345,
+      "to": 490,
+      "label": "Успех"
+    },
+    {
+      "from": 495,
+      "to": 660,
+      "label": "Отказ и авто-стоп"
+    }
+  ],
+  "messages": [
+    {
+      "id": "submit",
+      "from": "user",
+      "to": "action",
+      "y": 185,
+      "label": "submit(uriWebRtc, num, pass)",
+      "variant": "default"
+    },
+    {
+      "id": "register-call",
+      "from": "action",
+      "to": "runtime",
+      "y": 225,
+      "label": "registerSipUserAgent(handlers)",
+      "variant": "default"
+    },
+    {
+      "id": "on-request",
+      "from": "runtime",
+      "to": "action",
+      "y": 265,
+      "label": "handlers.onConnectRequest",
+      "variant": "default"
+    },
+    {
+      "id": "connect-request",
+      "from": "action",
+      "to": "rdcr",
+      "y": 305,
+      "label": "CONNECT_REQUEST (regState=off)",
+      "variant": "default"
+    },
+    {
+      "id": "start-register",
+      "from": "runtime",
+      "to": "registerer",
+      "y": 365,
+      "label": "start() + register()",
+      "variant": "emphasis"
+    },
+    {
+      "id": "ok-200",
+      "from": "registerer",
+      "to": "runtime",
+      "y": 405,
+      "label": "200 OK",
+      "variant": "return"
+    },
+    {
+      "id": "on-success",
+      "from": "runtime",
+      "to": "action",
+      "y": 445,
+      "label": "handlers.onConnectSuccess",
+      "variant": "default"
+    },
+    {
+      "id": "connect-success",
+      "from": "action",
+      "to": "rdcr",
+      "y": 480,
+      "label": "CONNECT_SUCCESS (regState=ok)",
+      "variant": "emphasis"
+    },
+    {
+      "id": "reject",
+      "from": "registerer",
+      "to": "runtime",
+      "y": 520,
+      "label": "401/403/таймаут",
+      "variant": "return"
+    },
+    {
+      "id": "on-error",
+      "from": "runtime",
+      "to": "action",
+      "y": 560,
+      "label": "handlers.onConnectError",
+      "variant": "default"
+    },
+    {
+      "id": "connect-error",
+      "from": "action",
+      "to": "rdcr",
+      "y": 595,
+      "label": "CONNECT_ERROR (regState=fail)",
+      "variant": "emphasis"
+    },
+    {
+      "id": "auto-stop",
+      "from": "runtime",
+      "to": "action",
+      "y": 635,
+      "label": "через 3с: onUnregistered",
+      "variant": "dashed"
+    }
+  ],
+  "activations": [
+    {
+      "participant": "action",
+      "from": 175,
+      "to": 610,
+      "type": "backend"
+    },
+    {
+      "participant": "runtime",
+      "from": 220,
+      "to": 650,
+      "type": "backend"
+    },
+    {
+      "participant": "registerer",
+      "from": 360,
+      "to": 410,
+      "type": "external"
+    },
+    {
+      "participant": "registerer",
+      "from": 515,
+      "to": 525,
+      "type": "external"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "regState — единственный флаг",
+      "items": [
+        "off / ok / fail; отдельного булева флага «зарегистрирован» нет",
+        "UNREGISTER не трогает regState — красный тумблер не гаснет сам"
+      ]
+    },
+    {
+      "dot": "orange",
+      "title": "Авто-стоп и реконнект",
+      "items": [
+        "runtime сам гасит UserAgent через 3 с после отказа",
+        "при обрыве сети — attemptReconnection до исчерпания попыток"
+      ]
+    }
+  ]
+}

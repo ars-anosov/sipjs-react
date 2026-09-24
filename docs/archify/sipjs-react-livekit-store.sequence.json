@@ -1,0 +1,187 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "sipjs-react: LiveKit — комнаты и store",
+    "quality_profile": "showcase",
+    "column_fit": "spread",
+    "viewBox": [
+      1500,
+      680
+    ],
+    "legend": {
+      "mode": "auto",
+      "entries": {
+        "emphasis": {
+          "label": "ключевой шаг"
+        },
+        "dashed": {
+          "label": "мост LK_ → PHONECTL_"
+        },
+        "return": {
+          "label": "ответ"
+        }
+      }
+    }
+  },
+  "participants": [
+    {
+      "id": "user",
+      "type": "external",
+      "label": "LkMeet",
+      "sublabel": "Создать/Пригласить"
+    },
+    {
+      "id": "action",
+      "type": "backend",
+      "label": "lkControlActions",
+      "sublabel": "handleLkRoomCreate"
+    },
+    {
+      "id": "token",
+      "type": "external",
+      "label": "POST /user/lk",
+      "sublabel": "lkToken.js"
+    },
+    {
+      "id": "rdcr",
+      "type": "database",
+      "label": "lkControlRdcr",
+      "sublabel": "invites · createStatus"
+    },
+    {
+      "id": "runtime",
+      "type": "backend",
+      "label": "lkRuntime",
+      "sublabel": "getLiveKitRoom()"
+    },
+    {
+      "id": "sfu",
+      "type": "external",
+      "label": "LiveKit SFU",
+      "sublabel": "комната · треки"
+    }
+  ],
+  "segments": [
+    {
+      "from": 150,
+      "to": 350,
+      "label": "Своя комната / приглашение"
+    },
+    {
+      "from": 355,
+      "to": 530,
+      "label": "Подключение к комнате"
+    }
+  ],
+  "messages": [
+    {
+      "id": "click",
+      "from": "user",
+      "to": "action",
+      "y": 185,
+      "label": "клик «Создать»/«Пригласить» (regState=ok)",
+      "variant": "emphasis"
+    },
+    {
+      "id": "post-lk",
+      "from": "action",
+      "to": "token",
+      "y": 225,
+      "label": "requestLkToken(num, room)",
+      "variant": "default"
+    },
+    {
+      "id": "jwt",
+      "from": "token",
+      "to": "action",
+      "y": 265,
+      "label": "jwt (exp, room)",
+      "variant": "return"
+    },
+    {
+      "id": "store-invite",
+      "from": "action",
+      "to": "rdcr",
+      "y": 305,
+      "label": "LKROOM_CREATE_* / LKTOKEN_SUBMIT_SUCCESS",
+      "variant": "default"
+    },
+    {
+      "id": "bridge-note",
+      "from": "action",
+      "to": "rdcr",
+      "y": 340,
+      "label": "приглашение → мост LkContainer → SIP MESSAGE",
+      "variant": "dashed"
+    },
+    {
+      "id": "open-url",
+      "from": "user",
+      "to": "runtime",
+      "y": 400,
+      "label": "#/?lk_room&lk_token → connect(url, token)",
+      "variant": "emphasis"
+    },
+    {
+      "id": "connect",
+      "from": "runtime",
+      "to": "sfu",
+      "y": 440,
+      "label": "Room.connect()",
+      "variant": "default"
+    },
+    {
+      "id": "tracks",
+      "from": "sfu",
+      "to": "runtime",
+      "y": 480,
+      "label": "треки участников",
+      "variant": "return"
+    }
+  ],
+  "activations": [
+    {
+      "participant": "action",
+      "from": 175,
+      "to": 350,
+      "type": "backend"
+    },
+    {
+      "participant": "token",
+      "from": 220,
+      "to": 270,
+      "type": "external"
+    },
+    {
+      "participant": "runtime",
+      "from": 395,
+      "to": 490,
+      "type": "backend"
+    },
+    {
+      "participant": "sfu",
+      "from": 435,
+      "to": 485,
+      "type": "external"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "violet",
+      "title": "Условие доступа — SIP, не AD",
+      "items": [
+        "своя комната и приглашение требуют regState=ok, номер — callerUserNum",
+        "приглашение уходит SIP MESSAGE — AD для него не нужен"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "Список приглашений",
+      "items": [
+        "хранится в localStorage.lkInvites, лимит LK_MAX_INVITES",
+        "в срез lkControlRdcr попадает сидом через preloadedState.js"
+      ]
+    }
+  ]
+}

@@ -1,116 +1,73 @@
 # AGENTS.md — sipjs-react
 
-WebRTC-телефон: SIP (sip.js), видеовстречи LiveKit, AD-авторизация. Язык общения, документации и комментариев — русский.
+WebRTC-телефон: SIP (sip.js), видеовстречи LiveKit, AD-авторизация. Общаться, документировать и
+комментировать по-русски.
 
-Единственный источник правил для AI-агентов. Адаптеры (`CLAUDE.md`, `.github/copilot-instructions.md`, `.cursor/rules/project.mdc`, `.codex/codex.md`) — тонкие ссылки сюда, без дублирования.
+Единственный источник правил для AI-агентов. Адаптеры (`CLAUDE.md`, `.github/copilot-instructions.md`,
+`.cursor/rules/project.mdc`, `.codex/codex.md`) — тонкие ссылки сюда, без дублирования. Общие
+правила среды DSH — в user-global `~/.dsh/AGENTS.md`; проверка UI — навыком `.dsh/skills/ui-verify`.
 
 ## Стек и команды
 
-Node.js 24, Vite 8, React 19, MUI 9 + Emotion, Redux 5 (redux-thunk; logger в dev), react-router-dom 7 (HashRouter), sip.js, livekit-client + `@livekit/components-react`, ky, date-fns. JavaScript (без TS). Формат — Biome.
+Node.js 24, Vite 8, React 19, MUI 9 + Emotion, Redux 5 (thunk; `redux-logger` в dev),
+react-router-dom 7 (HashRouter), sip.js, livekit-client + `@livekit/components-react`, ky,
+date-fns. Только JavaScript, форматирование — Biome. Тестов нет.
 
-```bash
-npm install
-npm run dev      # dev-сервер, http://localhost:3000 (порт 3000 из vite.config.js)
-npm run build    # сборка в dist
-npm run serve    # предпросмотр собранного dist, порт из вывода (по умолчанию 4173)
-npm run lint     # biome lint .
-npm run format   # biome format --write .
-npm run check    # biome check --write .
-```
+- `npm run dev` — Vite на порту 3000 (занят → следующий свободный, брать фактический из вывода);
+  `npm run build` — сборка в `dist`; `npm run serve` — preview, порт из вывода (по умолчанию 4173).
+- `npm run lint` — только проверка; `npm run format`/`npm run check` **перезаписывают файлы**.
+- CI (`.github/workflows/ci.yml`): push в `main`/`master` — `npm ci` + `npm run build`.
 
-Тестов нет.
+## Архитектурные границы
 
-## Инструменты и среда (DSH)
+- `services/` не зависят от Redux, общаются с actions через колбэки: `phoneRuntime`/`lkRuntime`
+  (singleton-runtime SIP и LiveKit-медиа), `adAuth` (AD-сессия, пробивка PHP-сессии по
+  `uriAdPhpAuth`), `lkToken` (токен LiveKit, срок действия, приглашения), `phoneDirectory`,
+  `phoneNotifications`, `phoneStorage`. Весь `localStorage` и весь HTTP (`ky`) — только здесь;
+  ключи — `constants/storage.js`.
+- Redux хранит только UI-флаги/заголовки/списки/счётчики — не SDK-объекты и не медиа.
+  `store/preloadedState.js` собирает сид из сервисов и отдаёт срезы в `configureStore`
+  (`createStore(preloadedState)` + `authTimeoutMiddleware`); reducers чистые и не импортируют
+  сервисы. Action types — `constants/redux.js` (префиксы `PHONECTL_`, `AUTHCTL_`,
+  `LKTOKEN_`/`LKROOM_`/`LK_`).
+- Namespace-инвариант: thunk-и `AUTHCTL_`, `PHONECTL_`, `LK_` не диспатчат чужой префикс и не
+  читают чужой срез через `getState()`. Мосты — только в контейнерах: `AuthContainer`
+  (AUTHCTL↔PHONECTL, URL→LK), `PhoneContainer` (URL→PHONECTL; кнопка LiveKit переключает
+  `lkControlRdcr.displayControl`), `LkContainer` (приглашение → чат). Владение рендером — по
+  срезу (`AuthContainer` — `AuthLinks`/`AuthAd`/`AuthPad`, `PhoneContainer` — `PhoneReg`/`PhonePad`/
+  `PhoneHistory`/`PhoneChat`).
+- `phoneControlRdcr.regState` (`off`/`ok`/`fail`) — единственный флаг SIP-регистрации; тумблер
+  `AuthPad` трёхпозиционный и отражает его напрямую (нет отдельного булева флага).
+- Своя LiveKit-комната и приглашение доступны только при живой SIP-регистрации
+  (`regState === "ok"`, номер комнаты — `callerUserNum`); приглашение уходит SIP MESSAGE, AD для
+  этого не нужен. Список приглашений — `localStorage.lkInvites` (лимит `LK_MAX_INVITES`).
+- `AuthAd` открывается только неуспешной пробивкой PHP-сессии (`GET uriAdPhpAuth?PHPSESSID=...`);
+  успех — тихий вход без формы, ошибкой AD пробивка не считается.
+- Компоненты не импортируют sip.js/livekit-client и не работают с runtime напрямую — только
+  пропсы + `*Actions` (исключения: `PhoneIco`→`phoneNotifications`, `LkMeet`→`lkRuntime`,
+  `AuthAd`→`adAuth`).
 
-Общие правила машины (WSL ↔ Windows, Mermaid — образец `docs/STATE.md`, archify, проверка результата) — в user-global `~/.dsh/AGENTS.md`; повторяемые процедуры — навыками в `.dsh/skills/`. Здесь только специфика репозитория:
+Полные потоки и Mermaid-диаграммы — `docs/STATE.md`; стенд LiveKit (OpenVidu-докер), токены и
+грабли проверки — `docs/LIVEKIT.md`; dev-mock — `mock/vite-mock-api.js`.
 
-- **Диаграммы-артефакты** — skill `archify`, результат в `docs/archify/` (`sipjs-react-architecture.*`, `sipjs-react-sip-registration.*`); проверка — навык `archify-visual-check`. В git остаются лишь `*.visual-check.2048x1320.light.png` (превью для README) и receipt `*.visual-check.json`, остальные скриншоты и contact sheet — временные (перечислены в `.gitignore`).
-- **Проверка UI** — по необходимости, а не по ритуалу: браузер нужен, только когда правку нельзя подтвердить статически (рантайм, вёрстка, стили от каскада и брейкпоинтов, ошибки в консоли); для декларативных правок (тексты, пропсы, константы, разметка) достаточно `git diff`, `npm run lint` и `npm run build`. Когда браузер всё же нужен — `npm run dev` (порт 3000 из `vite.config.js`; если занят, Vite возьмёт следующий — брать фактический из вывода), человеку — `win_open_url` по этому порту (только если результат нужен ему в браузере), агенту — обёртка `.dsh/bin/browser` по навыку `ui-verify` (там же уровни проверки и приёмы, снижающие число вызовов). Настройки — `.playwright/cli.config.json`, рантайм и вывод — в игнорируемом `.playwright/cache/`, авто-имена `page-*`/`console-*` чистят обёртка (старше суток) и шаг 7 навыка `ui-verify`; порядок и границы проверки (SIP, звонки и медиа требуют живого сервера) — там же.
+## Соглашения
 
-## Структура
+- React: функциональные компоненты, `PropTypes`; презентация — `components/`, связка со store —
+  `containers/` (`useSelector`, `bindActionCreators` + `useMemo`). UI — только MUI.
+- Biome: 2 пробела, без Tab, двойные кавычки; с автоформатом не спорить. Vite `base: './'` сохранять.
+- Диаграммы-артефакты — навык `archify` → `docs/archify/` (`sipjs-react-layers.*`,
+  `sipjs-react-auth-bridge.*`, `sipjs-react-sip-store.*`, `sipjs-react-livekit-store.*`), проверка
+  — навык `archify-visual-check`; для Mermaid в ответе эталон — `docs/STATE.md`.
+- Внешние библиотеки (sip.js, LiveKit): перед использованием незнакомого метода сверяться с
+  официальной документацией и давать в ответе ссылку на неё; API по памяти не выдумывать.
 
-```
-src/
-├── components/   # UI: AuthLinks, PhoneReg, PhonePad, PhoneChat, PhoneHistory, PhoneDir, AuthAd/AuthAdInfo/AuthIco/AuthPad, LkMeet/LkToken/LkThemeStyles, MenuAppBar, PhoneIco
-├── containers/   # Redux-контейнеры: PhoneContainer, AuthContainer, LkContainer, MenuAppContainer
-├── actions/      # thunks; utils/kyError.js
-├── services/     # adAuth, phoneRuntime, lkRuntime, lkToken, phoneDirectory, phoneNotifications, phoneStorage
-├── reducers/     # phoneControlRdcr, authControlRdcr, lkControlRdcr, authTimeoutMiddleware, rootReducer
-├── store/        # configureStore.js, preloadedState.js (сид из сервисов)
-├── constants/    # redux.js (action types), storage.js (ключи и лимиты localStorage), ui.js
-└── App.jsx, main.jsx, theme.js, Copyright.jsx
-mock/             # mock API для dev (vite plugin, apply: "serve")
-public/           # статика: img/, sounds/, sw.js
-img/              # скриншоты компонентов для README
-docs/             # документация и GitHub Pages (ars-anosov.github.io/sipjs-react):
-                  # index.html (лендинг), STATE.md (Mermaid-схемы), LIVEKIT.md (стенд встреч,
-                  # токены, проверка), archify/ (генерация skill'ом archify, исключён из
-                  # Biome), .nojekyll
-dist/             # результат npm run build — вручную не править
-.github/          # CI (workflows/ci.yml: npm ci + build) и адаптер copilot-instructions.md
-.dsh/             # навыки агента (skills/ui-verify) и обёртка bin/browser
-.playwright/      # конфиг Playwright CLI (cli.config.json); cache/ — рантайм и вывод проверок
-                  # (авто-имена page-*/console-* чистят обёртка и навык ui-verify), в git не хранится
-.devcontainer/    # devcontainer: образ javascript-node 24, forwardPorts 3000 и 4173
-.vscode/          # редактор: Biome-форматтер и formatOnSave, рекомендации расширений
-.zed/             # Zed: Biome как LSP и форматтер для JS/JSON, исключения node_modules и dist
-.cursor/          # адаптер правил для Cursor (rules/project.mdc)
-.codex/           # адаптер правил для Codex (codex.md)
-.editorconfig     # LF, финальный перевод строки, 2 пробела (в Markdown пробелы не обрезаются)
-jsconfig.json     # настройки JS-проекта для редактора: ES2022, JSX react-jsx, Bundler
-biome.json        # линтер и форматтер; includes исключает dist, node_modules, docs/archify
-README.md         # описание проекта и быстрый старт (Node.js 24), скриншоты — в img/
-LICENSE           # MIT
-```
+## Работа агента
 
-## Архитектура
-
-- Сервисы (`services/`) не зависят от Redux и общаются с actions через колбэки: `phoneRuntime` (sip.js + SIP-медиа) и `lkRuntime` (LiveKit-комната) — singleton'ы, `adAuth` (AD-сессия, её срок и пробивка PHP-сессии по `uriAdPhpAuth`), `lkToken` (конфиг LiveKit, токен, его срок действия и список приглашений в localStorage), `phoneDirectory`, `phoneNotifications` (Service Worker/Notification), `phoneStorage` (настройки, звонки и чат в localStorage).
-- Весь `localStorage` и весь HTTP (`ky`) — только в `services/`; ключи — в `constants/storage.js`. Исключения: `actions/utils/kyError.js` берёт из `ky` только `HTTPError`, а dev-дефолты адресов пишет корневой `index.html` (и только отсутствующие ключи).
-- Со стором сервисы сводит только слой стора: `store/preloadedState.js` собирает геттерами сервисов сид (`uriAdAuth`, `uriLk`/`uriLkToken`, `lkInvites`, `uriWebRtc`, `callerUserNum`, `useIce`) и отдаёт срезы `initialState` в `configureStore`, который передаёт их в `createStore` как `preloadedState` и инжектит зависимости `authTimeoutMiddleware` (срок AD-сессии, проверка раз в 10 с). `initialState` редьюсеров остаётся чистым. Reducers и middleware сервисов не импортируют.
-- Компоненты не импортируют `sip.js`/`livekit-client` и не работают с runtime напрямую — только пропсы + `*Actions` и узкий доменный API сервиса. Исключения: `PhoneIco` → `phoneNotifications`, `LkMeet` → `lkRuntime` и `@livekit/components-react`, `AuthAd` → `adAuth`.
-- Redux: только UI-флаги, заголовки, списки и счётчики; sip.js-объекты/сессии/медиа не хранятся. Actions — thunks (валидация → сервис/HTTP → dispatch), reducers чистые. Thunk работает только со своим срезом: чужой срез не читает через `getState()`, а получает значения аргументом.
-- Namespace-инвариант: thunks `AUTHCTL_` не диспатчат `PHONECTL_` (и наоборот), `LK_` — тоже не диспатчат `PHONECTL_`. Мосты между срезами — только в контейнерах: `AuthContainer` (`AUTHCTL_` ↔ `PHONECTL_` и URL → `LK_`), `PhoneContainer` (URL → `PHONECTL_`, а также `PHONECTL_` → `LK_`: кнопка LiveKit в ряду иконок `PhonePad` переключает `lkControlRdcr.displayControl` колбэком `onToggleLk`, а флаг `lkActive` подсвечивает её primary — это единственное, что контейнер читает из чужого среза; те же два пропа передаёт `MenuAppBar` для поповера с компактным `PhonePad`), `LkContainer` (`LK_` → `PHONECTL_`: приглашение в комнату пишется в чат через `handleSendInviteMessage`); остальные контейнеры раздают срезы пропсами (`LkContainer` → `phoneControlRdcr` для формы `LkToken`). Владение рендером — по срезу: `AuthContainer` (домен `authControlRdcr`, там же мост и стартовые ссылки `AuthLinks` на обе формы) рендерит `AuthLinks`, `AuthAd` и `AuthPad`, `PhoneContainer` (домен `phoneControlRdcr`) — `PhoneReg`, `PhonePad`, `PhoneHistory`, `PhoneChat`; чужой срез читает `AuthContainer` — как мост, а `PhoneContainer` — только флаг `lkControlRdcr.displayControl` для подсветки кнопки LiveKit. Стартовый экран: пока ни AD-сессия, ни SIP-регистрация не активны, показан стартовый блок `AuthLinks`, а поверх него — модальный `PhoneReg` (`phoneControlRdcr.displayReg` стартует `true`, форма — портал вне потока документа) — кроме гостя по ссылке-приглашению (`lk_token` в query): ему `AuthLinks` не показывают, `LkMeet` открывается сразу (мост URL → LK в `AuthContainer`), а форма `PhoneReg` не открывается сама (мост URL → PHONECTL в `PhoneContainer`), хотя из меню остаётся доступной; успех AD → `AuthPad`, успешная SIP-регистрация → `PhonePad` (заголовок `App` — flex-колонка на высоту экрана).
-- `phoneControlRdcr.regState` (`off`/`ok`/`fail`) — единственный флаг SIP-регистрации; проверки «зарегистрирован» — `regState === "ok"`, отдельного булева флага нет. Тумблер `AuthPad` трёхпозиционный и отражает `regState`: `off` — регистрация (без пары `sip_username`/`sip_secret` заблокирован), `ok` — разрегистрация, `fail` — возврат в `off`; при потере регистрации (`registrationLost`) показывается AuthPad с красным тумблером, а не `PhoneReg`.
-- `lkControlRdcr.displayControl` — показ `LkMeet` (пункт меню «LiveKit Встреча» и кнопка `VideoCallOutlined` в ряду иконок `PhonePad`; тело панели `AuthPad` отвечает только за SIP-регистрацию, а её подвал — кнопка состояния AD, открывающая форму `AuthAd`; сама `AuthPad` — `Snackbar` справа внизу, вне потока документа, поэтому места в вёрстке не занимает); ключ `displayControl` есть и у «кругляшей» в `phoneControlRdcr`/`authControlRdcr`. `LkMeet` читает `lk_room`/`lk_token` из query, а по ссылке-приглашению панель открывается сама. Свою комнату (кнопка «Создать» → `handleLkRoomCreate`) и ссылку-приглашение выдаёт `POST /user/lk`, но доступны они только при **живой SIP-регистрации** (`phoneControlRdcr.regState === "ok"`, номер комнаты — `callerUserNum`): приглашение уходит SIP MESSAGE, поэтому AD для этого не нужен и не проверяется; без регистрации и без токена в query панель показывает информирующий текст про ссылку-приглашение. Приглашений может быть несколько: `handleLkTokenSubmit` кладёт каждое в список `lkControlRdcr.invites` (на номер — одно актуальное, повторное вытесняет прежнее), список пишет сервис `storeLkInvite` в localStorage под ключом `lkInvites` с лимитом `LK_MAX_INVITES`, а в срез он попадает сидом через `preloadedState.js`. `LkMeet` показывает весь список: та же ссылка, что и в чате (`MEETING_LINK_SX`), с подписью срока действия (`exp` из JWT — `getLkTokenExpiresAt`, формат `date-fns` `HH:mm` или `dd.MM HH:mm`) и крестиком `handleRemoveInvite` (`removeStoredLkInvite` + `LK_STORE_VALUE`).
-- `AuthAd` ожидает JSON: `sip_username`, `sip_secret`, `ad_login`, `ad_cn`, `ad_title`, `ad_department`.
-- Форму `AuthAd` открывает только неуспешная пробивка PHP-сессии. При запросе формы (`displayAd`) и `status === "idle"` `AuthContainer` зовёт `handleAdPhpProbe(uriAdPhpAuth)` → `GET uriAdPhpAuth?PHPSESSID=<cookie>` (`adAuth.probeAdPhpSession`; адрес — ключ `uriAdPhpAuth`, сид из `preloadedState.js`). Успех — тихий `AUTHCTL_SUBMIT_SUCCESS` (формы нет), неуспех (нет `PHPSESSID`, 4xx/5xx, таймаут) — форма; итог пробивки — `authControlRdcr.phpProbe` (`idle`/`loading`/`success`/`fail`). Пробивка одна на загрузку страницы (`AUTHCTL_CLEAR` помечает её исчерпанной, поэтому выход из AD-сессии не запускает её заново), ошибкой AD она не считается и в форме не показывается.
-
-Потоки (AD-вход, SIP-регистрация, звонки, чат) — в `docs/STATE.md`.
-
-## Mock API
-
-`mock/vite-mock-api.js` (Vite-плагин, `apply: "serve"`, только dev): `POST /user/ad`, `GET /user/adphp`, `POST /user/lk`, `GET /user/phonedir`. Пробивка `/user/adphp` без `PHPSESSID` в query отвечает 401 — так dev идёт по ветке формы `AuthAd`. Единственный источник токена LiveKit — `POST /user/lk` (своя комната — `num` = `room` = свой номер, приглашение — `num` приглашаемого и `room` своей комнаты). Токен LiveKit подписывается dev-ключом.
-
-## LiveKit
-
-Бэкенд встреч — **OpenVidu Community в docker** (форк LiveKit, совместим по SDK и токенам), клиент — чистый `livekit-client`; OpenVidu-API проект не вызывает. Стенд, готовый токен, приёмы проверки и полный список грабель — `docs/LIVEKIT.md`. Самое дорогое при прогоне:
-
-- адрес сервера — `localStorage.uriLk`; если `https://…:7443` (Caddy) не отвечает (`curl` даёт `000`), у того же стенда есть LiveKit напрямую — `ws://localhost:7880`;
-- для проверок брать **свою комнату и свой identity**: комнату `9994` занимает личный браузер разработчика, и LiveKit выбивает чужого с тем же identity (`DUPLICATE_IDENTITY`);
-- `.lk-control-bar` появляется сразу при монтировании `LiveKitRoom` и **не доказывает подключение** — смотреть плитки сетки и `docker logs openvidu`;
-- панель `LkMeet` заполняет доступное место и не имеет внутренней прокрутки (Grid + `align-content: stretch`) — не откатывать к фиксированной высоте со скроллом.
-
-## Соглашения кода
-
-- React: функциональные компоненты, `PropTypes`; презентация — `components/`, связка со store — `containers/` (`useSelector`, `bindActionCreators` + `useMemo`). UI — только MUI.
-- Redux: action types — `constants/redux.js` (префиксы `PHONECTL_`, `AUTHCTL_`, `LKTOKEN_`/`LKROOM_`/`LK_`).
-- Прочее: ключи `localStorage` — `constants/storage.js`; HTTP (`ky`) и `localStorage` — только в `services/`; ошибки — `actions/utils/kyError.js`; Vite `base: './'` сохранять.
-- Формат: Biome — 2 пробела, только `Space` (без `Tab`), двойные кавычки; с автоформатом не спорить.
-- Внешние библиотеки (sip.js, LiveKit): перед использованием незнакомого метода сверяться с официальной документацией, а в ответе давать ссылку на раздел документации этого метода; API по памяти не выдумывать.
-
-## CI
-
-`.github/workflows/ci.yml` — push в `main`/`master`: Node.js 24, `npm ci`, `npm run build`.
-
-## Правила для агента
-
-1. Senior FullStack-разработчик.
-2. Минимальный необходимый diff — не расширять объём без запроса.
-3. Для критичных изменений — риски и минимально достаточный шаг проверки: доказательство выбирать по утверждению, а не по привычке (уровни — в `~/.dsh/AGENTS.md`).
-4. Без TS/тестов/CI/новых зависимостей/инфраструктуры без явного запроса.
-5. Не редактировать `dist` вручную — только `npm run build`.
-6. Русский язык в документации, комментариях и ответах.
-7. Формат — по Biome: 2 пробела, только пробелы, без табов, двойные кавычки; с автоформатом не спорить.
-8. Для каждого использованного метода внешних библиотек давать ссылку на официальную документацию этого метода; не выдумывать API по памяти, а сверяться с источником.
-9. При смене соглашений править этот файл; адаптеры не дублируют правила.
+1. Senior FullStack-разработчик; минимальный необходимый diff — не расширять объём без запроса.
+2. Без TS/тестов/CI/новых зависимостей/инфраструктуры без явного запроса. `dist` не редактировать
+   вручную — только `npm run build`.
+3. Проверка соразмерно изменению: diff → при необходимости `npm run lint`/`npm run build` →
+   браузер только для рантайма, вёрстки или консоли (навык `ui-verify`). Для критичных изменений
+   в ответе — риски и фактически выполненная проверка.
+4. Русский язык в документации, комментариях и ответах.
+5. При смене соглашений править этот файл; адаптеры не дублируют правила.

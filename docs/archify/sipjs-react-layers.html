@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="generator" content="archify 2.14.0">
-  <title>sipjs-react: архитектура приложения Diagram</title>
+  <title>sipjs-react: слои UI, store, сервисы Diagram</title>
   <script>
     // Resolve the theme before first paint so light-preference users don't
     // see a dark flash. The toolbar script below re-applies with UI state.
@@ -4836,12 +4836,12 @@
     <div class="header">
       <div class="header-row">
         <div class="pulse-dot"></div>
-        <h1>sipjs-react: архитектура приложения</h1>
+        <h1>sipjs-react: слои UI, store, сервисы</h1>
       </div>
     </div>
 
-    <script id="archify-guided-views-data" type="application/json">[{"id":"main-flow","label":"Основной поток данных","focus":["users","ui","containers","actions","runtime","sbc"],"note":"События UI проходят контейнеры и thunk-и, SIP-операции уходят в phoneRuntime и на SIP SBC по WSS."},{"id":"ad-bridge","label":"Мост AD → SIP","focus":["ad","actions","containers","store","ui"],"note":"AuthLinks открывает SIP-форму (displayReg); AD-форма в AuthContainer, тумблер AuthPad по regState, подвал AuthPad открывает AuthAd."},{"id":"livekit-path","label":"Ветка LiveKit","focus":["actions","ui","lkRuntime","livekit"],"note":"handleLkTokenSubmit берёт lk_token, LkMeet через lkRuntime подключается к комнате LiveKit."},{"id":"state-and-storage","label":"Состояние и хранилища","focus":["store","storage","actions","runtime"],"note":"Слой store собирает сид из сервисов, Redux хранит UI-состояние, звонки и чат персистятся в localStorage."}]</script>
-    <script id="archify-source-evidence-data" type="application/json">{"schemaVersion":1,"verified":true,"repository":{"url":"https://github.com/ars-anosov/sipjs-react","revision":"2ca17e1d9b1481d853e36d615ad4432e30e7c63a","shortRevision":"2ca17e1"},"referenceCount":15,"nodes":{"ui":[{"path":"src/components/AuthLinks.jsx","line":17,"label":"стартовый экран","href":"https://github.com/ars-anosov/sipjs-react/blob/2ca17e1d9b1481d853e36d615ad4432e30e7c63a/src/components/AuthLinks.jsx#L17"},{"path":"src/components/PhonePad.jsx","line":53,"label":"телефон","href":"https://github.com/ars-anosov/sipjs-react/blob/2ca17e1d9b1481d853e36d615ad4432e30e7c63a/src/components/PhonePad.jsx#L53"},{"path":"src/components/LkMeet.jsx","line":310,"label":"встреча","href":"https://github.com/ars-anosov/sipjs-react/blob/2ca17e1d9b1481d853e36d615ad4432e30e7c63a/src/components/LkMeet.jsx#L310"}],"containers":[{"path":"src/containers/AuthContainer.jsx","line":59,"label":"мост AUTHCTL_ ↔ PHONECTL_","href":"https://github.com/ars-anosov/sipjs-react/blob/2ca17e1d9b1481d853e36d615ad4432e30e7c63a/src/containers/AuthContainer.jsx#L59"},{"path":"src/containers/PhoneContainer.jsx","line":21,"label":"домен phoneControlRdcr","href":"https://github.com/ars-anosov/sipjs-react/blob/2ca17e1d9b1481d853e36d615ad4432e30e7c63a/src/containers/PhoneContainer.jsx#L21"}],"actions":[{"path":"src/actions/authControlActions.js","line":15,"label":"handleAdRegister","href":"https://github.com/ars-anosov/sipjs-react/blob/2ca17e1d9b1481d853e36d615ad4432e30e7c63a/src/actions/authControlActions.js#L15"},{"path":"src/actions/phoneControlActions.js","line":121,"label":"handleClkRegister","href":"https://github.com/ars-anosov/sipjs-react/blob/2ca17e1d9b1481d853e36d615ad4432e30e7c63a/src/actions/phoneControlActions.js#L121"},{"path":"src/actions/phoneControlActions.js","line":456,"label":"SIP MESSAGE","href":"https://github.com/ars-anosov/sipjs-react/blob/2ca17e1d9b1481d853e36d615ad4432e30e7c63a/src/actions/phoneControlActions.js#L456"}],"runtime":[{"path":"src/services/phoneRuntime.js","line":336,"label":"registerSipUserAgent","href":"https://github.com/ars-anosov/sipjs-react/blob/2ca17e1d9b1481d853e36d615ad4432e30e7c63a/src/services/phoneRuntime.js#L336"}],"store":[{"path":"src/store/preloadedState.js","line":14,"label":"сид из сервисов","href":"https://github.com/ars-anosov/sipjs-react/blob/2ca17e1d9b1481d853e36d615ad4432e30e7c63a/src/store/preloadedState.js#L14"},{"path":"src/store/configureStore.js","line":21,"label":"thunk + logger","href":"https://github.com/ars-anosov/sipjs-react/blob/2ca17e1d9b1481d853e36d615ad4432e30e7c63a/src/store/configureStore.js#L21"}],"storage":[{"path":"src/services/phoneStorage.js","line":15,"label":"настройки телефона","href":"https://github.com/ars-anosov/sipjs-react/blob/2ca17e1d9b1481d853e36d615ad4432e30e7c63a/src/services/phoneStorage.js#L15"}],"ad":[{"path":"src/services/adAuth.js","line":41,"label":"loginAd → POST uriAdAuth","href":"https://github.com/ars-anosov/sipjs-react/blob/2ca17e1d9b1481d853e36d615ad4432e30e7c63a/src/services/adAuth.js#L41"}],"dir":[{"path":"src/services/phoneDirectory.js","line":11,"label":"fetchPhoneDir","href":"https://github.com/ars-anosov/sipjs-react/blob/2ca17e1d9b1481d853e36d615ad4432e30e7c63a/src/services/phoneDirectory.js#L11"}],"lkRuntime":[{"path":"src/services/lkRuntime.js","line":21,"label":"getLiveKitRoom","href":"https://github.com/ars-anosov/sipjs-react/blob/2ca17e1d9b1481d853e36d615ad4432e30e7c63a/src/services/lkRuntime.js#L21"}]}}</script>
+    <script id="archify-guided-views-data" type="application/json">[]</script>
+    <script id="archify-source-evidence-data" type="application/json">{"schemaVersion":1,"verified":true,"repository":{"url":"https://github.com/ars-anosov/sipjs-react","revision":"8f12bfa4ec6b5bba07313b1beaede35690765f6b","shortRevision":"8f12bfa"},"referenceCount":6,"nodes":{"ui":[{"path":"src/components/PhonePad.jsx","line":53,"label":"телефон","href":"https://github.com/ars-anosov/sipjs-react/blob/8f12bfa4ec6b5bba07313b1beaede35690765f6b/src/components/PhonePad.jsx#L53"}],"containers":[{"path":"src/containers/PhoneContainer.jsx","line":21,"label":"домен phoneControlRdcr","href":"https://github.com/ars-anosov/sipjs-react/blob/8f12bfa4ec6b5bba07313b1beaede35690765f6b/src/containers/PhoneContainer.jsx#L21"}],"actions":[{"path":"src/actions/phoneControlActions.js","line":121,"label":"handleClkRegister","href":"https://github.com/ars-anosov/sipjs-react/blob/8f12bfa4ec6b5bba07313b1beaede35690765f6b/src/actions/phoneControlActions.js#L121"}],"services":[{"path":"src/services/phoneRuntime.js","line":336,"label":"registerSipUserAgent","href":"https://github.com/ars-anosov/sipjs-react/blob/8f12bfa4ec6b5bba07313b1beaede35690765f6b/src/services/phoneRuntime.js#L336"}],"store":[{"path":"src/store/preloadedState.js","line":14,"label":"сид из сервисов","href":"https://github.com/ars-anosov/sipjs-react/blob/8f12bfa4ec6b5bba07313b1beaede35690765f6b/src/store/preloadedState.js#L14"}],"storage":[{"path":"src/services/phoneStorage.js","line":15,"label":"настройки телефона","href":"https://github.com/ars-anosov/sipjs-react/blob/8f12bfa4ec6b5bba07313b1beaede35690765f6b/src/services/phoneStorage.js#L15"}]}}</script>
     <div class="guided-views no-print" id="guided-views" hidden aria-label="Guided diagram views">
       <button id="guided-view-prev" type="button" aria-label="Previous guided view" title="Previous guided view ([)">&#8592;</button>
       <div class="guided-view-copy">
@@ -4883,8 +4883,8 @@
 
     <!-- Main Diagram -->
     <div class="diagram-container" data-detail-level="read">
-      <svg viewBox="0 0 1495 548" role="img" aria-labelledby="archify-diagram-title archify-diagram-description" data-preset="classic" data-quality-profile="showcase">
-        <title id="archify-diagram-title">sipjs-react: архитектура приложения</title>
+      <svg viewBox="0 0 1500 500" role="img" aria-labelledby="archify-diagram-title archify-diagram-description" data-preset="classic" data-quality-profile="showcase">
+        <title id="archify-diagram-title">sipjs-react: слои UI, store, сервисы</title>
         <desc id="archify-diagram-description">A architecture diagram generated by Archify.</desc>
         <!-- Definitions -->
         <defs>
@@ -4909,257 +4909,170 @@
         <rect width="100%" height="100%" fill="url(#grid)" />
 
         <!-- Boundaries (behind everything) -->
-        <rect data-graph-role="structural-frame" data-composition-frame-kind="region" data-composition-frame-id="0" x="196" y="22" width="1073" height="458" rx="12" class="c-region" stroke-width="1"/>
-        <text x="204" y="40" class="t-cloud" font-size="9" font-weight="600">Клиент — SPA в браузере</text>
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="region" data-composition-frame-id="0" x="6" y="56" width="1198" height="376" rx="12" class="c-region" stroke-width="1"/>
+        <text x="14" y="74" class="t-cloud" font-size="9" font-weight="600">Клиент — SPA в браузере</text>
 
         <!-- Connection paths (before components for correct z-order) -->
-        <path data-edge-from="users" data-edge-to="ui" data-edge-label="ввод и клики" data-edge-key="0" data-edge-id="users-to-ui" data-composition-points="180,248;250,248" d="M 180 248 L 250 248" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
-        <path data-edge-from="ui" data-edge-to="containers" data-edge-label="события UI" data-edge-key="1" data-edge-id="ui-to-containers" data-composition-points="435,248;505,248" d="M 435 248 L 505 248" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="containers" data-edge-to="actions" data-edge-label="вызов action" data-edge-key="2" data-edge-id="containers-to-actions" data-composition-points="700,248;770,248" d="M 700 248 L 770 248" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="actions" data-edge-to="runtime" data-edge-label="SIP-операции" data-edge-key="3" data-edge-id="actions-to-runtime" data-composition-points="970,248;1040,248" d="M 970 248 L 1040 248" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="runtime" data-edge-to="sbc" data-edge-label="SIP over WSS" data-edge-key="4" data-edge-id="runtime-to-sbc" data-composition-points="1230,248;1300,248" d="M 1230 248 L 1300 248" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
-        <path data-edge-from="actions" data-edge-to="store" data-edge-label="PHONECTL_* · AUTHCTL_* · LK_*" data-edge-key="5" data-edge-id="actions-to-store" data-composition-points="870,212;870,170;524.5,170;524.5,128" d="M 870 212 L 870 178 Q 870 170 862 170 L 532.5 170 Q 524.5 170 524.5 162 L 524.5 128" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="store" data-edge-to="ui" data-edge-label="состояние → пропсы" data-edge-key="6" data-edge-id="store-to-ui" data-composition-points="510.5,128;510.5,170;342.5,170;342.5,212" d="M 510.5 128 L 510.5 162 Q 510.5 170 502.5 170 L 350.5 170 Q 342.5 170 342.5 178 L 342.5 212" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="storage" data-edge-to="store" data-edge-label="сид preloadedState" data-edge-key="7" data-edge-id="storage-to-store" data-composition-points="1040,92;615,92" d="M 1040 92 L 615 92" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="runtime" data-edge-to="storage" data-edge-label="logCall · saveChatMessage" data-edge-key="8" data-edge-id="runtime-to-storage" data-composition-points="1135,212;1135,188;1153.5,188;1153.5,152;1137.5,152;1137.5,128" d="M 1135 212 L 1135 196 Q 1135 188 1143 188 L 1145.5 188 Q 1153.5 188 1153.5 180 L 1153.5 160 Q 1153.5 152 1145.5 152 L 1145.5 152 Q 1137.5 152 1137.5 144 L 1137.5 128" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="actions" data-edge-to="ad" data-edge-label="POST uriAdAuth · adAuth.js" data-edge-key="9" data-edge-id="actions-to-ad" data-composition-points="870,284;870,336;1220,336;1220,388" d="M 870 284 L 870 328 Q 870 336 878 336 L 1212 336 Q 1220 336 1220 344 L 1220 388" class="a-security" stroke-width="1.5" marker-end="url(#arrowhead-security)"/>
-        <path data-edge-from="actions" data-edge-to="dir" data-edge-label="GET /user/phonedir" data-edge-key="10" data-edge-id="actions-to-dir" data-composition-points="870,284;870,336;935,336;935,388" d="M 870 284 L 870 328 Q 870 336 878 336 L 927 336 Q 935 336 935 344 L 935 388" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="ui" data-edge-to="lkRuntime" data-edge-label="getLiveKitRoom" data-edge-key="11" data-edge-id="ui-to-lkruntime" data-composition-points="342.5,284;342.5,336;325,336;325,388" d="M 342.5 284 L 342.5 328 Q 342.5 336 334.5 336 L 333 336 Q 325 336 325 344 L 325 388" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
-        <path data-edge-from="lkRuntime" data-edge-to="livekit" data-edge-label="комната по WSS" data-edge-key="12" data-edge-id="lkruntime-to-livekit" data-composition-points="420,424;540,424" d="M 420 424 L 540 424" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="ui" data-edge-to="containers" data-edge-label="события" data-edge-key="0" data-edge-id="ui-to-containers" data-composition-points="230,376;330,376" d="M 230 376 L 330 376" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="containers" data-edge-to="actions" data-edge-label="dispatch thunk" data-edge-key="1" data-edge-id="containers-to-actions" data-composition-points="530,376;650,376" d="M 530 376 L 650 376" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="actions" data-edge-to="services" data-edge-label="вызов сценария" data-edge-key="2" data-edge-id="actions-to-services" data-composition-points="850,376;970,376" d="M 850 376 L 970 376" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="services" data-edge-to="external" data-edge-label="WSS/WebRTC" data-edge-key="3" data-edge-id="services-to-external" data-composition-points="1170,376;1270,376" d="M 1170 376 L 1270 376" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+        <path data-edge-from="services" data-edge-to="actions" data-edge-label="handlers.* колбэк" data-edge-key="4" data-edge-id="services-to-actions" data-composition-points="1070,412;1070,470;750,470;750,412" d="M 1070 412 L 1070 462 Q 1070 470 1062 470 L 758 470 Q 750 470 750 462 L 750 412" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="actions" data-edge-to="store" data-edge-label="PHONECTL_* · AUTHCTL_* · LK_*" data-edge-key="5" data-edge-id="actions-to-store" data-composition-points="750,340;750,162" d="M 750 340 L 750 162" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="store" data-edge-to="containers" data-edge-label="props" data-edge-key="6" data-edge-id="store-to-containers" data-composition-points="650,126;430,126;430,340" d="M 650 126 L 438 126 Q 430 126 430 134 L 430 340" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="services" data-edge-to="storage" data-edge-label="localStorage (только здесь)" data-edge-key="7" data-edge-id="services-to-storage" data-composition-points="1070,340;1070,162" d="M 1070 340 L 1070 162" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="storage" data-edge-to="store" data-edge-label="сид preloadedState" data-edge-key="8" data-edge-id="storage-to-store" data-composition-points="970,126;850,126" d="M 970 126 L 850 126" class="a-default" stroke-width="1.5" marker-end="url(#arrowhead)"/>
 
         <!-- Components -->
-        <g id="node-users" data-node-id="users" data-node-label="Пользователь" tabindex="0" role="button" aria-label="Focus Пользователь, браузер Chrome / Edge, Architecture component" aria-pressed="false" data-node-kind="external" data-node-sublabel="браузер Chrome / Edge" data-node-context="Architecture component">
-          <title>Пользователь · браузер Chrome / Edge · Architecture component</title>
-          <rect x="30" y="212" width="150" height="72" rx="6" class="c-mask"/>
-          <rect x="30" y="212" width="150" height="72" rx="6" class="c-external" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="external" class="semantic-sigil s-external" transform="translate(36 218) scale(0.6875)">
-            <rect x="2.5" y="5" width="8.5" height="8" rx="1.5"/>
-            <path d="M8 2.5h5.5V8M13.5 2.5 7.5 8.5"/>
-          </g>
-          <text data-detail-anchor x="105" y="246" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Пользователь</text>
-        <text data-detail="context" x="105" y="262" class="t-muted" font-size="9" text-anchor="middle">браузер Chrome / Edge</text>
-        </g>
-
-        <g id="node-ui" data-node-id="ui" data-node-label="Компоненты React" tabindex="0" role="button" aria-label="Focus Компоненты React, AuthLinks · PhoneReg · LkMeet, Клиент — SPA в браузере" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="AuthLinks · PhoneReg · LkMeet" data-node-tag="MUI 9" data-node-context="Клиент — SPA в браузере">
-          <title>Компоненты React · AuthLinks · PhoneReg · LkMeet · Клиент — SPA в браузере · MUI 9</title>
-          <rect x="250" y="212" width="185" height="72" rx="6" class="c-mask"/>
-          <rect x="250" y="212" width="185" height="72" rx="6" class="c-frontend" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(256 218) scale(0.6875)">
+        <g id="node-ui" data-node-id="ui" data-node-label="Components" tabindex="0" role="button" aria-label="Focus Components, презентация на MUI, Клиент — SPA в браузере" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="презентация на MUI" data-node-tag="components/" data-node-context="Клиент — SPA в браузере">
+          <title>Components · презентация на MUI · Клиент — SPA в браузере · components/</title>
+          <rect x="40" y="340" width="190" height="72" rx="6" class="c-mask"/>
+          <rect x="40" y="340" width="190" height="72" rx="6" class="c-frontend" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(46 346) scale(0.6875)">
             <rect x="2" y="3" width="12" height="10" rx="2"/>
             <path d="M2 6.5h12"/>
             <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill"/>
             <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
           </g>
-          <text data-detail-anchor x="342.5" y="246" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Компоненты React</text>
-        <text data-detail="context" x="342.5" y="262" class="t-muted" font-size="9" text-anchor="middle">AuthLinks · PhoneReg · LkMeet</text>
-        <text data-detail="fine" x="342.5" y="276" class="t-frontend" font-size="7" text-anchor="middle">MUI 9</text>
+          <text data-detail-anchor x="135" y="374" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Components</text>
+        <text data-detail="context" x="135" y="390" class="t-muted" font-size="9" text-anchor="middle">презентация на MUI</text>
+        <text data-detail="fine" x="135" y="404" class="t-frontend" font-size="7" text-anchor="middle">components/</text>
         </g>
 
-        <g id="node-containers" data-node-id="containers" data-node-label="Контейнеры" tabindex="0" role="button" aria-label="Focus Контейнеры, useSelector · bindActionCreators, Клиент — SPA в браузере" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="useSelector · bindActionCreators" data-node-tag="react-redux" data-node-context="Клиент — SPA в браузере">
-          <title>Контейнеры · useSelector · bindActionCreators · Клиент — SPA в браузере · react-redux</title>
-          <rect x="505" y="212" width="195" height="72" rx="6" class="c-mask"/>
-          <rect x="505" y="212" width="195" height="72" rx="6" class="c-frontend" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(511 218) scale(0.6875)">
+        <g id="node-containers" data-node-id="containers" data-node-label="Containers" tabindex="0" role="button" aria-label="Focus Containers, useSelector · bindActionCreators, Клиент — SPA в браузере" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="useSelector · bindActionCreators" data-node-tag="containers/" data-node-context="Клиент — SPA в браузере">
+          <title>Containers · useSelector · bindActionCreators · Клиент — SPA в браузере · containers/</title>
+          <rect x="330" y="340" width="200" height="72" rx="6" class="c-mask"/>
+          <rect x="330" y="340" width="200" height="72" rx="6" class="c-frontend" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(336 346) scale(0.6875)">
             <rect x="2" y="3" width="12" height="10" rx="2"/>
             <path d="M2 6.5h12"/>
             <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill"/>
             <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
           </g>
-          <text data-detail-anchor x="602.5" y="246" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Контейнеры</text>
-        <text data-detail="context" x="602.5" y="262" class="t-muted" font-size="9" text-anchor="middle">useSelector · bindActionCreators</text>
-        <text data-detail="fine" x="602.5" y="276" class="t-frontend" font-size="7" text-anchor="middle">react-redux</text>
+          <text data-detail-anchor x="430" y="374" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Containers</text>
+        <text data-detail="context" x="430" y="390" class="t-muted" font-size="9" text-anchor="middle">useSelector · bindActionCreators</text>
+        <text data-detail="fine" x="430" y="404" class="t-frontend" font-size="7" text-anchor="middle">containers/</text>
         </g>
 
-        <g id="node-actions" data-node-id="actions" data-node-label="Thunk-actions" tabindex="0" role="button" aria-label="Focus Thunk-actions, phoneControl · authControl · lkControl, Клиент — SPA в браузере" aria-pressed="false" data-node-kind="backend" data-node-sublabel="phoneControl · authControl · lkControl" data-node-tag="redux-thunk + ky" data-node-context="Клиент — SPA в браузере">
-          <title>Thunk-actions · phoneControl · authControl · lkControl · Клиент — SPA в браузере · redux-thunk + ky</title>
-          <rect x="770" y="212" width="200" height="72" rx="6" class="c-mask"/>
-          <rect x="770" y="212" width="200" height="72" rx="6" class="c-backend" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(776 218) scale(0.6875)">
+        <g id="node-actions" data-node-id="actions" data-node-label="Thunk-actions" tabindex="0" role="button" aria-label="Focus Thunk-actions, валидация → сервис → dispatch, Клиент — SPA в браузере" aria-pressed="false" data-node-kind="backend" data-node-sublabel="валидация → сервис → dispatch" data-node-tag="actions/" data-node-context="Клиент — SPA в браузере">
+          <title>Thunk-actions · валидация → сервис → dispatch · Клиент — SPA в браузере · actions/</title>
+          <rect x="650" y="340" width="200" height="72" rx="6" class="c-mask"/>
+          <rect x="650" y="340" width="200" height="72" rx="6" class="c-backend" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(656 346) scale(0.6875)">
             <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
           </g>
-          <text data-detail-anchor x="870" y="246" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Thunk-actions</text>
-        <text data-detail="context" x="870" y="262" class="t-muted" font-size="8.4" text-anchor="middle">phoneControl · authControl · lkControl</text>
-        <text data-detail="fine" x="870" y="276" class="t-backend" font-size="7" text-anchor="middle">redux-thunk + ky</text>
+          <text data-detail-anchor x="750" y="374" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Thunk-actions</text>
+        <text data-detail="context" x="750" y="390" class="t-muted" font-size="9" text-anchor="middle">валидация → сервис → dispatch</text>
+        <text data-detail="fine" x="750" y="404" class="t-backend" font-size="7" text-anchor="middle">actions/</text>
         </g>
 
-        <g id="node-runtime" data-node-id="runtime" data-node-label="phoneRuntime" tabindex="0" role="button" aria-label="Focus phoneRuntime, sip.js UserAgent и сессии, Клиент — SPA в браузере" aria-pressed="false" data-node-kind="backend" data-node-sublabel="sip.js UserAgent и сессии" data-node-tag="singleton" data-node-context="Клиент — SPA в браузере">
-          <title>phoneRuntime · sip.js UserAgent и сессии · Клиент — SPA в браузере · singleton</title>
-          <rect x="1040" y="212" width="190" height="72" rx="6" class="c-mask"/>
-          <rect x="1040" y="212" width="190" height="72" rx="6" class="c-backend" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(1046 218) scale(0.6875)">
+        <g id="node-services" data-node-id="services" data-node-label="Services" tabindex="0" role="button" aria-label="Focus Services, phoneRuntime · lkRuntime · adAuth, Клиент — SPA в браузере" aria-pressed="false" data-node-kind="backend" data-node-sublabel="phoneRuntime · lkRuntime · adAuth" data-node-tag="services/" data-node-context="Клиент — SPA в браузере">
+          <title>Services · phoneRuntime · lkRuntime · adAuth · Клиент — SPA в браузере · services/</title>
+          <rect x="970" y="340" width="200" height="72" rx="6" class="c-mask"/>
+          <rect x="970" y="340" width="200" height="72" rx="6" class="c-backend" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(976 346) scale(0.6875)">
             <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
           </g>
-          <text data-detail-anchor x="1135" y="246" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">phoneRuntime</text>
-        <text data-detail="context" x="1135" y="262" class="t-muted" font-size="9" text-anchor="middle">sip.js UserAgent и сессии</text>
-        <text data-detail="fine" x="1135" y="276" class="t-backend" font-size="7" text-anchor="middle">singleton</text>
+          <text data-detail-anchor x="1070" y="374" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Services</text>
+        <text data-detail="context" x="1070" y="390" class="t-muted" font-size="9" text-anchor="middle">phoneRuntime · lkRuntime · adAuth</text>
+        <text data-detail="fine" x="1070" y="404" class="t-backend" font-size="7" text-anchor="middle">services/</text>
         </g>
 
-        <g id="node-sbc" data-node-id="sbc" data-node-label="SIP SBC" tabindex="0" role="button" aria-label="Focus SIP SBC, sbc.pecom.ru:9443, Architecture component" aria-pressed="false" data-node-kind="external" data-node-sublabel="sbc.pecom.ru:9443" data-node-tag="WSS" data-node-context="Architecture component">
-          <title>SIP SBC · sbc.pecom.ru:9443 · Architecture component · WSS</title>
-          <rect x="1300" y="212" width="155" height="72" rx="6" class="c-mask"/>
-          <rect x="1300" y="212" width="155" height="72" rx="6" class="c-external" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="external" class="semantic-sigil s-external" transform="translate(1306 218) scale(0.6875)">
+        <g id="node-external" data-node-id="external" data-node-label="sip.js / livekit-client" tabindex="0" role="button" aria-label="Focus sip.js / livekit-client, SIP SBC · LiveKit SFU, Architecture component" aria-pressed="false" data-node-kind="external" data-node-sublabel="SIP SBC · LiveKit SFU" data-node-tag="WSS" data-node-context="Architecture component">
+          <title>sip.js / livekit-client · SIP SBC · LiveKit SFU · Architecture component · WSS</title>
+          <rect x="1270" y="340" width="190" height="72" rx="6" class="c-mask"/>
+          <rect x="1270" y="340" width="190" height="72" rx="6" class="c-external" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="external" class="semantic-sigil s-external" transform="translate(1276 346) scale(0.6875)">
             <rect x="2.5" y="5" width="8.5" height="8" rx="1.5"/>
             <path d="M8 2.5h5.5V8M13.5 2.5 7.5 8.5"/>
           </g>
-          <text data-detail-anchor x="1377.5" y="246" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">SIP SBC</text>
-        <text data-detail="context" x="1377.5" y="262" class="t-muted" font-size="9" text-anchor="middle">sbc.pecom.ru:9443</text>
-        <text data-detail="fine" x="1377.5" y="276" class="t-external" font-size="7" text-anchor="middle">WSS</text>
+          <text data-detail-anchor x="1365" y="374" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">sip.js / livekit-client</text>
+        <text data-detail="context" x="1365" y="390" class="t-muted" font-size="9" text-anchor="middle">SIP SBC · LiveKit SFU</text>
+        <text data-detail="fine" x="1365" y="404" class="t-external" font-size="7" text-anchor="middle">WSS</text>
         </g>
 
-        <g id="node-store" data-node-id="store" data-node-label="Redux store" tabindex="0" role="button" aria-label="Focus Redux store, UI-флаги · настройки · чат, Клиент — SPA в браузере" aria-pressed="false" data-node-kind="database" data-node-sublabel="UI-флаги · настройки · чат" data-node-tag="redux" data-node-context="Клиент — SPA в браузере">
-          <title>Redux store · UI-флаги · настройки · чат · Клиент — SPA в браузере · redux</title>
-          <rect x="420" y="56" width="195" height="72" rx="6" class="c-mask"/>
-          <rect x="420" y="56" width="195" height="72" rx="6" class="c-database" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="database" class="semantic-sigil s-database" transform="translate(426 62) scale(0.6875)">
+        <g id="node-store" data-node-id="store" data-node-label="Redux store" tabindex="0" role="button" aria-label="Focus Redux store, UI-флаги · заголовки · списки, Клиент — SPA в браузере" aria-pressed="false" data-node-kind="database" data-node-sublabel="UI-флаги · заголовки · списки" data-node-tag="reducers/" data-node-context="Клиент — SPA в браузере">
+          <title>Redux store · UI-флаги · заголовки · списки · Клиент — SPA в браузере · reducers/</title>
+          <rect x="650" y="90" width="200" height="72" rx="6" class="c-mask"/>
+          <rect x="650" y="90" width="200" height="72" rx="6" class="c-database" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="database" class="semantic-sigil s-database" transform="translate(656 96) scale(0.6875)">
             <ellipse cx="8" cy="4" rx="5" ry="2"/>
             <path d="M3 4v8c0 1.1 2.2 2 5 2s5-.9 5-2V4M3 8c0 1.1 2.2 2 5 2s5-.9 5-2"/>
           </g>
-          <text data-detail-anchor x="517.5" y="90" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Redux store</text>
-        <text data-detail="context" x="517.5" y="106" class="t-muted" font-size="9" text-anchor="middle">UI-флаги · настройки · чат</text>
-        <text data-detail="fine" x="517.5" y="120" class="t-database" font-size="7" text-anchor="middle">redux</text>
+          <text data-detail-anchor x="750" y="124" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Redux store</text>
+        <text data-detail="context" x="750" y="140" class="t-muted" font-size="9" text-anchor="middle">UI-флаги · заголовки · списки</text>
+        <text data-detail="fine" x="750" y="154" class="t-database" font-size="7" text-anchor="middle">reducers/</text>
         </g>
 
-        <g id="node-storage" data-node-id="storage" data-node-label="localStorage" tabindex="0" role="button" aria-label="Focus localStorage, настройки · звонки · чат · AD, Клиент — SPA в браузере" aria-pressed="false" data-node-kind="database" data-node-sublabel="настройки · звонки · чат · AD" data-node-tag="services/*" data-node-context="Клиент — SPA в браузере">
-          <title>localStorage · настройки · звонки · чат · AD · Клиент — SPA в браузере · services/*</title>
-          <rect x="1040" y="56" width="195" height="72" rx="6" class="c-mask"/>
-          <rect x="1040" y="56" width="195" height="72" rx="6" class="c-database" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="database" class="semantic-sigil s-database" transform="translate(1046 62) scale(0.6875)">
+        <g id="node-storage" data-node-id="storage" data-node-label="localStorage" tabindex="0" role="button" aria-label="Focus localStorage, настройки · звонки · чат, Клиент — SPA в браузере" aria-pressed="false" data-node-kind="database" data-node-sublabel="настройки · звонки · чат" data-node-tag="constants/storage.js" data-node-context="Клиент — SPA в браузере">
+          <title>localStorage · настройки · звонки · чат · Клиент — SPA в браузере · constants/storage.js</title>
+          <rect x="970" y="90" width="200" height="72" rx="6" class="c-mask"/>
+          <rect x="970" y="90" width="200" height="72" rx="6" class="c-database" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="database" class="semantic-sigil s-database" transform="translate(976 96) scale(0.6875)">
             <ellipse cx="8" cy="4" rx="5" ry="2"/>
             <path d="M3 4v8c0 1.1 2.2 2 5 2s5-.9 5-2V4M3 8c0 1.1 2.2 2 5 2s5-.9 5-2"/>
           </g>
-          <text data-detail-anchor x="1137.5" y="90" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">localStorage</text>
-        <text data-detail="context" x="1137.5" y="106" class="t-muted" font-size="9" text-anchor="middle">настройки · звонки · чат · AD</text>
-        <text data-detail="fine" x="1137.5" y="120" class="t-database" font-size="7" text-anchor="middle">services/*</text>
-        </g>
-
-        <g id="node-ad" data-node-id="ad" data-node-label="AD-авторизация" tabindex="0" role="button" aria-label="Focus AD-авторизация, sip_username · sip_secret · lk_token, Architecture component" aria-pressed="false" data-node-kind="security" data-node-sublabel="sip_username · sip_secret · lk_token" data-node-tag="ky · HTTP" data-node-context="Architecture component">
-          <title>AD-авторизация · sip_username · sip_secret · lk_token · Architecture component · ky · HTTP</title>
-          <rect x="1120" y="388" width="200" height="72" rx="6" class="c-mask"/>
-          <rect x="1120" y="388" width="200" height="72" rx="6" class="c-security" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="security" class="semantic-sigil s-security" transform="translate(1126 394) scale(0.6875)">
-            <path d="M8 2.2 13 4v3.5c0 3.1-1.8 5.4-5 6.5-3.2-1.1-5-3.4-5-6.5V4Z"/>
-            <path d="m5.8 8 1.5 1.5 3-3"/>
-          </g>
-          <text data-detail-anchor x="1220" y="422" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">AD-авторизация</text>
-        <text data-detail="context" x="1220" y="438" class="t-muted" font-size="8.8" text-anchor="middle">sip_username · sip_secret · lk_token</text>
-        <text data-detail="fine" x="1220" y="452" class="t-security" font-size="7" text-anchor="middle">ky · HTTP</text>
-        </g>
-
-        <g id="node-dir" data-node-id="dir" data-node-label="Тел. справочник" tabindex="0" role="button" aria-label="Focus Тел. справочник, GET /user/phonedir, Architecture component" aria-pressed="false" data-node-kind="external" data-node-sublabel="GET /user/phonedir" data-node-tag="ky · HTTP" data-node-context="Architecture component">
-          <title>Тел. справочник · GET /user/phonedir · Architecture component · ky · HTTP</title>
-          <rect x="840" y="388" width="190" height="72" rx="6" class="c-mask"/>
-          <rect x="840" y="388" width="190" height="72" rx="6" class="c-external" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="external" class="semantic-sigil s-external" transform="translate(846 394) scale(0.6875)">
-            <rect x="2.5" y="5" width="8.5" height="8" rx="1.5"/>
-            <path d="M8 2.5h5.5V8M13.5 2.5 7.5 8.5"/>
-          </g>
-          <text data-detail-anchor x="935" y="422" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Тел. справочник</text>
-        <text data-detail="context" x="935" y="438" class="t-muted" font-size="9" text-anchor="middle">GET /user/phonedir</text>
-        <text data-detail="fine" x="935" y="452" class="t-external" font-size="7" text-anchor="middle">ky · HTTP</text>
-        </g>
-
-        <g id="node-lkRuntime" data-node-id="lkRuntime" data-node-label="lkRuntime" tabindex="0" role="button" aria-label="Focus lkRuntime, комната и треки, Клиент — SPA в браузере" aria-pressed="false" data-node-kind="backend" data-node-sublabel="комната и треки" data-node-tag="singleton" data-node-context="Клиент — SPA в браузере">
-          <title>lkRuntime · комната и треки · Клиент — SPA в браузере · singleton</title>
-          <rect x="230" y="388" width="190" height="72" rx="6" class="c-mask"/>
-          <rect x="230" y="388" width="190" height="72" rx="6" class="c-backend" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(236 394) scale(0.6875)">
-            <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
-          </g>
-          <text data-detail-anchor x="325" y="422" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">lkRuntime</text>
-        <text data-detail="context" x="325" y="438" class="t-muted" font-size="9" text-anchor="middle">комната и треки</text>
-        <text data-detail="fine" x="325" y="452" class="t-backend" font-size="7" text-anchor="middle">singleton</text>
-        </g>
-
-        <g id="node-livekit" data-node-id="livekit" data-node-label="LiveKit SFU" tabindex="0" role="button" aria-label="Focus LiveKit SFU, комната · треки, Architecture component" aria-pressed="false" data-node-kind="external" data-node-sublabel="комната · треки" data-node-tag="WebRTC · WSS" data-node-context="Architecture component">
-          <title>LiveKit SFU · комната · треки · Architecture component · WebRTC · WSS</title>
-          <rect x="540" y="388" width="155" height="72" rx="6" class="c-mask"/>
-          <rect x="540" y="388" width="155" height="72" rx="6" class="c-external" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="external" class="semantic-sigil s-external" transform="translate(546 394) scale(0.6875)">
-            <rect x="2.5" y="5" width="8.5" height="8" rx="1.5"/>
-            <path d="M8 2.5h5.5V8M13.5 2.5 7.5 8.5"/>
-          </g>
-          <text data-detail-anchor x="617.5" y="422" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">LiveKit SFU</text>
-        <text data-detail="context" x="617.5" y="438" class="t-muted" font-size="9" text-anchor="middle">комната · треки</text>
-        <text data-detail="fine" x="617.5" y="452" class="t-external" font-size="7" text-anchor="middle">WebRTC · WSS</text>
+          <text data-detail-anchor x="1070" y="124" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">localStorage</text>
+        <text data-detail="context" x="1070" y="140" class="t-muted" font-size="9" text-anchor="middle">настройки · звонки · чат</text>
+        <text data-detail="fine" x="1070" y="154" class="t-database" font-size="7" text-anchor="middle">constants/storage.js</text>
         </g>
 
         <!-- Connection labels -->
-        <g data-detail="context" data-edge-from="users" data-edge-to="ui" data-edge-label="ввод и клики" data-edge-key="0" data-edge-id="users-to-ui">
-          <rect x="181.2" y="228" width="67.6" height="14" rx="3" class="c-mask"/>
-          <text x="215" y="238" class="t-backend" font-size="8" text-anchor="middle">ввод и клики</text>
+        <g data-detail="context" data-edge-from="ui" data-edge-to="containers" data-edge-label="события" data-edge-key="0" data-edge-id="ui-to-containers">
+          <rect x="258.2" y="356" width="43.6" height="14" rx="3" class="c-mask"/>
+          <text x="280" y="366" class="t-muted" font-size="8" text-anchor="middle">события</text>
         </g>
-        <g data-detail="context" data-edge-from="ui" data-edge-to="containers" data-edge-label="события UI" data-edge-key="1" data-edge-id="ui-to-containers">
-          <rect x="441" y="228" width="58" height="14" rx="3" class="c-mask"/>
-          <text x="470" y="238" class="t-muted" font-size="8" text-anchor="middle">события UI</text>
+        <g data-detail="context" data-edge-from="containers" data-edge-to="actions" data-edge-label="dispatch thunk" data-edge-key="1" data-edge-id="containers-to-actions">
+          <rect x="551.4" y="356" width="77.2" height="14" rx="3" class="c-mask"/>
+          <text x="590" y="366" class="t-muted" font-size="8" text-anchor="middle">dispatch thunk</text>
         </g>
-        <g data-detail="context" data-edge-from="containers" data-edge-to="actions" data-edge-label="вызов action" data-edge-key="2" data-edge-id="containers-to-actions">
-          <rect x="701.2" y="228" width="67.6" height="14" rx="3" class="c-mask"/>
-          <text x="735" y="238" class="t-muted" font-size="8" text-anchor="middle">вызов action</text>
+        <g data-detail="context" data-edge-from="actions" data-edge-to="services" data-edge-label="вызов сценария" data-edge-key="2" data-edge-id="actions-to-services">
+          <rect x="871.4" y="356" width="77.2" height="14" rx="3" class="c-mask"/>
+          <text x="910" y="366" class="t-muted" font-size="8" text-anchor="middle">вызов сценария</text>
         </g>
-        <g data-detail="context" data-edge-from="actions" data-edge-to="runtime" data-edge-label="SIP-операции" data-edge-key="3" data-edge-id="actions-to-runtime">
-          <rect x="971.2" y="228" width="67.6" height="14" rx="3" class="c-mask"/>
-          <text x="1005" y="238" class="t-muted" font-size="8" text-anchor="middle">SIP-операции</text>
+        <g data-detail="context" data-edge-from="services" data-edge-to="external" data-edge-label="WSS/WebRTC" data-edge-key="3" data-edge-id="services-to-external">
+          <rect x="1191" y="356" width="58" height="14" rx="3" class="c-mask"/>
+          <text x="1220" y="366" class="t-backend" font-size="8" text-anchor="middle">WSS/WebRTC</text>
         </g>
-        <g data-detail="context" data-edge-from="runtime" data-edge-to="sbc" data-edge-label="SIP over WSS" data-edge-key="4" data-edge-id="runtime-to-sbc">
-          <rect x="1231.2" y="228" width="67.6" height="14" rx="3" class="c-mask"/>
-          <text x="1265" y="238" class="t-backend" font-size="8" text-anchor="middle">SIP over WSS</text>
+        <g data-detail="context" data-edge-from="services" data-edge-to="actions" data-edge-label="handlers.* колбэк" data-edge-key="4" data-edge-id="services-to-actions">
+          <rect x="864.2" y="460" width="91.6" height="14" rx="3" class="c-mask"/>
+          <text x="910" y="470" class="t-muted" font-size="8" text-anchor="middle">handlers.* колбэк</text>
         </g>
         <g data-detail="context" data-edge-from="actions" data-edge-to="store" data-edge-label="PHONECTL_* · AUTHCTL_* · LK_*" data-edge-key="5" data-edge-id="actions-to-store">
-          <rect x="622.65" y="150" width="149.2" height="14" rx="3" class="c-mask"/>
-          <text x="697.25" y="160" class="t-muted" font-size="8" text-anchor="middle">PHONECTL_* · AUTHCTL_* · LK_*</text>
+          <rect x="675.4" y="320" width="149.2" height="14" rx="3" class="c-mask"/>
+          <text x="750" y="330" class="t-muted" font-size="8" text-anchor="middle">PHONECTL_* · AUTHCTL_* · LK_*</text>
         </g>
-        <g data-detail="context" data-edge-from="store" data-edge-to="ui" data-edge-label="состояние → пропсы" data-edge-key="6" data-edge-id="store-to-ui">
-          <rect x="378.3" y="150" width="96.39999999999999" height="14" rx="3" class="c-mask"/>
-          <text x="426.5" y="160" class="t-muted" font-size="8" text-anchor="middle">состояние → пропсы</text>
+        <g data-detail="context" data-edge-from="store" data-edge-to="containers" data-edge-label="props" data-edge-key="6" data-edge-id="store-to-containers">
+          <rect x="413" y="213" width="34" height="14" rx="3" class="c-mask"/>
+          <text x="430" y="223" class="t-muted" font-size="8" text-anchor="middle">props</text>
         </g>
-        <g data-detail="context" data-edge-from="storage" data-edge-to="store" data-edge-label="сид preloadedState" data-edge-key="7" data-edge-id="storage-to-store">
-          <rect x="779.3" y="72" width="96.39999999999999" height="14" rx="3" class="c-mask"/>
-          <text x="827.5" y="82" class="t-muted" font-size="8" text-anchor="middle">сид preloadedState</text>
+        <g data-detail="context" data-edge-from="services" data-edge-to="storage" data-edge-label="localStorage (только здесь)" data-edge-key="7" data-edge-id="services-to-storage">
+          <rect x="1000.2" y="320" width="139.6" height="14" rx="3" class="c-mask"/>
+          <text x="1070" y="330" class="t-muted" font-size="8" text-anchor="middle">localStorage (только здесь)</text>
         </g>
-        <g data-detail="context" data-edge-from="runtime" data-edge-to="storage" data-edge-label="logCall · saveChatMessage" data-edge-key="8" data-edge-id="runtime-to-storage">
-          <rect x="1079.25" y="168" width="130" height="14" rx="3" class="c-mask"/>
-          <text x="1144.25" y="178" class="t-muted" font-size="8" text-anchor="middle">logCall · saveChatMessage</text>
-        </g>
-        <g data-detail="context" data-edge-from="actions" data-edge-to="ad" data-edge-label="POST uriAdAuth · adAuth.js" data-edge-key="9" data-edge-id="actions-to-ad">
-          <rect x="977.6" y="316" width="134.8" height="14" rx="3" class="c-mask"/>
-          <text x="1045" y="326" class="t-security" font-size="8" text-anchor="middle">POST uriAdAuth · adAuth.js</text>
-        </g>
-        <g data-detail="context" data-edge-from="actions" data-edge-to="dir" data-edge-label="GET /user/phonedir" data-edge-key="10" data-edge-id="actions-to-dir">
-          <rect x="886.8" y="348" width="96.39999999999999" height="14" rx="3" class="c-mask"/>
-          <text x="935" y="358" class="t-muted" font-size="8" text-anchor="middle">GET /user/phonedir</text>
-        </g>
-        <g data-detail="context" data-edge-from="ui" data-edge-to="lkRuntime" data-edge-label="getLiveKitRoom" data-edge-key="11" data-edge-id="ui-to-lkruntime">
-          <rect x="295.15" y="316" width="77.2" height="14" rx="3" class="c-mask"/>
-          <text x="333.75" y="326" class="t-muted" font-size="8" text-anchor="middle">getLiveKitRoom</text>
-        </g>
-        <g data-detail="context" data-edge-from="lkRuntime" data-edge-to="livekit" data-edge-label="комната по WSS" data-edge-key="12" data-edge-id="lkruntime-to-livekit">
-          <rect x="441.4" y="404" width="77.2" height="14" rx="3" class="c-mask"/>
-          <text x="480" y="414" class="t-muted" font-size="8" text-anchor="middle">комната по WSS</text>
+        <g data-detail="context" data-edge-from="storage" data-edge-to="store" data-edge-label="сид preloadedState" data-edge-key="8" data-edge-id="storage-to-store">
+          <rect x="861.8" y="106" width="96.39999999999999" height="14" rx="3" class="c-mask"/>
+          <text x="910" y="116" class="t-muted" font-size="8" text-anchor="middle">сид preloadedState</text>
         </g>
 
         <!-- Legend -->
         <g data-legend data-legend-bridge>
-          <text x="40" y="512" class="t-primary" font-size="12" font-weight="650">Legend</text>
-          <g data-legend-semantic-kind="frontend" data-legend-kind="frontend" data-legend-label="UI и контейнеры" data-legend-x="40" data-legend-baseline="532" data-legend-width="118">
-            <rect x="40" y="523" width="16" height="10" rx="2.5" class="c-frontend" stroke-width="1"/>
-            <text x="62" y="532" class="t-muted" font-size="10" font-weight="500">UI и контейнеры</text>
+          <text x="40" y="464" class="t-primary" font-size="12" font-weight="650">Legend</text>
+          <g data-legend-semantic-kind="frontend" data-legend-kind="frontend" data-legend-label="UI и контейнеры" data-legend-x="40" data-legend-baseline="484" data-legend-width="118">
+            <rect x="40" y="475" width="16" height="10" rx="2.5" class="c-frontend" stroke-width="1"/>
+            <text x="62" y="484" class="t-muted" font-size="10" font-weight="500">UI и контейнеры</text>
           </g>
-          <g data-legend-semantic-kind="backend" data-legend-kind="backend" data-legend-label="actions и services" data-legend-x="180" data-legend-baseline="532" data-legend-width="133">
-            <rect x="180" y="523" width="16" height="10" rx="2.5" class="c-backend" stroke-width="1"/>
-            <text x="202" y="532" class="t-muted" font-size="10" font-weight="500">actions и services</text>
+          <g data-legend-semantic-kind="backend" data-legend-kind="backend" data-legend-label="actions и services" data-legend-x="180" data-legend-baseline="484" data-legend-width="133">
+            <rect x="180" y="475" width="16" height="10" rx="2.5" class="c-backend" stroke-width="1"/>
+            <text x="202" y="484" class="t-muted" font-size="10" font-weight="500">actions и services</text>
           </g>
-          <g data-legend-semantic-kind="database" data-legend-kind="database" data-legend-label="Состояние и хранилища" data-legend-x="335" data-legend-baseline="532" data-legend-width="148">
-            <rect x="335" y="523" width="16" height="10" rx="2.5" class="c-database" stroke-width="1"/>
-            <text x="357" y="532" class="t-muted" font-size="10" font-weight="500">Состояние и хранилища</text>
+          <g data-legend-semantic-kind="database" data-legend-kind="database" data-legend-label="Redux store и localStorage" data-legend-x="335" data-legend-baseline="484" data-legend-width="172">
+            <rect x="335" y="475" width="16" height="10" rx="2.5" class="c-database" stroke-width="1"/>
+            <text x="357" y="484" class="t-muted" font-size="10" font-weight="500">Redux store и localStorage</text>
           </g>
-          <g data-legend-semantic-kind="security" data-legend-kind="security" data-legend-label="Внешняя AD-авторизация" data-legend-x="505" data-legend-baseline="532" data-legend-width="153">
-            <rect x="505" y="523" width="16" height="10" rx="2.5" class="c-security" stroke-width="1"/>
-            <text x="527" y="532" class="t-muted" font-size="10" font-weight="500">Внешняя AD-авторизация</text>
-          </g>
-          <g data-legend-semantic-kind="external" data-legend-kind="external" data-legend-label="Внешние системы и SDK" data-legend-x="680" data-legend-baseline="532" data-legend-width="148">
-            <rect x="680" y="523" width="16" height="10" rx="2.5" class="c-external" stroke-width="1"/>
-            <text x="702" y="532" class="t-muted" font-size="10" font-weight="500">Внешние системы и SDK</text>
+          <g data-legend-semantic-kind="external" data-legend-kind="external" data-legend-label="Внешние SDK и серверы" data-legend-x="529" data-legend-baseline="484" data-legend-width="148">
+            <rect x="529" y="475" width="16" height="10" rx="2.5" class="c-external" stroke-width="1"/>
+            <text x="551" y="484" class="t-muted" font-size="10" font-weight="500">Внешние SDK и серверы</text>
           </g>
         </g>
       </svg>
@@ -5348,38 +5261,24 @@
       <div class="card">
         <div class="card-header">
           <div class="card-dot cyan"></div>
-          <h3>Слои приложения</h3>
+          <h3>Границы слоёв</h3>
         </div>
         <ul>
-          <li>&bull; components/ — презентация на MUI: sip.js и livekit-client здесь не импортируются</li>
-          <li>&bull; containers/ — useSelector + bindActionCreators; мосты AUTHCTL_ ↔ PHONECTL_ только в AuthContainer</li>
-          <li>&bull; actions/ — thunk: валидация → сервис → dispatch; чужой срез не читается через getState()</li>
-          <li>&bull; services/ + store/ — сервисы, сид preloadedState и инъекция middleware в configureStore</li>
+          <li>&bull; components/ не импортируют sip.js/livekit-client напрямую</li>
+          <li>&bull; actions/ — чужой срез не читают через getState(), значения приходят аргументом</li>
+          <li>&bull; весь localStorage и весь HTTP (ky) — только в services/</li>
         </ul>
       </div>
 
       <div class="card">
         <div class="card-header">
           <div class="card-dot emerald"></div>
-          <h3>Стартовый экран и владение рендером</h3>
+          <h3>Store — не источник истины для медиа</h3>
         </div>
         <ul>
-          <li>&bull; на старте displayReg=true: PhoneReg открыт модальным Dialog, AuthLinks за ним</li>
-          <li>&bull; AuthLinks виден, пока authStatus ≠ success и regState ≠ ok; иконка AD-формы закомментирована</li>
-          <li>&bull; владение по срезу: AuthContainer — AuthLinks/AuthAd/AuthPad, PhoneContainer — PhoneReg/PhonePad/PhoneHistory/PhoneChat</li>
-        </ul>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <div class="card-dot violet"></div>
-          <h3>Мост AD → SIP и защита сессии</h3>
-        </div>
-        <ul>
-          <li>&bull; handleAdRegister → adAuth.loginAd → POST uriAdAuth → AUTHCTL_SUBMIT_SUCCESS</li>
-          <li>&bull; тумблер AuthPad трёхпозиционный по regState (off / ok / fail); успех стирает regUserPass из формы</li>
-          <li>&bull; при regState=ok PhoneContainer вешает beforeunload: F5 рвёт SIP-сессию в памяти singleton phoneRuntime</li>
-          <li>&bull; подвал AuthPad: состояние AD → onOpenAd → AuthAd</li>
+          <li>&bull; Redux хранит UI-флаги, заголовки, списки и счётчики</li>
+          <li>&bull; SIP/WebRTC-объекты и LiveKit-комната живут в singleton-сервисах</li>
+          <li>&bull; preloadedState.js — единственное место, где store сходится с сервисами</li>
         </ul>
       </div>
     </div>

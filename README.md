@@ -27,6 +27,25 @@ npm run check   # линт + форматирование с записью
 
 В dev-режиме Vite поднимает мок-API.
 
+## Инструменты для диаграмм и UI-проверок в WSL (не нужны для запуска приложения)
+
+Команды выполнять в **WSL Ubuntu** под Node.js 24, не в Windows и не с `sudo`. Глобальные
+пакеты npm устанавливаются для текущей версии Node, выбранной `fnm`:
+
+```bash
+npm install -g @mermaid-js/mermaid-cli @playwright/cli
+playwright-cli install-browser chromium
+dsh plugin --profile web add @tt-a1i/archify-dsh@0.1.0
+```
+
+Проверить установку:
+
+```bash
+mmdc --version
+playwright-cli --version
+node "$HOME/.dsh/profiles/web/node_modules/@tt-a1i/archify-dsh/skills/archify/bin/archify.mjs" doctor
+```
+
 # Компоненты
 
 Презентационные компоненты (`src/components/`) получают данные и `*Actions` пропсами; со стором их связывают контейнеры (`src/containers/`): `PhoneContainer`, `AuthContainer`, `LkContainer`, `MenuAppContainer`.

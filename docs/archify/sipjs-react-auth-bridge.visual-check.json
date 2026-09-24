@@ -5,9 +5,9 @@
   "status": "pass",
   "visualReview": "pending",
   "artifact": {
-    "path": "\\\\wsl.localhost\\Ubuntu\\home\\ars\\_git\\sipjs-react\\docs\\archify\\sipjs-react-sip-registration.html",
-    "sha256": "a801d4fdc5e482d3cca1bf83cd2bc8cea5c356be5d54344ac8bcdd32f0f3f119",
-    "bytes": 649938
+    "path": "/home/ars/_git/sipjs-react/docs/archify/sipjs-react-auth-bridge.html",
+    "sha256": "61c940419c4491708dac31e6105f336c0395a3a90e16adf33a0ad58164a8deee",
+    "bytes": 637578
   },
   "state": {
     "detail": "read",
@@ -15,7 +15,7 @@
   },
   "chrome": {
     "status": "available",
-    "executable": "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
+    "executable": "/home/ars/.cache/ms-playwright/chromium-1244/chrome-linux64/chrome"
   },
   "containment": {
     "status": "pass",
@@ -89,7 +89,7 @@
         "overflowY": false,
         "ok": true,
         "resolvedTheme": "light",
-        "file": "sipjs-react-sip-registration.visual-check.1440x900.light.png"
+        "file": "sipjs-react-auth-bridge.visual-check.1440x900.light.png"
       },
       {
         "width": 1440,
@@ -103,7 +103,7 @@
         "overflowY": false,
         "ok": true,
         "resolvedTheme": "dark",
-        "file": "sipjs-react-sip-registration.visual-check.1440x900.dark.png"
+        "file": "sipjs-react-auth-bridge.visual-check.1440x900.dark.png"
       },
       {
         "width": 2048,
@@ -117,7 +117,7 @@
         "overflowY": false,
         "ok": true,
         "resolvedTheme": "light",
-        "file": "sipjs-react-sip-registration.visual-check.2048x1320.light.png"
+        "file": "sipjs-react-auth-bridge.visual-check.2048x1320.light.png"
       },
       {
         "width": 2048,
@@ -131,13 +131,13 @@
         "overflowY": false,
         "ok": true,
         "resolvedTheme": "dark",
-        "file": "sipjs-react-sip-registration.visual-check.2048x1320.dark.png"
+        "file": "sipjs-react-auth-bridge.visual-check.2048x1320.dark.png"
       }
     ],
-    "contactSheet": "sipjs-react-sip-registration.visual-check.html"
+    "contactSheet": "sipjs-react-auth-bridge.visual-check.html"
   },
   "sidecars": {
-    "receipt": "sipjs-react-sip-registration.visual-check.json",
-    "contactSheet": "sipjs-react-sip-registration.visual-check.html"
+    "receipt": "sipjs-react-auth-bridge.visual-check.json",
+    "contactSheet": "sipjs-react-auth-bridge.visual-check.html"
   }
 }
