@@ -91,25 +91,41 @@ sequenceDiagram
   Action->>Runtime: registerSipUserAgent(handlers)
   Runtime->>Action: onConnectRequest
   Action->>Rdcr: PHONECTL_CONNECT_REQUEST (regState=off)
-  Runtime->>Runtime: UserAgent.start() → Registerer.register()
+  Runtime->>Runtime: UserAgent.start()
+  Runtime->>Runtime: onConnect → Registerer.register()
   alt accept
     Runtime->>Action: onConnectSuccess
     Action->>Rdcr: PHONECTL_CONNECT_SUCCESS (regState=ok)
-  else reject / disconnect
+  else reject
     Runtime->>Action: onConnectError
     Action->>Rdcr: PHONECTL_CONNECT_ERROR (regState=fail)
-    Runtime->>Runtime: reconnect (до лимита попыток)
+    Runtime->>Runtime: через 3 с userAgent.stop() → onUnregistered
   end
+  Note over Runtime: пока регистрация жива, sip.js сам шлёт re-REGISTER до истечения expires
+  Runtime->>Action: onConnectError (потеря регистрации · обрыв WebSocket)
+  Action->>Rdcr: PHONECTL_CONNECT_ERROR (regState=fail)
+  Runtime->>Action: onReconnectTry
+  Action->>Rdcr: PHONECTL_RECONNECT_TRY (connectStatus=Reconnect)
+  Runtime->>Runtime: attemptReconnection(): 2 попытки, пауза 4 с
   User->>PhoneReg: unregister
   Action->>Runtime: unregisterSip()
-  Action->>Rdcr: PHONECTL_UNREGISTER (regState не трогает)
+  Action->>Rdcr: PHONECTL_UNREGISTER (regState не трогает) + PHONECTL_STORE_VALUE (regState=off)
 ```
 
 Звонки, DTMF, hold и чат — те же три звена (`Action → phoneRuntime → PHONECTL_*`), сценарии в
 `src/actions/phoneControlActions.js`, состояния runtime — в `src/services/phoneRuntime.js`.
 Настройки подключения `uriWebRtc` и `callerUserNum` пишет `phoneStorage` при `handleClkRegister`;
 `useIce` только читается (`getStoredUseIce`, без ключа — `true`), сид среза `phoneControlRdcr`
-собирает `store/preloadedState.js`.
+собирает `store/preloadedState.js`. Отказ регистрации гасит UserAgent через 3 с — `onUnregistered`
+с `registrationLost`; `PHONECTL_UNREGISTER` намеренно не сбрасывает `regState` (красный тумблер
+AuthPad переживает авто-стоп), явная разрегистрация сбрасывает его отдельным
+`PHONECTL_STORE_VALUE`.
+
+Пока `regState === "ok"`, `PhoneContainer` держит браузерный диалог на F5 и закрытие вкладки
+(`beforeunload`); если пользователь подтверждает уход, по `pagehide` уходит разрегистрация
+(`handleUnregisterOnUnload` → `unregisterSip()`): REGISTER с `Expires: 0` отправляется сразу,
+но ответа регистратора страница уже не ждёт. Уход в bfcache (`persisted === true`) сессию
+не рвёт.
 
 ## 3. LiveKit комнаты
 
@@ -124,19 +140,30 @@ sequenceDiagram
   participant Rdcr as lkControlRdcr
 
   Note over User,Rdcr: своя комната/приглашение требуют regState=ok (номер — callerUserNum)
-  User->>LkMeet: «Создать» / «Пригласить»
-  LkMeet->>Action: handleLkRoomCreate / handleLkTokenSubmit
+  User->>LkMeet: «Создать»
+  LkMeet->>Action: handleLkRoomCreate({num · room · uriLkToken})
+  Action->>Token: requestLkToken({num, room, uriLkToken})
+  Token-->>Action: jwt: lk_token · lk_room
+  Action->>Rdcr: LKROOM_CREATE_* (createStatus)
+  Action-->>LkMeet: responseData
+  Note over LkMeet: токен уходит в query — #/?lk_room&lk_token (в localStorage не пишется)
+  User->>LkMeet: «Пригласить» → форма LkToken
+  LkMeet->>Action: handleLkTokenSubmit(formData)
   Action->>LS: uriLkToken
-  Action->>Token: requestLkToken(num, room)
-  Token-->>Action: jwt (exp, room)
-  Action->>LS: lkInvites: num · room · token
-  Action->>Rdcr: LKROOM_CREATE_* / LKTOKEN_SUBMIT_SUCCESS (invites)
-  Note over Action: приглашение уходит SIP MESSAGE через мост LkContainer → PHONECTL_
-  User->>LkMeet: открыть #/?lk_room&lk_token
-  LkMeet->>Runtime: getLiveKitRoom().connect(url, token)
-  Runtime-->>LkMeet: треки участников (@livekit/components-react)
+  Action->>Token: requestLkToken({num, room, uriLkToken})
+  Token-->>Action: jwt
+  Action->>LS: lkInvites: num · room · token · expiresAt
+  Action->>Rdcr: LKTOKEN_SUBMIT_SUCCESS (invites)
+  Note over Action,Rdcr: приглашение уходит SIP MESSAGE через мост LkContainer → PHONECTL_
+  User->>LkMeet: «Подключиться» (или ссылка-приглашение с lk_token)
+  LkMeet->>Runtime: getLiveKitRoom() — singleton Room
+  LkMeet->>Runtime: LiveKitRoom(connect · token · serverUrl=uriLk)
+  Runtime-->>LkMeet: комната и треки участников (@livekit/components-react)
 ```
 
 Эндпоинт выдачи токена `uriLkToken` и список приглашений `localStorage.lkInvites` (лимит
-`LK_MAX_INVITES`) пишет `lkToken`; сид в срез — через `store/preloadedState.js`. Стенд (OpenVidu),
-готовый токен и грабли проверки — `docs/LIVEKIT.md`.
+`LK_MAX_INVITES`, одно актуальное приглашение на номер) пишет `lkToken`; `uriLk` — адрес SFU,
+он только читается сидом, а сид в срез собирает `store/preloadedState.js`. Комната и токен —
+производные query, в состоянии их копии нет; список приглашений виден только в своей комнате
+(`callerUserNum === room`) при живой регистрации, крестик — `handleRemoveInvite`. Стенд
+(OpenVidu), готовый токен и грабли проверки — `docs/LIVEKIT.md`.

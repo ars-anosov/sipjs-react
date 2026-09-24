@@ -261,6 +261,14 @@ const handleClkUnregister = (rdcr) => (dispatch) => {
   });
 };
 
+// Уход со страницы, который пользователь подтвердил в диалоге (F5, закрытие вкладки, переход):
+// снимаем SIP-регистрацию, чтобы SBC не держал Contact до истечения. REGISTER с Expires: 0
+// уходит в момент вызова — sip.js отправляет запрос синхронно, — но ответа регистратора
+// страница уже не дождётся, поэтому промис не ждём и стор не трогаем.
+const handleUnregisterOnUnload = () => () => {
+  unregisterSip().catch((error) => console.log("unregisterOnUnload.catch()", error));
+};
+
 const handleClkSubmitIn = (_rdcr) => (dispatch) => {
   dispatch({
     type: PHONECTL_INCOME_SUBMIT,
@@ -556,6 +564,7 @@ export {
   handleClkUnregister,
   handleSendInviteMessage,
   handleSendMessage,
+  handleUnregisterOnUnload,
   MessagesArrUpdate,
   markCallsRead,
 };

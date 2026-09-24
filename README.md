@@ -147,7 +147,7 @@ node -e "console.log(require(process.env.HOME + '/.dsh/profiles/web/package.json
 ### AuthPad.jsx
 Панель «Мост к сервисам».
 
-## Срез LiveKit — LK_
+## Срез LK_
 
 ### LkMeet.jsx
 Видеовстреча на [LiveKit](https://livekit.io/) (локальный деплой — [openvidu-local-deployment](https://github.com/OpenVidu/openvidu-local-deployment)).

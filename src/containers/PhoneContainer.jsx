@@ -60,9 +60,22 @@ const PhoneContainer = () => {
       event.returnValue = "";
     };
 
+    // Подтверждённый уход (F5, закрытие вкладки, переход) — снимаем SIP-регистрацию:
+    // pagehide приходит уже после ответа в диалоге, отмена его не вызывает. persisted=true
+    // означает bfcache — страница может вернуться, такую сессию не рвём.
+    // https://developer.mozilla.org/ru/docs/Web/API/Window/pagehide_event
+    const handlePageHide = (event) => {
+      if (event.persisted) return;
+      phoneControlActions.handleUnregisterOnUnload();
+    };
+
     window.addEventListener("beforeunload", handleBeforeUnload);
-    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
-  }, [regState]);
+    window.addEventListener("pagehide", handlePageHide);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      window.removeEventListener("pagehide", handlePageHide);
+    };
+  }, [regState, phoneControlActions]);
 
   // Форма входа — модальный Dialog (портал), в потоке документа она места не занимает,
   // поэтому телефон под ней не сдвигается

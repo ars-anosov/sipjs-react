@@ -5,7 +5,7 @@
     "title": "SIP регистрация",
     "quality_profile": "showcase",
     "column_fit": "spread",
-    "viewBox": [1800, 780],
+    "viewBox": [1800, 1240],
     "legend": {
       "mode": "auto",
       "entries": {
@@ -22,6 +22,12 @@
     }
   },
   "participants": [
+    {
+      "id": "browser",
+      "type": "external",
+      "label": "Браузер",
+      "sublabel": "beforeunload · pagehide"
+    },
     {
       "id": "user",
       "type": "external",
@@ -60,153 +66,50 @@
     }
   ],
   "segments": [
-    {
-      "from": 150,
-      "to": 385,
-      "label": "Регистрация"
-    },
-    {
-      "from": 400,
-      "to": 555,
-      "label": "Успех"
-    },
-    {
-      "from": 570,
-      "to": 720,
-      "label": "Отказ и авто-стоп"
-    }
+    { "from": 150, "to": 385, "label": "Регистрация" },
+    { "from": 400, "to": 555, "label": "Успех" },
+    { "from": 570, "to": 660, "label": "Продление по expires" },
+    { "from": 675, "to": 825, "label": "Переподключение" },
+    { "from": 840, "to": 1000, "label": "Отказ и авто-стоп" },
+    { "from": 1015, "to": 1180, "label": "Уход со страницы (F5)" }
   ],
   "messages": [
-    {
-      "id": "submit",
-      "from": "user",
-      "to": "action",
-      "y": 185,
-      "label": "submit(uriWebRtc, num, pass)",
-      "variant": "default"
-    },
-    {
-      "id": "store-settings",
-      "from": "action",
-      "to": "storage",
-      "y": 225,
-      "label": "uriWebRtc · callerUserNum",
-      "variant": "default"
-    },
-    {
-      "id": "register-call",
-      "from": "action",
-      "to": "runtime",
-      "y": 265,
-      "label": "registerSipUserAgent(handlers)",
-      "variant": "default"
-    },
-    {
-      "id": "on-request",
-      "from": "runtime",
-      "to": "action",
-      "y": 305,
-      "label": "handlers.onConnectRequest",
-      "variant": "default"
-    },
-    {
-      "id": "connect-request",
-      "from": "action",
-      "to": "rdcr",
-      "y": 345,
-      "label": "CONNECT_REQUEST (regState=off)",
-      "variant": "default"
-    },
-    {
-      "id": "start-register",
-      "from": "runtime",
-      "to": "registerer",
-      "y": 425,
-      "label": "start() + register()",
-      "variant": "emphasis"
-    },
-    {
-      "id": "ok-200",
-      "from": "registerer",
-      "to": "runtime",
-      "y": 465,
-      "label": "200 OK",
-      "variant": "return"
-    },
-    {
-      "id": "on-success",
-      "from": "runtime",
-      "to": "action",
-      "y": 505,
-      "label": "handlers.onConnectSuccess",
-      "variant": "default"
-    },
-    {
-      "id": "connect-success",
-      "from": "action",
-      "to": "rdcr",
-      "y": 540,
-      "label": "CONNECT_SUCCESS (regState=ok)",
-      "variant": "emphasis"
-    },
-    {
-      "id": "reject",
-      "from": "registerer",
-      "to": "runtime",
-      "y": 580,
-      "label": "401/403/таймаут",
-      "variant": "return"
-    },
-    {
-      "id": "on-error",
-      "from": "runtime",
-      "to": "action",
-      "y": 620,
-      "label": "handlers.onConnectError",
-      "variant": "default"
-    },
-    {
-      "id": "connect-error",
-      "from": "action",
-      "to": "rdcr",
-      "y": 655,
-      "label": "CONNECT_ERROR (regState=fail)",
-      "variant": "emphasis"
-    },
-    {
-      "id": "auto-stop",
-      "from": "runtime",
-      "to": "action",
-      "y": 695,
-      "label": "через 3с: onUnregistered",
-      "variant": "dashed"
-    }
+    { "id": "submit", "from": "user", "to": "action", "y": 185, "label": "submit(uriWebRtc, num, pass)", "variant": "default" },
+    { "id": "store-settings", "from": "action", "to": "storage", "y": 225, "label": "uriWebRtc · callerUserNum", "variant": "default" },
+    { "id": "register-call", "from": "action", "to": "runtime", "y": 265, "label": "registerSipUserAgent(handlers)", "variant": "default" },
+    { "id": "on-request", "from": "runtime", "to": "action", "y": 305, "label": "handlers.onConnectRequest", "variant": "default" },
+    { "id": "connect-request", "from": "action", "to": "rdcr", "y": 345, "label": "CONNECT_REQUEST (regState=off)", "variant": "default" },
+
+    { "id": "start-register", "from": "runtime", "to": "registerer", "y": 425, "label": "start() + register()", "variant": "emphasis" },
+    { "id": "ok-200", "from": "registerer", "to": "runtime", "y": 465, "label": "200 OK (Contact · expires)", "variant": "return" },
+    { "id": "on-success", "from": "runtime", "to": "action", "y": 505, "label": "handlers.onConnectSuccess", "variant": "default" },
+    { "id": "connect-success", "from": "action", "to": "rdcr", "y": 540, "label": "CONNECT_SUCCESS (regState=ok)", "variant": "emphasis" },
+
+    { "id": "renew-register", "from": "runtime", "to": "registerer", "y": 600, "label": "sip.js: re-REGISTER до expires", "variant": "dashed" },
+    { "id": "renew-ok", "from": "registerer", "to": "runtime", "y": 635, "label": "200 OK: биндинг продлён", "variant": "return" },
+
+    { "id": "reg-lost", "from": "registerer", "to": "runtime", "y": 705, "label": "регистрация потеряна (Unregistered)", "variant": "default" },
+    { "id": "reconnect-try", "from": "runtime", "to": "action", "y": 750, "label": "onReconnectTry → PHONECTL_RECONNECT_TRY", "variant": "default" },
+    { "id": "reconnect", "from": "runtime", "to": "registerer", "y": 795, "label": "reconnect(): до 2 попыток, пауза 4 с", "variant": "emphasis" },
+
+    { "id": "reject", "from": "registerer", "to": "runtime", "y": 870, "label": "401/403/таймаут", "variant": "return" },
+    { "id": "on-error", "from": "runtime", "to": "action", "y": 910, "label": "handlers.onConnectError", "variant": "default" },
+    { "id": "connect-error", "from": "action", "to": "rdcr", "y": 945, "label": "CONNECT_ERROR (regState=fail)", "variant": "emphasis" },
+    { "id": "auto-stop", "from": "runtime", "to": "action", "y": 985, "label": "через 3 с: userAgent.stop()", "variant": "dashed" },
+
+    { "id": "pagehide", "from": "browser", "to": "action", "y": 1045, "label": "подтверждённый уход: pagehide", "variant": "default" },
+    { "id": "unload-call", "from": "action", "to": "runtime", "y": 1085, "label": "handleUnregisterOnUnload → unregisterSip()", "variant": "emphasis" },
+    { "id": "unreg-register", "from": "runtime", "to": "registerer", "y": 1120, "label": "REGISTER Contact · expires=0", "variant": "default" },
+    { "id": "unreg-ok", "from": "registerer", "to": "runtime", "y": 1155, "label": "200 OK — не ждём, страница закрывается", "variant": "return" }
   ],
   "activations": [
-    {
-      "participant": "action",
-      "from": 175,
-      "to": 670,
-      "type": "backend"
-    },
-    {
-      "participant": "runtime",
-      "from": 260,
-      "to": 710,
-      "type": "backend"
-    },
-    {
-      "participant": "registerer",
-      "from": 420,
-      "to": 470,
-      "type": "external"
-    },
-    {
-      "participant": "registerer",
-      "from": 575,
-      "to": 585,
-      "type": "external"
-    }
+    { "participant": "action", "from": 175, "to": 1095, "type": "backend" },
+    { "participant": "runtime", "from": 260, "to": 1165, "type": "backend" },
+    { "participant": "registerer", "from": 420, "to": 470, "type": "external" },
+    { "participant": "registerer", "from": 595, "to": 645, "type": "external" },
+    { "participant": "registerer", "from": 700, "to": 800, "type": "external" },
+    { "participant": "registerer", "from": 865, "to": 875, "type": "external" },
+    { "participant": "registerer", "from": 1115, "to": 1160, "type": "external" }
   ],
   "cards": [
     {
@@ -219,10 +122,20 @@
     },
     {
       "dot": "orange",
-      "title": "Авто-стоп и реконнект",
+      "title": "Продление и переподключение",
       "items": [
-        "runtime сам гасит UserAgent через 3 с после отказа",
-        "при обрыве сети — attemptReconnection до исчерпания попыток"
+        "re-REGISTER до истечения expires шлёт сам sip.js — стор в этом не участвует",
+        "потеря регистрации или обрыв WS: onConnectError + attemptReconnection",
+        "2 попытки, пауза 4 с; отказ регистрации гасит UserAgent через 3 с"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Уход со страницы (F5)",
+      "items": [
+        "пока regState=ok, beforeunload держит диалог браузера",
+        "после подтверждения pagehide шлёт REGISTER expires=0 и ждёт ответа не дольше страницы",
+        "bfcache (persisted=true) сессию не рвёт"
       ]
     },
     {
