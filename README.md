@@ -46,6 +46,67 @@ playwright-cli --version
 node "$HOME/.dsh/profiles/web/node_modules/@tt-a1i/archify-dsh/skills/archify/bin/archify.mjs" doctor
 ```
 
+## Плагины совместимости DSH с WSL (не нужны для запуска приложения)
+
+Чат открывается в Windows-браузере, а агент и инструменты работают в WSL Ubuntu, поэтому мост
+между ОС ставится набором [dsh-wsl-kit](https://github.com/173787247/dsh-wsl-kit) в профиль
+`web` (не через глобальный npm). Рекомендуемый минимум — набор `daily`:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/173787247/dsh-wsl-kit/master/install.sh \
+  | KIT_SET=daily bash
+```
+
+Скрипт вызывает `dsh plugin --profile web add` для каждого плагина. Наборы: `daily`
+(`env`, `net`, `fetch`, `open`, `clipboard`, `path`, `browser`, `launch` + `repeat-stop` и
+`tool-budget`), `github` (daily + GitHub App, подсказки по credentials, уведомления), `llm`
+(локальный LLM и доктора), `full` — всё (он же по умолчанию, если `KIT_SET` не задан).
+Профиль переопределяется `DSH_PROFILE` (по умолчанию `web`); из локального клона —
+`KIT_SET=daily bash install.sh`. Отдельный плагин:
+
+```bash
+dsh plugin --profile web add github:173787247/dsh-wsl-net
+```
+
+После установки перезапустить `dsh web`
+([`scripts/restart-dsh-web.sh`](https://github.com/173787247/dsh-wsl-kit/blob/master/scripts/restart-dsh-web.sh))
+и открыть **новую** сессию: в старой остаётся прежний набор инструментов. Скрипт печатает URL с
+одноразовым `?token=` — это `:3081` для Windows-браузера; `:3080` доступен только из WSL.
+
+Проверить установку (список плагинов профиля):
+
+```bash
+node -e "console.log(require(process.env.HOME + '/.dsh/profiles/web/package.json').dsh.profile.bundles)"
+```
+
+Что появляется в сессии (набор `daily`):
+
+| Инструмент | Плагин | Зачем |
+|---|---|---|
+| `net_doctor` | dsh-wsl-net | Прокси, `NODE_USE_ENV_PROXY`, доступность DeepSeek API и npm, готовые fix-скрипты |
+| `web_fetch` через прокси | dsh-wsl-fetch | `TypeError: fetch failed` при работающем API |
+| `path_convert` | dsh-wsl-path | Пути WSL ↔ Windows, `/mnt/c`, указатели на `mnt_doctor`/`encoding_doctor` |
+| `wsl_clipboard` | dsh-wsl-clipboard | Чтение и запись буфера обмена Windows |
+| `win_open_url` | dsh-wsl-browser | Открыть http(s)-ссылку в браузере Windows |
+| `win_launch` | dsh-wsl-launch | Запуск разрешённых приложений Windows |
+| Кликабельные Linux-пути | dsh-wsl-open | Открыть путь из чата в Проводнике Windows |
+| Факты о WSL в системном промпте | dsh-wsl-env | Агент не путает Linux и Windows |
+| `repeat-stop`, `tool-budget` | одноимённые | Стоп одинаковых циклов вызовов и лимит вызовов на сессию |
+
+Для Node.js 24 `fetch` игнорирует `*_PROXY` без `NODE_USE_ENV_PROXY=1`; в WSL прокси Windows
+задаётся так (порт — свой, например у Clash):
+
+```bash
+export HTTP_PROXY=http://127.0.0.1:7890
+export HTTPS_PROXY=http://127.0.0.1:7890
+export NODE_USE_ENV_PROXY=1
+```
+
+`restart-dsh-web.sh` сам выставляет `NODE_USE_ENV_PROXY=1` и оставляет `NO_PROXY` только для
+loopback (`127.0.0.1,localhost`) — чужие RFC1918-маски из Windows ломают доступ к
+`api.deepseek.com`. Если HTTPS в браузере Windows работает, а из агента нет — запустить
+`net_doctor` в новой сессии.
+
 # Компоненты
 
 Презентационные компоненты (`src/components/`) получают данные и `*Actions` пропсами; со стором их связывают контейнеры (`src/containers/`): `PhoneContainer`, `AuthContainer`, `LkContainer`, `MenuAppContainer`.
