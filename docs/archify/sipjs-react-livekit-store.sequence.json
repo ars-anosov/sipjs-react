@@ -24,7 +24,7 @@
   "participants": [
     {
       "id": "user",
-      "type": "external",
+      "type": "frontend",
       "label": "LkMeet",
       "sublabel": "Создать/Пригласить"
     },
@@ -41,12 +41,6 @@
       "sublabel": "uriLkToken · lkInvites"
     },
     {
-      "id": "token",
-      "type": "external",
-      "label": "POST /user/lk",
-      "sublabel": "lkToken.js"
-    },
-    {
       "id": "rdcr",
       "type": "database",
       "label": "lkControlRdcr",
@@ -56,7 +50,13 @@
       "id": "runtime",
       "type": "backend",
       "label": "lkRuntime",
-      "sublabel": "getLiveKitRoom()"
+      "sublabel": "getLiveKitRoom() · прослойка к SFU"
+    },
+    {
+      "id": "token",
+      "type": "external",
+      "label": "POST /user/lk",
+      "sublabel": "lkToken.js"
     },
     {
       "id": "sfu",
@@ -91,7 +91,7 @@
       "from": "action",
       "to": "storage",
       "y": 225,
-      "label": "uriLkToken",
+      "label": "uriLkToken (путь «Пригласить»)",
       "variant": "default"
     },
     {
@@ -99,7 +99,7 @@
       "from": "action",
       "to": "token",
       "y": 265,
-      "label": "requestLkToken(num, room)",
+      "label": "requestLkToken({ num, room, uriLkToken })",
       "variant": "default"
     },
     {
@@ -115,7 +115,7 @@
       "from": "action",
       "to": "storage",
       "y": 345,
-      "label": "lkInvites: num · room · token",
+      "label": "lkInvites: num · room · token · expiresAt",
       "variant": "default"
     },
     {
@@ -210,7 +210,7 @@
       "dot": "cyan",
       "title": "Хранилище",
       "items": [
-        "uriLkToken пишет lkToken перед запросом токена",
+        "uriLkToken пишет lkToken на пути «Пригласить» — перед запросом токена",
         "приглашения — localStorage.lkInvites, лимит LK_MAX_INVITES",
         "в срез lkControlRdcr всё попадает сидом через preloadedState.js"
       ]

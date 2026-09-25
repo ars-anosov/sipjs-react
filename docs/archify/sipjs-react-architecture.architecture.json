@@ -6,15 +6,23 @@
     "quality_profile": "showcase",
     "repository": {
       "url": "https://github.com/ars-anosov/sipjs-react.git",
-      "revision": "b2d102de776bd99f8888ff8d00f074f6f64651f5"
+      "revision": "6f051a2035b4fcd3f9bea1f397bd63869ecc084b"
     },
     "legend": {
       "mode": "auto",
       "entries": {
-        "frontend": { "label": "UI и контейнеры" },
-        "backend": { "label": "actions и services" },
-        "database": { "label": "Redux store и localStorage" },
-        "external": { "label": "Внешние SDK и серверы" }
+        "frontend": {
+          "label": "UI и контейнеры"
+        },
+        "backend": {
+          "label": "actions и services"
+        },
+        "database": {
+          "label": "Redux store и localStorage"
+        },
+        "external": {
+          "label": "Внешние SDK и серверы"
+        }
       }
     }
   },
@@ -25,17 +33,35 @@
       "label": "AuthLinks · AuthAd",
       "sublabel": "формы AD",
       "tag": "AUTHCTL_",
-      "pos": [40, 130],
-      "size": [200, 76]
+      "pos": [
+        40,
+        120
+      ],
+      "size": [
+        200,
+        76
+      ]
     },
     {
       "id": "authCnt",
       "type": "frontend",
       "label": "AuthContainer",
       "sublabel": "мост AUTHCTL_ ↔ PHONECTL_",
-      "pos": [360, 130],
-      "size": [220, 76],
-      "sources": [{ "path": "src/containers/AuthContainer.jsx", "line": 41, "label": "мост AUTHCTL_ → PHONECTL_" }]
+      "pos": [
+        420,
+        120
+      ],
+      "size": [
+        230,
+        76
+      ],
+      "sources": [
+        {
+          "path": "src/containers/AuthContainer.jsx",
+          "line": 41,
+          "label": "мост AUTHCTL_ → PHONECTL_"
+        }
+      ]
     },
     {
       "id": "authAct",
@@ -43,9 +69,21 @@
       "label": "authControlActions",
       "sublabel": "AUTHCTL_",
       "tag": "AUTHCTL_",
-      "pos": [680, 130],
-      "size": [220, 76],
-      "sources": [{ "path": "src/actions/authControlActions.js", "line": 15, "label": "handleAdRegister" }]
+      "pos": [
+        810,
+        120
+      ],
+      "size": [
+        230,
+        76
+      ],
+      "sources": [
+        {
+          "path": "src/actions/authControlActions.js",
+          "line": 15,
+          "label": "handleAdRegister"
+        }
+      ]
     },
     {
       "id": "authRdcr",
@@ -53,26 +91,56 @@
       "label": "authControlRdcr",
       "sublabel": "состояние AD",
       "tag": "AUTHCTL_",
-      "pos": [680, 235],
-      "size": [220, 76],
-      "sources": [{ "path": "src/reducers/authControlRdcr.js", "line": 27, "label": "authControlRdcr" }]
+      "pos": [
+        810,
+        225
+      ],
+      "size": [
+        230,
+        76
+      ],
+      "sources": [
+        {
+          "path": "src/reducers/authControlRdcr.js",
+          "line": 27,
+          "label": "authControlRdcr"
+        }
+      ]
     },
     {
       "id": "adSvc",
       "type": "backend",
       "label": "adAuth",
       "sublabel": "AD-сессия · ky",
-      "pos": [1040, 130],
-      "size": [240, 76],
-      "sources": [{ "path": "src/services/adAuth.js", "line": 52, "label": "loginAd" }]
+      "pos": [
+        1200,
+        120
+      ],
+      "size": [
+        250,
+        76
+      ],
+      "sources": [
+        {
+          "path": "src/services/adAuth.js",
+          "line": 52,
+          "label": "loginAd"
+        }
+      ]
     },
     {
       "id": "adRes",
       "type": "external",
       "label": "AD-сервис",
       "sublabel": "uriAdAuth · uriAdPhpAuth",
-      "pos": [1450, 130],
-      "size": [200, 76]
+      "pos": [
+        1660,
+        120
+      ],
+      "size": [
+        210,
+        76
+      ]
     },
     {
       "id": "phoneView",
@@ -80,17 +148,35 @@
       "label": "PhoneReg · PhonePad",
       "sublabel": "регистрация · звонки · чат",
       "tag": "PHONECTL_",
-      "pos": [40, 400],
-      "size": [200, 76]
+      "pos": [
+        40,
+        370
+      ],
+      "size": [
+        200,
+        76
+      ]
     },
     {
       "id": "phoneCnt",
       "type": "frontend",
       "label": "PhoneContainer",
       "sublabel": "URL → PHONECTL_",
-      "pos": [360, 400],
-      "size": [220, 76],
-      "sources": [{ "path": "src/containers/PhoneContainer.jsx", "line": 31, "label": "мост PHONECTL_ → LK_" }]
+      "pos": [
+        420,
+        370
+      ],
+      "size": [
+        230,
+        76
+      ],
+      "sources": [
+        {
+          "path": "src/containers/PhoneContainer.jsx",
+          "line": 31,
+          "label": "мост PHONECTL_ → LK_"
+        }
+      ]
     },
     {
       "id": "phoneAct",
@@ -98,9 +184,21 @@
       "label": "phoneControlActions",
       "sublabel": "PHONECTL_",
       "tag": "PHONECTL_",
-      "pos": [680, 400],
-      "size": [220, 76],
-      "sources": [{ "path": "src/actions/phoneControlActions.js", "line": 121, "label": "handleClkRegister" }]
+      "pos": [
+        810,
+        370
+      ],
+      "size": [
+        230,
+        76
+      ],
+      "sources": [
+        {
+          "path": "src/actions/phoneControlActions.js",
+          "line": 121,
+          "label": "handleClkRegister"
+        }
+      ]
     },
     {
       "id": "phoneRdcr",
@@ -108,18 +206,42 @@
       "label": "phoneControlRdcr",
       "sublabel": "regState · звонки · чат",
       "tag": "PHONECTL_",
-      "pos": [680, 505],
-      "size": [220, 76],
-      "sources": [{ "path": "src/reducers/phoneControlRdcr.js", "line": 70, "label": "phoneControlRdcr" }]
+      "pos": [
+        810,
+        475
+      ],
+      "size": [
+        230,
+        76
+      ],
+      "sources": [
+        {
+          "path": "src/reducers/phoneControlRdcr.js",
+          "line": 70,
+          "label": "phoneControlRdcr"
+        }
+      ]
     },
     {
       "id": "phoneSvc",
       "type": "backend",
       "label": "Телефонные сервисы",
       "sublabel": "phoneRuntime · phoneStorage",
-      "pos": [1040, 400],
-      "size": [240, 76],
-      "sources": [{ "path": "src/services/phoneRuntime.js", "line": 336, "label": "registerSipUserAgent" }]
+      "pos": [
+        1200,
+        370
+      ],
+      "size": [
+        250,
+        76
+      ],
+      "sources": [
+        {
+          "path": "src/services/phoneRuntime.js",
+          "line": 336,
+          "label": "registerSipUserAgent"
+        }
+      ]
     },
     {
       "id": "sipExt",
@@ -127,8 +249,14 @@
       "label": "SIP SBC",
       "sublabel": "WSS · WebRTC",
       "tag": "sipjs",
-      "pos": [1450, 400],
-      "size": [200, 76]
+      "pos": [
+        1660,
+        370
+      ],
+      "size": [
+        210,
+        76
+      ]
     },
     {
       "id": "lkView",
@@ -136,17 +264,35 @@
       "label": "LkMeet · LkToken",
       "sublabel": "комната · приглашение",
       "tag": "LK_",
-      "pos": [40, 670],
-      "size": [200, 76]
+      "pos": [
+        40,
+        620
+      ],
+      "size": [
+        200,
+        76
+      ]
     },
     {
       "id": "lkCnt",
       "type": "frontend",
       "label": "LkContainer",
       "sublabel": "приглашение → чат",
-      "pos": [360, 670],
-      "size": [220, 76],
-      "sources": [{ "path": "src/containers/LkContainer.jsx", "line": 19, "label": "мост LK_ → PHONECTL_" }]
+      "pos": [
+        420,
+        620
+      ],
+      "size": [
+        230,
+        76
+      ],
+      "sources": [
+        {
+          "path": "src/containers/LkContainer.jsx",
+          "line": 19,
+          "label": "мост LK_ → PHONECTL_"
+        }
+      ]
     },
     {
       "id": "lkAct",
@@ -154,9 +300,21 @@
       "label": "lkControlActions",
       "sublabel": "LKTOKEN_ · LKROOM_ · LK_",
       "tag": "LK_",
-      "pos": [680, 670],
-      "size": [220, 76],
-      "sources": [{ "path": "src/actions/lkControlActions.js", "line": 27, "label": "handleLkTokenSubmit" }]
+      "pos": [
+        810,
+        620
+      ],
+      "size": [
+        230,
+        76
+      ],
+      "sources": [
+        {
+          "path": "src/actions/lkControlActions.js",
+          "line": 27,
+          "label": "handleLkTokenSubmit"
+        }
+      ]
     },
     {
       "id": "lkRdcr",
@@ -164,18 +322,42 @@
       "label": "lkControlRdcr",
       "sublabel": "токен · invites",
       "tag": "LK_",
-      "pos": [680, 775],
-      "size": [220, 76],
-      "sources": [{ "path": "src/reducers/lkControlRdcr.js", "line": 29, "label": "lkTokenRdcr" }]
+      "pos": [
+        810,
+        725
+      ],
+      "size": [
+        230,
+        76
+      ],
+      "sources": [
+        {
+          "path": "src/reducers/lkControlRdcr.js",
+          "line": 29,
+          "label": "lkTokenRdcr"
+        }
+      ]
     },
     {
       "id": "lkSvc",
       "type": "backend",
       "label": "LiveKit-сервисы",
       "sublabel": "lkRuntime · lkToken",
-      "pos": [1040, 670],
-      "size": [240, 76],
-      "sources": [{ "path": "src/services/lkRuntime.js", "line": 21, "label": "getLiveKitRoom" }]
+      "pos": [
+        1200,
+        620
+      ],
+      "size": [
+        250,
+        76
+      ],
+      "sources": [
+        {
+          "path": "src/services/lkRuntime.js",
+          "line": 21,
+          "label": "getLiveKitRoom"
+        }
+      ]
     },
     {
       "id": "lkExt",
@@ -183,72 +365,242 @@
       "label": "LiveKit SFU",
       "sublabel": "комната · треки",
       "tag": "livekit-client",
-      "pos": [1450, 670],
-      "size": [200, 76]
+      "pos": [
+        1660,
+        620
+      ],
+      "size": [
+        210,
+        76
+      ]
     },
     {
       "id": "storage",
       "type": "database",
       "label": "localStorage",
       "sublabel": "ключи приложения",
-      "pos": [1450, 270],
-      "size": [200, 76],
-      "sources": [{ "path": "src/constants/storage.js", "line": 1, "label": "ключи localStorage" }]
+      "pos": [
+        1660,
+        255
+      ],
+      "size": [
+        210,
+        76
+      ],
+      "sources": [
+        {
+          "path": "src/constants/storage.js",
+          "line": 1,
+          "label": "ключи localStorage"
+        }
+      ]
     }
   ],
   "boundaries": [
     {
       "kind": "region",
       "label": "UI — компоненты",
-      "wraps": ["authView", "phoneView", "lkView"]
+      "wraps": [
+        "authView",
+        "phoneView",
+        "lkView"
+      ]
     },
     {
       "kind": "region",
       "label": "Контейнеры — связь с Redux",
-      "wraps": ["authCnt", "phoneCnt", "lkCnt"]
+      "wraps": [
+        "authCnt",
+        "phoneCnt",
+        "lkCnt"
+      ]
     },
     {
       "kind": "region",
       "label": "Redux — actions и reducers",
-      "wraps": ["authAct", "authRdcr", "phoneAct", "phoneRdcr", "lkAct", "lkRdcr"]
+      "wraps": [
+        "authAct",
+        "authRdcr",
+        "phoneAct",
+        "phoneRdcr",
+        "lkAct",
+        "lkRdcr"
+      ]
     },
     {
       "kind": "region",
       "label": "Сервисы",
-      "wraps": ["adSvc", "phoneSvc", "lkSvc"]
+      "wraps": [
+        "adSvc",
+        "phoneSvc",
+        "lkSvc"
+      ]
     },
     {
       "kind": "region",
       "label": "Хранилище",
-      "wraps": ["storage"]
+      "wraps": [
+        "storage"
+      ]
     }
   ],
   "connections": [
-    { "id": "auth-events", "from": "authView", "to": "authCnt", "label": "события" },
-    { "id": "auth-dispatch", "from": "authCnt", "to": "authAct", "label": "dispatch" },
-    { "id": "auth-domain", "from": "authAct", "to": "adSvc", "label": "доменный API" },
-    { "id": "auth-http", "from": "adSvc", "to": "adRes", "label": "ky · POST" },
-    { "id": "auth-state", "from": "authAct", "to": "authRdcr", "label": "состояние AD", "fromSide": "bottom", "toSide": "top", "labelDy": 30 },
-    { "id": "auth-use", "from": "authRdcr", "to": "authCnt", "label": "useSelector", "fromSide": "left", "toSide": "left" },
-    { "id": "auth-keys", "from": "adSvc", "to": "storage", "label": "ключи AD", "fromSide": "bottom", "toSide": "top" },
-
-    { "id": "phone-events", "from": "phoneView", "to": "phoneCnt", "label": "события" },
-    { "id": "phone-dispatch", "from": "phoneCnt", "to": "phoneAct", "label": "dispatch" },
-    { "id": "phone-domain", "from": "phoneAct", "to": "phoneSvc", "label": "доменный API" },
-    { "id": "phone-wss", "from": "phoneSvc", "to": "sipExt", "label": "WSS · WebRTC", "variant": "emphasis" },
-    { "id": "phone-state", "from": "phoneAct", "to": "phoneRdcr", "label": "regState · звонки", "fromSide": "bottom", "toSide": "top", "labelDy": 30 },
-    { "id": "phone-use", "from": "phoneRdcr", "to": "phoneCnt", "label": "useSelector", "fromSide": "left", "toSide": "left" },
-    { "id": "phone-keys", "from": "phoneSvc", "to": "storage", "label": "настройки · звонки · чат", "fromSide": "top", "toSide": "bottom" },
-
-    { "id": "lk-events", "from": "lkView", "to": "lkCnt", "label": "события" },
-    { "id": "lk-dispatch", "from": "lkCnt", "to": "lkAct", "label": "dispatch" },
-    { "id": "lk-domain", "from": "lkAct", "to": "lkSvc", "label": "доменный API" },
-    { "id": "lk-rtc", "from": "lkSvc", "to": "lkExt", "label": "WebRTC · треки" },
-    { "id": "lk-state", "from": "lkAct", "to": "lkRdcr", "label": "токен · invites", "fromSide": "bottom", "toSide": "top", "labelDy": 30 },
-    { "id": "lk-use", "from": "lkRdcr", "to": "lkCnt", "label": "useSelector", "fromSide": "left", "toSide": "left" },
-
-    { "id": "bridge-auth-phone", "from": "authCnt", "to": "phoneAct", "label": "мост: handleClkRegister", "fromSide": "bottom", "toSide": "top" },
-    { "id": "bridge-phone-lk", "from": "phoneCnt", "to": "lkAct", "label": "мост: displayControl", "fromSide": "bottom", "toSide": "top" }
+    {
+      "id": "auth-events",
+      "from": "authView",
+      "to": "authCnt",
+      "label": "события"
+    },
+    {
+      "id": "auth-dispatch",
+      "from": "authCnt",
+      "to": "authAct",
+      "label": "dispatch"
+    },
+    {
+      "id": "auth-domain",
+      "from": "authAct",
+      "to": "adSvc",
+      "label": "доменный API"
+    },
+    {
+      "id": "auth-http",
+      "from": "adSvc",
+      "to": "adRes",
+      "label": "ky · POST"
+    },
+    {
+      "id": "auth-state",
+      "from": "authAct",
+      "to": "authRdcr",
+      "label": "состояние AD",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelDy": 30
+    },
+    {
+      "id": "auth-use",
+      "from": "authRdcr",
+      "to": "authCnt",
+      "label": "useSelector",
+      "fromSide": "left",
+      "toSide": "left"
+    },
+    {
+      "id": "auth-keys",
+      "from": "adSvc",
+      "to": "storage",
+      "label": "ключи AD",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "phone-events",
+      "from": "phoneView",
+      "to": "phoneCnt",
+      "label": "события"
+    },
+    {
+      "id": "phone-dispatch",
+      "from": "phoneCnt",
+      "to": "phoneAct",
+      "label": "dispatch"
+    },
+    {
+      "id": "phone-domain",
+      "from": "phoneAct",
+      "to": "phoneSvc",
+      "label": "доменный API"
+    },
+    {
+      "id": "phone-wss",
+      "from": "phoneSvc",
+      "to": "sipExt",
+      "label": "WSS · WebRTC",
+      "variant": "emphasis"
+    },
+    {
+      "id": "phone-state",
+      "from": "phoneAct",
+      "to": "phoneRdcr",
+      "label": "regState · звонки",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelDy": 30
+    },
+    {
+      "id": "phone-use",
+      "from": "phoneRdcr",
+      "to": "phoneCnt",
+      "label": "useSelector",
+      "fromSide": "left",
+      "toSide": "left"
+    },
+    {
+      "id": "phone-keys",
+      "from": "phoneSvc",
+      "to": "storage",
+      "label": "настройки · звонки · чат",
+      "fromSide": "top",
+      "toSide": "bottom"
+    },
+    {
+      "id": "lk-events",
+      "from": "lkView",
+      "to": "lkCnt",
+      "label": "события"
+    },
+    {
+      "id": "lk-dispatch",
+      "from": "lkCnt",
+      "to": "lkAct",
+      "label": "dispatch"
+    },
+    {
+      "id": "lk-domain",
+      "from": "lkAct",
+      "to": "lkSvc",
+      "label": "доменный API"
+    },
+    {
+      "id": "lk-rtc",
+      "from": "lkSvc",
+      "to": "lkExt",
+      "label": "WebRTC · треки"
+    },
+    {
+      "id": "lk-state",
+      "from": "lkAct",
+      "to": "lkRdcr",
+      "label": "токен · invites",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelDy": 30
+    },
+    {
+      "id": "lk-use",
+      "from": "lkRdcr",
+      "to": "lkCnt",
+      "label": "useSelector",
+      "fromSide": "left",
+      "toSide": "left"
+    },
+    {
+      "id": "bridge-auth-phone",
+      "from": "authCnt",
+      "to": "phoneAct",
+      "label": "мост: handleClkRegister",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "bridge-phone-lk",
+      "from": "phoneCnt",
+      "to": "lkAct",
+      "label": "мост: displayControl",
+      "fromSide": "bottom",
+      "toSide": "top"
+    }
   ],
   "cards": [
     {

@@ -4929,10 +4929,10 @@
         <rect x="654.6666666666667" y="215" width="10" height="20" rx="3" class="c-database" stroke-width="1"/>
         <rect x="654.6666666666667" y="335" width="10" height="20" rx="3" class="c-mask"/>
         <rect x="654.6666666666667" y="335" width="10" height="20" rx="3" class="c-database" stroke-width="1"/>
-        <rect x="906" y="260" width="10" height="50" rx="3" class="c-mask"/>
-        <rect x="906" y="260" width="10" height="50" rx="3" class="c-external" stroke-width="1"/>
-        <rect x="1408.6666666666667" y="480" width="10" height="95" rx="3" class="c-mask"/>
-        <rect x="1408.6666666666667" y="480" width="10" height="95" rx="3" class="c-backend" stroke-width="1"/>
+        <rect x="1408.6666666666667" y="260" width="10" height="50" rx="3" class="c-mask"/>
+        <rect x="1408.6666666666667" y="260" width="10" height="50" rx="3" class="c-external" stroke-width="1"/>
+        <rect x="1157.3333333333335" y="480" width="10" height="95" rx="3" class="c-mask"/>
+        <rect x="1157.3333333333335" y="480" width="10" height="95" rx="3" class="c-backend" stroke-width="1"/>
         <rect x="1660" y="520" width="10" height="50" rx="3" class="c-mask"/>
         <rect x="1660" y="520" width="10" height="50" rx="3" class="c-external" stroke-width="1"/>
 
@@ -4945,75 +4945,75 @@
         </g>
         </g>
 
-        <g data-edge-from="action" data-edge-to="storage" data-edge-label="uriLkToken" data-edge-key="1" data-edge-id="store-token-uri">
+        <g data-edge-from="action" data-edge-to="storage" data-edge-label="uriLkToken (путь «Пригласить»)" data-edge-key="1" data-edge-id="store-token-uri">
           <path data-composition-edge-from="action" data-composition-edge-to="storage" data-composition-edge-id="store-token-uri" data-composition-points="415.33333333333337,225;652.6666666666667,225" d="M 415.33333333333337 225 L 652.6666666666667 225" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
         <g data-detail="context">
-          <rect x="502" y="205" width="64" height="16" rx="3" class="c-mask"/>
-          <text x="534" y="215" class="t-backend" font-size="9" text-anchor="middle">uriLkToken</text>
+          <rect x="450" y="205" width="168" height="16" rx="3" class="c-mask"/>
+          <text x="534" y="215" class="t-backend" font-size="9" text-anchor="middle">uriLkToken (путь «Пригласить»)</text>
         </g>
         </g>
 
-        <g data-edge-from="action" data-edge-to="token" data-edge-label="requestLkToken(num, room)" data-edge-key="2" data-edge-id="post-lk">
-          <path data-composition-edge-from="action" data-composition-edge-to="token" data-composition-edge-id="post-lk" data-composition-points="415.33333333333337,265;904,265" d="M 415.33333333333337 265 L 904 265" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <g data-edge-from="action" data-edge-to="token" data-edge-label="requestLkToken({ num, room, uriLkToken })" data-edge-key="2" data-edge-id="post-lk">
+          <path data-composition-edge-from="action" data-composition-edge-to="token" data-composition-edge-id="post-lk" data-composition-points="415.33333333333337,265;1406.6666666666667,265" d="M 415.33333333333337 265 L 1406.6666666666667 265" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
         <g data-detail="context">
-          <rect x="588.6666666666667" y="245" width="142" height="16" rx="3" class="c-mask"/>
-          <text x="659.6666666666667" y="255" class="t-backend" font-size="9" text-anchor="middle">requestLkToken(num, room)</text>
+          <rect x="798.4" y="245" width="225.20000000000002" height="16" rx="3" class="c-mask"/>
+          <text x="911" y="255" class="t-backend" font-size="9" text-anchor="middle">requestLkToken({ num, room, uriLkToken })</text>
         </g>
         </g>
 
         <g data-edge-from="token" data-edge-to="action" data-edge-label="jwt (exp, room)" data-edge-key="3" data-edge-id="jwt">
-          <path data-composition-edge-from="token" data-composition-edge-to="action" data-composition-edge-id="jwt" data-composition-points="904,305;415.33333333333337,305" d="M 904 305 L 415.33333333333337 305" class="a-default" stroke-width="1.4" stroke-dasharray="3,5" marker-end="url(#arrowhead)"/>
+          <path data-composition-edge-from="token" data-composition-edge-to="action" data-composition-edge-id="jwt" data-composition-points="1406.6666666666667,305;415.33333333333337,305" d="M 1406.6666666666667 305 L 415.33333333333337 305" class="a-default" stroke-width="1.4" stroke-dasharray="3,5" marker-end="url(#arrowhead)"/>
         <g data-detail="context">
-          <rect x="614.6666666666667" y="285" width="90" height="16" rx="3" class="c-mask"/>
-          <text x="659.6666666666667" y="295" class="t-muted" font-size="9" text-anchor="middle">jwt (exp, room)</text>
+          <rect x="866" y="285" width="90" height="16" rx="3" class="c-mask"/>
+          <text x="911" y="295" class="t-muted" font-size="9" text-anchor="middle">jwt (exp, room)</text>
         </g>
         </g>
 
-        <g data-edge-from="action" data-edge-to="storage" data-edge-label="lkInvites: num · room · token" data-edge-key="4" data-edge-id="store-invite">
+        <g data-edge-from="action" data-edge-to="storage" data-edge-label="lkInvites: num · room · token · expiresAt" data-edge-key="4" data-edge-id="store-invite">
           <path data-composition-edge-from="action" data-composition-edge-to="storage" data-composition-edge-id="store-invite" data-composition-points="415.33333333333337,345;652.6666666666667,345" d="M 415.33333333333337 345 L 652.6666666666667 345" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
         <g data-detail="context">
-          <rect x="452.6" y="325" width="162.8" height="16" rx="3" class="c-mask"/>
-          <text x="534" y="335" class="t-backend" font-size="9" text-anchor="middle">lkInvites: num · room · token</text>
+          <rect x="421.4" y="325" width="225.20000000000002" height="16" rx="3" class="c-mask"/>
+          <text x="534" y="335" class="t-backend" font-size="9" text-anchor="middle">lkInvites: num · room · token · expiresAt</text>
         </g>
         </g>
 
         <g data-edge-from="action" data-edge-to="rdcr" data-edge-label="LKROOM_CREATE_* / LKTOKEN_SUBMIT_SUCCESS" data-edge-key="5" data-edge-id="store-rdcr">
-          <path data-composition-edge-from="action" data-composition-edge-to="rdcr" data-composition-edge-id="store-rdcr" data-composition-points="415.33333333333337,385;1155.3333333333335,385" d="M 415.33333333333337 385 L 1155.3333333333335 385" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+          <path data-composition-edge-from="action" data-composition-edge-to="rdcr" data-composition-edge-id="store-rdcr" data-composition-points="415.33333333333337,385;904,385" d="M 415.33333333333337 385 L 904 385" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
         <g data-detail="context">
-          <rect x="675.3333333333335" y="365" width="220" height="16" rx="3" class="c-mask"/>
-          <text x="785.3333333333335" y="375" class="t-backend" font-size="9" text-anchor="middle">LKROOM_CREATE_* / LKTOKEN_SUBMIT_SUCCESS</text>
+          <rect x="549.6666666666667" y="365" width="220" height="16" rx="3" class="c-mask"/>
+          <text x="659.6666666666667" y="375" class="t-backend" font-size="9" text-anchor="middle">LKROOM_CREATE_* / LKTOKEN_SUBMIT_SUCCESS</text>
         </g>
         </g>
 
         <g data-edge-from="action" data-edge-to="rdcr" data-edge-label="приглашение → мост LkContainer → SIP MESSAGE" data-edge-key="6" data-edge-id="bridge-note">
-          <path data-composition-edge-from="action" data-composition-edge-to="rdcr" data-composition-edge-id="bridge-note" data-composition-points="415.33333333333337,420;1155.3333333333335,420" d="M 415.33333333333337 420 L 1155.3333333333335 420" class="a-dashed" stroke-width="1.4" marker-end="url(#arrowhead-dashed)"/>
+          <path data-composition-edge-from="action" data-composition-edge-to="rdcr" data-composition-edge-id="bridge-note" data-composition-points="415.33333333333337,420;904,420" d="M 415.33333333333337 420 L 904 420" class="a-dashed" stroke-width="1.4" marker-end="url(#arrowhead-dashed)"/>
         <g data-detail="context">
-          <rect x="664.9333333333335" y="400" width="240.8" height="16" rx="3" class="c-mask"/>
-          <text x="785.3333333333335" y="410" class="t-messagebus" font-size="9" text-anchor="middle">приглашение → мост LkContainer → SIP MESSAGE</text>
+          <rect x="539.2666666666668" y="400" width="240.8" height="16" rx="3" class="c-mask"/>
+          <text x="659.6666666666667" y="410" class="t-messagebus" font-size="9" text-anchor="middle">приглашение → мост LkContainer → SIP MESSAGE</text>
         </g>
         </g>
 
         <g data-edge-from="user" data-edge-to="runtime" data-edge-label="#/?lk_room&amp;lk_token → connect(url, token)" data-edge-key="7" data-edge-id="open-url">
-          <path data-composition-edge-from="user" data-composition-edge-to="runtime" data-composition-edge-id="open-url" data-composition-points="164,485;1406.6666666666667,485" d="M 164 485 L 1406.6666666666667 485" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+          <path data-composition-edge-from="user" data-composition-edge-to="runtime" data-composition-edge-id="open-url" data-composition-points="164,485;1155.3333333333335,485" d="M 164 485 L 1155.3333333333335 485" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
         <g data-detail="context">
-          <rect x="672.7333333333333" y="465" width="225.20000000000002" height="16" rx="3" class="c-mask"/>
-          <text x="785.3333333333334" y="475" class="t-backend" font-size="9" text-anchor="middle">#/?lk_room&amp;lk_token → connect(url, token)</text>
+          <rect x="547.0666666666667" y="465" width="225.20000000000002" height="16" rx="3" class="c-mask"/>
+          <text x="659.6666666666667" y="475" class="t-backend" font-size="9" text-anchor="middle">#/?lk_room&amp;lk_token → connect(url, token)</text>
         </g>
         </g>
 
         <g data-edge-from="runtime" data-edge-to="sfu" data-edge-label="Room.connect()" data-edge-key="8" data-edge-id="connect">
-          <path data-composition-edge-from="runtime" data-composition-edge-to="sfu" data-composition-edge-id="connect" data-composition-points="1420.6666666666667,525;1658,525" d="M 1420.6666666666667 525 L 1658 525" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+          <path data-composition-edge-from="runtime" data-composition-edge-to="sfu" data-composition-edge-id="connect" data-composition-points="1169.3333333333335,525;1658,525" d="M 1169.3333333333335 525 L 1658 525" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
         <g data-detail="context">
-          <rect x="1496.9333333333334" y="505" width="84.8" height="16" rx="3" class="c-mask"/>
-          <text x="1539.3333333333335" y="515" class="t-backend" font-size="9" text-anchor="middle">Room.connect()</text>
+          <rect x="1371.2666666666667" y="505" width="84.8" height="16" rx="3" class="c-mask"/>
+          <text x="1413.6666666666667" y="515" class="t-backend" font-size="9" text-anchor="middle">Room.connect()</text>
         </g>
         </g>
 
         <g data-edge-from="sfu" data-edge-to="runtime" data-edge-label="треки участников" data-edge-key="9" data-edge-id="tracks">
-          <path data-composition-edge-from="sfu" data-composition-edge-to="runtime" data-composition-edge-id="tracks" data-composition-points="1658,565;1420.6666666666667,565" d="M 1658 565 L 1420.6666666666667 565" class="a-default" stroke-width="1.4" stroke-dasharray="3,5" marker-end="url(#arrowhead)"/>
+          <path data-composition-edge-from="sfu" data-composition-edge-to="runtime" data-composition-edge-id="tracks" data-composition-points="1658,565;1169.3333333333335,565" d="M 1658 565 L 1169.3333333333335 565" class="a-default" stroke-width="1.4" stroke-dasharray="3,5" marker-end="url(#arrowhead)"/>
         <g data-detail="context">
-          <rect x="1491.7333333333336" y="545" width="95.2" height="16" rx="3" class="c-mask"/>
-          <text x="1539.3333333333335" y="555" class="t-muted" font-size="9" text-anchor="middle">треки участников</text>
+          <rect x="1366.0666666666668" y="545" width="95.2" height="16" rx="3" class="c-mask"/>
+          <text x="1413.6666666666667" y="555" class="t-muted" font-size="9" text-anchor="middle">треки участников</text>
         </g>
         </g>
 
@@ -5028,13 +5028,15 @@
         </g>
 
         <!-- Participants -->
-        <g id="node-user" data-node-id="user" data-node-label="LkMeet" tabindex="0" role="button" aria-label="Focus LkMeet, Создать/Пригласить, Sequence participant" aria-pressed="false" data-node-kind="external" data-node-sublabel="Создать/Пригласить" data-node-context="Sequence participant">
+        <g id="node-user" data-node-id="user" data-node-label="LkMeet" tabindex="0" role="button" aria-label="Focus LkMeet, Создать/Пригласить, Sequence participant" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="Создать/Пригласить" data-node-context="Sequence participant">
           <title>LkMeet · Создать/Пригласить · Sequence participant</title>
           <rect x="62" y="72" width="190" height="54" rx="6" class="c-mask"/>
-          <rect x="62" y="72" width="190" height="54" rx="6" class="c-external" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="external" class="semantic-sigil s-external" transform="translate(68 78) scale(0.6875)">
-            <rect x="2.5" y="5" width="8.5" height="8" rx="1.5"/>
-            <path d="M8 2.5h5.5V8M13.5 2.5 7.5 8.5"/>
+          <rect x="62" y="72" width="190" height="54" rx="6" class="c-frontend" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(68 78) scale(0.6875)">
+            <rect x="2" y="3" width="12" height="10" rx="2"/>
+            <path d="M2 6.5h12"/>
+            <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill"/>
+            <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
           </g>
           <text data-detail-anchor x="157" y="94" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">LkMeet</text>
           <text data-detail="context" x="157" y="111" class="t-muted" font-size="7" text-anchor="middle">Создать/Пригласить</text>
@@ -5063,39 +5065,39 @@
           <text data-detail="context" x="659.6666666666667" y="111" class="t-muted" font-size="7" text-anchor="middle">uriLkToken · lkInvites</text>
         </g>
 
-        <g id="node-token" data-node-id="token" data-node-label="POST /user/lk" tabindex="0" role="button" aria-label="Focus POST /user/lk, lkToken.js, Sequence participant" aria-pressed="false" data-node-kind="external" data-node-sublabel="lkToken.js" data-node-context="Sequence participant">
-          <title>POST /user/lk · lkToken.js · Sequence participant</title>
-          <rect x="816" y="72" width="190" height="54" rx="6" class="c-mask"/>
-          <rect x="816" y="72" width="190" height="54" rx="6" class="c-external" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="external" class="semantic-sigil s-external" transform="translate(822 78) scale(0.6875)">
-            <rect x="2.5" y="5" width="8.5" height="8" rx="1.5"/>
-            <path d="M8 2.5h5.5V8M13.5 2.5 7.5 8.5"/>
-          </g>
-          <text data-detail-anchor x="911" y="94" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">POST /user/lk</text>
-          <text data-detail="context" x="911" y="111" class="t-muted" font-size="7" text-anchor="middle">lkToken.js</text>
-        </g>
-
         <g id="node-rdcr" data-node-id="rdcr" data-node-label="lkControlRdcr" tabindex="0" role="button" aria-label="Focus lkControlRdcr, invites · createStatus, Sequence participant" aria-pressed="false" data-node-kind="database" data-node-sublabel="invites · createStatus" data-node-context="Sequence participant">
           <title>lkControlRdcr · invites · createStatus · Sequence participant</title>
-          <rect x="1067.3333333333335" y="72" width="190" height="54" rx="6" class="c-mask"/>
-          <rect x="1067.3333333333335" y="72" width="190" height="54" rx="6" class="c-database" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="database" class="semantic-sigil s-database" transform="translate(1073.3333333333335 78) scale(0.6875)">
+          <rect x="816" y="72" width="190" height="54" rx="6" class="c-mask"/>
+          <rect x="816" y="72" width="190" height="54" rx="6" class="c-database" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="database" class="semantic-sigil s-database" transform="translate(822 78) scale(0.6875)">
             <ellipse cx="8" cy="4" rx="5" ry="2"/>
             <path d="M3 4v8c0 1.1 2.2 2 5 2s5-.9 5-2V4M3 8c0 1.1 2.2 2 5 2s5-.9 5-2"/>
           </g>
-          <text data-detail-anchor x="1162.3333333333335" y="94" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">lkControlRdcr</text>
-          <text data-detail="context" x="1162.3333333333335" y="111" class="t-muted" font-size="7" text-anchor="middle">invites · createStatus</text>
+          <text data-detail-anchor x="911" y="94" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">lkControlRdcr</text>
+          <text data-detail="context" x="911" y="111" class="t-muted" font-size="7" text-anchor="middle">invites · createStatus</text>
         </g>
 
-        <g id="node-runtime" data-node-id="runtime" data-node-label="lkRuntime" tabindex="0" role="button" aria-label="Focus lkRuntime, getLiveKitRoom(), Sequence participant" aria-pressed="false" data-node-kind="backend" data-node-sublabel="getLiveKitRoom()" data-node-context="Sequence participant">
-          <title>lkRuntime · getLiveKitRoom() · Sequence participant</title>
-          <rect x="1318.6666666666667" y="72" width="190" height="54" rx="6" class="c-mask"/>
-          <rect x="1318.6666666666667" y="72" width="190" height="54" rx="6" class="c-backend" stroke-width="1.5"/>
-          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(1324.6666666666667 78) scale(0.6875)">
+        <g id="node-runtime" data-node-id="runtime" data-node-label="lkRuntime" tabindex="0" role="button" aria-label="Focus lkRuntime, getLiveKitRoom() · прослойка к SFU, Sequence participant" aria-pressed="false" data-node-kind="backend" data-node-sublabel="getLiveKitRoom() · прослойка к SFU" data-node-context="Sequence participant">
+          <title>lkRuntime · getLiveKitRoom() · прослойка к SFU · Sequence participant</title>
+          <rect x="1067.3333333333335" y="72" width="190" height="54" rx="6" class="c-mask"/>
+          <rect x="1067.3333333333335" y="72" width="190" height="54" rx="6" class="c-backend" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(1073.3333333333335 78) scale(0.6875)">
             <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
           </g>
-          <text data-detail-anchor x="1413.6666666666667" y="94" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">lkRuntime</text>
-          <text data-detail="context" x="1413.6666666666667" y="111" class="t-muted" font-size="7" text-anchor="middle">getLiveKitRoom()</text>
+          <text data-detail-anchor x="1162.3333333333335" y="94" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">lkRuntime</text>
+          <text data-detail="context" x="1162.3333333333335" y="111" class="t-muted" font-size="7" text-anchor="middle">getLiveKitRoom() · прослойка к SFU</text>
+        </g>
+
+        <g id="node-token" data-node-id="token" data-node-label="POST /user/lk" tabindex="0" role="button" aria-label="Focus POST /user/lk, lkToken.js, Sequence participant" aria-pressed="false" data-node-kind="external" data-node-sublabel="lkToken.js" data-node-context="Sequence participant">
+          <title>POST /user/lk · lkToken.js · Sequence participant</title>
+          <rect x="1318.6666666666667" y="72" width="190" height="54" rx="6" class="c-mask"/>
+          <rect x="1318.6666666666667" y="72" width="190" height="54" rx="6" class="c-external" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="external" class="semantic-sigil s-external" transform="translate(1324.6666666666667 78) scale(0.6875)">
+            <rect x="2.5" y="5" width="8.5" height="8" rx="1.5"/>
+            <path d="M8 2.5h5.5V8M13.5 2.5 7.5 8.5"/>
+          </g>
+          <text data-detail-anchor x="1413.6666666666667" y="94" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">POST /user/lk</text>
+          <text data-detail="context" x="1413.6666666666667" y="111" class="t-muted" font-size="7" text-anchor="middle">lkToken.js</text>
         </g>
 
         <g id="node-sfu" data-node-id="sfu" data-node-label="LiveKit SFU" tabindex="0" role="button" aria-label="Focus LiveKit SFU, комната · треки, Sequence participant" aria-pressed="false" data-node-kind="external" data-node-sublabel="комната · треки" data-node-context="Sequence participant">
@@ -5330,7 +5332,7 @@
           <h3>Хранилище</h3>
         </div>
         <ul>
-          <li>&bull; uriLkToken пишет lkToken перед запросом токена</li>
+          <li>&bull; uriLkToken пишет lkToken на пути «Пригласить» — перед запросом токена</li>
           <li>&bull; приглашения — localStorage.lkInvites, лимит LK_MAX_INVITES</li>
           <li>&bull; в срез lkControlRdcr всё попадает сидом через preloadedState.js</li>
         </ul>
