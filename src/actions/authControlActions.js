@@ -49,7 +49,6 @@ const handleRestRegister =
   };
 
 const handleRestAuthClear = () => (dispatch) => {
-  restAuth.clearRestAuthSession();
   dispatch({ type: AUTHCTL_CLEAR });
 };
 

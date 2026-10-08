@@ -21,13 +21,13 @@ date-fns. Только JavaScript, форматирование — Biome. Те�
 ## Архитектурные границы
 
 - `services/` не зависят от Redux, общаются с actions через колбэки: `phoneRuntime`/`lkRuntime`
-  (singleton-runtime SIP и LiveKit-медиа), `restAuth` (REST-сессия, пробивка PHP-сессии по
+  (singleton-runtime SIP и LiveKit-медиа), `restAuth` (адрес и логин REST-входа, пробивка PHP-сессии по
   `uriRestPhpAuth`), `lkToken` (токен LiveKit, срок действия, приглашения), `phoneDirectory`,
   `phoneNotifications`, `phoneStorage`. Весь `localStorage` и весь HTTP (`ky`) — только здесь;
   ключи — `constants/storage.js`.
 - Redux хранит только UI-флаги/заголовки/списки/счётчики — не SDK-объекты и не медиа.
   `store/preloadedState.js` собирает сид из сервисов и отдаёт срезы в `configureStore`
-  (`createStore(preloadedState)` + `authTimeoutMiddleware`); reducers чистые и не импортируют
+  (`createStore(preloadedState)` + `applyMiddleware(thunk)`); reducers чистые и не импортируют
   сервисы. Action types — `constants/redux.js` (префиксы `PHONECTL_`, `AUTHCTL_`,
   `LKTOKEN_`/`LKROOM_`/`LK_`).
 - Namespace-инвариант: thunk-и `AUTHCTL_`, `PHONECTL_`, `LK_` не диспатчат чужой префикс и не

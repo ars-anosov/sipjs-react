@@ -1,12 +1,10 @@
 import ky from "ky";
-import { REST_AUTH_EXPIRE_TIME_KEY, REST_LOGIN_KEY, REST_URI_AUTH_KEY, REST_URI_PHP_AUTH_KEY } from "../constants/storage";
+import { REST_LOGIN_KEY, REST_URI_AUTH_KEY, REST_URI_PHP_AUTH_KEY } from "../constants/storage";
 
-const REST_SESSION_TTL_MS = 24 * 60 * 60 * 1000;
 const REST_REQUEST_TIMEOUT_MS = 5000;
 
-// REST-сессия и адрес сервиса авторизации живут только здесь: actions вызывают
-// доменный API, configureStore и store/preloadedState.js — геттеры, компоненты —
-// getStoredRestLogin.
+// Адрес сервиса авторизации и логин последнего входа живут только здесь: actions вызывают
+// доменный API, store/preloadedState.js — геттеры, компоненты — getStoredRestLogin.
 
 function getStoredRestAuthUri() {
   return localStorage.getItem(REST_URI_AUTH_KEY) || "";
@@ -31,24 +29,11 @@ function storeRestAuthUri(uriRestAuth) {
   localStorage.setItem(REST_URI_AUTH_KEY, uriRestAuth);
 }
 
-function persistRestAuthSession({ login }) {
+function storeRestLogin(login) {
   localStorage.setItem(REST_LOGIN_KEY, login);
-  localStorage.setItem(REST_AUTH_EXPIRE_TIME_KEY, String(Date.now() + REST_SESSION_TTL_MS));
 }
 
-function clearRestAuthSession() {
-  localStorage.removeItem(REST_AUTH_EXPIRE_TIME_KEY);
-}
-
-function isRestAuthSessionExpired() {
-  const raw = localStorage.getItem(REST_AUTH_EXPIRE_TIME_KEY);
-  if (!raw) return false;
-
-  const expireTime = Number(raw);
-  return Number.isFinite(expireTime) && Date.now() > expireTime;
-}
-
-// Адрес сохраняем до запроса, сессию — только после успеха.
+// Адрес сохраняем до запроса, логин — только после успеха.
 async function loginRest({ login, password, uriRestAuth }) {
   storeRestAuthUri(uriRestAuth);
 
@@ -59,7 +44,7 @@ async function loginRest({ login, password, uriRestAuth }) {
     })
     .json();
 
-  persistRestAuthSession({ login });
+  storeRestLogin(login);
 
   return responseData;
 }
@@ -81,4 +66,4 @@ async function probeRestPhpSession(uriRestPhpAuth) {
     .json();
 }
 
-export { clearRestAuthSession, getStoredRestAuthUri, getStoredRestLogin, getStoredRestPhpAuthUri, isRestAuthSessionExpired, loginRest, probeRestPhpSession };
+export { getStoredRestAuthUri, getStoredRestLogin, getStoredRestPhpAuthUri, loginRest, probeRestPhpSession };
