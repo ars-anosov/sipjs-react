@@ -11,12 +11,12 @@ archify-спека и пересобирается HTML, и только пот�
 
 [Диаграмма](archify/sipjs-react-architecture.html).
 
-- Три среза и их внешние ресурсы: `AUTHCTL_` → `adAuth` → AD-сервис (`ky`),
+- Три среза и их внешние ресурсы: `AUTHCTL_` → `restAuth` → REST-сервис (`ky`),
   `PHONECTL_` → `phoneRuntime` → SIP SBC (`WSS`), `LKTOKEN_`/`LKROOM_`/`LK_` →
   `lkRuntime`/`lkToken` → LiveKit SFU. Thunk-и не диспатчат чужой префикс.
 - Слои: UI → контейнеры → Redux (`actions` и `reducers`) → сервисы; `localStorage` — общее
   хранилище трёх срезов (ключи — `constants/storage.js`), сид в store собирает
-  `store/preloadedState.js`. AD-сервис, SIP SBC и LiveKit SFU — внешние блоки вне слоёв.
+  `store/preloadedState.js`. REST-сервис, SIP SBC и LiveKit SFU — внешние блоки вне слоёв.
 - Мосты только в контейнерах: `AuthContainer` (`AUTHCTL_` ↔ `PHONECTL_`, URL `lk_token` → `LK_`),
   `PhoneContainer` (URL → `PHONECTL_`; кнопка LiveKit → `lkControlRdcr.displayControl`),
   `LkContainer` (приглашение → SIP MESSAGE через `PHONECTL_`).
@@ -24,7 +24,7 @@ archify-спека и пересобирается HTML, и только пот�
 ```mermaid
 flowchart LR
   subgraph UI["UI — компоненты"]
-    ViewAuth["AuthLinks · AuthAd<br/>формы AD"]
+    ViewAuth["AuthLinks · AuthRest<br/>формы REST"]
     ViewPhone["PhoneReg · PhonePad<br/>регистрация · звонки · чат"]
     ViewLk["LkMeet · LkToken<br/>комната · приглашение"]
   end
@@ -35,14 +35,14 @@ flowchart LR
   end
   subgraph RX["Redux — actions и reducers"]
     ActAuth["authControlActions<br/>AUTHCTL_"]
-    RdcrAuth["authControlRdcr<br/>состояние AD"]
+    RdcrAuth["authControlRdcr<br/>состояние REST"]
     ActPhone["phoneControlActions<br/>PHONECTL_"]
     RdcrPhone["phoneControlRdcr<br/>regState · звонки · чат"]
     ActLk["lkControlActions<br/>LKTOKEN_ · LKROOM_ · LK_"]
     RdcrLk["lkControlRdcr<br/>токен · invites"]
   end
   subgraph SV["Сервисы"]
-    SvcAd["adAuth<br/>AD-сессия · ky"]
+    SvcRest["restAuth<br/>REST-сессия · ky"]
     SvcPhone["Телефонные сервисы<br/>phoneRuntime · phoneStorage"]
     SvcLk["LiveKit-сервисы<br/>lkRuntime · lkToken"]
   end
@@ -51,11 +51,11 @@ flowchart LR
   end
   ViewAuth -->|события| CntAuth
   CntAuth -->|dispatch| ActAuth
-  ActAuth -->|доменный API| SvcAd
-  SvcAd -->|ky · POST| AdRes["AD-сервис<br/>uriAdAuth · uriAdPhpAuth"]
-  ActAuth -->|состояние AD| RdcrAuth
+  ActAuth -->|доменный API| SvcRest
+  SvcRest -->|ky · POST| RestRes["REST-сервис<br/>uriRestAuth · uriRestPhpAuth"]
+  ActAuth -->|состояние REST| RdcrAuth
   RdcrAuth -->|useSelector| CntAuth
-  SvcAd -->|ключи AD| Ls
+  SvcRest -->|ключи REST| Ls
   ViewPhone -->|события| CntPhone
   CntPhone -->|dispatch| ActPhone
   ActPhone -->|доменный API| SvcPhone
@@ -79,9 +79,9 @@ flowchart LR
   (`AUTHCTL_` ↔ `PHONECTL_`, URL `lk_token` → `LK_`), `PhoneContainer` (кнопка LiveKit →
   `lkControlRdcr.displayControl`), `LkContainer` (приглашение → SIP MESSAGE через `PHONECTL_`).
 - У каждого среза свой сервис и внешний ресурс, а ключи всех трёх лежат в `localStorage`
-  (`adAuth`, `phoneStorage`, `lkToken`); весь HTTP (`ky`) тоже только в `services/`.
-- Регистрация: `AuthAd` открывается лишь неуспешной пробивкой PHP-сессии
-  (`GET uriAdPhpAuth?PHPSESSID=...`); успех — тихий вход без формы, ошибкой AD пробивка не
+  (`restAuth`, `phoneStorage`, `lkToken`); весь HTTP (`ky`) тоже только в `services/`.
+- Регистрация: `AuthRest` открывается лишь неуспешной пробивкой PHP-сессии
+  (`GET uriRestPhpAuth?PHPSESSID=...`); успех — тихий вход без формы, ошибкой REST пробивка не
   считается.
 
 ## 2. SIP регистрация
@@ -147,9 +147,9 @@ sequenceDiagram
 
 [Диаграмма](archify/sipjs-react-livekit-store.html).
 
-- Условие доступа — SIP, не AD: своя комната и приглашение доступны только при живой
+- Условие доступа — SIP, не REST: своя комната и приглашение доступны только при живой
   регистрации (`regState === "ok"`, номер — `callerUserNum`); приглашение уходит SIP MESSAGE,
-  AD для него не нужен.
+  REST для него не нужен.
 - Хранилище: `uriLkToken` пишет `lkToken` на пути «Пригласить» перед запросом токена;
   приглашения — `localStorage.lkInvites` (лимит `LK_MAX_INVITES`, одно актуальное на номер,
   запись `num · room · token · expiresAt · createdAt`); `uriLk` — адрес SFU, только читается.

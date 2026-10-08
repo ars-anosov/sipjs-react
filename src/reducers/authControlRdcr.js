@@ -7,16 +7,16 @@ import {
   AUTHCTL_SUBMIT_SUCCESS,
 } from "../constants/redux";
 
-// Только UI-дефолты: сохранённые значения (uriAdAuth) подставляет сид стора —
+// Только UI-дефолты: сохранённые значения (uriRestAuth) подставляет сид стора —
 // store/preloadedState.js → preloadedState в configureStore.
 export const initialState = {
   displayControl: false,
-  displayAd: false,
+  displayRest: false,
   displayAuthPad: false,
-  uriAdAuth: "",
+  uriRestAuth: "",
   // Адрес PHP-пробивки и её итог: idle — ещё не пробовали, loading — запрос идёт,
-  // success — вход без формы, fail — форму AuthAd показывать можно
-  uriAdPhpAuth: "",
+  // success — вход без формы, fail — форму AuthRest показывать можно
+  uriRestPhpAuth: "",
   phpProbe: "idle",
   status: "idle", // 'idle' | 'loading' | 'success' | 'error'
   responseData: null,
@@ -30,7 +30,7 @@ export default function authControlRdcr(state = initialState, action) {
       return {
         ...state,
         status: "loading",
-        displayAd: true,
+        displayRest: true,
         responseData: null,
         errComponent: "",
         errText: "",
@@ -40,7 +40,7 @@ export default function authControlRdcr(state = initialState, action) {
       return {
         ...state,
         status: "success",
-        displayAd: false,
+        displayRest: false,
         displayAuthPad: true,
         responseData: action.payload.responseData,
         errComponent: "",
@@ -52,9 +52,9 @@ export default function authControlRdcr(state = initialState, action) {
       return {
         ...state,
         status: "error",
-        displayAd: true,
+        displayRest: true,
         responseData: null,
-        errComponent: "AuthAd",
+        errComponent: "AuthRest",
         errText,
       };
     }
@@ -67,8 +67,8 @@ export default function authControlRdcr(state = initialState, action) {
         responseData: null,
         errComponent: "",
         errText: "",
-        // Пробивка — одна на загрузку страницы: выход из AD-сессии её не повторяет,
-        // а помечает исчерпанной (fail), чтобы форма AuthAd открылась сразу
+        // Пробивка — одна на загрузку страницы: выход из REST-сессии её не повторяет,
+        // а помечает исчерпанной (fail), чтобы форма AuthRest открылась сразу
         phpProbe: "fail",
       };
 

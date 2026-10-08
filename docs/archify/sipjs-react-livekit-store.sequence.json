@@ -200,10 +200,10 @@
   "cards": [
     {
       "dot": "violet",
-      "title": "Условие доступа — SIP, не AD",
+      "title": "Условие доступа — SIP, не REST",
       "items": [
         "своя комната и приглашение требуют regState=ok, номер — callerUserNum",
-        "приглашение уходит SIP MESSAGE — AD для него не нужен"
+        "приглашение уходит SIP MESSAGE — REST для него не нужен"
       ]
     },
     {

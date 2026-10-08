@@ -4,11 +4,11 @@ export const CHAT_MAX_MESSAGES = 50;
 export const CALLS_STORAGE_KEY = "sipCalls";
 export const CALLS_MAX_CALLS = 50;
 
-export const AD_URI_AUTH_KEY = "uriAdAuth";
-// Адрес PHP-пробивки: GET uriAdPhpAuth?PHPSESSID=<cookie> вместо формы AuthAd
-export const AD_URI_PHP_AUTH_KEY = "uriAdPhpAuth";
-export const AD_LOGIN_KEY = "adLogin";
-export const AD_AUTH_EXPIRE_TIME_KEY = "adAuthExpireTime";
+export const REST_URI_AUTH_KEY = "uriRestAuth";
+// Адрес PHP-пробивки: GET uriRestPhpAuth?PHPSESSID=<cookie> вместо формы AuthRest
+export const REST_URI_PHP_AUTH_KEY = "uriRestPhpAuth";
+export const REST_LOGIN_KEY = "restLogin";
+export const REST_AUTH_EXPIRE_TIME_KEY = "restAuthExpireTime";
 
 export const PHONE_URI_WEBRTC_KEY = "uriWebRtc";
 export const PHONE_CALLER_USER_NUM_KEY = "callerUserNum";

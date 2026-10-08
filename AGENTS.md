@@ -1,7 +1,7 @@
 # AGENTS.md — sipjs-react
 
-WebRTC-телефон: SIP (sip.js), видеовстречи LiveKit, AD-авторизация. Общаться, документировать и
-комментировать по-русски.
+WebRTC-телефон: SIP (sip.js), видеовстречи LiveKit, REST-авторизация через внешний REST API.
+Общаться, документировать и комментировать по-русски.
 
 Единственный источник правил для AI-агентов. Адаптеры (`CLAUDE.md`, `.github/copilot-instructions.md`,
 `.cursor/rules/project.mdc`, `.codex/codex.md`) — тонкие ссылки сюда, без дублирования. Общие
@@ -21,8 +21,8 @@ date-fns. Только JavaScript, форматирование — Biome. Те�
 ## Архитектурные границы
 
 - `services/` не зависят от Redux, общаются с actions через колбэки: `phoneRuntime`/`lkRuntime`
-  (singleton-runtime SIP и LiveKit-медиа), `adAuth` (AD-сессия, пробивка PHP-сессии по
-  `uriAdPhpAuth`), `lkToken` (токен LiveKit, срок действия, приглашения), `phoneDirectory`,
+  (singleton-runtime SIP и LiveKit-медиа), `restAuth` (REST-сессия, пробивка PHP-сессии по
+  `uriRestPhpAuth`), `lkToken` (токен LiveKit, срок действия, приглашения), `phoneDirectory`,
   `phoneNotifications`, `phoneStorage`. Весь `localStorage` и весь HTTP (`ky`) — только здесь;
   ключи — `constants/storage.js`.
 - Redux хранит только UI-флаги/заголовки/списки/счётчики — не SDK-объекты и не медиа.
@@ -34,18 +34,18 @@ date-fns. Только JavaScript, форматирование — Biome. Те�
   читают чужой срез через `getState()`. Мосты — только в контейнерах: `AuthContainer`
   (AUTHCTL↔PHONECTL, URL→LK), `PhoneContainer` (URL→PHONECTL; кнопка LiveKit переключает
   `lkControlRdcr.displayControl`), `LkContainer` (приглашение → чат). Владение рендером — по
-  срезу (`AuthContainer` — `AuthLinks`/`AuthAd`/`AuthPad`, `PhoneContainer` — `PhoneReg`/`PhonePad`/
+  срезу (`AuthContainer` — `AuthLinks`/`AuthRest`/`AuthPad`, `PhoneContainer` — `PhoneReg`/`PhonePad`/
   `PhoneHistory`/`PhoneChat`).
 - `phoneControlRdcr.regState` (`off`/`ok`/`fail`) — единственный флаг SIP-регистрации; тумблер
   `AuthPad` трёхпозиционный и отражает его напрямую (нет отдельного булева флага).
 - Своя LiveKit-комната и приглашение доступны только при живой SIP-регистрации
-  (`regState === "ok"`, номер комнаты — `callerUserNum`); приглашение уходит SIP MESSAGE, AD для
+  (`regState === "ok"`, номер комнаты — `callerUserNum`); приглашение уходит SIP MESSAGE, REST для
   этого не нужен. Список приглашений — `localStorage.lkInvites` (лимит `LK_MAX_INVITES`).
-- `AuthAd` открывается только неуспешной пробивкой PHP-сессии (`GET uriAdPhpAuth?PHPSESSID=...`);
-  успех — тихий вход без формы, ошибкой AD пробивка не считается.
+- `AuthRest` открывается только неуспешной пробивкой PHP-сессии (`GET uriRestPhpAuth?PHPSESSID=...`);
+  успех — тихий вход без формы, ошибкой REST пробивка не считается.
 - Компоненты не импортируют sip.js/livekit-client и не работают с runtime напрямую — только
   пропсы + `*Actions` (исключения: `PhoneIco`→`phoneNotifications`, `LkMeet`→`lkRuntime`,
-  `AuthAd`→`adAuth`).
+  `AuthRest`→`restAuth`).
 
 ## Соглашения
 

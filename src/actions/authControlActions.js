@@ -1,39 +1,39 @@
 import { AUTHCTL_CLEAR, AUTHCTL_STORE_VALUE, AUTHCTL_SUBMIT_ERROR, AUTHCTL_SUBMIT_REQUEST, AUTHCTL_SUBMIT_SUCCESS } from "../constants/redux";
-import * as adAuth from "../services/adAuth";
+import * as restAuth from "../services/restAuth";
 import { getApiErrorMessage } from "./utils/kyError";
 
 // Namespace-инвариант: thunk-и AUTHCTL_ не трогают PHONECTL_ (и наоборот).
-// Мост «AD-данные → PhoneReg» живёт в контейнере AuthContainer.
+// Мост «REST-данные → PhoneReg» живёт в контейнере AuthContainer.
 
-function dispatchAdAuthError(dispatch, errText) {
+function dispatchRestAuthError(dispatch, errText) {
   dispatch({
     type: AUTHCTL_SUBMIT_ERROR,
     payload: { errText },
   });
 }
 
-const handleAdRegister =
+const handleRestRegister =
   (formData = {}) =>
   async (dispatch) => {
     const login = typeof formData.login === "string" ? formData.login.trim() : "";
     const password = typeof formData.password === "string" ? formData.password.trim() : "";
-    const uriAdAuth = typeof formData.uriAdAuth === "string" ? formData.uriAdAuth.trim() : "";
+    const uriRestAuth = typeof formData.uriRestAuth === "string" ? formData.uriRestAuth.trim() : "";
 
     if (!login || !password) {
-      dispatchAdAuthError(dispatch, "Заполните логин и пароль.");
+      dispatchRestAuthError(dispatch, "Заполните логин и пароль.");
       return;
     }
 
-    if (!uriAdAuth) {
-      dispatchAdAuthError(dispatch, "Не задан uriAdAuth.");
+    if (!uriRestAuth) {
+      dispatchRestAuthError(dispatch, "Не задан uriRestAuth.");
       return;
     }
 
     dispatch({ type: AUTHCTL_SUBMIT_REQUEST });
 
     try {
-      // Сервис сам сохраняет адрес AD и AD-сессию.
-      const responseData = await adAuth.loginAd({ login, password, uriAdAuth });
+      // Сервис сам сохраняет адрес REST и REST-сессию.
+      const responseData = await restAuth.loginRest({ login, password, uriRestAuth });
 
       dispatch({
         type: AUTHCTL_SUBMIT_SUCCESS,
@@ -44,20 +44,20 @@ const handleAdRegister =
       // в AuthContainer (мост AUTHCTL_ → PHONECTL_), управляется тумблером AuthPad.
     } catch (error) {
       const detailMessage = await getApiErrorMessage(error);
-      dispatchAdAuthError(dispatch, detailMessage);
+      dispatchRestAuthError(dispatch, detailMessage);
     }
   };
 
-const handleAdAuthClear = () => (dispatch) => {
-  adAuth.clearAdAuthSession();
+const handleRestAuthClear = () => (dispatch) => {
+  restAuth.clearRestAuthSession();
   dispatch({ type: AUTHCTL_CLEAR });
 };
 
-// Пробивка PHP-сессии (GET uriAdPhpAuth?PHPSESSID=<cookie>): успех — тихий AD-вход без
-// формы (AUTHCTL_SUBMIT_SUCCESS), неуспех — форма AuthAd (сюда AuthContainer смотрит
+// Пробивка PHP-сессии (GET uriRestPhpAuth?PHPSESSID=<cookie>): успех — тихий REST-вход без
+// формы (AUTHCTL_SUBMIT_SUCCESS), неуспех — форма AuthRest (сюда AuthContainer смотрит
 // на phpProbe). Ошибку пробивки пользователю не показываем: это ожидаемый фолбэк.
-const handleAdPhpProbe = (uriAdPhpAuth) => async (dispatch) => {
-  const phpAuthUri = typeof uriAdPhpAuth === "string" ? uriAdPhpAuth.trim() : "";
+const handleRestPhpProbe = (uriRestPhpAuth) => async (dispatch) => {
+  const phpAuthUri = typeof uriRestPhpAuth === "string" ? uriRestPhpAuth.trim() : "";
 
   if (!phpAuthUri) {
     dispatch(handleChangeStore("phpProbe", "fail"));
@@ -67,7 +67,7 @@ const handleAdPhpProbe = (uriAdPhpAuth) => async (dispatch) => {
   dispatch(handleChangeStore("phpProbe", "loading"));
 
   try {
-    const responseData = await adAuth.probeAdPhpSession(phpAuthUri);
+    const responseData = await restAuth.probeRestPhpSession(phpAuthUri);
 
     dispatch({
       type: AUTHCTL_SUBMIT_SUCCESS,
@@ -76,7 +76,7 @@ const handleAdPhpProbe = (uriAdPhpAuth) => async (dispatch) => {
     dispatch(handleChangeStore("phpProbe", "success"));
   } catch (error) {
     if (import.meta.env.DEV) {
-      console.warn("Пробивка uriAdPhpAuth не прошла — показываем форму AuthAd:", error);
+      console.warn("Пробивка uriRestPhpAuth не прошла — показываем форму AuthRest:", error);
     }
 
     dispatch(handleChangeStore("phpProbe", "fail"));
@@ -90,4 +90,4 @@ const handleChangeStore = (storeDataKey, storeDataValue) => (dispatch) => {
   });
 };
 
-export { handleAdAuthClear, handleAdPhpProbe, handleAdRegister, handleChangeStore };
+export { handleChangeStore, handleRestAuthClear, handleRestPhpProbe, handleRestRegister };

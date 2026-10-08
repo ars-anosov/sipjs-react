@@ -1,9 +1,9 @@
 import { initialState as authControlInitialState } from "../reducers/authControlRdcr";
 import { initialState as lkControlInitialState } from "../reducers/lkControlRdcr";
 import { initialState as phoneControlInitialState } from "../reducers/phoneControlRdcr";
-import { getStoredAdAuthUri, getStoredAdPhpAuthUri } from "../services/adAuth";
 import { getStoredLkInvites, getStoredLkTokenUri, getStoredLkUri } from "../services/lkToken";
 import { getStoredCallerUserNum, getStoredUriWebRtc, getStoredUseIce } from "../services/phoneStorage";
+import { getStoredRestAuthUri, getStoredRestPhpAuthUri } from "../services/restAuth";
 
 // Нормализация сохранённого адреса WebRTC.
 const parseUriWebRtcValue = (uriWebRtc = "") => (typeof uriWebRtc === "string" ? uriWebRtc.trim() : "");
@@ -21,8 +21,8 @@ export default function getPreloadedState() {
     },
     authControlRdcr: {
       ...authControlInitialState,
-      uriAdAuth: getStoredAdAuthUri(),
-      uriAdPhpAuth: getStoredAdPhpAuthUri(),
+      uriRestAuth: getStoredRestAuthUri(),
+      uriRestPhpAuth: getStoredRestPhpAuthUri(),
     },
     lkControlRdcr: {
       ...lkControlInitialState,

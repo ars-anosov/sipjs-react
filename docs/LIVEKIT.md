@@ -1,7 +1,7 @@
 # LiveKit в sipjs-react: стенд, токены, проверка
 
 Заметки для AI-агентов: чем на самом деле является бэкенд встреч, как подключиться к комнате
-без AD, как проверить правку и какие грабли ломают прогоны. Правила проекта — в
+без REST-авторизации, как проверить правку и какие грабли ломают прогоны. Правила проекта — в
 `AGENTS.md`, потоки — в `docs/STATE.md`.
 
 ## Что где
@@ -18,13 +18,13 @@
   `uriLkToken` (эндпоинт выдачи) лежат в `localStorage` (`constants/storage.js`), dev-дефолты
   пишет корневой `index.html`. Токен выдаёт только `uriLkToken`: своя комната — `POST` с
   `num` = `room` = свой номер (кнопка «Создать» в `LkMeet`), приглашение — `num` приглашаемого и
-  `room` своей комнаты; токен LiveKit AD (`POST /user/ad`) не выдаёт.
+  `room` своей комнаты; запрос REST (`POST /user/ad`) токен LiveKit не выдаёт.
 - **Показ панели**: `lkControlRdcr.displayControl` — пункт меню «LiveKit Встреча» (панель `AuthPad`
   отвечает только за SIP-регистрацию). По ссылке-приглашению
   (`lk_token` в query) панель открывается сама, а гостю не показывают стартовый экран `AuthLinks`
   и модальную форму `PhoneReg` (оба флага снимают контейнеры по query, из меню форма регистрации
   доступна). Своя комната и приглашение доступны только при **живой SIP-регистрации**
-  (`phoneControlRdcr.regState === "ok"`; приглашение уходит SIP MESSAGE, AD для этого не нужен) —
+  (`phoneControlRdcr.regState === "ok"`; приглашение уходит SIP MESSAGE, REST для этого не нужен) —
   номер комнаты берётся из `callerUserNum`. Без регистрации и без токена в query `LkMeet`
   показывает информирующий текст про ссылку-приглашение.
 
@@ -67,7 +67,7 @@ node -e "const jwt=require('jsonwebtoken');console.log(jwt.sign({video:{roomJoin
 ```
 
 `video.room` — комната, `subject` — identity участника. Дальше достаточно открыть
-`http://localhost:<порт>/#/?lk_room=grid3&lk_token=<jwt>` — **AD и авторизация для этого не нужны**:
+`http://localhost:<порт>/#/?lk_room=grid3&lk_token=<jwt>` — **REST-авторизация для этого не нужна**:
 панель встречи открывается сама, стартовый экран «Войти» и форма SIP-регистрации гостю не
 показываются (встречу всегда можно открыть и пунктом меню «LiveKit Встреча»). Если Caddy лежит,
 перед загрузкой страницы подставить `localstorage-set uriLk ws://localhost:7880` и **перезагрузить
@@ -75,7 +75,7 @@ node -e "const jwt=require('jsonwebtoken');console.log(jwt.sign({video:{roomJoin
 
 ## Проверка в браузере
 
-Обёртка — `.dsh/bin/browser`, порядок и уровни — навык `ui-verify`. Короткий путь до панели без AD:
+Обёртка — `.dsh/bin/browser`, порядок и уровни — навык `ui-verify`. Короткий путь до панели без REST-авторизации:
 закрыть модальный `PhoneReg` → меню → «LiveKit Встреча» → `Escape` (закрыть drawer) →
 «Подключиться к …».
 
@@ -86,7 +86,7 @@ node -e "const jwt=require('jsonwebtoken');console.log(jwt.sign({video:{roomJoin
 - Тумблеры MUI `Switch` в этом проекте **не находятся** через `getByRole("checkbox", { name })`
   (проверено, локатор ждёт таймаут) — брать CSS:
   `page.locator('input[aria-label="Тумблер SIP регистрации"]')`.
-- AD-диалог закрывается сам на `AUTHCTL_SUBMIT_SUCCESS` (`displayAd: false`) — ждать «Мост к
+- REST-диалог закрывается сам на `AUTHCTL_SUBMIT_SUCCESS` (`displayRest: false`) — ждать «Мост к
   сервисам», а не текст успеха.
 - Сценарий — одной цепочкой в одном вызове `bash` (демон CLI живёт только внутри вызова), включая
   `open … run-code … close`.

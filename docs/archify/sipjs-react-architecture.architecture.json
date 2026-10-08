@@ -30,8 +30,8 @@
     {
       "id": "authView",
       "type": "frontend",
-      "label": "AuthLinks · AuthAd",
-      "sublabel": "формы AD",
+      "label": "AuthLinks · AuthRest",
+      "sublabel": "формы REST",
       "tag": "AUTHCTL_",
       "pos": [
         40,
@@ -81,7 +81,7 @@
         {
           "path": "src/actions/authControlActions.js",
           "line": 15,
-          "label": "handleAdRegister"
+          "label": "handleRestRegister"
         }
       ]
     },
@@ -89,7 +89,7 @@
       "id": "authRdcr",
       "type": "database",
       "label": "authControlRdcr",
-      "sublabel": "состояние AD",
+      "sublabel": "состояние REST",
       "tag": "AUTHCTL_",
       "pos": [
         810,
@@ -108,10 +108,10 @@
       ]
     },
     {
-      "id": "adSvc",
+      "id": "restSvc",
       "type": "backend",
-      "label": "adAuth",
-      "sublabel": "AD-сессия · ky",
+      "label": "restAuth",
+      "sublabel": "REST-сессия · ky",
       "pos": [
         1200,
         120
@@ -122,17 +122,17 @@
       ],
       "sources": [
         {
-          "path": "src/services/adAuth.js",
+          "path": "src/services/restAuth.js",
           "line": 52,
-          "label": "loginAd"
+          "label": "loginRest"
         }
       ]
     },
     {
-      "id": "adRes",
+      "id": "restRes",
       "type": "external",
-      "label": "AD-сервис",
-      "sublabel": "uriAdAuth · uriAdPhpAuth",
+      "label": "REST-сервис",
+      "sublabel": "uriRestAuth · uriRestPhpAuth",
       "pos": [
         1660,
         120
@@ -431,7 +431,7 @@
       "kind": "region",
       "label": "Сервисы",
       "wraps": [
-        "adSvc",
+        "restSvc",
         "phoneSvc",
         "lkSvc"
       ]
@@ -460,20 +460,20 @@
     {
       "id": "auth-domain",
       "from": "authAct",
-      "to": "adSvc",
+      "to": "restSvc",
       "label": "доменный API"
     },
     {
       "id": "auth-http",
-      "from": "adSvc",
-      "to": "adRes",
+      "from": "restSvc",
+      "to": "restRes",
       "label": "ky · POST"
     },
     {
       "id": "auth-state",
       "from": "authAct",
       "to": "authRdcr",
-      "label": "состояние AD",
+      "label": "состояние REST",
       "fromSide": "bottom",
       "toSide": "top",
       "labelDy": 30
@@ -488,9 +488,9 @@
     },
     {
       "id": "auth-keys",
-      "from": "adSvc",
+      "from": "restSvc",
       "to": "storage",
-      "label": "ключи AD",
+      "label": "ключи REST",
       "fromSide": "bottom",
       "toSide": "top"
     },
@@ -607,7 +607,7 @@
       "dot": "cyan",
       "title": "Три среза",
       "items": [
-        "AUTHCTL_ — AD-вход и сессия AD",
+        "AUTHCTL_ — REST-вход и сессия REST",
         "PHONECTL_ — SIP-регистрация, звонки и чат",
         "LKTOKEN_ · LKROOM_ · LK_ — токен, комнаты, приглашения",
         "Thunk-и не диспатчат чужой префикс"
@@ -619,7 +619,7 @@
       "items": [
         "UI → контейнеры → Redux → сервисы",
         "localStorage — общее хранилище трёх срезов",
-        "AD-сервис, SIP SBC и LiveKit SFU — внешние блоки вне слоёв"
+        "REST-сервис, SIP SBC и LiveKit SFU — внешние блоки вне слоёв"
       ]
     },
     {

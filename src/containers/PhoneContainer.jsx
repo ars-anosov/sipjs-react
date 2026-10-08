@@ -14,7 +14,7 @@ import PhonePad from "../components/PhonePad.jsx";
 import PhoneReg from "../components/PhoneReg.jsx";
 
 // Контейнер среза телефона: форма входа PhoneReg и рабочие блоки PhonePad/PhoneHistory/PhoneChat.
-// AD-вход (AuthAd) относится к authControlRdcr — его рендерит AuthContainer. Из чужого среза
+// REST-вход (AuthRest) относится к authControlRdcr — его рендерит AuthContainer. Из чужого среза
 // здесь читается только флаг показа панели встречи (подсветка кнопки LiveKit в PhonePad).
 const PhoneContainer = () => {
   const dispatch = useDispatch();

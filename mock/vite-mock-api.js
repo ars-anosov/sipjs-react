@@ -56,8 +56,8 @@ export const mockEndpoints = [
   {
     path: "/user/adphp",
     methods: ["GET"],
-    // Пробивка PHP-сессии (AuthContainer → handleAdPhpProbe): PHPSESSID приходит
-    // параметром строки запроса, без него живой сессии нет и форма AuthAd остаётся
+    // Пробивка PHP-сессии (AuthContainer → handleRestPhpProbe): PHPSESSID приходит
+    // параметром строки запроса, без него живой сессии нет и форма AuthRest остаётся
     handler(req, res) {
       const url = new URL(req.url, `http://${req.headers.host}`);
       const phpSessId = url.searchParams.get("PHPSESSID") || "";

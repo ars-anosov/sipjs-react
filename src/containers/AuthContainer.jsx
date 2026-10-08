@@ -5,9 +5,9 @@ import { bindActionCreators } from "redux";
 import * as authActions from "../actions/authControlActions.js";
 import * as lkActions from "../actions/lkControlActions.js";
 import * as phoneActions from "../actions/phoneControlActions.js";
-import AuthAd from "../components/AuthAd.jsx";
 import AuthLinks from "../components/AuthLinks.jsx";
 import AuthPad from "../components/AuthPad.jsx";
+import AuthRest from "../components/AuthRest.jsx";
 
 // Ключ пары SIP-реквизитов: защищает от повторных dispatch на каждый ререндер
 const buildSipKey = (sipUsername, sipSecret) => `${sipUsername}\u0000${sipSecret}`;
@@ -23,7 +23,7 @@ const AuthContainer = () => {
   const authControlActions = useMemo(() => bindActionCreators(authActions, dispatch), [dispatch]);
   const lkControlActions = useMemo(() => bindActionCreators(lkActions, dispatch), [dispatch]);
 
-  const { responseData, displayAd, displayAuthPad, status: authStatus, errComponent: authErrComponent, uriAdPhpAuth, phpProbe } = authControlRdcr;
+  const { responseData, displayRest, displayAuthPad, status: authStatus, errComponent: authErrComponent, uriRestPhpAuth, phpProbe } = authControlRdcr;
   const { callerUserNum, uriWebRtc, connectStatus, regState } = phoneControlRdcr;
 
   const isRegistered = regState === "ok";
@@ -37,7 +37,7 @@ const AuthContainer = () => {
   // Уже подставленная в PhoneReg пара sip_username / sip_secret
   const filledKeyRef = useRef("");
 
-  // Мост AUTHCTL_ → PHONECTL_: данные AD-входа заполняют форму PhoneReg
+  // Мост AUTHCTL_ → PHONECTL_: данные REST-входа заполняют форму PhoneReg
   useEffect(() => {
     if (!sipUsername || !sipSecret) {
       filledKeyRef.current = "";
@@ -84,27 +84,27 @@ const AuthContainer = () => {
     phoneControlActions.handleChangeStore("displayReg", true);
   };
 
-  const handleOpenAd = () => {
-    authControlActions.handleChangeStore("displayAd", true);
+  const handleOpenRest = () => {
+    authControlActions.handleChangeStore("displayRest", true);
   };
 
-  // Пробивка PHP-сессии идёт впереди формы AuthAd: пока запрос в пути, модальное окно
+  // Пробивка PHP-сессии идёт впереди формы AuthRest: пока запрос в пути, модальное окно
   // не монтируется — на экран оно попадает только при неуспехе пробивки. Уже пройденный
-  // AD (status не idle, в том числе успех) пробивать незачем: там форма нужна лишь для
+  // REST (status не idle, в том числе успех) пробивать незачем: там форма нужна лишь для
   // просмотра сеанса и выхода из него.
-  const isAdFormRequested = displayAd || authErrComponent === "AuthAd";
-  const needsAdPhpProbe = authStatus === "idle" && Boolean(uriAdPhpAuth);
-  const isAdPhpProbePending = needsAdPhpProbe && phpProbe !== "fail";
+  const isRestFormRequested = displayRest || authErrComponent === "AuthRest";
+  const needsRestPhpProbe = authStatus === "idle" && Boolean(uriRestPhpAuth);
+  const isRestPhpProbePending = needsRestPhpProbe && phpProbe !== "fail";
 
   useEffect(() => {
     // phpProbe != "idle" — пробивка одна на загрузку страницы: ни закрытие формы,
-    // ни выход из AD-сессии её не повторяют
-    if (!isAdFormRequested || !needsAdPhpProbe || phpProbe !== "idle") return;
+    // ни выход из REST-сессии её не повторяют
+    if (!isRestFormRequested || !needsRestPhpProbe || phpProbe !== "idle") return;
 
-    authControlActions.handleAdPhpProbe(uriAdPhpAuth);
-  }, [isAdFormRequested, needsAdPhpProbe, phpProbe, uriAdPhpAuth, authControlActions]);
+    authControlActions.handleRestPhpProbe(uriRestPhpAuth);
+  }, [isRestFormRequested, needsRestPhpProbe, phpProbe, uriRestPhpAuth, authControlActions]);
 
-  // Мост PHONECTL_ → AUTHCTL_: AuthAdInfo/LkMeet читают sip_username из authControlRdcr
+  // Мост PHONECTL_ → AUTHCTL_: AuthRestInfo/LkMeet читают sip_username из authControlRdcr
   useEffect(() => {
     if (!callerUserNum) return;
     if (!isRegistered && !connectStatus) return;
@@ -135,21 +135,21 @@ const AuthContainer = () => {
   }, [hasInvite, lkControlActions]);
 
   // Стартовый экран — ссылки на обе формы, пока ни одна авторизация не прошла.
-  // Дальше: успех AD → мост AuthPad, успешная SIP-регистрация → телефон PhonePad.
+  // Дальше: успех REST → мост AuthPad, успешная SIP-регистрация → телефон PhonePad.
   // Гость по ссылке-приглашению входит во встречу сразу, поэтому экран «Войти» ему
   // не показываем, а панель LkMeet открываем без похода в меню
   const showAuthLinks = authStatus !== "success" && regState !== "ok" && !hasInvite;
 
-  // Оба блока AD-домена: форма входа (displayAd) и мост к сервисам (displayAuthPad).
+  // Оба блока REST-домена: форма входа (displayRest) и мост к сервисам (displayAuthPad).
   // Форма — модальный Dialog (портал), в потоке документа она места не занимает
   return (
     <>
-      {showAuthLinks && <AuthLinks onOpenReg={handleOpenReg} onOpenAd={handleOpenAd} />}
+      {showAuthLinks && <AuthLinks onOpenReg={handleOpenReg} onOpenRest={handleOpenRest} />}
 
-      {isAdFormRequested && !isAdPhpProbePending && <AuthAd authControlRdcr={authControlRdcr} authControlActions={authControlActions} />}
+      {isRestFormRequested && !isRestPhpProbePending && <AuthRest authControlRdcr={authControlRdcr} authControlActions={authControlActions} />}
 
       {displayAuthPad && (
-        <AuthPad authControlRdcr={authControlRdcr} regState={regState} onToggleReg={handleToggleReg} onOpenAd={handleOpenAd} onClose={handleCloseAuthPad} />
+        <AuthPad authControlRdcr={authControlRdcr} regState={regState} onToggleReg={handleToggleReg} onOpenRest={handleOpenRest} onClose={handleCloseAuthPad} />
       )}
     </>
   );

@@ -320,7 +320,7 @@ function LkMeet(props) {
   const room = searchParams.get("lk_room") || "";
   const token = searchParams.get("lk_token") || "";
 
-  // Своя комната и приглашение опираются на живую SIP-регистрацию, а не на AD: приглашение
+  // Своя комната и приглашение опираются на живую SIP-регистрацию, а не на REST: приглашение
   // уходит SIP MESSAGE, и номер комнаты — зарегистрированный внутренний номер (callerUserNum)
   const ownNum = phoneControlRdcr?.callerUserNum || "";
   const isSipRegistered = phoneControlRdcr?.regState === "ok";

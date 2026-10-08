@@ -32,7 +32,7 @@ function PhoneReg(props) {
   const [uriWebRtc, setUriWebRtc] = useState(phoneControlRdcr.uriWebRtc);
   const [showPassword, setShowPassword] = useState(false);
 
-  // Синхронизация полей, когда authControlActions присылает новые данные SIP после AD-логина
+  // Синхронизация полей, когда authControlActions присылает новые данные SIP после REST-логина
   useEffect(() => {
     setCallerUserNum(phoneControlRdcr.callerUserNum || "");
     setRegUserPass(phoneControlRdcr.regUserPass || "");

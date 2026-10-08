@@ -1,6 +1,6 @@
 # sipjs-react
 
-WebRTC-телефон: SIP-клиент на [sip.js](https://sipjs.com/), видеовстречи на [LiveKit](https://livekit.io/) и авторизация через Active Directory (внешний AD-API).
+WebRTC-телефон: SIP-клиент на [sip.js](https://sipjs.com/), видеовстречи на [LiveKit](https://livekit.io/) и авторизация через внешний REST API.
 
 ![phone](img/phone.png)
 
@@ -82,9 +82,9 @@ node -e "console.log(require(process.env.HOME + '/.dsh/profiles/web/package.json
 ## Каркас
 
 ### MenuAppBar.jsx
-Меню и шапка приложения: пункты «SIP …» (`phoneControlRdcr`), «AD …» (`authControlRdcr`),
+Меню и шапка приложения: пункты «SIP …» (`phoneControlRdcr`), «REST …» (`authControlRdcr`),
 «LiveKit Встреча» (`lkControlRdcr`); в шапке — индикаторы `PhoneIco` и `AuthIco`, в drawer —
-панели `PhoneDir`, `PhonePad`, `AuthAdInfo`.
+панели `PhoneDir`, `PhonePad`, `AuthRestInfo`.
 
 ## Срез PHONECTL_
 
@@ -120,10 +120,10 @@ node -e "console.log(require(process.env.HOME + '/.dsh/profiles/web/package.json
 ## Срез AUTHCTL_
 
 ### AuthLinks.jsx
-Стартовый экран «Войти»: пока нет ни AD-сессии, ни SIP-регистрации.
+Стартовый экран «Войти»: пока нет ни REST-сессии, ни SIP-регистрации.
 
-### AuthAd.jsx
-Модальная форма AD-входа: `POST` на `uriAdAuth`, ожидаемый ответ:
+### AuthRest.jsx
+Модальная форма REST-входа: `POST` на `uriRestAuth`, ожидаемый ответ:
 
 ```json
 {
@@ -139,7 +139,7 @@ node -e "console.log(require(process.env.HOME + '/.dsh/profiles/web/package.json
 ### AuthIco.jsx
 Индикатор Auth-статуса.
 
-### AuthAdInfo.jsx
+### AuthRestInfo.jsx
 Сведения об Auth-сессии.
 
 ### AuthPad.jsx
