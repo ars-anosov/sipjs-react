@@ -78,23 +78,31 @@ const resolveEndpointsWebRtc = (endpointsWebRtc) => {
 // WebRTC transport с перебором эндпоинтов
 // ============================================================
 
-// Каждый connect() идёт на текущий эндпоинт; после неудачи следующий connect()
-// переключается на следующий адрес. Так работают и старт, и реконнект sip.js:
-// приложение само решает, сколько попыток сделать.
+const pickRandomEndpointIndex = (count, random = Math.random) => {
+  if (!Number.isInteger(count) || count <= 1) return 0;
+
+  const value = typeof random === "function" ? random() : Math.random();
+  const index = Number.isFinite(value) ? Math.floor(value * count) : 0;
+
+  return index >= 0 && index < count ? index : 0;
+};
+
+// Стартовый эндпоинт выбирается случайно; при неудаче следующий connect()
+// переключается на следующий адрес по списку. Так работают и старт, и
+// реконнект sip.js: приложение само решает, сколько попыток сделать.
 class EndpointsWebRtcTransport extends Web.Transport {
   constructor(logger, options = {}) {
-    const transportOptions = { ...options };
-    delete transportOptions.endpoints;
-
-    const endpoints = resolveEndpointsWebRtc(options.endpoints);
+    const { endpoints: configuredEndpoints, random, ...transportOptions } = options;
+    const endpoints = resolveEndpointsWebRtc(configuredEndpoints);
+    const endpointIndex = pickRandomEndpointIndex(endpoints.length, random);
 
     super(logger, {
       ...transportOptions,
-      server: endpoints[0],
+      server: endpoints[endpointIndex],
     });
 
     this.endpoints = endpoints;
-    this.endpointIndex = 0;
+    this.endpointIndex = endpointIndex;
     this.previousAttemptFailed = false;
   }
 
@@ -140,4 +148,4 @@ class EndpointsWebRtcTransport extends Web.Transport {
   }
 }
 
-export { DEFAULT_ENDPOINT_WEBRTC, EndpointsWebRtcTransport, normalizeEndpointWebRtc, parseEndpointsWebRtc, resolveEndpointsWebRtc };
+export { DEFAULT_ENDPOINT_WEBRTC, EndpointsWebRtcTransport, normalizeEndpointWebRtc, parseEndpointsWebRtc, pickRandomEndpointIndex, resolveEndpointsWebRtc };
