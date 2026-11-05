@@ -245,7 +245,7 @@ function MenuAppBar(props) {
         transformOrigin={{ vertical: "top", horizontal: "center" }}
       >
         <Box sx={{ p: 1 }}>
-          <Typography variant="body2">{phoneControlRdcr.uriWebRtc || ""}</Typography>
+          <Typography variant="body2">{phoneControlRdcr.domainWebRtc || ""}</Typography>
           <Divider />
           <PhonePad
             phoneControlRdcr={phoneControlRdcr}

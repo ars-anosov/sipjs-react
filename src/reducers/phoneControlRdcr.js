@@ -25,8 +25,9 @@ const getUnreadMissedCallsCount = (callsArr = []) =>
     return row?.read === false && flow.includes("in") && state.includes("lost");
   }).length;
 
-// Только UI-дефолты: сохранённые настройки (uriWebRtc, callerUserNum, useIce)
-// подставляет сид стора — store/preloadedState.js → preloadedState в configureStore.
+// Только UI-дефолты: сохранённые настройки (domainWebRtc, endpointsWebRtc,
+// callerUserNum, useIce) подставляет сид стора — store/preloadedState.js →
+// preloadedState в configureStore.
 export const initialState = {
   // --- UI ---
   // MenuAppBar
@@ -37,7 +38,10 @@ export const initialState = {
   displayHistory: false,
   displayChat: false,
   // PhoneReg form fields
-  uriWebRtc: "",
+  // SIP-домен для AOR (sip:<номер>@<домен>)
+  domainWebRtc: "",
+  // Список WebRTC-эндпоинтов; пусто — DEFAULT_ENDPOINT_WEBRTC
+  endpointsWebRtc: [],
   callerUserNum: "",
   regUserPass: "",
   useIce: true,

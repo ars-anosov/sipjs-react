@@ -17,13 +17,14 @@ import {
   PHONECTL_STORE_VALUE,
   PHONECTL_UNREGISTER,
 } from "../constants/redux";
+import { parseEndpointsWebRtc, resolveEndpointsWebRtc } from "../services/endpointsWebRtc";
 import { fetchPhoneDir, getStoredPhoneDirUri } from "../services/phoneDirectory";
 import {
   answerIncomingCall,
   createChatMessage,
-  getUriHostFromWebRtc,
   isSipConnected,
   isValidSipTarget,
+  normalizeDomainWebRtc,
   placeOutgoingCall,
   registerSipUserAgent,
   resetSipCall,
@@ -42,7 +43,8 @@ import {
   saveCallsArr,
   saveChatMessage,
   storeCallerUserNum,
-  storeUriWebRtc,
+  storeDomainWebRtc,
+  storeEndpointsWebRtc,
 } from "../services/phoneStorage";
 import { getApiErrorMessage } from "./utils/kyError";
 
@@ -139,18 +141,39 @@ const handleClkRegister = (formData, rdcr) => (dispatch) => {
     });
   };
 
-  const normalizedUriWebRtc = typeof formData.uriWebRtc === "string" ? formData.uriWebRtc.trim() : "";
+  const normalizedDomainWebRtc = typeof formData.domainWebRtc === "string" ? formData.domainWebRtc.trim() : "";
 
   // Checks
-  if (!normalizedUriWebRtc || !formData.callerUserNum || !formData.regUserPass) {
+  if (!normalizedDomainWebRtc || !formData.callerUserNum || !formData.regUserPass) {
     regAlert("Заполните все поля.");
     return;
   }
-  storeUriWebRtc(normalizedUriWebRtc);
+
+  // Пустое поле — использовать дефолтный эндпоинт; непустое, но целиком
+  // некорректное — не глотаем молча.
+  const rawEndpointsWebRtc = formData.endpointsWebRtc ?? rdcr.endpointsWebRtc;
+  const hasEndpointsWebRtcInput = Array.isArray(rawEndpointsWebRtc)
+    ? rawEndpointsWebRtc.length > 0
+    : typeof rawEndpointsWebRtc === "string" && rawEndpointsWebRtc.trim() !== "";
+  const normalizedEndpointsWebRtc = parseEndpointsWebRtc(rawEndpointsWebRtc);
+
+  if (hasEndpointsWebRtcInput && normalizedEndpointsWebRtc.length === 0) {
+    regAlert("Некорректный список WebRTC-эндпоинтов.");
+    return;
+  }
+
+  const resolvedEndpointsWebRtc = resolveEndpointsWebRtc(normalizedEndpointsWebRtc);
+
+  storeDomainWebRtc(normalizedDomainWebRtc);
+  storeEndpointsWebRtc(resolvedEndpointsWebRtc);
   storeCallerUserNum(formData.callerUserNum);
   dispatch({
     type: PHONECTL_STORE_VALUE,
-    payload: { storeDataKey: "uriWebRtc", storeDataValue: normalizedUriWebRtc },
+    payload: { storeDataKey: "domainWebRtc", storeDataValue: normalizedDomainWebRtc },
+  });
+  dispatch({
+    type: PHONECTL_STORE_VALUE,
+    payload: { storeDataKey: "endpointsWebRtc", storeDataValue: resolvedEndpointsWebRtc },
   });
   dispatch({
     type: PHONECTL_STORE_VALUE,
@@ -169,7 +192,8 @@ const handleClkRegister = (formData, rdcr) => (dispatch) => {
       formData: {
         callerUserNum: formData.callerUserNum,
         regUserPass: formData.regUserPass,
-        uriWebRtc: normalizedUriWebRtc,
+        domainWebRtc: normalizedDomainWebRtc,
+        endpointsWebRtc: resolvedEndpointsWebRtc,
         useIce: rdcr.useIce,
       },
       handlers: {
@@ -502,7 +526,7 @@ const handleSendMessage = (peerPhoneNum, messageBody, rdcr) => (dispatch) => {
     return;
   }
 
-  const uriHost = getUriHostFromWebRtc(rdcr.uriWebRtc);
+  const uriHost = normalizeDomainWebRtc(rdcr.domainWebRtc);
   if (!isValidSipTarget(peer, uriHost)) {
     chatAlert(`Некорректный SIP URI: sip:${peer}@${uriHost}`);
     return;
@@ -521,7 +545,7 @@ const handleSendInviteMessage = (inviteMessage, rdcr) => (dispatch) => {
 
   if (!peer || !body || !isSipConnected()) return;
 
-  const uriHost = getUriHostFromWebRtc(rdcr.uriWebRtc);
+  const uriHost = normalizeDomainWebRtc(rdcr.domainWebRtc);
   if (!isValidSipTarget(peer, uriHost)) {
     console.warn(`Некорректный SIP URI приглашения: sip:${peer}@${uriHost}`);
     return;

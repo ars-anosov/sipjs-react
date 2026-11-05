@@ -71,7 +71,8 @@ Linux-Chromium через обёртку; человеку показывать 
    - `phoneControlRdcr.regState` (`off`/`ok`/`fail`) — единственный флаг регистрации; тумблер
      `AuthPad` трёхпозиционный (`ok` зелёный, `fail` красный). Без настоящего SBC `regState: "ok"`
      даёт только заглушка SIP-over-WebSocket (одноразовый WS-сервер в
-     `.playwright/cache/tmpcheck/`, `uriWebRtc` → `ws://127.0.0.1:5080`): нужно эхо
+     `.playwright/cache/tmpcheck/`, `domainWebRtc` → `127.0.0.1`, `endpointsWebRtc` →
+     `["ws://127.0.0.1:5080"]`): нужно эхо
      `Sec-WebSocket-Protocol: sip` в рукопожатии, эхо `Contact` из REGISTER в 200 OK и парный
      `\r\n` на keep-alive — без любого из трёх sip.js рвёт соединение или дропает ответ. Тот же
      200 OK годится для MESSAGE (приглашение получит `delivered`). Удалять заглушку с остальными

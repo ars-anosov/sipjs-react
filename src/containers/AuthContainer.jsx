@@ -24,7 +24,7 @@ const AuthContainer = () => {
   const lkControlActions = useMemo(() => bindActionCreators(lkActions, dispatch), [dispatch]);
 
   const { responseData, displayRest, displayAuthPad, status: authStatus, errComponent: authErrComponent, uriRestPhpAuth, phpProbe } = authControlRdcr;
-  const { callerUserNum, uriWebRtc, connectStatus, regState } = phoneControlRdcr;
+  const { callerUserNum, domainWebRtc, connectStatus, regState } = phoneControlRdcr;
 
   const isRegistered = regState === "ok";
 
@@ -71,7 +71,7 @@ const AuthContainer = () => {
     if (isRegistered || connectStatus === "Request") return;
     if (!sipUsername || !sipSecret) return;
 
-    phoneControlActions.handleClkRegister({ callerUserNum: sipUsername, regUserPass: sipSecret, uriWebRtc }, phoneControlRdcr);
+    phoneControlActions.handleClkRegister({ callerUserNum: sipUsername, regUserPass: sipSecret, domainWebRtc }, phoneControlRdcr);
   };
 
   const handleCloseAuthPad = () => {

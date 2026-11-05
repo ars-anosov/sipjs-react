@@ -9,7 +9,7 @@ import {
   LKTOKEN_SUBMIT_SUCCESS,
 } from "../constants/redux";
 import { getLkTokenExpiresAt, removeStoredLkInvite, requestLkToken, storeLkInvite, storeLkTokenUri } from "../services/lkToken";
-import { getUriHostFromWebRtc, isSipConnected } from "../services/phoneRuntime";
+import { isSipConnected, normalizeDomainWebRtc } from "../services/phoneRuntime";
 import { getApiErrorMessage } from "./utils/kyError";
 
 const buildInviteSipMessageBody = (room, responseData) => {
@@ -22,7 +22,7 @@ const buildInviteSipMessageBody = (room, responseData) => {
   return `room=${room}`;
 };
 
-// uriWebRtc — данные чужого среза (phoneControlRdcr): thunk не читает стор напрямую,
+// domainWebRtc (SIP-домен) — данные чужого среза (phoneControlRdcr): thunk не читает стор напрямую,
 // мост между срезами делает контейнер и передаёт значение аргументом.
 const handleLkTokenSubmit =
   (formData = {}) =>
@@ -30,7 +30,7 @@ const handleLkTokenSubmit =
     const num = typeof formData.num === "string" ? formData.num.trim() : "";
     const room = typeof formData.room === "string" ? formData.room.trim() : "";
     const uriLkToken = typeof formData.uriLkToken === "string" ? formData.uriLkToken.trim() : "";
-    const uriWebRtc = typeof formData.uriWebRtc === "string" ? formData.uriWebRtc.trim() : "";
+    const domainWebRtc = typeof formData.domainWebRtc === "string" ? formData.domainWebRtc.trim() : "";
 
     if (!num || !room) {
       dispatch({
@@ -72,7 +72,7 @@ const handleLkTokenSubmit =
       // Отправку SIP MESSAGE с приглашением ведёт домен телефона (запись чата и статусы
       // доставки живут в phoneControlRdcr). Здесь только готовим текст со ссылкой и
       // возвращаем его вызывающему коду — мост LK_ → PHONECTL_ делает LkContainer.
-      const uriHost = getUriHostFromWebRtc(uriWebRtc);
+      const uriHost = normalizeDomainWebRtc(domainWebRtc);
       if (!isSipConnected() || !uriHost || !num) return null;
 
       return { num, body: buildInviteSipMessageBody(room, responseData) };

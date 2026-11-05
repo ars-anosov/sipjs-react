@@ -44,7 +44,7 @@
       "id": "storage",
       "type": "database",
       "label": "localStorage",
-      "sublabel": "uriWebRtc · callerUserNum"
+      "sublabel": "domainWebRtc · callerUserNum"
     },
     {
       "id": "rdcr",
@@ -74,8 +74,8 @@
     { "from": 677, "to": 805, "label": "Уход со страницы (F5)" }
   ],
   "messages": [
-    { "id": "submit", "from": "user", "to": "action", "y": 185, "label": "submit(uriWebRtc, num, pass)", "variant": "default" },
-    { "id": "store-settings", "from": "action", "to": "storage", "y": 213, "label": "uriWebRtc · callerUserNum", "variant": "default" },
+    { "id": "submit", "from": "user", "to": "action", "y": 185, "label": "submit(domainWebRtc, num, pass)", "variant": "default" },
+    { "id": "store-settings", "from": "action", "to": "storage", "y": 213, "label": "domainWebRtc · callerUserNum", "variant": "default" },
     { "id": "register-call", "from": "action", "to": "runtime", "y": 241, "label": "registerSipUserAgent(handlers)", "variant": "default" },
     { "id": "on-request", "from": "runtime", "to": "action", "y": 269, "label": "handlers.onConnectRequest", "variant": "default" },
     { "id": "connect-request", "from": "action", "to": "rdcr", "y": 297, "label": "CONNECT_REQUEST (regState=off)", "variant": "default" },
@@ -90,7 +90,7 @@
 
     { "id": "reg-lost", "from": "registerer", "to": "runtime", "y": 493, "label": "регистрация потеряна (Unregistered)", "variant": "default" },
     { "id": "reconnect-try", "from": "runtime", "to": "action", "y": 521, "label": "onReconnectTry → PHONECTL_RECONNECT_TRY", "variant": "default" },
-    { "id": "reconnect", "from": "runtime", "to": "registerer", "y": 549, "label": "reconnect(): до 2 попыток, пауза 4 с", "variant": "emphasis" },
+    { "id": "reconnect", "from": "runtime", "to": "registerer", "y": 549, "label": "reconnect(): по числу эндпоинтов, пауза 4 с", "variant": "emphasis" },
 
     { "id": "reject", "from": "registerer", "to": "runtime", "y": 577, "label": "401/403/таймаут", "variant": "return" },
     { "id": "on-error", "from": "runtime", "to": "action", "y": 605, "label": "handlers.onConnectError", "variant": "default" },
@@ -126,7 +126,7 @@
       "items": [
         "re-REGISTER до истечения expires шлёт сам sip.js — стор в этом не участвует",
         "потеря регистрации или обрыв WS: onConnectError + attemptReconnection",
-        "2 попытки, пауза 4 с; отказ регистрации гасит UserAgent через 3 с"
+        "попыток не меньше 2 (по числу эндпоинтов), пауза 4 с; отказ регистрации гасит UserAgent через 3 с"
       ]
     },
     {
@@ -142,8 +142,8 @@
       "dot": "emerald",
       "title": "Хранилище",
       "items": [
-        "uriWebRtc и callerUserNum пишет phoneStorage при submit",
-        "сид среза phoneControlRdcr: uriWebRtc · callerUserNum · useIce",
+        "domainWebRtc, endpointsWebRtc и callerUserNum пишет phoneStorage при submit",
+        "сид среза phoneControlRdcr: domainWebRtc · endpointsWebRtc · callerUserNum · useIce",
         "localStorage трогает только services/ — весь HTTP и ключи там же"
       ]
     }

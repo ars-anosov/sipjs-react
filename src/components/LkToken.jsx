@@ -16,13 +16,13 @@ function LkToken(props) {
   const handleSubmit = (event) => {
     event.preventDefault();
     if (!num.trim()) return;
-    // uriWebRtc — из чужого среза phoneControlRdcr: мост делает контейнер (LkContainer),
+    // domainWebRtc (SIP-домен) — из чужого среза phoneControlRdcr: мост делает контейнер (LkContainer),
     // thunk получает значение аргументом и не читает стор.
     lkControlActions.handleLkTokenSubmit({
       num,
       room,
       uriLkToken,
-      uriWebRtc: phoneControlRdcr?.uriWebRtc || "",
+      domainWebRtc: phoneControlRdcr?.domainWebRtc || "",
     });
   };
 

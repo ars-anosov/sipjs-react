@@ -1,5 +1,6 @@
 import { Inviter, Messager, Registerer, RegistererState, SessionState, UserAgent, Web } from "sip.js";
 
+import { EndpointsWebRtcTransport, resolveEndpointsWebRtc } from "./endpointsWebRtc";
 import { getChatMessageStatus, logCall, saveChatMessage, updateChatMessageStatus } from "./phoneStorage";
 
 const createPhoneRuntime = () => ({
@@ -7,6 +8,9 @@ const createPhoneRuntime = () => ({
   sessionOptions: null,
   userAgent: null,
   registerer: null,
+  sipDomain: "",
+  endpointsWebRtc: [],
+  endpointWebRtc: "",
   audioLocalIn: null,
   audioLocalOut: null,
   audioRemote: null,
@@ -312,18 +316,7 @@ const transmitSipMessage = ({ chatMessage, uriHost, onStatusChange }) => {
 // SIP.js High-Level Orchestration
 // ============================================================
 
-const getUriHostFromWebRtc = (uriWebRtc = "") => {
-  if (!uriWebRtc) {
-    return "";
-  }
-
-  try {
-    return new URL(uriWebRtc).hostname || "";
-  } catch {
-    const match = String(uriWebRtc).match(/^wss?:\/\/([^:/]+)/i);
-    return match?.[1] || "";
-  }
-};
+const normalizeDomainWebRtc = (domainWebRtc = "") => (typeof domainWebRtc === "string" ? domainWebRtc.trim() : "");
 
 const isSipConnected = () => Boolean(getPhoneRuntime().userAgent);
 
@@ -334,14 +327,18 @@ const isValidSipTarget = (peer, uriHost) => Boolean(UserAgent.makeURI(`sip:${pee
 // ------------------------------------------------------------
 
 const registerSipUserAgent = ({ formData, handlers }) => {
-  const { callerUserNum, regUserPass, uriWebRtc, useIce } = formData;
+  const { callerUserNum, regUserPass, domainWebRtc, endpointsWebRtc, useIce } = formData;
 
-  const uriHostFromWebRtc = getUriHostFromWebRtc(uriWebRtc);
-  const uriStr = `sip:${callerUserNum}@${uriHostFromWebRtc}`;
+  const sipDomain = normalizeDomainWebRtc(domainWebRtc);
+  const uriStr = `sip:${callerUserNum}@${sipDomain}`;
   const uri = UserAgent.makeURI(uriStr);
   if (!uri) {
     throw new Error(`UserAgent URI:${uriStr}`);
   }
+
+  // AOR строится от SIP-домена из domainWebRtc, а WebSocket может идти на любой
+  // эндпоинт из списка (round robin SBC).
+  const resolvedEndpointsWebRtc = resolveEndpointsWebRtc(endpointsWebRtc);
 
   const userAgentOptions = {
     uri,
@@ -349,8 +346,12 @@ const registerSipUserAgent = ({ formData, handlers }) => {
     authorizationPassword: regUserPass,
     displayName: callerUserNum,
     hackIpInContact: true,
+    transportConstructor: EndpointsWebRtcTransport,
     transportOptions: {
-      server: uriWebRtc,
+      // server — первый эндпоинт для валидации и начального лога;
+      // фактический WebSocket выбирает EndpointsWebRtcTransport из endpoints.
+      server: resolvedEndpointsWebRtc[0],
+      endpoints: resolvedEndpointsWebRtc,
       // Эти "/r/n/r/n" ломают OpenSIPS и это не нужно т.к. REGISTER все равно будет слать запросы перергистрации через expires.
       // Полагаемся на браузерный встроенный keep alive.
       // keepAliveInterval: 30,
@@ -402,11 +403,16 @@ const registerSipUserAgent = ({ formData, handlers }) => {
     sessionOptions,
     userAgent,
     registerer: null,
+    sipDomain,
+    endpointsWebRtc: resolvedEndpointsWebRtc,
+    endpointWebRtc: resolvedEndpointsWebRtc[0],
     incomingSession: null,
     outgoingSession: null,
   });
 
-  const reconnectionAttempts = 2;
+  // Попыток не меньше числа эндпоинтов: реконнект после обрыва должен успеть
+  // перебрать все адреса, а не только первые два.
+  const reconnectionAttempts = Math.max(2, resolvedEndpointsWebRtc.length);
   const reconnectionDelay = 4;
 
   let attemptingReconnection = false;
@@ -568,6 +574,8 @@ const registerSipUserAgent = ({ formData, handlers }) => {
   });
 
   userAgent.delegate.onConnect = () => {
+    setPhoneRuntime({ endpointWebRtc: userAgent.transport?.endpoint || "" });
+
     if (!connectionCtl.shouldBeConnected || registrationAccepted || registrationInFlight) {
       return;
     }
@@ -642,14 +650,16 @@ const registerSipUserAgent = ({ formData, handlers }) => {
     registrationInFlight = false;
     attemptingReconnection = false;
 
-    console.error("WebSocket disconnected:", error ? error.message : "unknown reason");
+    console.error("WebSocket disconnected:", error ? error.message : "unknown reason", `endpoint: ${userAgent.transport?.endpoint || "unknown"}`);
 
     handlers.onConnectError({
       phoneHeader: "Disconnected",
       icoHeader: "Disconnected",
     });
 
-    if (error && connectionCtl.shouldBeConnected) {
+    // Даже «чистое» закрытие сокета сервером — повод переподключиться,
+    // возможно уже к другому эндпоинту из списка.
+    if (connectionCtl.shouldBeConnected) {
       try {
         attemptReconnection();
       } catch (e) {
@@ -663,21 +673,35 @@ const registerSipUserAgent = ({ formData, handlers }) => {
     icoHeader: "UserAgent starting...",
   });
 
-  userAgent
-    .start()
-    .then(() => {
-      handlers.onRegisterStarted();
-    })
-    .catch((e) => {
-      console.error("userAgent.start() failed:", e.message || e);
-      connectionCtl.shouldBeConnected = false;
-      handlers.onConnectError({
-        phoneHeader: "SIP proxy WebSocket problem",
-        icoHeader: "SIP proxy WebSocket problem",
+  // Старт с перебором эндпоинтов: после неудачи transport переключается на
+  // следующий адрес, а reconnect() пытается установить соединение заново.
+  const startUserAgent = (attempt = 1) => {
+    const connectPromise = attempt === 1 ? userAgent.start() : userAgent.reconnect();
+
+    return connectPromise
+      .then(() => {
+        handlers.onRegisterStarted();
+      })
+      .catch((e) => {
+        const hasNextEndpoint = connectionCtl.shouldBeConnected && attempt < resolvedEndpointsWebRtc.length;
+
+        if (hasNextEndpoint) {
+          console.warn(`WebRTC endpoint ${attempt}/${resolvedEndpointsWebRtc.length} failed, trying next:`, e.message || e);
+          return startUserAgent(attempt + 1);
+        }
+
+        console.error("userAgent.start() failed:", e.message || e);
+        connectionCtl.shouldBeConnected = false;
+        handlers.onConnectError({
+          phoneHeader: "SIP proxy WebSocket problem",
+          icoHeader: "SIP proxy WebSocket problem",
+        });
+        handlers.onUnregistered();
+        resetPhoneRuntime();
       });
-      handlers.onUnregistered();
-      resetPhoneRuntime();
-    });
+  };
+
+  startUserAgent();
 };
 
 // ------------------------------------------------------------
@@ -738,8 +762,7 @@ const answerIncomingCall = () => {
 const placeOutgoingCall = (calleePhoneNum, { callerUserNum = "", onOutgoingSubmit, onCallLogUpdate, onCallEnded, onInviteError } = {}) => {
   const runtime = getPhoneRuntime();
 
-  const server = runtime.userAgentOptions?.transportOptions?.server || "";
-  const uriHost = getUriHostFromWebRtc(server);
+  const uriHost = runtime.sipDomain;
   const targetStr = `sip:${calleePhoneNum}@${uriHost}`;
   const target = UserAgent.makeURI(targetStr);
   if (!target) {
@@ -890,9 +913,9 @@ const setHold = (hold = true) => {
 export {
   answerIncomingCall,
   createChatMessage,
-  getUriHostFromWebRtc,
   isSipConnected,
   isValidSipTarget,
+  normalizeDomainWebRtc,
   placeOutgoingCall,
   registerSipUserAgent,
   resetSipCall,

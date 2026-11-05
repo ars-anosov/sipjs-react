@@ -100,7 +100,7 @@ flowchart LR
   подтверждённого ухода `pagehide` вызывает `handleUnregisterOnUnload()` → `unregisterSip()` —
   REGISTER с `Expires: 0` уходит сразу, ответа ждать некому; уход в bfcache
   (`persisted === true`) сессию не рвёт.
-- Хранилище: `uriWebRtc` и `callerUserNum` пишет `phoneStorage` при `handleClkRegister`; `useIce`
+- Хранилище: `domainWebRtc` и `callerUserNum` пишет `phoneStorage` при `handleClkRegister`; `useIce`
   только читается (`getStoredUseIce`, без ключа — `true`); сид среза собирает
   `store/preloadedState.js`.
 
@@ -113,9 +113,9 @@ sequenceDiagram
   participant Rdcr as phoneControlRdcr
   participant Runtime as phoneRuntime (sip.js)
 
-  User->>PhoneReg: submit(uriWebRtc, num, pass)
+  User->>PhoneReg: submit(domainWebRtc, num, pass)
   PhoneReg->>Action: handleClkRegister
-  Action->>LS: uriWebRtc · callerUserNum
+  Action->>LS: domainWebRtc · callerUserNum
   Action->>Runtime: registerSipUserAgent(handlers)
   Runtime->>Action: onConnectRequest
   Action->>Rdcr: PHONECTL_CONNECT_REQUEST (regState=off)

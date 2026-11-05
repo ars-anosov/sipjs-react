@@ -10,7 +10,10 @@
     <script type="text/javascript">
       // Dev-дефолты: заполняем только отсутствующие ключи, чтобы не затирать значения пользователя
       const devDefaults = {
-        uriWebRtc: 'wss://sbc.pecom.ru:9443',
+        // SIP-домен для AOR: sip:<номер>@sbc.pecom.ru
+        domainWebRtc: 'sbc.pecom.ru',
+        // Список WebRTC-эндпоинтов из round robin DNS: через запятую.
+        endpointsWebRtc: 'wss://sbc.pecom.ru:9443',
         useIce: 'true',
         uriRestAuth: 'http://localhost:3000/user/ad',
         uriRestPhpAuth: 'http://localhost:3000/user/adphp',

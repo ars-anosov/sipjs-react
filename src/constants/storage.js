@@ -9,7 +9,10 @@ export const REST_URI_AUTH_KEY = "uriRestAuth";
 export const REST_URI_PHP_AUTH_KEY = "uriRestPhpAuth";
 export const REST_LOGIN_KEY = "restLogin";
 
-export const PHONE_URI_WEBRTC_KEY = "uriWebRtc";
+export const PHONE_DOMAIN_WEBRTC_KEY = "domainWebRtc";
+// Список WebRTC-эндпоинтов (JSON-массив или строка через запятую).
+// Пусто — используется DEFAULT_ENDPOINT_WEBRTC.
+export const PHONE_ENDPOINTS_WEBRTC_KEY = "endpointsWebRtc";
 export const PHONE_CALLER_USER_NUM_KEY = "callerUserNum";
 export const PHONE_USE_ICE_KEY = "useIce";
 export const PHONE_URI_DIR_KEY = "uriPhoneDir";

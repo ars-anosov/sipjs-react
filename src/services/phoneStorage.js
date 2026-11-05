@@ -4,7 +4,8 @@ import {
   CHAT_MAX_MESSAGES,
   CHAT_STORAGE_KEY,
   PHONE_CALLER_USER_NUM_KEY,
-  PHONE_URI_WEBRTC_KEY,
+  PHONE_DOMAIN_WEBRTC_KEY,
+  PHONE_ENDPOINTS_WEBRTC_KEY,
   PHONE_USE_ICE_KEY,
 } from "../constants/storage";
 
@@ -12,10 +13,25 @@ import {
 // Phone Settings Persistence
 // ============================================================
 
-const getStoredUriWebRtc = () => localStorage.getItem(PHONE_URI_WEBRTC_KEY) || "";
+const getStoredDomainWebRtc = () => localStorage.getItem(PHONE_DOMAIN_WEBRTC_KEY) || "";
 
-const storeUriWebRtc = (uriWebRtc) => {
-  localStorage.setItem(PHONE_URI_WEBRTC_KEY, uriWebRtc);
+const storeDomainWebRtc = (domainWebRtc) => {
+  localStorage.setItem(PHONE_DOMAIN_WEBRTC_KEY, domainWebRtc);
+};
+
+// Сырое значение (JSON-массив или список через запятую): разбирает сервис
+// endpointsWebRtc, чтобы хранилище не зависело от его формата.
+const getStoredEndpointsWebRtc = () => localStorage.getItem(PHONE_ENDPOINTS_WEBRTC_KEY) || "";
+
+const storeEndpointsWebRtc = (endpointsWebRtc = []) => {
+  const hasEndpoints = Array.isArray(endpointsWebRtc) && endpointsWebRtc.length > 0;
+
+  if (hasEndpoints) {
+    localStorage.setItem(PHONE_ENDPOINTS_WEBRTC_KEY, JSON.stringify(endpointsWebRtc));
+    return;
+  }
+
+  localStorage.removeItem(PHONE_ENDPOINTS_WEBRTC_KEY);
 };
 
 const getStoredCallerUserNum = () => localStorage.getItem(PHONE_CALLER_USER_NUM_KEY) || "";
@@ -195,7 +211,8 @@ export {
   clearChatMessages,
   getChatMessageStatus,
   getStoredCallerUserNum,
-  getStoredUriWebRtc,
+  getStoredDomainWebRtc,
+  getStoredEndpointsWebRtc,
   getStoredUseIce,
   loadCallsArr,
   loadChatMessages,
@@ -204,6 +221,7 @@ export {
   saveCallsArr,
   saveChatMessage,
   storeCallerUserNum,
-  storeUriWebRtc,
+  storeDomainWebRtc,
+  storeEndpointsWebRtc,
   updateChatMessageStatus,
 };

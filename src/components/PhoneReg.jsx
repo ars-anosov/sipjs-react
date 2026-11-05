@@ -29,15 +29,17 @@ function PhoneReg(props) {
 
   const [callerUserNum, setCallerUserNum] = useState(phoneControlRdcr.callerUserNum);
   const [regUserPass, setRegUserPass] = useState(phoneControlRdcr.regUserPass);
-  const [uriWebRtc, setUriWebRtc] = useState(phoneControlRdcr.uriWebRtc);
+  const [domainWebRtc, setDomainWebRtc] = useState(phoneControlRdcr.domainWebRtc);
+  const [endpointsWebRtc, setEndpointsWebRtc] = useState((phoneControlRdcr.endpointsWebRtc || []).join("\n"));
   const [showPassword, setShowPassword] = useState(false);
 
   // Синхронизация полей, когда authControlActions присылает новые данные SIP после REST-логина
   useEffect(() => {
     setCallerUserNum(phoneControlRdcr.callerUserNum || "");
     setRegUserPass(phoneControlRdcr.regUserPass || "");
-    setUriWebRtc(phoneControlRdcr.uriWebRtc || "");
-  }, [phoneControlRdcr.callerUserNum, phoneControlRdcr.regUserPass, phoneControlRdcr.uriWebRtc]);
+    setDomainWebRtc(phoneControlRdcr.domainWebRtc || "");
+    setEndpointsWebRtc((phoneControlRdcr.endpointsWebRtc || []).join("\n"));
+  }, [phoneControlRdcr.callerUserNum, phoneControlRdcr.regUserPass, phoneControlRdcr.domainWebRtc, phoneControlRdcr.endpointsWebRtc]);
 
   const handleClose = () => {
     phoneControlActions.handleChangeStore("displayReg", false);
@@ -51,7 +53,7 @@ function PhoneReg(props) {
     event.preventDefault();
     // Пустые поля не глотаем: валидацию и алерт «Заполните все поля.» даёт handleClkRegister.
     // Это важно после разрегистрации — пароль в форме не хранится (PHONECTL_CONNECT_SUCCESS).
-    phoneControlActions.handleClkRegister({ callerUserNum, regUserPass, uriWebRtc }, phoneControlRdcr);
+    phoneControlActions.handleClkRegister({ callerUserNum, regUserPass, domainWebRtc, endpointsWebRtc }, phoneControlRdcr);
   };
 
   const handleUnregister = () => {
@@ -186,12 +188,39 @@ function PhoneReg(props) {
               fullWidth
               required
               disabled={isRegistered}
-              id="uriWebRtc"
-              label="WebRTC URI (Dev Only)"
+              id="domainWebRtc"
+              label="SIP-домен (Dev Only)"
+              placeholder="sbc.pecom.ru"
               variant="outlined"
               size="small"
-              value={uriWebRtc}
-              onChange={(e) => setUriWebRtc(e.target.value)}
+              value={domainWebRtc}
+              onChange={(e) => setDomainWebRtc(e.target.value)}
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Dns color="action" style={{ fontSize: 18 }} />
+                    </InputAdornment>
+                  ),
+                },
+              }}
+            />
+          )}
+
+          {/* WebRTC-эндпоинты из round robin списка (Dev Only): пусто — дефолт */}
+          {import.meta.env.DEV && (
+            <TextField
+              fullWidth
+              disabled={isRegistered}
+              id="endpointsWebRtc"
+              label="WebRTC Endpoints (Dev Only)"
+              variant="outlined"
+              size="small"
+              multiline
+              minRows={2}
+              value={endpointsWebRtc}
+              onChange={(e) => setEndpointsWebRtc(e.target.value)}
+              helperText="По одному URL в строке или через запятую; пусто — wss://sbc.pecom.ru:9443"
               slotProps={{
                 input: {
                   startAdornment: (
@@ -250,7 +279,8 @@ PhoneReg.propTypes = {
   phoneControlRdcr: PropTypes.shape({
     callerUserNum: PropTypes.string,
     regUserPass: PropTypes.string,
-    uriWebRtc: PropTypes.string,
+    domainWebRtc: PropTypes.string,
+    endpointsWebRtc: PropTypes.arrayOf(PropTypes.string),
     regState: PropTypes.oneOf(["off", "ok", "fail"]),
     errComponent: PropTypes.string,
     errText: PropTypes.string,
