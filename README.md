@@ -15,6 +15,7 @@ npm install
 npm run dev     # Vite dev-сервер: http://localhost:3000 (host 0.0.0.0)
 npm run build   # сборка в dist
 npm run serve   # предпросмотр сборки: http://localhost:4173 (vite preview, host 0.0.0.0)
+npm run deploy  # сборка + публикация на GitHub Pages (ветка gh-pages)
 ```
 
 Проверки и форматирование — Biome (`format` и `check` пишут правки в файлы):
@@ -26,6 +27,18 @@ npm run check   # линт + форматирование с записью
 ```
 
 В dev-режиме Vite поднимает мок-API.
+
+## Публикация (GitHub Pages)
+
+Сайт — <https://ars-anosov.github.io/sipjs-react/>, источник GitHub Pages — ветка `gh-pages`
+(Settings → Pages). Ветку целиком пересобирает `npm run deploy` (`scripts/deploy.mjs`): приложение
+из `dist/` — в корень, диаграммы `docs/archify/` — в `/archify/`, оглавление `docs/index.html` —
+в `/docs/`, плюс `.nojekyll`. Ветка «сирота» и генерируется заново, поэтому push принудительный;
+`main` и рабочее дерево скрипт не меняет.
+
+Флаги: `--no-build` (публиковать уже собранный `dist/` без пересборки), `--dry-run` (показать
+состав публикации), `--allow-dirty` (разрешить незакоммиченные правки отслеживаемых файлов —
+по умолчанию скрипт их не пропускает, чтобы на сайте не оказалось кода вне коммита).
 
 ## Настройки SIP
 
@@ -170,14 +183,17 @@ node -e "console.log(require(process.env.HOME + '/.dsh/profiles/web/package.json
 
 # Документация
 
+Приложение: <https://ars-anosov.github.io/sipjs-react/> · оглавление документации:
+<https://ars-anosov.github.io/sipjs-react/docs/>
+
 [![Архитектура](docs/archify/sipjs-react-architecture.visual-check.2048x1320.light.png)](https://ars-anosov.github.io/sipjs-react/archify/sipjs-react-architecture.html)
 
 [![SIP регистрация](docs/archify/sipjs-react-sip-store.visual-check.2048x1320.light.png)](https://ars-anosov.github.io/sipjs-react/archify/sipjs-react-sip-store.html)
 
 [![LiveKit комнаты](docs/archify/sipjs-react-livekit-store.visual-check.2048x1320.light.png)](https://ars-anosov.github.io/sipjs-react/archify/sipjs-react-livekit-store.html)
 
-
-Все документы: <https://ars-anosov.github.io/sipjs-react/>
+Текстовые документы — в репозитории: [docs/STATE.md](docs/STATE.md) (архитектура и Mermaid-схемы),
+[docs/LIVEKIT.md](docs/LIVEKIT.md) (локальный LiveKit-стенд, токены).
 
 ## Генерация archify-документации
 
