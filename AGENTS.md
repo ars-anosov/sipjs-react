@@ -17,7 +17,8 @@ date-fns. Только JavaScript, форматирование — Biome. Те�
   `npm run build` — сборка в `dist`; `npm run serve` — preview, порт из вывода (по умолчанию 4173).
 - `npm run deploy` — `vite build` + публикация `dist/` пакетом `gh-pages` в ветку `gh-pages`
   (источник Pages): приложение в корне, документация в `/docs/` и `/archify/` (в сборку её кладёт
-  плагин `githubPagesDocs` из `vite.config.js`); история ветки сохраняется, `main` не меняется.
+  плагин `githubPagesDocs` из `vite.config.js`); `gh-pages-clean` обязателен — кэш клона ломает
+  публикацию, если ветку удалили. История ветки сохраняется, `main` не меняется.
 - `npm run lint` — только проверка; `npm run format`/`npm run check` **перезаписывают файлы**.
 - CI (`.github/workflows/ci.yml`): push в `main`/`master` — `npm ci` + `npm run build`.
 

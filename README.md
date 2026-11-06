@@ -31,9 +31,16 @@ npm run check   # линт + форматирование с записью
 ## Публикация (GitHub Pages)
 
 Сайт — <https://ars-anosov.github.io/sipjs-react/>, источник GitHub Pages — ветка `gh-pages`
-(Settings → Pages). `npm run deploy` = `vite build` + публикация готового `dist/` пакетом
-[gh-pages](https://github.com/tschaub/gh-pages): приложение — в корне, диаграммы — в `/archify/`,
-оглавление документации — в `/docs/`, `.nojekyll` создаёт сам `gh-pages` (`--nojekyll`).
+(Settings → Pages). `npm run deploy` = `vite build && gh-pages-clean && gh-pages -d dist --nojekyll`:
+публикуется готовый `dist/` пакетом [gh-pages](https://github.com/tschaub/gh-pages) — приложение в
+корне, диаграммы в `/archify/`, оглавление документации в `/docs/`, `.nojekyll` создаёт сам пакет.
+
+`gh-pages-clean` перед публикацией обязателен: gh-pages кэширует клон ветки с refspec на
+`gh-pages`, и если ветку удалили, следующий деплой падает на `git fetch` с `fatal: couldn't find
+remote ref refs/heads/gh-pages`. Кэш — shallow-клон (единицы мегабайт), чистить его каждый раз
+дешевле, чем разбирать это состояние. Если ветки нет, gh-pages создаёт её заново, но клонирует
+`main` и не удаляет dot-файлы — после такого пересоздания в ветке остаются исходники проекта, их
+надо убрать отдельным коммитом.
 
 Документация попадает в сборку плагином `githubPagesDocs` из `vite.config.js`: на `closeBundle` он
 копирует `docs/archify/` (без служебных `.visual-check.*`) и `docs/index.html` в `dist/`, поэтому
