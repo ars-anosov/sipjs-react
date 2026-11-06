@@ -31,14 +31,14 @@ npm run check   # линт + форматирование с записью
 ## Публикация (GitHub Pages)
 
 Сайт — <https://ars-anosov.github.io/sipjs-react/>, источник GitHub Pages — ветка `gh-pages`
-(Settings → Pages). Ветку целиком пересобирает `npm run deploy` (`scripts/deploy.mjs`): приложение
-из `dist/` — в корень, диаграммы `docs/archify/` — в `/archify/`, оглавление `docs/index.html` —
-в `/docs/`, плюс `.nojekyll`. Ветка «сирота» и генерируется заново, поэтому push принудительный;
-`main` и рабочее дерево скрипт не меняет.
+(Settings → Pages). `npm run deploy` = `vite build` + публикация готового `dist/` пакетом
+[gh-pages](https://github.com/tschaub/gh-pages): приложение — в корне, диаграммы — в `/archify/`,
+оглавление документации — в `/docs/`, `.nojekyll` создаёт сам `gh-pages` (`--nojekyll`).
 
-Флаги: `--no-build` (публиковать уже собранный `dist/` без пересборки), `--dry-run` (показать
-состав публикации), `--allow-dirty` (разрешить незакоммиченные правки отслеживаемых файлов —
-по умолчанию скрипт их не пропускает, чтобы на сайте не оказалось кода вне коммита).
+Документация попадает в сборку плагином `githubPagesDocs` из `vite.config.js`: на `closeBundle` он
+копирует `docs/archify/` (без служебных `.visual-check.*`) и `docs/index.html` в `dist/`, поэтому
+`npm run build` + `npm run serve` показывают те же разделы, что и сайт. `gh-pages` дописывает
+коммит в существующую ветку — история деплоев сохраняется; `main` не меняется.
 
 ## Настройки SIP
 
